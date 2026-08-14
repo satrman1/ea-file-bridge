@@ -11,15 +11,32 @@
 // zde NEZAKLADAJI (GUI fallback = az iterace 1, klonem vzoru).
 //
 // PRED SPUSTENIM:
-//   - uprav SRC_DIR na cestu klonu repa na teto stanici
 //   - v Project Browseru OZNAC package, kam ma element patrit (jen pri
 //     prvnim zalozeni; kdyz uz element existuje, vyber se ignoruje)
+//   - SRC_DIR se resi samo: zkusi obvykle cesty, jinak se zepta dialogem
+//     (zadava se cesta ke slozce src\ klonu) - soubor neni treba editovat
 // Spusteni: Specialize > Scripting > novy JScript > vlozit > Run.
 // PO DOBEHNUTI: spustit/restartovat pumpu (kod se cte pri attachi).
 // ============================================================================
 
-var SRC_DIR = "C:\\GIT\\ea-file-bridge\\src\\"; // <-- upravit dle klonu!
+// Kandidati na slozku src\ klonu (v poradi); kdyz zadny neexistuje,
+// skript se zepta dialogem. Diky tomu se soubor needituje -> zadny diff
+// pri kazdem pullu v bance.
+var SRC_CANDIDATES = [
+    "C:\\GIT\\ea-file-bridge\\src\\",
+    "D:\\GIT\\ea-file-bridge\\src\\"
+];
 var ADDIN_NAME = "AICodeBridge";
+
+function resolveSrcDir(fso) {
+    for (var i = 0; i < SRC_CANDIDATES.length; i++) {
+        if (fso.FolderExists(SRC_CANDIDATES[i])) { return SRC_CANDIDATES[i]; }
+    }
+    var p = "" + Session.Input("Slozka src klonu nenalezena na obvyklych cestach. Zadej plnou cestu ke slozce src (napr. C:\\GIT\\ea-file-bridge\\src):");
+    p = p.replace(/^\s+|\s+$/g, "");
+    if (p != "" && p.charAt(p.length - 1) != "\\") { p = p + "\\"; }
+    return p;
+}
 
 // Operace + poradi parametru (loader pumpy se ridi Position!)
 var SIG = [
@@ -27,6 +44,7 @@ var SIG = [
     { n: "FB_JsonParse",       p: ["text"] },
     { n: "FB_JsonStringify",   p: ["v"] },
     { n: "FB_XmlRows",         p: ["xml"] },
+    { n: "FB_RepoId",          p: ["Repository"] },
     { n: "FB_OpPing",          p: ["Repository", "op"] },
     { n: "FB_OpQuery",         p: ["Repository", "op"] },
     { n: "FB_OpCreateElement", p: ["Repository", "op", "reqId"] },
@@ -61,10 +79,12 @@ function main() {
     Session.Output("=== ITAN-Bootstrap File Bridge ===");
 
     var fso = new ActiveXObject("Scripting.FileSystemObject");
-    if (!fso.FolderExists(SRC_DIR)) {
-        Session.Output("CHYBA: slozka src nenalezena: " + SRC_DIR + " - uprav SRC_DIR v hlavicce skriptu.");
+    var SRC_DIR = resolveSrcDir(fso);
+    if (SRC_DIR == "" || !fso.FolderExists(SRC_DIR)) {
+        Session.Output("CHYBA: slozka src nenalezena: " + SRC_DIR + " - spust znovu a zadej platnou cestu.");
         return;
     }
+    Session.Output("Slozka src: " + SRC_DIR);
 
     // 1) element
     var el = findAddin();

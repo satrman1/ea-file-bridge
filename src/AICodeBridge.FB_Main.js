@@ -12,14 +12,18 @@ try {
 }
 var reqId = "" + ((req && req.id) || ("noid-" + (new Date()).getTime()));
 resp.id = reqId;
-resp.repository = "" + Repository.ConnectionString;
+// repository = identita dle FB_RepoId (MS SQL: nazev DB; lokalni fallback
+// ConnectionString); connection = cesta pripojeni - v response je videt oboji.
+resp.repository = "" + this.FB_RepoId(Repository);
+resp.connection = "" + Repository.ConnectionString;
 // Volitelna (v copilot-instructions povinna) deklarace ciloveho repozitare:
-// request.repo = podretezec ConnectionString. Pri neshode se NIC neprovede
-// (ani audit - do ciziho repozitare se nezapisuje ani carka).
-// Kryje scenar "davka pro TEST zpracovana v PROD" (klon) - klon ma shodne
-// GUIDy i whitelist kod, rozhodnout muze jen deklarace v samotne davce.
+// request.repo = podretezec identity dle FB_RepoId (u MS SQL nazev databaze).
+// Pri neshode se NIC neprovede (ani audit - do ciziho repozitare se
+// nezapisuje ani carka). Kryje scenar "davka pro TEST zpracovana v PROD"
+// (klon) - klon ma shodne GUIDy i whitelist kod, rozhodnout muze jen
+// deklarace v samotne davce.
 if (req.repo) {
-    var cs = ("" + Repository.ConnectionString).toUpperCase();
+    var cs = ("" + resp.repository).toUpperCase();
     if (cs.indexOf(("" + req.repo).toUpperCase()) < 0) {
         resp.code = "E_REPO";
         resp.message = "Davka je urcena pro repozitar '" + req.repo + "', pripojeny je jiny. Nic nebylo provedeno.";

@@ -1,6 +1,6 @@
 # Nasazení EA File Bridge do banky — fáze 2 (klikací postup)
 
-2026-08-14 · Předpoklad: generálka doma kompletní (všech 6 předpokladů POC ✅, protokol vyhodnocení v0.5) · Cíl: tentýž tracer bullet proti testovacímu repozitáři **`<TEST-DB>`** s GitHub Copilotem jako driverem
+2026-08-14 · Předpoklad: generálka doma kompletní (všech 6 předpokladů POC ✅, protokol vyhodnocení v0.5) · Cíl: tentýž tracer bullet proti testovacímu repozitáři **`<TEST-DB>`** s GitHub Copilotem jako driverem · **Aktualizace pro bridge v0.2:** identita repozitáře = název databáze (`FB_RepoId`), už NE connection string / název `.qea` zástupce — whitelist i `repo` v dávkách se píší jako `<TEST-DB>` a fungují na každé stanici (upgrade z v0.1 viz §6)
 
 > Placeholdery: `<TEST-DB>` / `<PROD-DB>` = skutečné názvy testovací a produkční databáze repozitáře. Do tohoto repa (GitHub) nepatří — reálné hodnoty viz interní poznámky projektu; dosazují se až lokálně při nasazení a necommitují se.
 
@@ -27,12 +27,11 @@
        { repo: "<TEST-DB>", pkg: "{GUID-#FB-TEST-z-kroku-2}" }
    ];
    ```
-   (`repo` = podřetězec connection stringu; název databáze stačí. Ulož.)
+   (`repo` = od v0.2 podřetězec **názvu databáze** — executor si ho zjistí sám přes `DB_NAME()`, takže nezáleží na názvu `.qea` zástupce ani cestě. Ulož.)
 4. **Bootstrap executoru:** v EA (`<TEST-DB>`):
    - v Project Browseru **označ package**, kam má patřit element AICodeBridge (např. vedle #FB-TEST),
    - Specialize → Scripting → nový **JScript** → vlož obsah `<KLON>\scripts\ITAN-Bootstrap File Bridge.js`,
-   - v hlavičce uprav `SRC_DIR` na `<KLON>\src\`,
-   - Run. Výstup má hlásit založení elementu + `OK` pro 15 operací.
+   - Run (cestu ke složce `src` skript najde sám na obvyklých cestách, jinak se zeptá dialogem — nic se needituje). Výstup má hlásit založení elementu + `OK` pro 16 operací.
 5. **Copilot instrukce:** zkopíruj `<KLON>\docs\copilot-instructions-eafb.md` jako `<KLON>\.github\copilot-instructions.md` a uvnitř dosaď skutečnou hodnotu `repo` (= `<TEST-DB>`).
 
 ## 3. Spuštění a smoke test (~5 minut)
@@ -44,7 +43,7 @@
    { "protocol": "eafb/0.1", "id": "smoke-01", "repo": "<TEST-DB>",
      "ops": [ { "op": "ping", "echo": "banka" } ] }
    ```
-   Do ~2 s má v `responses\` být `res-smoke.json` se `status:"done"` a polem `repository` obsahujícím `<TEST-DB>`.
+   Do ~2 s má v `responses\` být `res-smoke.json` se `status:"done"` a polem `repository` = **`<TEST-DB>`** (název databáze; pole `connection` vedle toho informativně ukazuje cestu připojení).
 
 ## 4. Průchod fáze 2 (Copilot jako driver — P3 naostro)
 
@@ -65,6 +64,16 @@
 ## 5. Po průchodu
 
 Výsledky nadiktovat Claudovi → protokol vyhodnocení (finální GO/NO-GO na iterace 1+2) → fáze 3 (přenosové primitivy M365: E2E za studena s ručním přenosem, zaznamenat `(1)` varianty názvů při opakovaném stažení).
+
+## 6. Upgrade z v0.1 na v0.2 (pokud už fáze 2 běžela na v0.1)
+
+Fáze 2 na v0.1 běžela s provizorním whitelistem na název `.qea` zástupce. Přechod na v0.2 (~5 minut):
+
+1. Aktualizuj klon repa (obvyklý sync/pull).
+2. `src\AICodeBridge.FB_Whitelist.js` v klonu: položku `repo` přepiš z názvu zástupce na **`<TEST-DB>`** (název databáze). Lokální úprava, necommituje se.
+3. EA (`<TEST-DB>`) → Scripting → spusť **`scripts/ITAN-Bootstrap File Bridge.js`** (idempotentní — doplní novou operaci `FB_RepoId` a nahraje aktuální kód všech operací; obyčejný inject novou operaci nezaloží, jen na ni upozorní).
+4. Restartuj pumpu. Smoke ping (§3.3) — `repository` v response musí být `<TEST-DB>`.
+5. Dávky od teď deklarují `"repo": "<TEST-DB>"` — uprav i lokální `.github\copilot-instructions.md`, pokud tam byl název zástupce.
 
 ## Troubleshooting (nejčastější)
 

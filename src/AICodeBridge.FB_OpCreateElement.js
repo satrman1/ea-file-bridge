@@ -24,11 +24,11 @@ if (pkg == null) {
     return { op: "create_element", status: "error", code: "E_NOT_FOUND", message: "Package nenalezen: " + ref };
 }
 // --- whitelist (vynuceno v kodu, jedine misto pravdy = FB_Whitelist) ---
-// Polozka = { repo: podretezec ConnectionString, pkg: "{GUID}" }.
-// Nejdriv se overi INSTANCE repozitare (klon ma shodne GUIDy, ale jiny
-// connection string), teprve pak package.
+// Polozka = { repo: podretezec identity dle FB_RepoId, pkg: "{GUID}" }.
+// Nejdriv se overi INSTANCE repozitare (klon ma shodne GUIDy, ale jinou
+// identitu - u MS SQL nazev DB), teprve pak package.
 var wl = this.FB_Whitelist();
-var cs = ("" + Repository.ConnectionString).toUpperCase();
+var cs = ("" + this.FB_RepoId(Repository)).toUpperCase();
 var pguid = ("" + pkg.PackageGUID).toUpperCase();
 var repoKnown = false;
 var allowed = false;
@@ -40,7 +40,7 @@ for (var i = 0; i < wl.length; i++) {
 }
 if (!repoKnown) {
     return { op: "create_element", status: "error", code: "E_REPO",
-        message: "Pripojeny repozitar neni ve whitelistu - zapis zamitnut. Pripojeno: " + Repository.ConnectionString };
+        message: "Pripojeny repozitar neni ve whitelistu - zapis zamitnut. Identita: " + this.FB_RepoId(Repository) + " | Pripojeni: " + Repository.ConnectionString };
 }
 if (!allowed) {
     return { op: "create_element", status: "error", code: "E_WHITELIST",

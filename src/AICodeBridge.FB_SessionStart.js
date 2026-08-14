@@ -7,13 +7,15 @@ var ver = "FB " + d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.
     + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
 var wl = this.FB_Whitelist();
 var pi = Repository.GetProjectInterface();
-var cs = ("" + Repository.ConnectionString).toUpperCase();
+// identita repozitare dle FB_RepoId (MS SQL: nazev DB; lokalni .qea: fallback
+// ConnectionString) - NE cesta k zastupci, viz komentar ve FB_RepoId
+var rid = ("" + this.FB_RepoId(Repository)).toUpperCase();
 var done = 0, fail = 0, skipped = 0, lastErr = "";
 for (var i = 0; i < wl.length; i++) {
     var w = wl[i];
-    // baseline jen pro polozky patrici PRIPOJENEMU repozitari (klon = jiny
-    // connection string -> polozka se preskoci a nahlas se to do konzole)
-    if (cs.indexOf(("" + w.repo).toUpperCase()) < 0) { skipped++; continue; }
+    // baseline jen pro polozky patrici PRIPOJENEMU repozitari (klon = jina
+    // identita -> polozka se preskoci a nahlas se to do konzole)
+    if (rid.indexOf(("" + w.repo).toUpperCase()) < 0) { skipped++; continue; }
     try {
         pi.CreateBaseline(pi.GUIDtoXML("" + w.pkg), ver, "EA File Bridge - auto-baseline pri startu session pumpy");
         done++;
@@ -27,7 +29,7 @@ var out = "Session baseline: " + done + " vytvoren"
     + (skipped > 0 ? (", " + skipped + " preskocen (jiny repozitar!)") : "")
     + " [" + ver + "]";
 if (done == 0) {
-    out = out + " | POZOR: pripojeny repozitar nema zadnou whitelist polozku - zapisy budou zamitnuty (E_REPO). Pripojeno: " + Repository.ConnectionString;
+    out = out + " | POZOR: pripojeny repozitar nema zadnou whitelist polozku - zapisy budou zamitnuty (E_REPO). Identita: " + this.FB_RepoId(Repository) + " | Pripojeni: " + Repository.ConnectionString;
 }
 this.Log(Repository, out);
 return out;

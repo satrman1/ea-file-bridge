@@ -14,8 +14,8 @@ AI driver ◄── responses\res-*.json ◄────────────
 | Cesta | Co |
 |---|---|
 | `pump.wsf` | pumpa — watcher + COM attach + code loader z modelu; start dvojklikem, konec zavřením konzole |
-| `src/` | kanon kódu executoru (operace elementu AICodeBridge; deploy = inject + restart pumpy) |
-| `scripts/ITAN-Inject Addin Code.js` | nalití `src/` do modelu (EA Scripting, **JScript**; upravit SRC_DIR dle umístění klonu) |
+| `src/` | kanon kódu executoru (operace elementu AICodeBridge; deploy = inject + restart pumpy; NOVÁ operace = bootstrap) |
+| `scripts/` | ITAN-Inject (nalití `src/` do existujících operací) + ITAN-Bootstrap (založení elementu/operací, idempotentní) — EA Scripting, **JScript**; cestu ke `src/` si najdou samy, jinak se zeptají dialogem |
 | `krok0/` | smoke testy prostředí (WSH, COM attach, XMLHTTP, free Copilot) + návod |
 | `docs/` | protokol eafb/0.1, návod domácí generálky, šablony copilot-instructions (domácí/bankovní) |
 | `.github/copilot-instructions.md` | instrukce pro Copilot agenta — vytvořit ručně kopií z `docs/github-copilot-instructions.md` (doma), resp. bankovní varianty |

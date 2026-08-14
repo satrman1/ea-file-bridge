@@ -29,8 +29,8 @@ Pracuješ s Enterprise Architect přes **EA File Bridge**: souborový protokol m
 
 ## Pravidla (závazná)
 
-1. **`repo` je povinné** — deklaruje cílový repozitář (část connection stringu — název cílové databáze; skutečnou hodnotu dosaď při nasazení). Chrání proti zpracování dávky ve špatném repozitáři; hodnotu ti řekne uživatel na začátku práce.
-2. **První dávka session = samotný `ping`.** Z odpovědi zkontroluj pole `repository` — musí odpovídat očekávanému repozitáři. Nesedí-li, zastav se a ohlas to uživateli.
+1. **`repo` je povinné** — deklaruje cílový repozitář **názvem databáze** (skutečnou hodnotu dosaď při nasazení; hodnotu ti řekne uživatel na začátku práce). Chrání proti zpracování dávky ve špatném repozitáři.
+2. **První dávka session = samotný `ping`.** Z odpovědi zkontroluj pole `repository` — obsahuje název databáze a musí odpovídat očekávanému repozitáři (pole `connection` je jen informativní cesta připojení). Nesedí-li, zastav se a ohlas to uživateli.
 3. **Notes posílej jako obyčejný text** v poli `notes` (řádné JSON escapování stačí — diakritiku i tabulátory protokol zvládá). Pole `notes_b64` (base64 UTF-8) existuje jen jako záloha — nepoužívej ho, ať nemusíš nic kódovat ani ověřovat.
 4. **SQL**: jen SELECT/WITH (zápis přes SQL je zakázán a executor ho odmítne). Dialekt = dialekt repozitáře: bankovní repozitář = **MS SQL 2022**, lokální `.qea` = SQLite.
 5. **Zápis jen do vyhrazeného package** (whitelist vynucuje executor — `E_WHITELIST`/`E_REPO` neobcházej, ohlas uživateli).
