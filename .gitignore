@@ -1,0 +1,6 @@
+# runtime data pumpy - obsahuji data z EA repozitare, do gitu nepatri
+requests/
+responses/
+
+# testovaci PNG (generalka P6)
+*.png

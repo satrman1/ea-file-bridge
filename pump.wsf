@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<job id="EAFileBridgePump">
+<script language="VBScript">
+<![CDATA[
+' COM attach na bezici EA - VBScript umi GetObject(, "EA.App"), JScript ne.
+Function AttachEA()
+    On Error Resume Next
+    Set AttachEA = GetObject(, "EA.App")
+    If Err.Number <> 0 Then
+        Err.Clear
+        Set AttachEA = Nothing
+    End If
+End Function
+]]>
+</script>
+<script language="JScript">
+<![CDATA[
+// ============================================================================
+// EA File Bridge - pumpa v0.1 (POC tracer bullet, eafb/0.1)
+// Hloupy nosic: watcher + COM attach + code loader z modelu + souborove IO.
+// Zadna business logika - tela operaci ziji v elementu AICodeBridge v modelu
+// (jediny kanon kodu, verzovany baselinami, citelny kazdym ctenarem modelu).
+//
+// Start: dvojklik (sam se prehodi do cscript konzole).
+// Konec: zavrit okno konzole (nebo Ctrl+C).
+// Slozky (vznikaji samy vedle pumpy):
+//   requests\            <- sem pise AI (Copilot) davky req-*.json
+//   requests\processed\  <- archiv zpracovanych (s timestampem)
+//   requests\rejected\   <- nevalidni davky
+//   responses\           <- odpovedi res-*.json
+// ============================================================================
+
+// --- prepnuti wscript -> cscript (konzole misto vyskakovacich okenek) ---
+if (WScript.FullName.toLowerCase().indexOf("wscript.exe") >= 0) {
+    var sh0 = new ActiveXObject("WScript.Shell");
+    sh0.Run("cscript //nologo \"" + WScript.ScriptFullName + "\"");
+    WScript.Quit(0);
+}
+
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+var BASE = fso.GetParentFolderName(WScript.ScriptFullName);
+var DIR_REQ  = BASE + "\\requests";
+var DIR_RES  = BASE + "\\responses";
+var DIR_PROC = DIR_REQ + "\\processed";
+var DIR_REJ  = DIR_REQ + "\\rejected";
+var ADDIN_NAME = "AICodeBridge";
+var POLL_MS = 1000;
+
+// --- Session shim: kod z modelu smi volat Session.Output / Session.Prompt ---
+var Session = {
+    Output: function (s) { echo("[EA] " + s); },
+    Prompt: function (s, t) { echo("[EA prompt] " + s); return 1; }
+};
+
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+function ts() {
+    var d = new Date();
+    return "" + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate())
+        + "-" + pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
+}
+function echo(s) {
+    var d = new Date();
+    WScript.Echo(pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds()) + "  " + s);
+}
+
+function ensureDir(p) { if (!fso.FolderExists(p)) { fso.CreateFolder(p); } }
+
+function readUtf8(path) {
+    var st = new ActiveXObject("ADODB.Stream");
+    st.Type = 2; st.Charset = "utf-8"; st.Open();
+    st.LoadFromFile(path);
+    var s = st.ReadText(-1);
+    st.Close();
+    return s;
+}
+function writeUtf8(path, text) {
+    var st = new ActiveXObject("ADODB.Stream");
+    st.Type = 2; st.Charset = "utf-8"; st.Open();
+    st.WriteText(text);
+    st.SaveToFile(path, 2);
+    st.Close();
+}
+
+// --- code loader: nacte tela operaci AICodeBridge z modelu a zkompiluje ---
+function loadBridge(repo) {
+    var xml = "" + repo.SQLQuery(
+        "SELECT Object_ID FROM t_object WHERE Name = '" + ADDIN_NAME + "' AND Stereotype = 'JavascriptAddin'");
+    var m = /<Object_ID>(\d+)<\/Object_ID>/.exec(xml);
+    if (!m) { throw new Error("Element '" + ADDIN_NAME + "' (JavascriptAddin) v modelu nenalezen."); }
+    var el = repo.GetElementByID(parseInt(m[1], 10));
+    var bridge = {};
+    var count = 0;
+    for (var i = 0; i < el.Methods.Count; i++) {
+        var meth = el.Methods.GetAt(i);
+        var body = "" + meth.Code;
+        if (body == "") { continue; }
+        // parametry seradit podle Position (nespolehat na poradi kolekce)
+        var prm = [];
+        for (var j = 0; j < meth.Parameters.Count; j++) {
+            var p = meth.Parameters.GetAt(j);
+            var pos = j;
+            try { pos = parseInt(p.Position, 10); if (isNaN(pos)) { pos = j; } } catch (eP) { pos = j; }
+            prm.push({ n: "" + p.Name, pos: pos, idx: j });
+        }
+        prm.sort(function (a, b) { return (a.pos - b.pos) || (a.idx - b.idx); });
+        var args = [];
+        for (var j2 = 0; j2 < prm.length; j2++) { args.push(prm[j2].n); }
+        args.push(body);
+        try {
+            bridge["" + meth.Name] = Function.apply(null, args);
+            count++;
+        } catch (e) {
+            echo("WARN: operace " + meth.Name + " se nezkompilovala: " + e.message);
+        }
+    }
+    echo("Code loader: " + count + " operaci nacteno z modelu (elementID " + el.ElementID + ").");
+    if (!bridge.FB_Main) {
+        echo("POZOR: operace FB_Main v modelu chybi - spust ITAN-Inject Addin Code v EA Scripting.");
+    }
+    return bridge;
+}
+
+// --- jmeno response souboru: req-X.json -> res-X.json ---
+function responseName(reqName) {
+    if (/^req/i.test(reqName)) { return reqName.replace(/^req/i, "res"); }
+    return "res-" + reqName;
+}
+
+function errorResponse(code, message) {
+    return "{\"protocol\":\"eafb/0.1\",\"id\":\"\",\"status\":\"error\",\"code\":\""
+        + code + "\",\"message\":\"" + message + "\",\"results\":[]}";
+}
+
+// --- zpracovani jedne davky ---
+function processFile(repo, bridge, file) {
+    var name = "" + file.Name;
+    var path = "" + file.Path;
+
+    // stabilita souboru (Copilot muze jeste zapisovat)
+    var size1 = file.Size;
+    WScript.Sleep(200);
+    var size2 = fso.GetFile(path).Size;
+    if (size1 != size2) { echo("Soubor " + name + " se jeste zapisuje, pockam."); return; }
+
+    echo("Zpracovavam " + name + " ...");
+    var text = readUtf8(path);
+    var respText, rejected = false;
+
+    if (!bridge.FB_Main) {
+        respText = errorResponse("E_NO_EXECUTOR",
+            "Executor v modelu chybi (FB_Main). Spust ITAN-Inject Addin Code v EA Scripting.");
+        rejected = true;
+    } else {
+        respText = "" + bridge.FB_Main(repo, text);
+        rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0);
+    }
+
+    writeUtf8(DIR_RES + "\\" + responseName(name), respText);
+    var stamped = name.replace(/\.json$/i, "") + "." + ts() + ".json";
+    fso.MoveFile(path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
+    echo((rejected ? "ODMITNUTO " : "Hotovo ") + name + " -> " + responseName(name));
+}
+
+function eaAlive(ea) {
+    try { var x = "" + ea.Repository.ConnectionString; return true; }
+    catch (e) { return false; }
+}
+
+// ============================ hlavni smycka =================================
+ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ);
+echo("=== EA File Bridge pumpa v0.1 ===");
+echo("Slozka requestu: " + DIR_REQ);
+
+var ea = null, bridge = null;
+
+while (true) {
+    // (re)attach na EA
+    if (ea == null) {
+        ea = AttachEA();
+        if (ea == null || !eaAlive(ea)) {
+            ea = null;
+            echo("Cekam na bezici EA s otevrenym projektem ...");
+            WScript.Sleep(3000);
+            continue;
+        }
+        echo("Pripojeno na EA: " + ea.Repository.ConnectionString);
+        try {
+            bridge = loadBridge(ea.Repository);
+            if (bridge.FB_SessionStart) {
+                try { echo("" + bridge.FB_SessionStart(ea.Repository)); }
+                catch (eB) { echo("WARN: session baseline selhal: " + eB.message); }
+            }
+        } catch (eL) {
+            echo("CHYBA code loaderu: " + eL.message + " - zkusim znovu za 5 s.");
+            ea = null; bridge = null;
+            WScript.Sleep(5000);
+            continue;
+        }
+    }
+
+    // pruchod requests\*.json
+    try {
+        var en = new Enumerator(fso.GetFolder(DIR_REQ).Files);
+        for (; !en.atEnd(); en.moveNext()) {
+            var f = en.item();
+            if (!/\.json$/i.test("" + f.Name)) { continue; }
+            try {
+                processFile(ea.Repository, bridge, f);
+            } catch (eF) {
+                if (!eaAlive(ea)) { throw eF; } // EA spadlo -> ven na re-attach, soubor zustava
+                // jina chyba: odpovez chybou a odloz do rejected
+                echo("ERROR u " + f.Name + ": " + eF.message);
+                try {
+                    writeUtf8(DIR_RES + "\\" + responseName("" + f.Name),
+                        errorResponse("E_EXCEPTION", ("" + eF.message).replace(/[\\"]/g, " ")));
+                    fso.MoveFile("" + f.Path, DIR_REJ + "\\" + ("" + f.Name).replace(/\.json$/i, "") + "." + ts() + ".json");
+                } catch (eM) { echo("ERROR presunu: " + eM.message); }
+            }
+        }
+    } catch (eLoop) {
+        if (ea != null && !eaAlive(ea)) {
+            echo("Spojeni s EA ztraceno (EA zavreno?). Cekam na nove pripojeni; rozpracovany request zustava ve fronte.");
+            ea = null; bridge = null;
+        } else {
+            echo("ERROR smycky: " + eLoop.message);
+        }
+    }
+
+    WScript.Sleep(POLL_MS);
+}
+]]>
+</script>
+</job>
