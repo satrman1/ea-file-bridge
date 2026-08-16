@@ -1,11 +1,13 @@
 // AICodeBridge.FB_OpLayoutConnectors(Repository, op, reqId)
 // layout_connectors (K11) - styl vedeni konektoru na diagramu.
 // op.diagram = diagramID | "{GUID}" | jmeno
-// op.style   = "direct" | "auto" | "custom" | "treeV" | "treeH" | "treeLV" | "treeLH"
-//              | "lateralV" | "lateralH" | "orthS" | "orthR" (DiagramLink.LineStyle 1-11)
+// op.style   = "direct" | "auto" | "custom" | "treeV" | "treeH" | "lateralV" | "lateralH"
+//              | "orthS" | "orthR" (DiagramLink.LineStyle 1-9; treeLV/treeLH = aliasy lateral)
 // op.connectorIDs = volitelny filtr (jinak vsechny linky diagramu)
+// OPRAVA 20260817-11: EA LinkLineStyle ma jen 1-9 (orthS=8, orthR=9);
+// puvodni mapa 10/11 tise degradovala orthS/orthR na "custom" (Mode=3 bez TREE).
 var STYLES = { "DIRECT": 1, "AUTO": 2, "CUSTOM": 3, "TREEV": 4, "TREEH": 5, "TREELV": 6, "TREELH": 7,
-    "LATERALV": 8, "LATERALH": 9, "ORTHS": 10, "ORTHR": 11 };
+    "LATERALV": 6, "LATERALH": 7, "ORTHS": 8, "ORTHR": 9 };
 if (!op || !op.diagram || !op.style) {
     return { op: "layout_connectors", status: "error", code: "E_ARGS", message: "Povinne: diagram, style." };
 }

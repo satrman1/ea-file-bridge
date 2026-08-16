@@ -1,8 +1,15 @@
 // AICodeBridge.EA_MenuClick - obsluha kliknuti (vzor: vendor MyDemoAddin)
 // v0.2 - GUI fallback File Bridge (akceptacni kriterium 4 iterace 1)
+// 20260817: try/catch kolem FB_ProcessFolder - chyba se MUSI ukazat v dialogu,
+// tiche selhani ("nic se nestalo") je nepripustne.
 if (ItemName == "Process requests (File Bridge)") {
-    var out = "" + this.FB_ProcessFolder(Repository);
-    Session.Output("[AI Bridge] " + out);
+    var out = "";
+    try {
+        out = "" + this.FB_ProcessFolder(Repository);
+    } catch (eFB) {
+        out = "CHYBA GUI fallbacku: " + eFB.message;
+    }
+    try { Session.Output("[AI Bridge] " + out); } catch (eO) { }
     Session.Prompt("File Bridge - GUI fallback:\n\n" + out, 0);
 }
 else if (ItemName == "Process requests (#AI-CODE)")

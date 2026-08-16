@@ -19,7 +19,7 @@ for (var ci = 0; ci < cfgs.length; ci++) {
 if (cfg == null || !cfg.baseDir) {
     return { op: "import_element_linked_documents", status: "error", code: "E_ARGS", message: "FB_Config nema baseDir pro repozitar " + this.FB_RepoId(Repository) + "." };
 }
-var fso = new ActiveXObject("Scripting.FileSystemObject");
+var fso = this.FB_ComObj("Scripting.FileSystemObject");
 var items = [];
 for (var i = 0; i < op.documents.length; i++) {
     var d = op.documents[i];
@@ -32,7 +32,7 @@ for (var i = 0; i < op.documents.length; i++) {
     if (d.rtf_b64) {
         var rtf = this.B64Decode(d.rtf_b64);
         path = cfg.baseDir + "\\responses\\tmp-linkeddoc-" + el.ElementID + ".rtf";
-        var st = new ActiveXObject("ADODB.Stream");
+        var st = this.FB_ComObj("ADODB.Stream");
         st.Type = 2; st.Charset = "windows-1250"; st.Open();
         st.WriteText(rtf);
         st.SaveToFile(path, 2);

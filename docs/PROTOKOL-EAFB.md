@@ -1,8 +1,10 @@
-# Protokol eafb/0.1 — EA File Bridge (POC tracer bullet)
+# Protokol eafb/0.2 — EA File Bridge
 
-2026-08-13 · Ověřeno E2E na eaexample (dávky e2e-01 … e2e-07) · Doplněk k `PROTOKOL.md` (AI Code Bridge) · Zadání: `IT-ANALYSIS/Zadani-POC-EA-File-Bridge.md` v1.1 · **Bridge v0.2 (2026-08-14): identita repozitáře = `FB_RepoId` (u MS SQL název DB, ne connection string) — reakce na nález 2.1 protokolu vyhodnocení POC**
+2026-08-17 · **v0.2** (nahrazuje eafb/0.1 z 2026-08-13) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta).
 
-## Architektura
+Změny proti 0.1: **registr operací** (zrcadlo MCP toolů — skilly fungují beze změn), **`$N` řetězení GUIDů v dávce**, **whitelist operací `FB_OpsAllowed`** (E_OP_FORBIDDEN), **kvóty klonování** (E_QUOTA), sekvenční zprávy (K1), baselines (K5), linked docs (K10), diagram helpery (K11), bonusy K6–K9, **GUI fallback** (zpracování dávek bez pumpy, klik v EA), **`deploy_src`** (dev nasazení kódu bez klikání), **dvojí runtime + `FB_ComObj`**.
+
+## 1. Architektura
 
 ```
 AI driver (Copilot/Claude)          pumpa (pump.wsf, WSH)            EA (běžící instance)
@@ -10,78 +12,184 @@ AI driver (Copilot/Claude)          pumpa (pump.wsf, WSH)            EA (běží
   čte responses\res-*.json  ◄──  zapíše response, archivuje  ◄──  z elementu AICodeBridge (11037)
 ```
 
-- **Jediný kanon kódu = model.** Pumpa nemá logiku — při připojení načte těla operací `FB_*` z elementu AICodeBridge (SQL lookup dle jména + stereotypu `JavascriptAddin`) a zkompiluje. Změna kódu = ITAN-Inject (z `src/`) + restart pumpy.
+- **Kanon kódu = `src/` v repu**; runtime kopie žije v modelu (element AICodeBridge). Nasazení změn = dávka `deploy_src` (pumpa si kód po dávce sama přenačte). Bootstrap v EA Scripting je jen nouzový fallback.
 - **Zápis výhradně Automation API.** `Repository.SQLQuery` jen čtení (vrací i GUIDy).
 - Složky vedle `pump.wsf`: `requests\` (vstup), `responses\` (výstup), `requests\processed\` (archiv s timestampem), `requests\rejected\` (nevalidní).
-- Životní cyklus souboru: `req-X.json` → zpracování → `res-X.json` + přesun requestu do `processed\` (`rejected\` u E_PARSE). Při zavřeném EA request **čeká ve frontě** a zpracuje se po re-attachi (smyčka nikdy nepadá).
+- Životní cyklus souboru: `req-X.json` → zpracování → `res-X.json` + přesun requestu do `processed\` (`rejected\` u E_PARSE). Při zavřeném EA request čeká ve frontě a zpracuje se po re-attachi.
 
-## Request (1 soubor = 1 dávka)
+### 1a. Dvojí runtime a `FB_ComObj` (lekce 2026-08-17)
+
+Stejný kód operací běží ve **dvou různých JS runtime**:
+
+| Runtime | Engine | COM objekty | Enumerator |
+|---|---|---|---|
+| pumpa (pump.wsf, WSH) | JScript | `new ActiveXObject(...)` | ano |
+| EA in-model add-in (GUI fallback, prod strana M365-A) | JavaScript (Mozilla) | `new COMObject(...)` | **ne** |
+
+Pravidla:
+
+1. Kód, který může běžet v obou runtime (GUI fallback, linked docs), tvoří COM objekty **výhradně přes `this.FB_ComObj(progId)`** (zkusí ActiveXObject, fallback COMObject). Přímý `new ActiveXObject` v EA runtime hodí ReferenceError a **tiše shodí celý handler** — u uživatele „klik nic neudělal".
+2. `Enumerator` v EA runtime neexistuje — výpis složky řeší `FB_ProcessFolder` fallbackem přes skrytý `dir /b` (WScript.Shell.Run, okno 0, wait).
+3. **Aktivace nového kódu v EA runtime = plný restart EA.** `File → Reload Current Project` na EA 17.1.5 (build 1715) NEobnovil ani strukturu menu, ani těla operací add-inu (ověřeno 2026-08-16/17; dřívější lekce „reload stačí" z 2026-07-19 pro tento účel neplatí). Pumpa restart EA přežije (re-attach); `deploy_src` se týká jen runtime pumpy.
+
+## 2. Request (1 soubor = 1 dávka)
 
 ```json
 {
-  "protocol": "eafb/0.1",
-  "id": "unikatni-id-davky",
+  "protocol": "eafb/0.2",
+  "id": "20260817-01",
   "repo": "EAExample.qea",
   "ops": [
     { "op": "ping", "echo": "text" },
-    { "op": "query", "sql": "SELECT ... " },
-    { "op": "create_element", "package": "{GUID} | packageID | jméno",
-      "name": "...", "type": "Class", "stereotype": "", "notes": "plain text" }
+    { "op": "create_or_update_package", "parent": "{GUID}", "name": "Pkg" },
+    { "op": "create_or_update_elements", "elements": [ { "package": "$1", "name": "X", "type": "Class" } ] }
   ]
 }
 ```
 
-- `repo` — deklarace cílového repozitáře (case-insensitive podřetězec **identity dle `FB_RepoId`**: u MS SQL **název databáze** zjištěný `DB_NAME()`, u lokálního `.qea`/SQLite fallback = ConnectionString, tj. název/cesta souboru). Volitelné v protokolu, **povinné v copilot-instructions**. Při neshodě se neprovede NIC (ani audit) → `E_REPO`. Důvod: testovací repozitář vzniká klonem produkčního — GUIDy se shodují, instanci rozliší jen deklarace v dávce. **Proč ne ConnectionString (změna v0.2, nález 2.1):** při otevření EA přes `.qea` zástupce vrací ConnectionString cestu k zástupci — název lokálního souboru nemá autoritu, je stanice-závislý a nemusí odpovídat názvu DB; identita se proto zjišťuje zdola, dotazem do databáze.
-- `sql` plain text (řádné JSON escapování); alternativně `sql_b64`. **Notes preferovaně plain** (`notes`) — JSON escaping tab/diakritiku zvládá; `notes_b64` (base64 UTF-8) zůstává podporované jako záloha. (Base64 lekce z addin-bridge platila pro JSON vrstvu MCP serveru; v eafb parseru neplatí. Změna 2026-08-14 po generálce: driver si base64 ověřoval terminálem → ruční Allow.)
+- `repo` — deklarace cílového repozitáře (case-insensitive podřetězec identity dle `FB_RepoId`: u MS SQL název DB přes `DB_NAME()`, u lokálního `.qea` fallback ConnectionString). Volitelné v protokolu, **povinné v copilot-instructions**. Při neshodě se neprovede NIC (ani audit) → `E_REPO`.
 - Sémantika dávky: **stop-on-error** — první chyba zastaví zbytek (`skipped`).
+- `notes` plain text (JSON escapování zvládá diakritiku i tab); `notes_b64`/`sql_b64` = záloha.
 
-## Response
+### 2a. `$N` řetězení GUIDů v dávce
+
+Kterákoli string hodnota v opu může odkázat na výsledek dřívějšího opu téže dávky:
+
+| Zápis | Význam |
+|---|---|
+| `"$0"` | `results[0].guid` |
+| `"$0.id"` | `results[0].id` |
+| `"$1[2]"` | `results[1].items[2].guid` |
+| `"$1[2].id"` | `results[1].items[2].id` |
+
+Reference se rozresolvují rekurzivně v celém objektu opu (i uvnitř polí `targets`, `elements`, `taggedValues.ids`…). Nerozresolvovatelná reference = chyba opu. Do SQL řetězců `$N` NElze vkládat (nahrazuje se jen celá hodnota pole).
+
+## 3. Response
 
 ```json
 {
-  "protocol": "eafb/0.1", "id": "...", "status": "done | error",
-  "repository": "identita repozitáře dle FB_RepoId (MS SQL: název DB)",
-  "connection": "connection string / cesta připojení (informativní)",
-  "results": [
-    { "op": "ping", "status": "ok", "echo": "...", "eaVersion": "...", "repository": "...", "connection": "...", "time": "..." },
-    { "op": "query", "status": "ok", "rowCount": 2, "rows": [ { "sloupec": "hodnota" } ] },
-    { "op": "create_element", "status": "ok", "guid": "{...}", "elementId": 123, "name": "..." }
-  ],
+  "protocol": "eafb/0.2", "id": "...", "status": "done | error",
+  "repository": "identita dle FB_RepoId", "connection": "cesta připojení (informativní)",
+  "results": [ { "op": "...", "status": "ok | error | skipped", "...": "..." } ],
   "audit": { "aiLogGuid": "{...}" }
 }
 ```
 
-## Chybové kódy
+Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, created}` u dávkových operací) — kvůli `$N` referencím.
+
+## 4. Registr operací (32; zrcadlo MCP toolů)
+
+Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whitelistu packages), Č = čtecí (povolena vždy). Stav ✅ = E2E ověřeno (iterace 1 = dávky 20260816-*, iterace 3 = 20260817-*).
+
+| op | Z/Č | Klíčové argumenty | Response (nad rámec status) | Stav |
+|---|---|---|---|---|
+| `ping` | Č | `echo` | `echo, eaVersion, repository, connection, time` | ✅ |
+| `query` | Č | `sql` (jen SELECT/WITH; dialekt dle repa) | `rowCount, rows[]` (vrací i GUIDy) | ✅ |
+| `find_elements_by_name` | Č | `name` | `items[{guid,id,name,type}]` | ✅ |
+| `find_packages_by_name` | Č | `name` | `items[{guid,id,name}]` | ✅ |
+| `get_elements_information` | Č | `elements[]` (guid\|id\|jméno\|$ref), `brief` | plný dump vč. atributů, operací, TV (RefGUID rozpřaženě), konektorů, owned diagramů | ✅ |
+| `get_packages_information` | Č | `packages[]` | dump package | ✅ |
+| `get_connectors_information` | Č | `connectors[]` \| `element` | dump konektorů | ✅ |
+| `get_diagrams_information` | Č | `diagrams[]` | dump diagramu vč. bloku `messages` (seqNo, operace rozpřaženě) | ✅ |
+| `get_baselines` | Č | `package` | `items[{guid,version,notes,date}], raw` | ✅ |
+| `baseline_diff` | Č | `package`, `baseline` (GUID) | `summary` (počty per status), `raw` (XML comparelog) | ✅ 20260817-02 |
+| `export_element_linked_documents` | Č | `elements[]`, `inline` | `items[{hasDocument,file,size,rtf_b64?}]`; soubory jen do `<baseDir>\responses\docs\` | ✅ 20260817-08 |
+| `create_element` | Z | legacy POC alias (nahrazeno `create_or_update_elements`) | `guid, elementId` | ✅ |
+| `create_or_update_elements` | Z | `elements[{guid\|elementID→update; package\|owningElement+type→create; name, stereotypes, notes, alias, status, author/version (K6), type na update = změna typu (K7), isComposite+compositeDiagram (K8), classifier, taggedValues}]` | `items[{guid,id,name,created}]` | ✅ K7/K8: 20260817-13 |
+| `create_or_update_package` | Z | `parent`, `name`, `notes`, `taggedValues` | `items[{guid,id,name,created}]` | ✅ |
+| `create_or_update_connectors` | Z | `connectors[{source,target,type,stereotypes,direction,taggedValues(RefGUID ids)}]` | `items[]` | ✅ |
+| `create_or_update_attributes` | Z | `element`, `attributes[{name,type,classifier,…}]` (parciální update) | `items[{guid,id,name,created}]` | ✅ |
+| `create_or_update_operations` | Z | `element`, `operations[{name,returnType,parameters[]…}]` (parameters = deterministický rebuild) | `items[]` vč. GUIDů parametrů | ✅ |
+| `create_or_update_messages` | Z | `diagram`, `messages[{source,target,name\|operation,isReturn,isAsynchronous,arguments,returnValue,seqNo}]` | `items[]` + `pdata` readback | ✅ (K1, viz §5) |
+| `delete_from_model` | Z | `targets[{type: Package\|Diagram\|Element\|Connector\|Attribute\|Operation\|Parameter, id\|guid, name (Parameter)}]` | `items[{type,id,deleted}]` | ✅ všech 7 typů (20260817-04, -07; Connector 20260816-12/14) |
+| `delete_taggedvalue_from_model` | Z | `targets[{type: Element/Connector/Attribute/Operation/PackageTaggedValue, id\|guid, name}]` | `items[]` | ✅ Element+Connector TV (20260817-03, UNDO drill T1) |
+| `remove_elements_from_diagram` | Z | `diagram`, `elementIDs[]` — jen z diagramu, model nedotčen (§11) | `removedElementIDs` | ✅ 20260817-03 |
+| `create_baseline` | Z | `package`, `name` (default `AI-pre-<session>-<batch>`), `session`, `notes` — **pojmenovaná** (MCP jméno neuměl) | `name, baselineGuid, guid` | ✅ 20260817-02 |
+| `clone_package` | Z | `package`, `name`, `confirm` — kvóta V3 §12e | `guid, id, volume{elements,packages}` | ✅ 20260817-05 |
+| `clone_elements` | Z | `elements[]`, `package` (cíl), `confirm` | `items[{…,sourceID,ownedDiagrams}]`, `volume` | ✅ 20260817-05/-07; kvóta -14 |
+| `import_element_linked_documents` | Z | `documents[{element, rtf_b64 \| file (jen uvnitř baseDir)}]` | `items[{imported}]` | ✅ 20260817-08 |
+| `layout_connectors` | Z | `diagram`, `style` (direct/auto/custom/treeV/treeH/lateralV/lateralH/orthS/orthR), `connectorIDs` filtr | `changed` | ✅ 20260817-12 (viz §6) |
+| `change_connector_visibility` | Z | `diagram`, `connectorIDs[]`, `hidden` | `connectorIDs` (změněné) | ✅ 20260817-09 |
+| `open_diagrams` | Č | `diagrams[]` | `opened[]` | ✅ 20260817-09 |
+| `reload_diagrams` | Č | `diagrams[]` | `reloaded[]` | ✅ 20260816-14 |
+| `update_diagram_properties` | Z | `diagrams[{diagram, name, author, version, showDetails, styleEx}]` (K6, konvence §7e) | `items[]` | ✅ 20260817-13 |
+| `set_diagram_object_style` | Z | `diagram`, `objects[{elementID, backgroundColor{red,green,blue}, fontColor, borderColor, borderWidth, reset}]` (K9) | `changedElementIDs` | ✅ 20260817-13 |
+| `deploy_src` | Z | `only[]` — nalije kód ze `src/` do modelu, založí i NOVOU operaci (signatura z hlavičky `// AICodeBridge.Nazev(args)`); pumpa si kód po dávce sama přenačte | `updated[], created[], skipped[]` | ✅ (VÝHRADNĚ dev; v bance deny) |
+
+Trvale vyloučeno (neimplementuje se): `apply_baseline` (§12a — obnova z baseline jen člověk v EA UI), `find_element_in_diagrams` (kryje `query` nad `t_diagramobjects`), interaktivní `select_*`/`get_current_*` (pro dávkový kanál bezpředmětné). Iterace 2: `create_or_update_diagram`, `place_elements_on_diagram`, `get_diagram_image` (Diagram Builder + PNG export).
+
+## 5. Sekvenční zprávy (K1) — mechanika v `t_connector`
+
+Reverse-engineering proti MCP referenci (zprávy 4799–4801 vs. bridge 4809–4812, diagram 1131):
+
+| Pole `t_connector` | Automation | Význam |
+|---|---|---|
+| `PDATA1` | `TransitionEvent` | `Synchronous` / `Asynchronous` |
+| `PDATA2` | `TransitionGuard` | `paramsDlgs=;params=<argumenty>;retval=<návratový typ>` |
+| `PDATA3` | `TransitionAction` | `Call` |
+| `SeqNo`, `DiagramID` | zapisovatelné | pořadí zprávy, domovský diagram |
+
+Návratová zpráva: MCP kóduje `PDATA4=1`, bridge používá `SubType="Return"` — **obojí EA kreslí čárkovaně**, čtecí strana bridge (`get_diagrams_information`) rozumí oběma. Vazba na operaci = tag `operation_guid` na konektoru. Deterministický rebuild V2d: delete zpráv + recreate v jedné dávce (`delete_from_model` Connector + `create_or_update_messages` s explicitními `seqNo`).
+
+## 6. Poznámky z E2E iterace 3
+
+- **`layout_connectors`**: EA `LinkLineStyle` má jen hodnoty 1–9 (orthS=8, orthR=9). Původní mapa 10/11 tiše degradovala orthogonální styly na „custom" (`Mode=3;` bez `TREE=`). Opraveno 20260817-11/-12; readback v `t_diagramlinks.Style`: `Mode=3;TREE=OS;` / `TREE=OR;` / `TREE=LH;` atd.
+- **`clone_elements` a owned diagramy**: `Element.Clone()` owned diagramy NEPŘENÁŠÍ (ověřeno 20260817-07: zdroj s 1 owned diagramem → klon `ownedDiagrams: 0`). Limit MCP éry platí i pro Automation; bridge ho aspoň **vykazuje** v response (`ownedDiagrams`), driver musí případné diagramy řešit zvlášť (iterace 2 Diagram Builder). `clone_package` diagramy v podstromu klonuje.
+- **`create_baseline`**: pojmenovaná baseline je dohledatelná v `get_baselines` (`version` = jméno) — konkrétní výhoda proti MCP (bezejmenné baseline).
+- **Linked docs round-trip**: EA při importu RTF normalizuje (obohatí hlavičky) — porovnávat obsah/markery, ne byte-shodu.
+- **K8 isComposite**: zapisuje `t_object.NType=8`; `compositeDiagram` přes `SetCompositeDiagram`.
+- **K9 reset**: zapíše explicitní `BCol=-1;BFol=-1;LCol=-1;LWth=1;` (= default vzhled).
+
+## 7. Chybové kódy
 
 | Kód | Úroveň | Význam |
 |---|---|---|
 | `E_PARSE` | dávka | nevalidní JSON / chybí `ops` → soubor do `rejected\`, bez auditu |
-| `E_REPO` | dávka i op | deklarace `repo` nesedí na připojený repozitář, NEBO připojený repozitář nemá žádnou whitelist položku; nic se neprovede |
+| `E_REPO` | dávka | deklarace `repo` nesedí na připojený repozitář; nic se neprovede (ani audit) |
+| `E_OP_FORBIDDEN` | op | **nové v 0.2**: zápisová operace není povolena whitelistem operací `FB_OpsAllowed` |
+| `E_QUOTA` | op | **nové v 0.2**: objem klonování nad soft kvótou (100, §12e) bez `confirm: true`; nic se neprovedlo |
 | `E_UNKNOWN_OP` | op | neznámá operace |
 | `E_ARGS` | op | chybí povinné argumenty |
 | `E_SQL_READONLY` | op | jiný dotaz než SELECT/WITH |
 | `E_WHITELIST` | op | package mimo whitelist (v rámci správného repozitáře) |
-| `E_NOT_FOUND` | op | package/cíl nenalezen |
+| `E_NOT_FOUND` | op | cíl nenalezen |
 | `E_EXCEPTION` | op/dávka | neočekávaná výjimka |
-| `E_NO_EXECUTOR` | dávka | v modelu chybí FB_Main (nespuštěný inject) |
+| `E_NO_EXECUTOR` | dávka | v modelu chybí FB_Main |
 
-## Bezpečnostní výbava (povinná, ne volitelná)
+## 8. Bezpečnostní výbava (povinná, ne volitelná)
 
-1. **Whitelist vázaný na instanci repozitáře** (`FB_Whitelist`, jediné místo pravdy v kódu = v modelu): položka `{ repo: podřetězec identity dle FB_RepoId, pkg: "{GUID}" }`. Zápis projde jen při shodě obojího. Klon repozitáře (shodné GUIDy, jiná identita — u MS SQL jiný název DB) → `E_REPO`; přesměrování whitelistu na klon = vědomá, baselinovaná změna kódu. Porovnání provádí nezávisle `FB_SessionStart` (baseline), `FB_Main` (deklarace `repo`) i `FB_OpCreateElement` (zápis) — všechna tři místa přes `FB_RepoId`.
-2. **Deklarace `repo` v dávce** — kryje opačný směr (dávka pro Test zpracovaná v Prod, kde whitelist i GUIDy po klonu sedí).
-3. **Auto-baseline** whitelistovaných packages při startu session pumpy (`FB_SessionStart`); položky cizího repozitáře se přeskakují s varováním v konzoli; 0 baselinů = hlasité POZOR.
-4. **Audit**: každá provedená dávka = Artifact `FB <id>` v `#AI-LOG` (tagy `ai.channel=eafb`, `ai.request`; Notes = souhrn + celý request). Každý zapsaný element nese tagy `ai.channel` + `ai.request` (detektivní model práv, kap. 3 zadání v1.5).
+1. **Whitelist packages = celá větev** (`FB_Whitelist`): `{repo, pkg:"{GUID}"}` — zápis projde jen při shodě repozitáře (dle `FB_RepoId`) a package uvnitř whitelistované větve.
+2. **Whitelist OPERACÍ `FB_OpsAllowed`** (nové v 0.2, K4 — náhrada MCP `-enableDelete`/`-enableEdit`): per repo `{repo, allow[], deny[]}`; deny má přednost, `"*"` v allow = vše; čtecí operace povoleny vždy; **repo bez položky = žádný zápis (fail-secure)**. Změna = změna kódu v modelu = baselinovaná událost.
+   **Doporučená bankovní konfigurace (P1, §12a+§12g):**
+   ```
+   { repo: "<TEST-DB>", allow: ["*"],
+     deny: ["delete_from_model", "delete_taggedvalue_from_model",
+            "remove_elements_from_diagram", "clone_package", "clone_elements",
+            "deploy_src"] }
+   ```
+   (delete/clone se zapínají až v P2+ po zácviku; `deploy_src` je VÝHRADNĚ dev operace — v bance deny trvale.)
+3. **Deklarace `repo` v dávce** — kryje směr „dávka pro TEST zpracovaná v PROD".
+4. **Auto-baseline** whitelistovaných packages při startu session pumpy + explicitní pojmenované mikro-baseline `create_baseline` před zápisem (§12c).
+5. **Audit**: každá dávka = Artifact `FB <id>` v `#AI-LOG` (tagy `ai.channel=eafb`, `ai.request`; Notes = souhrn + celý request); každý zapsaný element nese `ai.channel`/`ai.request`.
+6. **Kvóty klonování V3** (§12e): objem se vykazuje vždy (`volume`), nad soft 100 nutné `confirm: true` (= potvrzení uživatele v session), jinak `E_QUOTA`.
 
-## ⚠ SQL dialekty
+## 9. GUI fallback (bez pumpy) — ověřeno 20260817-23
 
-Dotazy v `query` běží v dialektu připojeného repozitáře: **lokální `.qea` = SQLite**, **bankovní repozitář = MS SQL 2022**. Executor SQL jen provádí — dialekt musí hlídat autor dotazu (skilly / copilot-instructions / ea-sql-expert). Dotazy pro fázi 2 psát rovnou v MS SQL; sdílené dotazy omezit na průnik obou dialektů.
+Menu v EA: **Specialize → AI Bridge → Process requests (File Bridge)** (operace `FB_ProcessFolder`, běží UVNITŘ EA.exe = základ prod strany M365-A). Zpracuje všechny `requests\*.json` stejným životním cyklem jako pumpa (response, `processed\`/`rejected\`, audit, Log). Složky určuje `FB_Config` (baseDir per repo). Výsledek ukáže dialog; chyby se zobrazují (`CHYBA GUI fallbacku: …`), tiché selhání je nepřípustné.
 
-## Provoz (klikací)
+Provozní poznámky: pumpa nesmí běžet zároveň (sebrala by requesty první); po nasazení nové verze kódu vyžaduje EA runtime **plný restart EA** (§1a).
 
-- Start: dvojklik `pump.wsf` (sám se přehodí do konzole). Konec: zavřít okno.
-- Po změně kódu v `src/`: EA Scripting → **ITAN-Inject Addin Code** → restart pumpy. Přibyl-li v `src/` NOVÝ soubor operace, inject ji nezaloží — spustit **ITAN-Bootstrap File Bridge** (idempotentní, doplní chybějící operace; inject na to sám upozorní).
-- Konzole při startu hlásí připojený repozitář, počet načtených operací a výsledek baseline — **zkontrolovat pohledem, že repozitář je ten zamýšlený**.
+## 10. SQL dialekty
 
-## Stav modelu (eaexample)
+`query` běží v dialektu připojeného repozitáře: lokální `.qea` = SQLite, bankovní repozitář = MS SQL 2022. Executor SQL jen provádí — dialekt hlídá autor dotazu (skilly / copilot-instructions / ea-sql-expert).
 
-AICodeBridge el. 11037 — operace FB_Main, FB_JsonParse, FB_JsonStringify, FB_XmlRows, **FB_RepoId (od v0.2)**, FB_OpPing, FB_OpQuery, FB_OpCreateElement, FB_Whitelist, FB_Audit, FB_SessionStart (1155–1164 + FB_RepoId doplněná bootstrapem). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 `{8DF101C4-14A9-4b89-927E-833EA58D9F3C}` (audit). Kanon: `src/AICodeBridge.*.js` v tomto repu (po každém deployi sync!).
+## 11. Provoz
+
+- Start: dvojklik `pump.wsf`. Konzole hlásí verzi (`pumpa v0.4`), repozitář, počet operací (Code loader) a session baseline — **zkontrolovat pohledem**.
+- Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem.
+- Kód pro EA runtime (menu, GUI fallback): po `deploy_src` navíc **restart EA** (§1a).
+- Po každé změně: sync `src/` = commit v repu (dělá Miloš, VS Code GUI).
+
+## 12. Stav modelu (eaexample, po iteraci 3)
+
+AICodeBridge el. 11037 (pkg 1052), 62 operací (33× `FB_Op*`/`FB_*` + AI Code Bridge legacy + `FB_ComObj` od 20260817-22). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) — úklid rozhoduje Miloš.

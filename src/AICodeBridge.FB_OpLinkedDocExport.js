@@ -17,7 +17,7 @@ for (var ci = 0; ci < cfgs.length; ci++) {
 if (cfg == null || !cfg.baseDir) {
     return { op: "export_element_linked_documents", status: "error", code: "E_ARGS", message: "FB_Config nema baseDir pro repozitar " + this.FB_RepoId(Repository) + " - export nema kam psat." };
 }
-var fso = new ActiveXObject("Scripting.FileSystemObject");
+var fso = this.FB_ComObj("Scripting.FileSystemObject");
 var docsDir = cfg.baseDir + "\\responses\\docs";
 if (!fso.FolderExists(cfg.baseDir + "\\responses")) { fso.CreateFolder(cfg.baseDir + "\\responses"); }
 if (!fso.FolderExists(docsDir)) { fso.CreateFolder(docsDir); }
@@ -33,7 +33,7 @@ for (var i = 0; i < op.elements.length; i++) {
         if (fn == "") { fn = "element"; }
         fn = fn + "-" + el.ElementID + ".rtf";
         var path = docsDir + "\\" + fn;
-        var st = new ActiveXObject("ADODB.Stream");
+        var st = this.FB_ComObj("ADODB.Stream");
         st.Type = 2; st.Charset = "windows-1250"; st.Open();
         st.WriteText(rtf);
         st.SaveToFile(path, 2);
