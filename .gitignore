@@ -4,3 +4,6 @@ responses/
 
 # testovaci PNG (generalka P6)
 *.png
+
+# pracovni poznamky (lokalni; plati doma i v bance)
+tmp-*.md

@@ -16,10 +16,12 @@ End Function
 <script language="JScript">
 <![CDATA[
 // ============================================================================
-// EA File Bridge - pumpa v0.1 (POC tracer bullet, eafb/0.1)
+// EA File Bridge - pumpa v0.4 (eafb/0.2)
 // Hloupy nosic: watcher + COM attach + code loader z modelu + souborove IO.
 // Zadna business logika - tela operaci ziji v elementu AICodeBridge v modelu
 // (jediny kanon kodu, verzovany baselinami, citelny kazdym ctenarem modelu).
+// v0.4: kdyz response obsahuje priznak "reloadCode":true (operace deploy_src),
+// pumpa po davce sama prenacte kod z modelu - dev smycka bez restartu pumpy.
 //
 // Start: dvojklik (sam se prehodi do cscript konzole).
 // Konec: zavrit okno konzole (nebo Ctrl+C).
@@ -131,7 +133,7 @@ function errorResponse(code, message) {
         + code + "\",\"message\":\"" + message + "\",\"results\":[]}";
 }
 
-// --- zpracovani jedne davky ---
+// --- zpracovani jedne davky; vraci true = po davce prenacist kod z modelu ---
 function processFile(repo, bridge, file) {
     var name = "" + file.Name;
     var path = "" + file.Path;
@@ -140,7 +142,7 @@ function processFile(repo, bridge, file) {
     var size1 = file.Size;
     WScript.Sleep(200);
     var size2 = fso.GetFile(path).Size;
-    if (size1 != size2) { echo("Soubor " + name + " se jeste zapisuje, pockam."); return; }
+    if (size1 != size2) { echo("Soubor " + name + " se jeste zapisuje, pockam."); return false; }
 
     echo("Zpracovavam " + name + " ...");
     var text = readUtf8(path);
@@ -159,6 +161,8 @@ function processFile(repo, bridge, file) {
     var stamped = name.replace(/\.json$/i, "") + "." + ts() + ".json";
     fso.MoveFile(path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
     echo((rejected ? "ODMITNUTO " : "Hotovo ") + name + " -> " + responseName(name));
+    // v0.4: deploy_src oznamuje novy kod v modelu -> prenacist (bez restartu)
+    return (respText.indexOf("\"reloadCode\":true") >= 0);
 }
 
 function eaAlive(ea) {
@@ -168,7 +172,7 @@ function eaAlive(ea) {
 
 // ============================ hlavni smycka =================================
 ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ);
-echo("=== EA File Bridge pumpa v0.1 ===");
+echo("=== EA File Bridge pumpa v0.4 (eafb/0.2) ===");
 echo("Slozka requestu: " + DIR_REQ);
 
 var ea = null, bridge = null;
@@ -205,7 +209,11 @@ while (true) {
             var f = en.item();
             if (!/\.json$/i.test("" + f.Name)) { continue; }
             try {
-                processFile(ea.Repository, bridge, f);
+                if (processFile(ea.Repository, bridge, f)) {
+                    echo("deploy_src -> prenacitam kod z modelu ...");
+                    try { bridge = loadBridge(ea.Repository); }
+                    catch (eRC) { echo("WARN: reload kodu selhal: " + eRC.message + " - pumpa jede dal se starym kodem."); }
+                }
             } catch (eF) {
                 if (!eaAlive(ea)) { throw eF; } // EA spadlo -> ven na re-attach, soubor zustava
                 // jina chyba: odpovez chybou a odloz do rejected
