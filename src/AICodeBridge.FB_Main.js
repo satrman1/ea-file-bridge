@@ -5,6 +5,9 @@
 // (FB_OpsAllowed, K4), retezeni GUIDu v davce pres "$N" placeholdery.
 // v0.3 (iterace 2): Diagram Builder - create_or_update_diagram,
 // place_elements_on_diagram, get_diagram_image (PNG do souboru).
+// v0.4 (iterace 2b): create_or_update_scenarios (strukturovane UC scenare),
+// apply_classifier_stereotypes (IDS instance na SD), find_or_create_
+// referencing_sr (port ITAN scaffoldu, SR vetev; sablony = FB_ScaffoldConfig).
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var req = null;
 try {
@@ -71,6 +74,9 @@ var REG = {
     "create_or_update_diagram":          { fn: "FB_OpDiagram", w: true },
     "place_elements_on_diagram":         { fn: "FB_OpPlaceElements", w: true },
     "get_diagram_image":                 { fn: "FB_OpDiagramImage", w: false },
+    "create_or_update_scenarios":        { fn: "FB_OpScenarios", w: true },
+    "apply_classifier_stereotypes":      { fn: "FB_OpApplyClassifierStereotypes", w: true },
+    "find_or_create_referencing_sr":     { fn: "FB_OpFindOrCreateSR", w: true },
     "deploy_src":                        { fn: "FB_OpDeploySrc", w: true }
 };
 // --- whitelist operaci (K4): allow/deny per repo, deny ma prednost ---

@@ -1,4 +1,4 @@
-# Matice parity MCP × ea-file-bridge (stav 2026-08-17, po iteraci 2 — Diagram Builder; dávky 20260818-*)
+# Matice parity MCP × ea-file-bridge (stav 2026-08-17, po iteraci 2b — Scenarios/Classifier/Scaffold; dávky 20260818-*)
 
 Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP · ⛔ vědomě vynecháno
 
@@ -43,12 +43,15 @@ Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP 
 | (nad rámec MCP) | `set_diagram_object_style` (K9 barvy objektu + reset) | ✅ 🔵 (20260817-13) |
 | (nad rámec MCP) | změna `Element.Type` (K7) — součást `create_or_update_elements` | ✅ 🔵 Object→Component→Object (20260817-13) |
 | (nad rámec MCP) | `isComposite` + `SetCompositeDiagram` (K8) — součást `create_or_update_elements` | ✅ 🔵 NType=8 (20260817-13) |
+| (nad rámec MCP) | `create_or_update_scenarios` (strukturované UC scénáře do Scenarios tab, deterministický rebuild V2d) | ✅ 🔵 pořadí+typy kroků (actor/system) + větve Alternate/Exception s napojením na kroky (20260818-28; UI potvrzeno). ⚠ Step API reorder lekce — mechanika výhradně přes `XMLContent` (spike -18…-26, §6b protokolu) |
+| (nad rámec MCP) | `apply_classifier_stereotypes` (port ITAN-Apply Classifier Stereotypes on SD.vbs) | ✅ 🔵 Object→Component + stereotyp classifiera; idempotence 2. běh = 0 změn (20260818-31) |
+| (nad rámec MCP) | `find_or_create_referencing_sr` (port ITAN scaffoldu, SR větev; šablony per-repo `FB_ScaffoldConfig`) | ✅ 🔵 1. běh založil 1 pkg + 4 diagramy + 4 elementy + 3 vazby + TV 505-1 (20260818-35), 2. běh našel a nic nezaložil (20260818-36) |
 | (nad rámec MCP) | `deploy_src` (dev nasazení kódu executoru) | ✅ 🔵 vč. založení NOVÉ operace ze signatury (FB_ComObj, 20260817-22); v bance deny |
 | (nad rámec MCP) | **GUI fallback** `FB_ProcessFolder` + menu „Process requests (File Bridge)" | ✅ 🔵 response bez běžící pumpy, archiv processed\ (20260817-23). ⚠ EA runtime: nutný `FB_ComObj` (žádný ActiveXObject/Enumerator) a aktivace kódu = **plný restart EA** (Reload Current Project nestačí) |
 
 **K9 legenda diagramu**: neimplementována — kandidát, odhad 0,5 dne (vlastní struktura legend elementu v EA, netriviální mapování na protokol). Fallback: ITAN skript.
 
-**Regresní běh 2026-08-17** (bod 4 zadání): pozitivní ping+query+create_or_update_elements + `E_WHITELIST`+skipped (20260817-15), `E_REPO` na dávce pro EMR_PROD — nic neprovedeno (20260817-16), `E_SQL_READONLY` na DELETE (20260817-17). Shodné chování jako 2026-08-16. **Regrese po iteraci 2**: ping + query + create (el. 11123) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-11).
+**Regresní běh 2026-08-17** (bod 4 zadání): pozitivní ping+query+create_or_update_elements + `E_WHITELIST`+skipped (20260817-15), `E_REPO` na dávce pro EMR_PROD — nic neprovedeno (20260817-16), `E_SQL_READONLY` na DELETE (20260817-17). Shodné chování jako 2026-08-16. **Regrese po iteraci 2**: ping + query + create (el. 11123) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-11). **Regrese po iteraci 2b**: ping + query + create (el. 11163) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-37).
 
 **Sekvenční řetěz Diagram Builder + K1** (dosud šly messages jen na předpřipravený diagram 1131): nový MDG Sequence diagram + place lifelin 11061/11062 + `create_or_update_messages` v jedné dávce přes `$N`, PNG důkaz po reloadu (20260818-09/-10, diagram 1140).
 
