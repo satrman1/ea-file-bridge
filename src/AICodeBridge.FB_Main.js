@@ -3,6 +3,8 @@
 // Stop-on-error: prvni chyba v davce zastavi zbytek (oznaci se "skipped").
 // v0.2 (iterace 1+3): registr operaci (zrcadlo MCP toolu), WHITELIST OPERACI
 // (FB_OpsAllowed, K4), retezeni GUIDu v davce pres "$N" placeholdery.
+// v0.3 (iterace 2): Diagram Builder - create_or_update_diagram,
+// place_elements_on_diagram, get_diagram_image (PNG do souboru).
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var req = null;
 try {
@@ -66,6 +68,9 @@ var REG = {
     "reload_diagrams":                   { fn: "FB_OpReloadDiagrams", w: false },
     "update_diagram_properties":         { fn: "FB_OpUpdateDiagramProps", w: true },
     "set_diagram_object_style":          { fn: "FB_OpDiagramObjectStyle", w: true },
+    "create_or_update_diagram":          { fn: "FB_OpDiagram", w: true },
+    "place_elements_on_diagram":         { fn: "FB_OpPlaceElements", w: true },
+    "get_diagram_image":                 { fn: "FB_OpDiagramImage", w: false },
     "deploy_src":                        { fn: "FB_OpDeploySrc", w: true }
 };
 // --- whitelist operaci (K4): allow/deny per repo, deny ma prednost ---

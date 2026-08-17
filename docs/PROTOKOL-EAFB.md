@@ -1,8 +1,10 @@
 # Protokol eafb/0.2 — EA File Bridge
 
-2026-08-17 · **v0.2** (nahrazuje eafb/0.1 z 2026-08-13) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta).
+2026-08-17 · **v0.3** (dokumentační verze; protokol na drátě zůstává `eafb/0.2`) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + **iterace 2 Diagram Builder (dávky 20260818-01…11)** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta).
 
-Změny proti 0.1: **registr operací** (zrcadlo MCP toolů — skilly fungují beze změn), **`$N` řetězení GUIDů v dávce**, **whitelist operací `FB_OpsAllowed`** (E_OP_FORBIDDEN), **kvóty klonování** (E_QUOTA), sekvenční zprávy (K1), baselines (K5), linked docs (K10), diagram helpery (K11), bonusy K6–K9, **GUI fallback** (zpracování dávek bez pumpy, klik v EA), **`deploy_src`** (dev nasazení kódu bez klikání), **dvojí runtime + `FB_ComObj`**.
+Změny v0.3 proti v0.2: **Diagram Builder (iterace 2)** — `create_or_update_diagram` (vč. MDG typů a diagramů pod elementem), `place_elements_on_diagram` (geometrie + auto-pozice + výkaz konektorů), `get_diagram_image` (**PNG do souboru** — výhoda proti MCP, který uměl jen inline). Registr 32 → **35 operací**. Viz §6a.
+
+Změny 0.2 proti 0.1: **registr operací** (zrcadlo MCP toolů — skilly fungují beze změn), **`$N` řetězení GUIDů v dávce**, **whitelist operací `FB_OpsAllowed`** (E_OP_FORBIDDEN), **kvóty klonování** (E_QUOTA), sekvenční zprávy (K1), baselines (K5), linked docs (K10), diagram helpery (K11), bonusy K6–K9, **GUI fallback** (zpracování dávek bez pumpy, klik v EA), **`deploy_src`** (dev nasazení kódu bez klikání), **dvojí runtime + `FB_ComObj`**.
 
 ## 1. Architektura
 
@@ -77,9 +79,9 @@ Reference se rozresolvují rekurzivně v celém objektu opu (i uvnitř polí `ta
 
 Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, created}` u dávkových operací) — kvůli `$N` referencím.
 
-## 4. Registr operací (32; zrcadlo MCP toolů)
+## 4. Registr operací (35; zrcadlo MCP toolů)
 
-Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whitelistu packages), Č = čtecí (povolena vždy). Stav ✅ = E2E ověřeno (iterace 1 = dávky 20260816-*, iterace 3 = 20260817-*).
+Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whitelistu packages), Č = čtecí (povolena vždy). Stav ✅ = E2E ověřeno (iterace 1 = dávky 20260816-*, iterace 3 = 20260817-*, iterace 2 = 20260818-*).
 
 | op | Z/Č | Klíčové argumenty | Response (nad rámec status) | Stav |
 |---|---|---|---|---|
@@ -112,11 +114,14 @@ Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whiteli
 | `change_connector_visibility` | Z | `diagram`, `connectorIDs[]`, `hidden` | `connectorIDs` (změněné) | ✅ 20260817-09 |
 | `open_diagrams` | Č | `diagrams[]` | `opened[]` | ✅ 20260817-09 |
 | `reload_diagrams` | Č | `diagrams[]` | `reloaded[]` | ✅ 20260816-14 |
+| `create_or_update_diagram` | Z | `diagrams[{diagram→update; package\|owningElement+type→create (type vč. MDG "Tech::Typ"); name, notes, author, version, showDetails, styleEx}]` — na create vždy Author+Version dle §7e | `items[{guid,id,name,type,created}]` | ✅ 20260818-05 |
+| `place_elements_on_diagram` | Z | `diagram`, `elementPlacements[{elementID\|element, x, y, width, height, style}]` — bez souřadnic auto-mřížka | `items[{elementID,guid,x,y,width,height}]`, `connectorsOnDiagram[]` | ✅ 20260818-05/-07 |
+| `get_diagram_image` | Č | `diagrams[]` \| `diagram`, `inline` | `items[{file,size,png_b64?}]`; PNG jen do `<baseDir>\responses\images\` | ✅ 20260818-08/-10 |
 | `update_diagram_properties` | Z | `diagrams[{diagram, name, author, version, showDetails, styleEx}]` (K6, konvence §7e) | `items[]` | ✅ 20260817-13 |
 | `set_diagram_object_style` | Z | `diagram`, `objects[{elementID, backgroundColor{red,green,blue}, fontColor, borderColor, borderWidth, reset}]` (K9) | `changedElementIDs` | ✅ 20260817-13 |
 | `deploy_src` | Z | `only[]` — nalije kód ze `src/` do modelu, založí i NOVOU operaci (signatura z hlavičky `// AICodeBridge.Nazev(args)`); pumpa si kód po dávce sama přenačte | `updated[], created[], skipped[]` | ✅ (VÝHRADNĚ dev; v bance deny) |
 
-Trvale vyloučeno (neimplementuje se): `apply_baseline` (§12a — obnova z baseline jen člověk v EA UI), `find_element_in_diagrams` (kryje `query` nad `t_diagramobjects`), interaktivní `select_*`/`get_current_*` (pro dávkový kanál bezpředmětné). Iterace 2: `create_or_update_diagram`, `place_elements_on_diagram`, `get_diagram_image` (Diagram Builder + PNG export).
+Trvale vyloučeno (neimplementuje se): `apply_baseline` (§12a — obnova z baseline jen člověk v EA UI), `find_element_in_diagrams` (kryje `query` nad `t_diagramobjects`), interaktivní `select_*`/`get_current_*` (pro dávkový kanál bezpředmětné). M365 části iterace 2 (Downloads watcher, OneDrive/SharePoint, prod add-in) čekají na POC fázi 3.
 
 ## 5. Sekvenční zprávy (K1) — mechanika v `t_connector`
 
@@ -139,6 +144,14 @@ Návratová zpráva: MCP kóduje `PDATA4=1`, bridge používá `SubType="Return"
 - **Linked docs round-trip**: EA při importu RTF normalizuje (obohatí hlavičky) — porovnávat obsah/markery, ne byte-shodu.
 - **K8 isComposite**: zapisuje `t_object.NType=8`; `compositeDiagram` přes `SetCompositeDiagram`.
 - **K9 reset**: zapíše explicitní `BCol=-1;BFol=-1;LCol=-1;LWth=1;` (= default vzhled).
+
+## 6a. Diagram Builder a PNG export (iterace 2, dávky 20260818-01…11)
+
+- **`create_or_update_diagram`**: create v package (`package`) NEBO pod elementem (`owningElement` — auto-kompozity, linked diagramy §7e). **MDG typ** se zadává kvalifikovaně (`"UML Behavioral::Sequence"`, `"CSOB-ITAN::FA-Behavioral"`): EA zapíše základní `Diagram_Type` a MDG vazbu drží `StyleEx` `MDGDgm=<typ>;` (mechanika ověřena RE proti MCP referenci, dávky 20260818-02/-03; executor MDGDgm doplní, kdyby ho AddNew nezapsal). Na create se **vždy** nastaví `Author` (default `Claude via eafb`) a `Version` (default `1.0`) — §7e: diagramy založené přes API jinak autora nemají. Update = cíl přes `diagram` ("{GUID}" | id), mění jméno/notes/author/version/showDetails/styleEx.
+- **`place_elements_on_diagram`**: geometrie v `t_diagramobjects`: `RectLeft=x`, `RectTop=−y`, `RectRight=x+width`, `RectBottom=−(y+height)` (souřadnice od levého horního rohu, shodné s MCP). Bez `x`/`y` auto-mřížka 4 sloupce (krok 220×140), default velikost 160×80. **Konektory mezi umístěnými elementy EA vykreslí sám**, jakmile jsou oba konce na diagramu — response je vykazuje v `connectorsOnDiagram` (čte se `t_connector`; ⚠ `t_diagramlinks` se plní až při otevření/kreslení diagramu v EA, u čerstvého diagramu je prázdná — ověřeno 20260818-05/-07).
+- **`get_diagram_image`**: `Project.PutDiagramImageToFile` → PNG **výhradně do `<baseDir>\responses\images\`** (jméno se sanitizuje, vzor linked docs). `inline: true` přidá `png_b64` (base64 přes ADODB.Stream+MSXML, obojí `FB_ComObj` — dual runtime §1a). Klíčová výhoda proti MCP: ten uměl obrázek jen inline v odpovědi (bolest EDU pipeline).
+- ⚠ **Lekce — pořadí v dávce**: (1) `deploy_src` přenačítá kód pumpy až **po doběhnutí dávky** — operace za ním v téže dávce běží starým kódem; nový kód používej až od následující dávky (pozorováno 20260818-06). (2) PNG exportovaný v téže dávce hned po zápisu zpráv nezachytí čerstvé změny — před `get_diagram_image` zařaď `reload_diagrams`, ideálně v samostatné dávce (20260818-09/-10).
+- Sekvenční řetěz Diagram Builder + K1 ověřen: nový MDG Sequence diagram + place lifelin + `create_or_update_messages` v jedné dávce přes `$N` (20260818-09) — dosud šly zprávy jen na předpřipravený diagram.
 
 ## 7. Chybové kódy
 
@@ -186,10 +199,10 @@ Provozní poznámky: pumpa nesmí běžet zároveň (sebrala by requesty první)
 ## 11. Provoz
 
 - Start: dvojklik `pump.wsf`. Konzole hlásí verzi (`pumpa v0.4`), repozitář, počet operací (Code loader) a session baseline — **zkontrolovat pohledem**.
-- Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem.
+- Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte — až **po doběhnutí dávky**; nový kód platí od následující dávky, §6a). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem.
 - Kód pro EA runtime (menu, GUI fallback): po `deploy_src` navíc **restart EA** (§1a).
 - Po každé změně: sync `src/` = commit v repu (dělá Miloš, VS Code GUI).
 
-## 12. Stav modelu (eaexample, po iteraci 3)
+## 12. Stav modelu (eaexample, po iteraci 2)
 
-AICodeBridge el. 11037 (pkg 1052), 62 operací (33× `FB_Op*`/`FB_*` + AI Code Bridge legacy + `FB_ComObj` od 20260817-22). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) — úklid rozhoduje Miloš.
+AICodeBridge el. 11037 (pkg 1052), **65 operací** (36× `FB_Op*`/`FB_*` — od 20260818-04 navíc `FB_OpDiagram`, `FB_OpPlaceElements`, `FB_OpDiagramImage` + AI Code Bridge legacy). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) + artefakty iterace 2 (diagramy MCP reference 1136 `FBT MCPRef Logical`/1137 `FBT MCPRef Seq`, bridge 1138 `FBT BLD Statika`/1139 `FBT BLD Seq`/1140 `FBT BLD SeqTest`, zprávy 4814/4815, element 11123 `FBT Regres IT2`, 11060 umístěn na 1132) — úklid rozhoduje Miloš.
