@@ -15,6 +15,13 @@
 // op.diagram  = domovsky diagram zprav (id | "{GUID}") - doporucene: zapise
 //               se do Connector.DiagramID (zprava patri interakci, ale EA
 //               ji kresli podle DiagramID/SeqNo)
+// op.rebuild  = true -> OPT-IN (audit B2, K3): deterministicky rebuild V2d
+//               server-side (vzor FB_OpScenarios): SMAZE vsechny Sequence
+//               konektory diagramu (vyzaduje op.diagram; whitelist kontrola
+//               drzi - vzor FB_OpDelete) a postavi je znovu z davky. V rebuild
+//               modu musi kazda zprava mit explicitni seqNo a nesmi nest
+//               guid/connectorID (cile prave smazane). Response nese removed.
+//               Default off - chovani stavajicich davek se NEMENI.
 // op.messages = [ {
 //   connectorID | guid    -> UPDATE; jinak CREATE
 //   source, target        -> lifeliny ("{GUID}" | elementID | $ref)
@@ -38,6 +45,67 @@ if (op.diagram) {
     if (dg == null) { return { op: "create_or_update_messages", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + op.diagram }; }
 }
 var items = [], warns = [];
+// --- OPT-IN rebuild mod (audit B2, K3): smaz Sequence konektory diagramu + postav znovu ---
+var rebuild = (op.rebuild === true || ("" + op.rebuild) == "true");
+var removed = 0;
+if (rebuild) {
+    if (dg == null) {
+        return { op: "create_or_update_messages", status: "error", code: "E_ARGS", message: "rebuild: true vyzaduje op.diagram." };
+    }
+    for (var vi = 0; vi < op.messages.length; vi++) {
+        var vm = op.messages[vi];
+        if (vm && (vm.connectorID || vm.guid)) {
+            return { op: "create_or_update_messages", status: "error", code: "E_ARGS",
+                message: "messages[" + vi + "]: v rebuild modu nesmi zprava nest guid/connectorID (cile se prave mazou) - posli kompletni sadu jako create." };
+        }
+        if (!vm || typeof vm.seqNo == "undefined") {
+            return { op: "create_or_update_messages", status: "error", code: "E_ARGS",
+                message: "messages[" + vi + "]: rebuild mod vyzaduje explicitni seqNo u kazde zpravy (deterministicke poradi)." };
+        }
+    }
+    var delRows;
+    try {
+        delRows = this.FB_XmlRows(Repository.SQLQuery(
+            "SELECT Connector_ID FROM t_connector WHERE DiagramID = " + dg.DiagramID + " AND Connector_Type = 'Sequence'"));
+    } catch (eRQ) {
+        return { op: "create_or_update_messages", status: "error", code: "E_EXCEPTION", message: "rebuild: dotaz na zpravy diagramu selhal: " + eRQ.message };
+    }
+    // pre-check whitelistu VSECH mazanych konektoru PRED prvnim mazanim (zadne parcialni mazani)
+    var toDel = [];
+    for (var di = 0; di < delRows.length; di++) {
+        var dcid = parseInt(delRows[di].Connector_ID, 10);
+        var dc = null;
+        try { dc = Repository.GetConnectorByID(dcid); } catch (eDC) { dc = null; }
+        if (dc == null) { continue; }
+        var dCli = Repository.GetElementByID(dc.ClientID);
+        var dSup = Repository.GetElementByID(dc.SupplierID);
+        var dChk1 = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dCli.PackageID));
+        var dChk2 = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dSup.PackageID));
+        if (dChk1 != null && dChk2 != null) {
+            return { op: "create_or_update_messages", status: "error", code: dChk1.code,
+                message: "rebuild: konektor " + dcid + " ma oba konce mimo whitelist - nic nebylo smazano. " + dChk1.message };
+        }
+        toDel.push({ id: dcid, clientID: dc.ClientID });
+    }
+    // delete pass (vzor FB_OpDelete: kolekce Connectors.DeleteAt)
+    for (var dj = 0; dj < toDel.length; dj++) {
+        var dCliEl = Repository.GetElementByID(toDel[dj].clientID);
+        var dFound = false;
+        for (var dk = 0; dk < dCliEl.Connectors.Count; dk++) {
+            if (dCliEl.Connectors.GetAt(dk).ConnectorID == toDel[dj].id) {
+                dCliEl.Connectors.DeleteAt(dk, false);
+                dCliEl.Connectors.Refresh();
+                dFound = true;
+                removed++;
+                break;
+            }
+        }
+        if (!dFound) {
+            return { op: "create_or_update_messages", status: "error", code: "E_EXCEPTION",
+                message: "rebuild: konektor " + toDel[dj].id + " se nepodarilo najit v kolekci elementu (smazano " + removed + " z " + toDel.length + ").", removed: removed };
+        }
+    }
+}
 for (var i = 0; i < op.messages.length; i++) {
     var msg = op.messages[i];
     var conn = null, created = false, srcEl = null, tgtEl = null;
@@ -144,6 +212,7 @@ for (var i = 0; i < op.messages.length; i++) {
     items.push(item);
 }
 var res = { op: "create_or_update_messages", status: "ok", count: items.length, items: items };
+if (rebuild) { res.removed = removed; } // K3: vykaz smazanych zprav (vzor FB_OpScenarios)
 if (items.length > 0) { res.guid = items[0].guid; res.id = items[0].id; }
 if (warns.length > 0) { res.warnings = warns; }
 return res;

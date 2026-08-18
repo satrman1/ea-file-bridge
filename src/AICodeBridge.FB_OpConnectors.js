@@ -11,6 +11,16 @@
 //   sourceEnd, targetEnd -> { aggregation: 0|1|2, multiplicity: "0..*", role, navigable: true|false }
 //                           (aggregation na tom konci, kde ma byt diamant - par. 7f)
 //   taggedValues         -> vc. RefGUID ids struktury (505-1 Operation Link, par. 7h)
+//   dedupKey             -> OPT-IN (audit B2, K4): stabilni klientsky klic; na create
+//                           se zapise jako TV ai.dedup, pri dalsim behu se konektor
+//                           najde podle nej (prezije prejmenovani). Poradi lookupu:
+//                           guid -> dedupKey -> match.
+//   match: "composite"   -> OPT-IN (audit B2, K2): pred create SQL lookup na
+//                           t_connector dle kompozitu (Start_Object_ID,
+//                           End_Object_ID, Connector_Type, Stereotype). Presne
+//                           1 nalez = UPDATE nalezeneho; >1 nalez bez dedupKey
+//                           = E_AMBIGUOUS s vyctem GUIDu. Default off - chovani
+//                           stavajicich davek se NEMENI.
 // } ]
 // Whitelist: aspon jeden konec musi byt ve whitelistovane vetvi (novy konektor
 // AI element -> existujici je povoleny vzorec, par. 12a).
@@ -36,7 +46,7 @@ function applyEnd(end, spec, label) {
 }
 for (var i = 0; i < op.connectors.length; i++) {
     var c = op.connectors[i];
-    var conn = null, created = false, srcEl = null, tgtEl = null;
+    var conn = null, created = false, srcEl = null, tgtEl = null, matchedBy = "";
     if (c.guid || c.connectorID) {
         try {
             if (c.guid) { conn = Repository.GetConnectorByGuid("" + c.guid); }
@@ -54,6 +64,49 @@ for (var i = 0; i < op.connectors.length; i++) {
         if (srcEl == null || tgtEl == null) {
             return { op: "create_or_update_connectors", status: "error", code: "E_NOT_FOUND",
                 message: "connectors[" + i + "]: " + (srcEl == null ? "source" : "target") + " nenalezen.", items: items };
+        }
+        // --- OPT-IN idempotence (audit B2): dedupKey (K4) -> match composite (K2) ---
+        if (typeof c.match != "undefined" && c.match !== null && ("" + c.match) != "" && ("" + c.match).toLowerCase() != "composite") {
+            return { op: "create_or_update_connectors", status: "error", code: "E_ARGS",
+                message: "connectors[" + i + "]: match podporuje jen hodnotu 'composite'.", items: items };
+        }
+        if (c.dedupKey) {
+            var df = this.FB_DedupFind(Repository, "connector", "" + c.dedupKey);
+            if (df.count > 1) {
+                return { op: "create_or_update_connectors", status: "error", code: "E_AMBIGUOUS",
+                    message: "connectors[" + i + "]: dedupKey '" + c.dedupKey + "' odpovida " + df.count + " konektorum.",
+                    guids: df.guids, items: items };
+            }
+            if (df.count == 1) { conn = df.obj; matchedBy = "dedupKey"; }
+        }
+        if (conn == null && c.match && ("" + c.match).toLowerCase() == "composite") {
+            var stPrim = "";
+            if (c.stereotypes) {
+                var stM = c.stereotypes;
+                if (Object.prototype.toString.call(stM) == "[object Array]") { stM = (stM.length > 0 ? stM[0] : ""); }
+                stPrim = ("" + stM).split(",")[0].replace(/^\s+|\s+$/g, "");
+            }
+            var sqlC = "SELECT ea_guid FROM t_connector WHERE Start_Object_ID = " + srcEl.ElementID +
+                " AND End_Object_ID = " + tgtEl.ElementID +
+                " AND Connector_Type = '" + ("" + c.type).replace(/'/g, "''") + "' AND " +
+                (stPrim == "" ? "(Stereotype IS NULL OR Stereotype = '')" : "Stereotype = '" + stPrim.replace(/'/g, "''") + "'");
+            var rowsC;
+            try { rowsC = this.FB_XmlRows(Repository.SQLQuery(sqlC)); }
+            catch (eCM) {
+                return { op: "create_or_update_connectors", status: "error", code: "E_EXCEPTION",
+                    message: "connectors[" + i + "]: kompozitni lookup selhal: " + eCM.message, items: items };
+            }
+            if (rowsC.length > 1 && !c.dedupKey) {
+                var ambG = [];
+                for (var aj = 0; aj < rowsC.length; aj++) { ambG.push("" + rowsC[aj].ea_guid); }
+                return { op: "create_or_update_connectors", status: "error", code: "E_AMBIGUOUS",
+                    message: "connectors[" + i + "]: kompozit (source, target, type, stereotyp) odpovida " + rowsC.length + " konektorum - rozliseni vyzaduje dedupKey nebo guid.",
+                    guids: ambG, items: items };
+            }
+            if (rowsC.length == 1) {
+                try { conn = Repository.GetConnectorByGuid("" + rowsC[0].ea_guid); } catch (eCG) { conn = null; }
+                if (conn != null) { matchedBy = "composite"; }
+            }
         }
     }
     // whitelist: aspon jeden konec ve whitelistovane vetvi
@@ -98,9 +151,12 @@ for (var i = 0; i < op.connectors.length; i++) {
     var w2 = this.FB_TagWrite(Repository, conn, c.taggedValues);
     for (var wj = 0; wj < w2.length; wj++) { warns.push("connectors[" + i + "]: " + w2[wj]); }
     if (created) { this.SetTag(conn, "ai.channel", "eafb"); }
+    if (created && c.dedupKey) { this.SetTag(conn, "ai.dedup", "" + c.dedupKey); } // K4: klic prezije prejmenovani
     this.SetTag(conn, "ai.request", "" + reqId);
     if (created) { srcEl.Connectors.Refresh(); }
-    items.push({ guid: "" + conn.ConnectorGUID, id: conn.ConnectorID, type: "" + conn.Type, created: created });
+    var itC = { guid: "" + conn.ConnectorGUID, id: conn.ConnectorID, type: "" + conn.Type, created: created };
+    if (matchedBy != "") { itC.matchedBy = matchedBy; }
+    items.push(itC);
 }
 var res = { op: "create_or_update_connectors", status: "ok", count: items.length, items: items };
 if (items.length > 0) { res.guid = items[0].guid; res.id = items[0].id; }

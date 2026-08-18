@@ -1,4 +1,4 @@
-# Matice parity MCP × ea-file-bridge (stav 2026-08-17, po iteraci 2b — Scenarios/Classifier/Scaffold; dávky 20260818-*)
+# Matice parity MCP × ea-file-bridge (stav 2026-08-18, po dostavbě idempotence dle auditu B2; dávky 20260818-*)
 
 Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP · ⛔ vědomě vynecháno
 
@@ -50,6 +50,17 @@ Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP 
 | (nad rámec MCP) | **GUI fallback** `FB_ProcessFolder` + menu „Process requests (File Bridge)" | ✅ 🔵 response bez běžící pumpy, archiv processed\ (20260817-23). ⚠ EA runtime: nutný `FB_ComObj` (žádný ActiveXObject/Enumerator) a aktivace kódu = **plný restart EA** (Reload Current Project nestačí) |
 
 **K9 legenda diagramu**: neimplementována — kandidát, odhad 0,5 dne (vlastní struktura legend elementu v EA, netriviální mapování na protokol). Fallback: ITAN skript.
+
+**Dostavba idempotence dle auditu B2 (2026-08-18, dávky 20260818-40…55; spec = `AUDIT-B2-IDEMPOTENCE-2026-08.md` §5, docs v0.5):** sonda názvů sloupců přes `sqlite_master` (-40), deploy 5 souborů vč. nového helperu `FB_DedupFind` (-41), setup K2A 11173 / K2B 11174 (-42). Důkazy:
+
+- **(a) K2 `match: "composite"`**: táž konektorová dávka 2× — 1. běh `created: true` (Dependency «use» 4819, -43), 2. běh `created: false` + `matchedBy: "composite"` + týž GUID, SQL readback `COUNT(*)` v `t_connector` = 1 beze změny (-44).
+- **(b) K1 `matchByName`**: táž dávka 2× — `FBT B2 MBN` → 1 element (11178; 2. běh `matchedBy: "name"`), `FBT B2 NOMATCH` **bez** matchByName → 2 elementy (11179 + 11182 = důkaz nezměněného defaultu), package `FBT B2 PKG` → 1 (1062, `matchedBy: "name"`); COUNT readbacky 1/2/1 (-45/-46).
+- **(c) K4 `dedupKey`**: create s `FBT-B2-DK1` → el. 11184 + TV `ai.dedup` (-47) → přejmenování GUIDem na „FBT B2 DK prejmenovano" (-48) → **táž dávka znovu** → UPDATE původního GUID (`created: false`, `matchedBy: "dedupKey"`), žádný nový element (COUNT dle ai.dedup = 1, dle jmen = 1) (-49) — klíč přežil přejmenování.
+- **(d) K3 `rebuild: true`**: diagram `FBT B2 Seq` 1155 + lifeliny 11188/11189 (-50); rebuild 3 zpráv s explicitními seqNo: 1. běh `removed: 0` + 3 created (-51), 2. běh `removed: 3` + 3 recreated, COUNT Sequence konektorů diagramu = 3 v obou bězích (-53); PNG diagramu po obou bězích **byte-identické** (SHA-256 `e15bfcbb…` shodný, -52/-54).
+- **(e) regresní dávka vzoru 20260818-11**: shodné chování — ping + query (model 70 ops) + create (el. 11195) + `E_WHITELIST` na pkg 1052 + skipped (-55).
+- **(f)** grep `ActiveXObject` na nových/změněných souborech (FB_DedupFind, FB_OpConnectors, FB_OpElements, FB_OpPackage, FB_OpMessages) = 0.
+
+Testovací artefakty FBT-B2 k úklidu viz PROTOKOL §12.
 
 **Regresní běh 2026-08-17** (bod 4 zadání): pozitivní ping+query+create_or_update_elements + `E_WHITELIST`+skipped (20260817-15), `E_REPO` na dávce pro EMR_PROD — nic neprovedeno (20260817-16), `E_SQL_READONLY` na DELETE (20260817-17). Shodné chování jako 2026-08-16. **Regrese po iteraci 2**: ping + query + create (el. 11123) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-11). **Regrese po iteraci 2b**: ping + query + create (el. 11163) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-37).
 

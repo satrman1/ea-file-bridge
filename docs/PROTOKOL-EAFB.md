@@ -1,6 +1,8 @@
 # Protokol eafb/0.2 — EA File Bridge
 
-2026-08-17 · **v0.4** (dokumentační verze; protokol na drátě zůstává `eafb/0.2`) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + iterace 2 Diagram Builder (dávky 20260818-01…11) + **iterace 2b Scenarios/Classifier/Scaffold (dávky 20260818-14…37)** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta).
+2026-08-18 · **v0.5** (dokumentační verze; protokol na drátě zůstává `eafb/0.2`) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + iterace 2 Diagram Builder (dávky 20260818-01…11) + iterace 2b Scenarios/Classifier/Scaffold (dávky 20260818-14…37) + **dostavba idempotence dle auditu B2 (dávky 20260818-40…55)** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta).
+
+Změny v0.5 proti v0.4: **dostavba idempotenčních mechanismů dle auditu B2** (`docs/AUDIT-B2-IDEMPOTENCE-2026-08.md` §5, rozhodnutí 2026-08-18 — před stavbou vrátného). Vše **opt-in, výchozí chování dávek se NEMĚNÍ**: `matchByName` (elements, packages — K1, find_or_create dle jména/aliasu scoped na cílový package/parent), `match: "composite"` (connectors — K2, kompozitní lookup Start/End/Type/Stereotype), `dedupKey` + TV `ai.dedup` + sdílený helper `FB_DedupFind` (elements, connectors — K4, klíč přežívá přejmenování; pořadí lookupu guid → dedupKey → kompozit/jméno), `rebuild: true` (messages — K3, server-side deterministický rebuild V2d po vzoru scenarios, `removed` v response). Nový chybový kód `E_AMBIGUOUS` (výčet kandidátů v `guids`). Nová sekce **§5a Retry sémantika**. Registr zůstává 38 operací (jen nová pole).
 
 Změny v0.4 proti v0.3: **iterace 2b** — `create_or_update_scenarios` (strukturované UC scénáře do Scenarios tab — revize U2, rozhodnutí 2026-08-17), `apply_classifier_stereotypes` (port ITAN-Apply Classifier Stereotypes on SD.vbs), `find_or_create_referencing_sr` (port ITAN scaffoldu, SR větev) + konfigurační sekce **`FB_ScaffoldConfig`** (šablonové GUIDy per repo). Registr 35 → **38 operací**. Viz §6b.
 
@@ -99,12 +101,12 @@ Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whiteli
 | `baseline_diff` | Č | `package`, `baseline` (GUID) | `summary` (počty per status), `raw` (XML comparelog) | ✅ 20260817-02 |
 | `export_element_linked_documents` | Č | `elements[]`, `inline` | `items[{hasDocument,file,size,rtf_b64?}]`; soubory jen do `<baseDir>\responses\docs\` | ✅ 20260817-08 |
 | `create_element` | Z | legacy POC alias (nahrazeno `create_or_update_elements`) | `guid, elementId` | ✅ |
-| `create_or_update_elements` | Z | `elements[{guid\|elementID→update; package\|owningElement+type→create; name, stereotypes, notes, alias, status, author/version (K6), type na update = změna typu (K7), isComposite+compositeDiagram (K8), classifier, taggedValues}]` | `items[{guid,id,name,created}]` | ✅ K7/K8: 20260817-13 |
-| `create_or_update_package` | Z | `parent`, `name`, `notes`, `taggedValues` | `items[{guid,id,name,created}]` | ✅ |
-| `create_or_update_connectors` | Z | `connectors[{source,target,type,stereotypes,direction,taggedValues(RefGUID ids)}]` | `items[]` | ✅ |
+| `create_or_update_elements` | Z | `elements[{guid\|elementID→update; package\|owningElement+type→create; name, stereotypes, notes, alias, status, author/version (K6), type na update = změna typu (K7), isComposite+compositeDiagram (K8), classifier, taggedValues, **matchByName (opt-in B2/K1: find dle jména/aliasu scoped na package/parent → UPDATE), dedupKey (opt-in B2/K4: TV `ai.dedup`, přežívá přejmenování)**}]` | `items[{guid,id,name,created,matchedBy?}]` | ✅ K7/K8: 20260817-13; B2: 20260818-45…49 |
+| `create_or_update_package` | Z | `parent`, `name`, `notes`, `taggedValues`, **`matchByName` (opt-in B2/K1: find dle jména scoped na parent → UPDATE)** | `items[{guid,id,name,created,matchedBy?}]` | ✅ B2: 20260818-45/-46 |
+| `create_or_update_connectors` | Z | `connectors[{source,target,type,stereotypes,direction,taggedValues(RefGUID ids), **match: "composite" (opt-in B2/K2: lookup dle Start/End/Type/Stereotype → UPDATE; >1 bez dedupKey = E_AMBIGUOUS), dedupKey (opt-in B2/K4: TV `ai.dedup`)**}]` | `items[{…,created,matchedBy?}]` | ✅ B2: 20260818-43/-44 |
 | `create_or_update_attributes` | Z | `element`, `attributes[{name,type,classifier,…}]` (parciální update) | `items[{guid,id,name,created}]` | ✅ |
 | `create_or_update_operations` | Z | `element`, `operations[{name,returnType,parameters[]…}]` (parameters = deterministický rebuild) | `items[]` vč. GUIDů parametrů | ✅ |
-| `create_or_update_messages` | Z | `diagram`, `messages[{source,target,name\|operation,isReturn,isAsynchronous,arguments,returnValue,seqNo}]` | `items[]` + `pdata` readback | ✅ (K1, viz §5) |
+| `create_or_update_messages` | Z | `diagram`, `messages[{source,target,name\|operation,isReturn,isAsynchronous,arguments,returnValue,seqNo}]`, **`rebuild: true` (opt-in B2/K3: server-side V2d — smaže Sequence konektory diagramu a postaví znovu; vyžaduje `diagram` + explicitní `seqNo` u všech zpráv, zprávy bez guid/connectorID)** | `items[]` + `pdata` readback, **`removed` (rebuild)** | ✅ (K1, viz §5); rebuild B2: 20260818-51…54 |
 | `delete_from_model` | Z | `targets[{type: Package\|Diagram\|Element\|Connector\|Attribute\|Operation\|Parameter, id\|guid, name (Parameter)}]` | `items[{type,id,deleted}]` | ✅ všech 7 typů (20260817-04, -07; Connector 20260816-12/14) |
 | `delete_taggedvalue_from_model` | Z | `targets[{type: Element/Connector/Attribute/Operation/PackageTaggedValue, id\|guid, name}]` | `items[]` | ✅ Element+Connector TV (20260817-03, UNDO drill T1) |
 | `remove_elements_from_diagram` | Z | `diagram`, `elementIDs[]` — jen z diagramu, model nedotčen (§11) | `removedElementIDs` | ✅ 20260817-03 |
@@ -139,7 +141,22 @@ Reverse-engineering proti MCP referenci (zprávy 4799–4801 vs. bridge 4809–4
 | `PDATA3` | `TransitionAction` | `Call` |
 | `SeqNo`, `DiagramID` | zapisovatelné | pořadí zprávy, domovský diagram |
 
-Návratová zpráva: MCP kóduje `PDATA4=1`, bridge používá `SubType="Return"` — **obojí EA kreslí čárkovaně**, čtecí strana bridge (`get_diagrams_information`) rozumí oběma. Vazba na operaci = tag `operation_guid` na konektoru. Deterministický rebuild V2d: delete zpráv + recreate v jedné dávce (`delete_from_model` Connector + `create_or_update_messages` s explicitními `seqNo`).
+Návratová zpráva: MCP kóduje `PDATA4=1`, bridge používá `SubType="Return"` — **obojí EA kreslí čárkovaně**, čtecí strana bridge (`get_diagrams_information`) rozumí oběma. Vazba na operaci = tag `operation_guid` na konektoru. Deterministický rebuild V2d: klientsky delete zpráv + recreate v jedné dávce, **nebo od v0.5 server-side `rebuild: true`** (preferováno — atomický smaž-a-postav uvnitř jedné operace, viz §5a).
+
+## 5a. Retry sémantika a idempotence (dostavba auditu B2, 2026-08-18)
+
+Referenční audit: `docs/AUDIT-B2-IDEMPOTENCE-2026-08.md` (verdikty K1–K4). Pravidla pro klienty (vrátný, copilot-instructions, skilly):
+
+1. **Rollback neexistuje.** Dávka je stop-on-error; chybová response nese v `items` GUIDy položek **dosud vytvořených** uvnitř chybující operace — ty v modelu zůstávají. Operace za chybou jsou `skipped` (neproběhly vůbec).
+2. **Korektní retry bez opt-in polí = opravná dávka adresující GUIDy z chybové response** (guid → UPDATE cesta), **nikdy slepé přeposlání celé dávky** — každé přeposlání create položek bez guid vytvoří duplicity. Toto pravidlo platí bezpodmínečně, dokud klient nepoužívá `matchByName`/`match`/`dedupKey`.
+3. **Opt-in idempotence (v0.5)** — s těmito poli je přeposlání téže dávky bezpečné (druhý běh = UPDATE, `created: false` + `matchedBy` v items):
+   - `matchByName: true` (elements, packages — K1): find dle jména/aliasu **scoped na cílový package (`Package_ID` + `ParentID = 0`) / parent element (`ParentID`) / parent package (`t_package.Parent_ID`)**. Globální resolver `FB_ResolveEl` se pro tohle nepoužívá.
+   - `match: "composite"` (connectors — K2): lookup dle (`Start_Object_ID`, `End_Object_ID`, `Connector_Type`, `Stereotype`); právě 1 nález = UPDATE.
+   - `dedupKey` (elements, connectors — K4): stabilní klientský klíč; na create se zapíše jako TV `ai.dedup` (sdílený helper `FB_DedupFind`, SQL `t_objectproperties`/`t_connectortag`, bez dialektových funkcí). **Přežívá přejmenování.** Pořadí lookupu: guid → dedupKey → kompozit/jméno.
+   - `rebuild: true` (messages — K3): server-side V2d — smaže **všechny** Sequence konektory diagramu (whitelist kontrola drží, pre-check před prvním mazáním = žádné parciální mazání) a postaví znovu z dávky; vyžaduje `diagram` + explicitní `seqNo` u každé zprávy; response nese `removed`. Vzor `create_or_update_scenarios`.
+4. **`E_AMBIGUOUS`**: match/dedupKey lookup našel >1 kandidáta — response nese `guids` (výčet). Řešení: adresovat konkrétní `guid`, nebo u konektorů poslat `dedupKey` (create pak založí nový, jednoznačně klíčovaný).
+5. **Vazba na modal hang** (T4-3): po zotavení z visící pumpy odklikem hrozí falešné OK `rowCount: 0` — právě tam vzniknou duplicity nepozorovaně. Retry po každém zotavení proto **výhradně** s `match`/`dedupKey`, nebo přes kontrolní čtení + opravnou dávku dle bodu 2.
+6. Výchozí chování beze změny: create bez opt-in polí je vždy `AddNew` — dávky, které duplicitní jména legitimně chtějí (nepojmenované lifeliny, opakovaná jména v různých kontextech), fungují jako dřív.
 
 ## 6. Poznámky z E2E iterace 3
 
@@ -178,6 +195,7 @@ Návratová zpráva: MCP kóduje `PDATA4=1`, bridge používá `SubType="Return"
 | `E_ARGS` | op | chybí povinné argumenty |
 | `E_SQL_READONLY` | op | jiný dotaz než SELECT/WITH |
 | `E_WHITELIST` | op | package mimo whitelist (v rámci správného repozitáře) |
+| `E_AMBIGUOUS` | op | **nové v 0.5** (audit B2): `matchByName`/`match: "composite"`/`dedupKey` lookup našel víc kandidátů — response nese `guids`; adresuj `guid`, nebo použij `dedupKey` |
 | `E_NOT_FOUND` | op | cíl nenalezen |
 | `E_EXCEPTION` | op/dávka | neočekávaná výjimka |
 | `E_NO_EXECUTOR` | dávka | v modelu chybí FB_Main |
@@ -216,6 +234,6 @@ Provozní poznámky: pumpa nesmí běžet zároveň (sebrala by requesty první)
 - Kód pro EA runtime (menu, GUI fallback): po `deploy_src` navíc **restart EA** (§1a).
 - Po každé změně: sync `src/` = commit v repu (dělá Miloš, VS Code GUI).
 
-## 12. Stav modelu (eaexample, po iteraci 2b)
+## 12. Stav modelu (eaexample, po dostavbě B2)
 
-AICodeBridge el. 11037 (pkg 1052), **69 operací** (40× `FB_Op*`/`FB_*` — od 20260818-15/-29/-34 navíc `FB_OpScenarios`, `FB_OpApplyClassifierStereotypes`, `FB_OpFindOrCreateSR`, `FB_ScaffoldConfig` + AI Code Bridge legacy). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) + artefakty iterace 2 (diagramy MCP reference 1136 `FBT MCPRef Logical`/1137 `FBT MCPRef Seq`, bridge 1138 `FBT BLD Statika`/1139 `FBT BLD Seq`/1140 `FBT BLD SeqTest`, zprávy 4814/4815, element 11123 `FBT Regres IT2`, 11060 umístěn na 1132) + MDG probe (el. 11126, diagramy 1141/1143/1144) + **artefakty iterace 2b**: UC `FBT UC Scenarios` 11129 (3 scénáře), lifeliny 11061/11062 + classifier 11060 zkonvertované na Component «IDS-Manager» (dávka -31), pkg `FBT Scaffold Templates` 1059 (šablony: el. 11149–11152, diagramy 1147–1150), pkg `FBT #UNSORTED` 1060 + scaffold `DoBind_AREL2608` 1061 (el. 11157–11160, diagramy 1151–1154, konektory 4816–4818), regres el. `FBT Regres IT2b` 11163 — úklid rozhoduje Miloš.
+AICodeBridge el. 11037 (pkg 1052), **70 operací** (od 20260818-41 navíc `FB_DedupFind`) (40× `FB_Op*`/`FB_*` — od 20260818-15/-29/-34 navíc `FB_OpScenarios`, `FB_OpApplyClassifierStereotypes`, `FB_OpFindOrCreateSR`, `FB_ScaffoldConfig` + AI Code Bridge legacy). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) + artefakty iterace 2 (diagramy MCP reference 1136 `FBT MCPRef Logical`/1137 `FBT MCPRef Seq`, bridge 1138 `FBT BLD Statika`/1139 `FBT BLD Seq`/1140 `FBT BLD SeqTest`, zprávy 4814/4815, element 11123 `FBT Regres IT2`, 11060 umístěn na 1132) + MDG probe (el. 11126, diagramy 1141/1143/1144) + **artefakty iterace 2b**: UC `FBT UC Scenarios` 11129 (3 scénáře), lifeliny 11061/11062 + classifier 11060 zkonvertované na Component «IDS-Manager» (dávka -31), pkg `FBT Scaffold Templates` 1059 (šablony: el. 11149–11152, diagramy 1147–1150), pkg `FBT #UNSORTED` 1060 + scaffold `DoBind_AREL2608` 1061 (el. 11157–11160, diagramy 1151–1154, konektory 4816–4818), regres el. `FBT Regres IT2b` 11163 + **artefakty dostavby B2** (dávky 20260818-42…55): elementy `FBT B2 K2A` 11173, `FBT B2 K2B` 11174, `FBT B2 MBN` 11178, `FBT B2 NOMATCH` 11179 + 11182 (záměrná duplicita — důkaz defaultu), `FBT B2 DK original` 11184 (TV `ai.dedup`), lifeliny `FBT B2 LL1` 11188 / `FBT B2 LL2` 11189, regres `FBT Regres B2` 11195; konektor Dependency«use» 4819; zprávy 4823–4825; pkg `FBT B2 PKG` 1062; diagram `FBT B2 Seq` 1155 — úklid rozhoduje Miloš.
