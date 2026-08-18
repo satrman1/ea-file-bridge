@@ -8,6 +8,8 @@
 // v0.4 (iterace 2b): create_or_update_scenarios (strukturovane UC scenare),
 // apply_classifier_stereotypes (IDS instance na SD), find_or_create_
 // referencing_sr (port ITAN scaffoldu, SR vetev; sablony = FB_ScaffoldConfig).
+// v0.6: create_or_update_constraints (internal constraints elementu -
+// zalozka Constraints, PRE/PST/ASU na UC dle U2 rev. 2026-08-17).
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var req = null;
 try {
@@ -75,6 +77,7 @@ var REG = {
     "place_elements_on_diagram":         { fn: "FB_OpPlaceElements", w: true },
     "get_diagram_image":                 { fn: "FB_OpDiagramImage", w: false },
     "create_or_update_scenarios":        { fn: "FB_OpScenarios", w: true },
+    "create_or_update_constraints":      { fn: "FB_OpConstraints", w: true },
     "apply_classifier_stereotypes":      { fn: "FB_OpApplyClassifierStereotypes", w: true },
     "find_or_create_referencing_sr":     { fn: "FB_OpFindOrCreateSR", w: true },
     "deploy_src":                        { fn: "FB_OpDeploySrc", w: true }

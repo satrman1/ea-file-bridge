@@ -1,4 +1,4 @@
-# Matice parity MCP × ea-file-bridge (stav 2026-08-18, po dostavbě idempotence dle auditu B2; dávky 20260818-*)
+# Matice parity MCP × ea-file-bridge (stav 2026-08-19, po přidání `create_or_update_constraints`; dávky 20260818-* + 20260819-*)
 
 Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP · ⛔ vědomě vynecháno
 
@@ -44,6 +44,7 @@ Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP 
 | (nad rámec MCP) | změna `Element.Type` (K7) — součást `create_or_update_elements` | ✅ 🔵 Object→Component→Object (20260817-13) |
 | (nad rámec MCP) | `isComposite` + `SetCompositeDiagram` (K8) — součást `create_or_update_elements` | ✅ 🔵 NType=8 (20260817-13) |
 | (nad rámec MCP) | `create_or_update_scenarios` (strukturované UC scénáře do Scenarios tab, deterministický rebuild V2d) | ✅ 🔵 pořadí+typy kroků (actor/system) + větve Alternate/Exception s napojením na kroky (20260818-28; UI potvrzeno). ⚠ Step API reorder lekce — mechanika výhradně přes `XMLContent` (spike -18…-26, §6b protokolu) |
+| (nad rámec MCP — **MCP protějšek neexistuje, bridge-only**) | `create_or_update_constraints` (internal constraints do záložky Constraints / `t_objectconstraint` — PRE/PST/ASU na UC dle U2 rev., deterministický rebuild V2d) | ✅ 🔵 create 3× + rebuild `removed: 3` s propsanou úpravou, readback `t_objectconstraint` 3/3 (20260819-02…04, §6c protokolu) |
 | (nad rámec MCP) | `apply_classifier_stereotypes` (port ITAN-Apply Classifier Stereotypes on SD.vbs) | ✅ 🔵 Object→Component + stereotyp classifiera; idempotence 2. běh = 0 změn (20260818-31) |
 | (nad rámec MCP) | `find_or_create_referencing_sr` (port ITAN scaffoldu, SR větev; šablony per-repo `FB_ScaffoldConfig`) | ✅ 🔵 1. běh založil 1 pkg + 4 diagramy + 4 elementy + 3 vazby + TV 505-1 (20260818-35), 2. běh našel a nic nezaložil (20260818-36) |
 | (nad rámec MCP) | `deploy_src` (dev nasazení kódu executoru) | ✅ 🔵 vč. založení NOVÉ operace ze signatury (FB_ComObj, 20260817-22); v bance deny |
