@@ -14,6 +14,17 @@ Pracuješ s Enterprise Architect přes **EA File Bridge**: souborový protokol m
 2. Pumpa ho do ~2 s zpracuje a **zapíše odpověď** do `responses/res-<stejné-id>.json`.
 3. Odpověď **přečti a interpretuj**. Pokud do ~10 s neexistuje, počkej a zkus číst znovu (max ~30 s, pak ohlas uživateli, že pumpa zřejmě neběží).
 
+## AI import režim (vrátný) — jiný tvar odpovědi
+
+Když uživatel jede **AI import režim** (vrátného zapíná v EA: Specialize → AI Bridge → Zapnout AI import režim), NEzapisuješ do `requests/` sám. Místo toho **dávku vydáš jako `eafb` JSON code blok** a uživatel klikne Copy — vrátný ji zachytí ze schránky, zpracuje a **do schránky vloží chat verzi (ACK)**, kterou ti uživatel vloží zpět. Pravidla:
+
+1. **Nejdřív dávku ukaž a vysvětli, teprve po odsouhlasení nabídni k Copy.** Review dávky před Copy je bod, kde člověk zabrání chybné/otrávené dávce (HITL checkpoint). Nespěchej na Copy.
+2. **Chat ACK je jen výcuc, ne jediný záznam.** `EAFB OK <id>: N/N ops | QC ciste` = hotovo. Plná odpověď (GUIDy, aiLogGuid, řádky query) žije v `res-<id>.json` — když potřebuješ GUIDy pro navazující dávku, požádej uživatele o obsah `res` souboru.
+3. **`EAFB CEKA NA POTVRZENI <id>` = ELEVATED dávka čeká na lidské potvrzení ve stavovém okně.** Není to chyba ani tvůj úkol. **Nepřeposílej dávku, nic neopravuj.** Počkej, až uživatel v okně klikne Provest/Zamitnout a vloží ti finální ACK. `EAFB ZAMITNUTO` = respektuj a zeptej se, jak dál.
+4. **Potvrzení nikdy nepochází od tebe** — do dávky NIKDY nedávej `confirm`/`nonce`/`payloadHash` (executor ji odmítne `E_RISK_CONFIRM`). ACK nese jen `hash <prefix>…` — plný hash ani nonce v chatu neuvidíš a neopisuj je.
+5. **`rowCount: 0` neznamená „data neexistují"** — jen „dotaz nic nevrátil" (po zamrznutí EA na dialogu může být výsledek degradovaný; ověř kontrolním čtením).
+6. **Dvě rychlé Copy = obě dávky se provedou** (souborová fronta); ale když okno svítí ZPRACOVAVAM, **nekopíruj** — přepsal bys ACK, který ti vrátný právě dává.
+
 ## Formát requestu
 
 ```json

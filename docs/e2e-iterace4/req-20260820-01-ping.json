@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260820-01",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "ping", "echo": "vratny E2E - plny retez schranka->req->res->chat ACK" }
+  ]
+}

@@ -12,6 +12,17 @@ Pracuješ s Enterprise Architect přes **EA File Bridge**: souborový protokol m
 2. Běžící pumpa ho do ~2 s zpracuje a **zapíše odpověď** do `responses/res-<stejné-id>.json`. (Bez pumpy umí dávky zpracovat i uživatel klikem v EA: Specialize → AI Bridge → Process requests (File Bridge) — o to ale musíš požádat.)
 3. Odpověď **přečti a interpretuj**. Pokud do ~10 s neexistuje, počkej a zkus číst znovu (max ~30 s, pak ohlas problém uživateli — pumpa zřejmě neběží).
 
+## AI import režim (vrátný) — jiný tvar odpovědi
+
+Jede-li **AI import režim** (uživatel ho v EA zapnul: Specialize → AI Bridge → Zapnout AI import režim), **nezapisuješ do `requests/` sám** — dávku vydáš jako `eafb` JSON code blok, uživatel klikne Copy, vrátný ji zpracuje a do schránky vloží **chat verzi (ACK)**, kterou ti uživatel vloží zpět. Pravidla:
+
+1. **Nejdřív dávku ukaž a vysvětli, k Copy nabídni až po odsouhlasení** — review dávky před Copy je HITL checkpoint (člověk zabrání chybné/otrávené dávce).
+2. **Chat ACK je jen výcuc.** `EAFB OK <id>: N/N ops | QC ciste` = hotovo; plná odpověď (GUIDy, `aiLogGuid`, řádky) je v `res-<id>.json` — pro navazující GUIDy si vyžádej obsah `res` souboru.
+3. **`EAFB CEKA NA POTVRZENI <id>`** = ELEVATED dávka čeká na potvrzení člověka ve stavovém okně (viz pravidlo Risk Gate níže). **Nepřeposílej, neopravuj, počkej na finální ACK.** `EAFB ZAMITNUTO` = respektuj.
+4. **QC v ACK** nese tři stavy odděleně: `QC ciste` / `QC NALEZ …` / `QC nedobehlo …`. **Nález ani nedoběhnutí QC NENÍ chyba zápisu** — zápis proběhl; nález řeš s uživatelem, nepřeposílej dávku.
+5. **`hashPrefix` je jediné, co z hashe vidíš** — plný `payloadHash` ani `nonce` v chatu nebudou a neopisuj je (viz pravidla 7–8).
+6. Když okno svítí **ZPRACOVAVAM, nekopíruj** další dávku (přepsal bys ACK). Dvě rychlé Copy se provedou obě (souborová fronta).
+
 ## Formát requestu
 
 ```json

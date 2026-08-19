@@ -453,6 +453,13 @@ for (var i = 0; i < req.ops.length; i++) {
     if (r.status == "ok") { okc++; } else { errc++; failed = true; }
 }
 resp.status = failed ? "error" : "done";
+// QC v ACK (iterace 4 par. 3.4): jen po zapisove davce, ktera neco zapsala.
+// TRI STAVY ODDELENE - selhani QC NENI chyba zapisu (W6), proto try/catch
+// a vysledek vyhradne do resp.qc (chat verze ho rendruje zvlast).
+if (writesInBatch > 0 && okc > 0) {
+    try { resp.qc = this.FB_QcRun(Repository, req, resp); }
+    catch (eQc) { resp.qc = { status: "nedobehlo", reason: "FB_QcRun selhal: " + eQc.message, checks: 0, findings: [] }; }
+}
 var summary = resp.status + ": " + req.ops.length + " ops (" + okc + " ok, " + errc + " chyb)"
     + this.FB_RiskNote(risk);
 try {

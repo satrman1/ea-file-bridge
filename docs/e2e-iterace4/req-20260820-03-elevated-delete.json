@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260820-03",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "create_or_update_elements", "elements": [
+      { "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT IT4 DEL", "type": "Class", "notes": "iterace 4 E2E - cil pro ELEVATED delete (potvrzeni kanalem okno)" }
+    ] }
+  ]
+}

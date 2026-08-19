@@ -1,0 +1,11 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260820-05",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "create_or_update_elements", "elements": [
+      { "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT IT4 LOW", "type": "Class", "notes": "rebuild s vetsim objemem", "matchByName": true }
+    ] },
+    { "op": "delete_from_model", "targets": [ { "type": "Element", "name": "FBT IT4 LOW" } ] }
+  ]
+}

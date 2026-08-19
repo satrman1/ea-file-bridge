@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260820-04",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "delete_from_model", "targets": [ { "type": "Element", "name": "FBT IT4 DEL" } ] }
+  ]
+}
