@@ -1,12 +1,13 @@
 // AICodeBridge.FB_RiskGate(Repository, req, reg)
-// RISK GATE - vypocetni cast (iterace 4b, zadani v1.1 par. 3-5): deterministicke
-// METRIKY + KLASIFIKACE zapisove davky PRED exekuci. Zadne AI hodnoceni
-// (CR par. 14/3). Confirm okruh (nonce, pending\, E_RISK_INTEGRITY) = V2.
+// RISK GATE (iterace 4b, zadani v1.1 par. 3-5): deterministicke METRIKY +
+// KLASIFIKACE zapisove davky PRED exekuci. Zadne AI hodnoceni (CR par. 14/3).
 //
 // Vraci { riskLevel: "LOW"|"ELEVATED"|"BLOCKED", riskReasons[], metrics{},
-//         policyValid, elapsedMs, budgetMs, hashMaxChars }.
-// Vynucovani: FB_Main vynucuje jen BLOCKED (E_RISK_BLOCKED); LOW i ELEVATED
-// zatim exekuce jako dosud (shadow rezim - riskova pole v response + auditu).
+//         summary{ops,targets,packages,diagrams}, policyValid, elapsedMs,
+//         budgetMs, hashMaxChars }.
+// Vynucovani (od v0.8 - confirm okruh V2): BLOCKED = E_RISK_BLOCKED;
+// ELEVATED = confirm_required (zadny zapis bez lidskeho potvrzeni pres
+// FB_ConfirmPending); LOW = auto. Vynucuje FB_Main, gate jen klasifikuje.
 //
 // PRAVIDLA (dispozice red teamu jsou zavazne):
 //  - $N reference (B3): jako "prvek vytvoreny touto davkou" se pocita JEN $N
@@ -189,6 +190,15 @@ var elSet = {}, elCount = 0, pkgSet = {}, pkgCount = 0, dgmSet = {}, dgmCount = 
 function addEl(k) { if (elSet[k] != 1) { elSet[k] = 1; elCount++; } }
 function addPkg(k) { if (pkgSet[k] != 1) { pkgSet[k] = 1; pkgCount++; } }
 function addForeignDgm(k) { if (dgmSet[k] != 1) { dgmSet[k] = 1; dgmCount++; } }
+// --- souhrn pro potvrzovaci UI (V2, I6: dialog zobrazuje konkretni davku) ---
+var opCounts = {}, tgtNames = [], pkgNames = [], dgmNames = [], nameSeen = {};
+function pushName(arr, prefix, nm) {
+    var k = prefix + ":" + nm;
+    if (nameSeen[k] == 1) { return; }
+    nameSeen[k] = 1;
+    if (arr.length < 12) { arr.push("" + nm); }
+    else if (arr.length == 12) { arr.push("..."); }
+}
 
 // --- klasifikace $N reference (B3): OWN | EXISTING | UNCERTAIN ---
 var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
@@ -262,6 +272,7 @@ function touchElement(ref, ctx, countUpdate, addPackages) {
     }
     guardResolved(res, ctx);
     addEl(res.guid);
+    pushName(tgtNames, "e", res.name);
     if (addPackages && res.pkgId > 0) { addPkg("p" + res.pkgId); }
     if (countUpdate) { updatedExisting++; }
     return { own: false, res: res };
@@ -287,6 +298,7 @@ function touchPackage(ref, ctx, countUpdate) {
     if (PROT[("" + res.name).toUpperCase()] == 1) { block("Target package '" + res.name + "' (" + ctx + ") = konfiguracni jmeno bridge - BLOCKED (B4)"); }
     if (countUpdate) { updatedExisting++; }
     addPkg("p" + res.id);
+    pushName(pkgNames, "p", res.name);
 }
 // vraci { own: bool } - cizi (ne-vlastni) diagram jde do foreignDiagrams
 function touchDiagram(ref, ctx) {
@@ -310,6 +322,7 @@ function touchDiagram(ref, ctx) {
         return { own: false };
     }
     addForeignDgm(res.guid);
+    pushName(dgmNames, "d", res.name);
     if (res.pkgId > 0) { addPkg("p" + res.pkgId); }
     return { own: false };
 }
@@ -334,6 +347,7 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         continue;
     }
     if (!rg.w) { continue; } // cteci operace mimo gate
+    opCounts[name] = (opCounts[name] ? opCounts[name] + 1 : 1); // souhrn UI
     if (polValid) {
         var klass = pol.classes[name];
         if (klass == "BLOCKED") { block("Operace '" + name + "' je politikou klasifikovana BLOCKED"); }
@@ -456,13 +470,13 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         writeOps++;
     } else if (name == "clone_package") {
         writeOps++; createOps++;
-        addReason("clone_package: objem klonu je znamy az pri exekuci (kvota E_QUOTA trva)");
+        addReason("clone_package: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)");
     } else if (name == "clone_elements") {
         lst = o.elements || [];
         writeOps += (lst.length > 0 ? lst.length : 1);
         createOps += (lst.length > 0 ? lst.length : 1);
         touchPackage(o["package"], "cloneElements.package", false);
-        addReason("clone_elements: objem klonu je znamy az pri exekuci (kvota E_QUOTA trva)");
+        addReason("clone_elements: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)");
     } else if (name == "import_element_linked_documents") {
         lst = o.documents || [];
         writeOps += (lst.length > 0 ? lst.length : 1);
@@ -577,6 +591,7 @@ return {
     riskLevel: (level == 3 ? "BLOCKED" : (level == 2 ? "ELEVATED" : "LOW")),
     riskReasons: reasons,
     policyValid: polValid,
+    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames },
     metrics: {
         writeOps: writeOps, createOps: createOps, updatedExisting: updatedExisting,
         deleteTargets: deleteTargets, affectedElements: elCount,

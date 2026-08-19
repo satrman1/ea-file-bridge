@@ -23,7 +23,9 @@ var h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a,
 // --- vstup na UTF-8 bajty ---
 var bytes, bi = 0, i;
 if (input !== null && typeof input == "object" && Object.prototype.toString.call(input) == "[object Array]") {
-    bytes = input;
+    // KOPIE vstupu (V2): padding nize by jinak MUTOVAL volajicimu pole -
+    // FB_Main hashuje tytez bajty, ktere pak dekoduje FB_Utf8Decode (I5)
+    bytes = input.slice(0);
     bi = bytes.length;
 } else {
     var s = "" + input;

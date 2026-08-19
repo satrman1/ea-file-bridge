@@ -16,6 +16,17 @@ var s = " | risk=" + risk.riskLevel
     + (typeof risk.elapsedMs == "number" ? " gateMs=" + risk.elapsedMs : "")
     + (typeof risk.hashMs == "number" ? " hashMs=" + risk.hashMs : "")
     + (risk.payloadHash ? " payloadHash=" + risk.payloadHash : "");
+// Audit potvrzeni (iterace 4b V2, zadani par. 8): confirmationRequired,
+// confirmedByUser + timestamp, confirmChannel; integrityFailed u E_RISK_INTEGRITY.
+if (risk.confirm) {
+    s += " | confirmationRequired=" + (risk.confirm.required ? "true" : "false");
+    if (risk.confirm.required) {
+        s += " confirmedByUser=" + (risk.confirm.confirmedByUser ? "true" : "false");
+        if (risk.confirm.channel) { s += " confirmChannel=" + risk.confirm.channel; }
+        if (risk.confirm.timestamp) { s += " confirmedAt=" + risk.confirm.timestamp; }
+        if (risk.confirm.integrityFailed) { s += " integrityFailed=true"; }
+    }
+}
 if (risk.riskReasons && risk.riskReasons.length > 0) {
     s += " | duvody: " + risk.riskReasons.join("; ");
 }

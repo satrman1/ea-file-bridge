@@ -4,15 +4,12 @@
 // chovani Element.Clone() overit E2E, vysledek vykazat.
 // op.elements = [ "{GUID}" | id | $ref, ... ]
 // op.package  = cilovy package (volitelne - jinak klon zustava ve zdrojovem)
-// op.confirm  = true -> potvrzeni objemu nad soft urovni (100)
-// KVOTA V3 (par. 12e): objem se vykazuje vzdy.
+// v0.8 (iterace 4b V2, migrace E_QUOTA dle zadani par. 6.4/W6): kvotu kryje
+// RISK GATE (klony ELEVATED -> lidske potvrzeni), E_QUOTA se uz NEVYDAVA;
+// op.confirm ztratilo ucinek (FB_Main odstrani + warning). Objem se dal
+// VZDY vykazuje (volume).
 if (!op || !op.elements || Object.prototype.toString.call(op.elements) != "[object Array]" || op.elements.length == 0) {
     return { op: "clone_elements", status: "error", code: "E_ARGS", message: "Povinne: elements (neprazdne pole)." };
-}
-var SOFT = 100;
-if (op.elements.length > SOFT && !op.confirm) {
-    return { op: "clone_elements", status: "error", code: "E_QUOTA",
-        message: "Davka klonuje " + op.elements.length + " elementu (soft kvota " + SOFT + ", par. 12e). Posli znovu s confirm: true po potvrzeni uzivatelem." };
 }
 var targetPkg = null;
 if (op["package"]) {

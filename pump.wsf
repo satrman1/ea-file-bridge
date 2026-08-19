@@ -16,20 +16,36 @@ End Function
 <script language="JScript">
 <![CDATA[
 // ============================================================================
-// EA File Bridge - pumpa v0.4 (eafb/0.2)
+// EA File Bridge - pumpa v0.5 (eafb/0.2)
 // Hloupy nosic: watcher + COM attach + code loader z modelu + souborove IO.
 // Zadna business logika - tela operaci ziji v elementu AICodeBridge v modelu
 // (jediny kanon kodu, verzovany baselinami, citelny kazdym ctenarem modelu).
 // v0.4: kdyz response obsahuje priznak "reloadCode":true (operace deploy_src),
 // pumpa po davce sama prenacte kod z modelu - dev smycka bez restartu pumpy.
+// v0.5 (iterace 4b V2 - CONFIRM OKRUH):
+//  - FB_Main dostava CESTU k req souboru (kontrakt I5, hash surovych bajtu).
+//  - requests\pending\ = davky cekajici na potvrzeni (ELEVATED). Podslozka -
+//    watcher ji strukturalne preskakuje (bere jen soubory primo v requests\).
+//  - confirm_required: executor presunul soubor do pending\; pumpa vypise
+//    souhrn na konzoli a zobrazi POPUP Ano/Ne/Storno s timeoutem. Vedoma
+//    odchylka od zadani ("Enter na konzoli"): StdIn.ReadLine nema timeout -
+//    nezodpovezene potvrzeni by navzdy zastavilo watcher vcetne LOW davek.
+//    Popup po timeoutu necha davku cekat a pumpa jede dal; lokalnost ukonu
+//    (klik u stroje) je stejna jako Enter.
+//  - Klik se predava FB_ConfirmPending (kanal "pumpa"); presuny pending
+//    souboru dela executor, pumpa jen prepisuje res-*.json.
+//  - Po startu se cekajici davky v pending\ znovu nabidnou (bezstavovost:
+//    potvrzeni prezije restart pumpy i EA).
+//  - rejected\ nove i pro E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky).
 //
 // Start: dvojklik (sam se prehodi do cscript konzole).
 // Konec: zavrit okno konzole (nebo Ctrl+C).
 // Slozky (vznikaji samy vedle pumpy):
 //   requests\            <- sem pise AI (Copilot) davky req-*.json
+//   requests\pending\    <- ELEVATED davky cekajici na potvrzeni cloveka
 //   requests\processed\  <- archiv zpracovanych (s timestampem)
-//   requests\rejected\   <- nevalidni davky
-//   responses\           <- odpovedi res-*.json
+//   requests\rejected\   <- nevalidni/odmitnute/zamitnute davky
+//   responses\           <- odpovedi res-*.json (u cekajicich vc. nonce)
 // ============================================================================
 
 // --- prepnuti wscript -> cscript (konzole misto vyskakovacich okenek) ---
@@ -45,8 +61,10 @@ var DIR_REQ  = BASE + "\\requests";
 var DIR_RES  = BASE + "\\responses";
 var DIR_PROC = DIR_REQ + "\\processed";
 var DIR_REJ  = DIR_REQ + "\\rejected";
+var DIR_PEND = DIR_REQ + "\\pending";
 var ADDIN_NAME = "AICodeBridge";
 var POLL_MS = 1000;
+var CONFIRM_TIMEOUT_S = 300; // popup potvrzeni; timeout = davka dal ceka
 
 // --- Session shim: kod z modelu smi volat Session.Output / Session.Prompt ---
 var Session = {
@@ -133,6 +151,76 @@ function errorResponse(code, message) {
         + code + "\",\"message\":\"" + message + "\",\"results\":[]}";
 }
 
+// --- potvrzovaci cyklus (confirm_required): konzolovy souhrn + popup ---
+// Vraci true = po davce prenacist kod z modelu (deploy_src potvrzeny clovekem).
+function promptConfirm(repo, bridge, pendPath, respText) {
+    var needReload = false;
+    var name = "" + fso.GetFileName(pendPath);
+    for (var round = 0; round < 3; round++) {
+        var r = null;
+        try { r = bridge.FB_JsonParse(respText); } catch (ePr) { r = null; }
+        if (r == null || ("" + r.status) != "confirm_required") { return needReload; }
+        if (!r.confirm || !r.confirm.nonce) {
+            echo("CEKA " + name + " - potvrzeni neni mozne: " + ((r.confirm && r.confirm.note) || "bez nonce"));
+            return needReload;
+        }
+        var sum = "";
+        try { sum = "" + bridge.FB_ConfirmSummary(r); } catch (eSm) { sum = "(souhrn nedostupny: " + eSm.message + ")"; }
+        echo("--- CEKA NA POTVRZENI (Risk Gate ELEVATED) ---");
+        var lines = sum.split("\n");
+        for (var li = 0; li < lines.length; li++) { echo("  " + lines[li]); }
+        echo("--- Ano = provest, Ne = zamitnout, Storno/timeout (" + CONFIRM_TIMEOUT_S + " s) = nechat cekat ---");
+        var sh = new ActiveXObject("WScript.Shell");
+        var btn = sh.Popup("CEKA NA POTVRZENI (Risk Gate ELEVATED)\n\n" + sum
+            + "\n\nAno = provest, Ne = zamitnout (rejected), Storno = nechat cekat v pending\\.",
+            CONFIRM_TIMEOUT_S, "EA File Bridge - potvrzeni davky " + r.id, 3 + 32 + 4096);
+        if (btn != 6 && btn != 7) {
+            echo("Bez rozhodnuti (timeout/storno) - " + name + " ceka v pending\\; restart pumpy ji znovu nabidne.");
+            return needReload;
+        }
+        var out = "";
+        try {
+            out = "" + bridge.FB_ConfirmPending(repo, pendPath, r.confirm.nonce, r.confirm.payloadHash, "pumpa", (btn == 6));
+        } catch (eCf) {
+            echo("ERROR potvrzeni " + name + ": " + eCf.message);
+            return needReload;
+        }
+        writeUtf8(DIR_RES + "\\" + responseName(name), out);
+        if (out.indexOf("\"reloadCode\":true") >= 0) { needReload = true; }
+        if (out.indexOf("\"status\":\"confirm_required\"") >= 0) {
+            echo("Re-klasifikace: metriky se zmenily - nove potvrzeni s novym nonce.");
+            respText = out;
+            continue;
+        }
+        if (out.indexOf("\"code\":\"E_RISK_REJECTED\"") >= 0) { echo("ZAMITNUTO " + name + " -> rejected\\"); }
+        else if (out.indexOf("\"code\":\"E_RISK_INTEGRITY\"") >= 0) { echo("E_RISK_INTEGRITY " + name + " (payload zmenen) -> rejected\\"); }
+        else if (out.indexOf("\"status\":\"done\"") >= 0) { echo("POTVRZENO a provedeno " + name + " -> processed\\"); }
+        else { echo("POTVRZENO " + name + ", vysledek s chybou - viz " + responseName(name)); }
+        return needReload;
+    }
+    echo("CEKA " + name + " - opakovana re-klasifikace, necham v pending\\.");
+    return needReload;
+}
+
+// --- po startu znovu nabidnout davky cekajici v pending\ (bezstavovost) ---
+function offerPendingOnStart(repo, bridge) {
+    var needReload = false;
+    try {
+        var en = new Enumerator(fso.GetFolder(DIR_PEND).Files);
+        for (; !en.atEnd(); en.moveNext()) {
+            var f = en.item();
+            if (!/\.json$/i.test("" + f.Name)) { continue; }
+            var resPath = DIR_RES + "\\" + responseName("" + f.Name);
+            if (!fso.FileExists(resPath)) {
+                echo("CEKA " + f.Name + " v pending\\ bez res souboru - nelze potvrdit, vyres rucne.");
+                continue;
+            }
+            if (promptConfirm(repo, bridge, "" + f.Path, readUtf8(resPath))) { needReload = true; }
+        }
+    } catch (eOP) { echo("WARN: kontrola pending\\ selhala: " + eOP.message); }
+    return needReload;
+}
+
 // --- zpracovani jedne davky; vraci true = po davce prenacist kod z modelu ---
 function processFile(repo, bridge, file) {
     var name = "" + file.Name;
@@ -145,7 +233,6 @@ function processFile(repo, bridge, file) {
     if (size1 != size2) { echo("Soubor " + name + " se jeste zapisuje, pockam."); return false; }
 
     echo("Zpracovavam " + name + " ...");
-    var text = readUtf8(path);
     var respText, rejected = false;
 
     if (!bridge.FB_Main) {
@@ -153,16 +240,29 @@ function processFile(repo, bridge, file) {
             "Executor v modelu chybi (FB_Main). Spust ITAN-Inject Addin Code v EA Scripting.");
         rejected = true;
     } else {
-        respText = "" + bridge.FB_Main(repo, text);
-        // rejected: E_PARSE (nevalidni JSON) + E_RISK_BLOCKED (iterace 4b -
-        // BLOCKED davka patri do rejected\, zadne prezpracovani)
+        // kontrakt I5 (v0.5): executor dostava CESTU - hash surovych bajtu
+        // a parse probehnou nad jednim ctenim souboru uvnitr FB_Main
+        respText = "" + bridge.FB_Main(repo, path);
+        // rejected: E_PARSE (nevalidni JSON) + E_RISK_BLOCKED (BLOCKED davka)
+        // + E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky, B1)
         rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
-            || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0);
+            || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
+            || (respText.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0);
     }
 
     writeUtf8(DIR_RES + "\\" + responseName(name), respText);
-    var stamped = name.replace(/\.json$/i, "") + "." + ts() + ".json";
-    fso.MoveFile(path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
+
+    // confirm_required: executor presunul soubor do pending\ - zadny presun
+    // zde; nabidnout potvrzeni (popup) a skoncit
+    if (respText.indexOf("\"status\":\"confirm_required\"") >= 0) {
+        echo("CEKA NA POTVRZENI " + name + " -> requests\\pending\\");
+        return promptConfirm(repo, bridge, DIR_PEND + "\\" + name, respText);
+    }
+
+    if (fso.FileExists(path)) {
+        var stamped = name.replace(/\.json$/i, "") + "." + ts() + ".json";
+        fso.MoveFile(path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
+    }
     echo((rejected ? "ODMITNUTO " : "Hotovo ") + name + " -> " + responseName(name));
     // v0.4: deploy_src oznamuje novy kod v modelu -> prenacist (bez restartu)
     return (respText.indexOf("\"reloadCode\":true") >= 0);
@@ -174,9 +274,9 @@ function eaAlive(ea) {
 }
 
 // ============================ hlavni smycka =================================
-ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ);
-echo("=== EA File Bridge pumpa v0.4 (eafb/0.2) ===");
-echo("Slozka requestu: " + DIR_REQ);
+ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ); ensureDir(DIR_PEND);
+echo("=== EA File Bridge pumpa v0.5 (eafb/0.2, confirm okruh) ===");
+echo("Slozka requestu: " + DIR_REQ + " (pending\\ = davky cekajici na potvrzeni)");
 
 var ea = null, bridge = null;
 
@@ -197,6 +297,12 @@ while (true) {
                 try { echo("" + bridge.FB_SessionStart(ea.Repository)); }
                 catch (eB) { echo("WARN: session baseline selhal: " + eB.message); }
             }
+            // bezstavovost confirm okruhu: davky cekajici v pending\ znovu nabidnout
+            if (bridge.FB_ConfirmPending && offerPendingOnStart(ea.Repository, bridge)) {
+                echo("deploy_src (potvrzeny) -> prenacitam kod z modelu ...");
+                try { bridge = loadBridge(ea.Repository); }
+                catch (eRC0) { echo("WARN: reload kodu selhal: " + eRC0.message); }
+            }
         } catch (eL) {
             echo("CHYBA code loaderu: " + eL.message + " - zkusim znovu za 5 s.");
             ea = null; bridge = null;
@@ -205,7 +311,8 @@ while (true) {
         }
     }
 
-    // pruchod requests\*.json
+    // pruchod requests\*.json (jen soubory primo ve slozce - pending\,
+    // processed\ a rejected\ jsou podslozky, watcher je strukturalne preskakuje)
     try {
         var en = new Enumerator(fso.GetFolder(DIR_REQ).Files);
         for (; !en.atEnd(); en.moveNext()) {
@@ -224,7 +331,9 @@ while (true) {
                 try {
                     writeUtf8(DIR_RES + "\\" + responseName("" + f.Name),
                         errorResponse("E_EXCEPTION", ("" + eF.message).replace(/[\\"]/g, " ")));
-                    fso.MoveFile("" + f.Path, DIR_REJ + "\\" + ("" + f.Name).replace(/\.json$/i, "") + "." + ts() + ".json");
+                    if (fso.FileExists("" + f.Path)) {
+                        fso.MoveFile("" + f.Path, DIR_REJ + "\\" + ("" + f.Name).replace(/\.json$/i, "") + "." + ts() + ".json");
+                    }
                 } catch (eM) { echo("ERROR presunu: " + eM.message); }
             }
         }

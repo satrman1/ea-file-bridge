@@ -22,5 +22,14 @@ try {
              + ";complete=" + (m.metricsComplete ? "1" : "0")).substring(0, 250));
     }
     if (risk.payloadHash) { this.SetTag(el, "ai.risk.hash", ("" + risk.payloadHash).substring(0, 64)); }
+    // Audit potvrzeni (V2, zadani par. 8) - strojove citelny vytah
+    if (risk.confirm) {
+        this.SetTag(el, "ai.risk.confirm",
+            ("required=" + (risk.confirm.required ? "1" : "0")
+             + ";confirmedByUser=" + (risk.confirm.confirmedByUser ? "1" : "0")
+             + (risk.confirm.channel ? ";channel=" + risk.confirm.channel : "")
+             + (risk.confirm.timestamp ? ";at=" + risk.confirm.timestamp : "")
+             + (risk.confirm.integrityFailed ? ";integrityFailed=1" : "")).substring(0, 250));
+    }
 } catch (eT) { }
 return "";

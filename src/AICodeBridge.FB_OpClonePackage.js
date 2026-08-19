@@ -1,11 +1,12 @@
 // AICodeBridge.FB_OpClonePackage(Repository, op, reqId)
 // clone_package (K3) - klon package pro verzovaci/release cyklus (_AREL forma).
-// KVOTA dle Koncepce bezpecneho AI zapisu, vrstva V3 (par. 12e, klonovani
-// 100/300): objem se VZDY vykazuje; nad soft uroven (100 elementu) je
-// vyzadovano op.confirm = true (potvrzeni uzivatele v session), jinak E_QUOTA.
+// v0.8 (iterace 4b V2, migrace E_QUOTA dle zadani par. 6.4/W6): kvotu klonu
+// pokryva RISK GATE - klony jsou v politice ELEVATED (lidske potvrzeni nad
+// skutecnym payloadem), E_QUOTA se uz NEVYDAVA. Pole op.confirm ztratilo
+// ucinek - FB_Main ho odstrani a prida warning (stara davka nespadne na
+// chybu). Objem se dal VZDY vykazuje (volume) - ladeni limitu politiky.
 // op.package = zdrojovy package ("{GUID}" | id | jmeno)
 // op.name    = jmeno klonu (volitelne - prejmenuje po klonu)
-// op.confirm = true -> potvrzeni objemu nad soft urovni
 // Klon vznika VEDLE zdroje (stejny rodic) - chovani Package.Clone().
 if (!op || !op["package"]) {
     return { op: "clone_package", status: "error", code: "E_ARGS", message: "Povinne: package." };
@@ -31,13 +32,7 @@ while (queue.length > 0 && guard < 500) {
     var rowsP = this.FB_XmlRows(Repository.SQLQuery("SELECT Package_ID FROM t_package WHERE Parent_ID = " + pid));
     for (var i = 0; i < rowsP.length; i++) { queue.push(parseInt(rowsP[i].Package_ID, 10)); }
 }
-var SOFT = 100;
-if (total > SOFT && !op.confirm) {
-    return { op: "clone_package", status: "error", code: "E_QUOTA",
-        message: "Klonovany podstrom ma " + total + " elementu v " + pkgCount + " packages (soft kvota " + SOFT
-            + ", par. 12e). Posli operaci znovu s confirm: true po potvrzeni uzivatelem.",
-        volume: { elements: total, packages: pkgCount } };
-}
+// (E_QUOTA odstranena v0.8 - kvotu kryje Risk Gate: klony ELEVATED, par. 6.4)
 var cl = null;
 try {
     cl = pkg.Clone();

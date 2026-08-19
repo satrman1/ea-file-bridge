@@ -1,6 +1,8 @@
 # Protokol eafb/0.2 — EA File Bridge
 
-2026-08-19 · **v0.7** (dokumentační verze; protokol na drátě zůstává `eafb/0.2`) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + iterace 2 Diagram Builder (dávky 20260818-01…11) + iterace 2b Scenarios/Classifier/Scaffold (dávky 20260818-14…37) + dostavba idempotence dle auditu B2 (dávky 20260818-40…55) + constraints (dávky 20260819-01…04) + **Risk Gate výpočetní část (dávky 20260819-05…19)** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta) + `IT-ANALYSIS/Zadani-EA-File-Bridge-Iterace-4b-Risk-Gate.md` v1.1.
+2026-08-19 · **v0.8** (dokumentační verze; protokol na drátě zůstává `eafb/0.2` — status `confirm_required` a blok `confirm` jsou aditivní rozšíření response) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + iterace 2 Diagram Builder (dávky 20260818-01…11) + iterace 2b Scenarios/Classifier/Scaffold (dávky 20260818-14…37) + dostavba idempotence dle auditu B2 (dávky 20260818-40…55) + constraints (dávky 20260819-01…04) + Risk Gate výpočetní část (dávky 20260819-05…19) + **Risk Gate confirm okruh V2 (dávky 20260819-22…41)** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 (kap. 5a: operace K1–K11 předsunuty do iterace 3; v bance MCP zakázané trvale — bridge = bankovní cesta) + `IT-ANALYSIS/Zadani-EA-File-Bridge-Iterace-4b-Risk-Gate.md` v1.1.
+
+Změny v0.8 proti v0.7: **Risk Gate — confirm okruh (iterace 4b V2, zadání v1.1 §3 kroky 4–6, §6)**: ELEVATED přestává být shadow — **vynucuje se lidské potvrzení nad skutečným payloadem**. Nové: kontrakt `FB_Main` na cestu k souboru (hash surových bajtů + parse z jednoho čtení, I5), stav `requests\pending\`, response status `confirm_required` s jednorázovým nonce (jen v `res-*.json`, `FB_Nonce`), vstupní bod potvrzení `FB_ConfirmPending` (mimo registr operací!), bezstavová re-klasifikace při potvrzení (W1), kódy `E_RISK_INTEGRITY`/`E_RISK_CONFIRM`/`E_RISK_REJECTED`, migrace `confirm: true` u klonů (`E_QUOTA` se už nevydává, W6), audit polí potvrzení (§8), pumpa v0.5 (popup Ano/Ne/Storno s timeoutem) a GUI fallback v0.3 (dialog + nabídka čekajících dávek). Registr zůstává 39 operací; model 81 metod (+`FB_ConfirmPending`, `FB_ConfirmSummary`, `FB_FileBytes`, `FB_Utf8Decode`, `FB_Nonce`). Viz §6e.
 
 Změny v0.7 proti v0.6: **Risk Gate — výpočetní část (iterace 4b)**: deterministické metriky + klasifikace zápisových dávek před exekucí (`FB_RiskGate`), politika per repo (`FB_RiskPolicy` — vzor FB_OpsAllowed, chráněná B4), čistá JS SHA-256 (`FB_Sha256`), audit helpery (`FB_RiskNote`, `FB_RiskAuditTags`). Vynucuje se **jen BLOCKED** (`E_RISK_BLOCKED`, dávka do `rejected\`); LOW i ELEVATED zatím exekuce beze změny — **shadow režim** (risková pole v `response.risk` a v auditu #AI-LOG). **Confirm okruh (nonce, `pending\`, `E_RISK_INTEGRITY`, kontrakt na cestu/raw bytes, migrace E_QUOTA confirm) = V2/TBD** — staví se v navazujícím vlákně dle zadání 4b v1.1 §3/§6. Registr zůstává 39 operací. Viz §6d.
 
@@ -24,8 +26,9 @@ AI driver (Copilot/Claude)          pumpa (pump.wsf, WSH)            EA (běží
 
 - **Kanon kódu = `src/` v repu**; runtime kopie žije v modelu (element AICodeBridge). Nasazení změn = dávka `deploy_src` (pumpa si kód po dávce sama přenačte). Bootstrap v EA Scripting je jen nouzový fallback.
 - **Zápis výhradně Automation API.** `Repository.SQLQuery` jen čtení (vrací i GUIDy).
-- Složky vedle `pump.wsf`: `requests\` (vstup), `responses\` (výstup), `requests\processed\` (archiv s timestampem), `requests\rejected\` (nevalidní).
-- Životní cyklus souboru: `req-X.json` → zpracování → `res-X.json` + přesun requestu do `processed\` (`rejected\` u E_PARSE). Při zavřeném EA request čeká ve frontě a zpracuje se po re-attachi.
+- Složky vedle `pump.wsf`: `requests\` (vstup), `responses\` (výstup), `requests\pending\` (**v0.8**: ELEVATED dávky čekající na lidské potvrzení), `requests\processed\` (archiv s timestampem), `requests\rejected\` (nevalidní/odmítnuté/zamítnuté).
+- Životní cyklus souboru: `req-X.json` → zpracování → `res-X.json` + přesun requestu do `processed\` (`rejected\` u E_PARSE, E_RISK_BLOCKED, E_RISK_CONFIRM), **nebo** (v0.8, ELEVATED) → `pending\` beze změny jména + `res-X.json` se stavem `confirm_required` → po potvrzení/zamítnutí člověkem `processed\`/`rejected\` a přepis `res-X.json` finálním výsledkem. Podsložku `pending\` pumpa i GUI fallback strukturálně přeskakují (výpis bere jen soubory přímo v `requests\`) — čekající dávka nikdy nerotuje ve smyčce. Při zavřeném EA request čeká ve frontě a zpracuje se po re-attachi; čekající dávka v `pending\` restart EA i pumpy přežije (bezstavovost, §6e).
+- **Kontrakt executoru (I5, v0.8):** `FB_Main(Repository, requestText)` přijímá přednostně **cestu k req souboru** (pumpa v0.5 i `FB_ProcessFolder` předávají cestu) — SHA-256 surových bajtů i JSON parse proběhnou nad týmž jedním čtením souboru (`FB_FileBytes` + `FB_Utf8Decode`), žádné mikro-TOCTOU okno. Text začínající `{` = zpětně kompatibilní fallback (ELEVATED v textovém režimu nelze potvrdit — fail-closed `confirm_required` bez nonce, nic se neprovede).
 
 ### 1a. Dvojí runtime a `FB_ComObj` (lekce 2026-08-17)
 
@@ -41,6 +44,7 @@ Pravidla:
 1. Kód, který může běžet v obou runtime (GUI fallback, linked docs), tvoří COM objekty **výhradně přes `this.FB_ComObj(progId)`** (zkusí ActiveXObject, fallback COMObject). Přímý `new ActiveXObject` v EA runtime hodí ReferenceError a **tiše shodí celý handler** — u uživatele „klik nic neudělal".
 2. `Enumerator` v EA runtime neexistuje — výpis složky řeší `FB_ProcessFolder` fallbackem přes skrytý `dir /b` (WScript.Shell.Run, okno 0, wait).
 3. **Aktivace nového kódu v EA runtime = plný restart EA.** `File → Reload Current Project` na EA 17.1.5 (build 1715) NEobnovil ani strukturu menu, ani těla operací add-inu (ověřeno 2026-08-16/17; dřívější lekce „reload stačí" z 2026-07-19 pro tento účel neplatí). Pumpa restart EA přežije (re-attach); `deploy_src` se týká jen runtime pumpy.
+4. **COM chyby v EA runtime NEJSOU zachytitelné try/catch** (lekce 2026-08-19, T5-10): např. přiřazení binárního VARIANTu z `ADODB.Stream.Read` do MSXML `node.nodeTypedValue` hází „Nesoulad typů", výjimka projde skrz JS try/catch a shodí CELOU invokaci add-inu („Invocation error in: addin.EA_MenuClick" v System Output, u uživatele „klik nic neudělal" — žádný dialog, žádná response). Binární čtení souborů (`FB_FileBytes`) se proto pouští jen v JScript runtime; EA runtime čte soubory textově utf-8 (hash textu ≡ hash surových bajtů pro UTF-8 soubory bez BOM). Stejná past pravděpodobně platí pro `get_diagram_image` s `inline: true` v EA runtime (base64 přes MSXML) — neověřeno, inline používat jen přes pumpu.
 
 ## 2. Request (1 soubor = 1 dávka)
 
@@ -78,14 +82,17 @@ Reference se rozresolvují rekurzivně v celém objektu opu (i uvnitř polí `ta
 
 ```json
 {
-  "protocol": "eafb/0.2", "id": "...", "status": "done | error",
+  "protocol": "eafb/0.2", "id": "...", "status": "done | error | confirm_required | rejected",
   "repository": "identita dle FB_RepoId", "connection": "cesta připojení (informativní)",
-  "results": [ { "op": "...", "status": "ok | error | skipped", "...": "..." } ],
+  "results": [ { "op": "...", "status": "ok | error | skipped | pending", "...": "..." } ],
+  "warnings": [ "jen když je co hlásit (např. ignorované confirm: true, W6)" ],
+  "risk": { "riskLevel": "...", "riskReasons": [], "metrics": {}, "summary": {}, "payloadHash": "...", "confirm": { "required": true, "confirmedByUser": true, "channel": "pumpa|gui|okno", "timestamp": "..." } },
+  "confirm": { "nonce": "jen u confirm_required", "payloadHash": "plný hash", "hashPrefix": "12 znaků", "pendingPath": "..." },
   "audit": { "aiLogGuid": "{...}" }
 }
 ```
 
-Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, created}` u dávkových operací) — kvůli `$N` referencím.
+Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, created}` u dávkových operací) — kvůli `$N` referencím. **`confirm_required` (v0.8)**: žádný zápis neproběhl, dávka čeká v `pending\`; top-level blok `confirm` s nonce žije **výhradně v `res-*.json`** — do chat verze smí jen `hashPrefix` (§6e pravidla). `rejected` = dávka zamítnuta člověkem (`E_RISK_REJECTED`).
 
 ## 4. Registr operací (39; zrcadlo MCP toolů)
 
@@ -115,8 +122,8 @@ Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whiteli
 | `delete_taggedvalue_from_model` | Z | `targets[{type: Element/Connector/Attribute/Operation/PackageTaggedValue, id\|guid, name}]` | `items[]` | ✅ Element+Connector TV (20260817-03, UNDO drill T1) |
 | `remove_elements_from_diagram` | Z | `diagram`, `elementIDs[]` — jen z diagramu, model nedotčen (§11) | `removedElementIDs` | ✅ 20260817-03 |
 | `create_baseline` | Z | `package`, `name` (default `AI-pre-<session>-<batch>`), `session`, `notes` — **pojmenovaná** (MCP jméno neuměl) | `name, baselineGuid, guid` | ✅ 20260817-02 |
-| `clone_package` | Z | `package`, `name`, `confirm` — kvóta V3 §12e | `guid, id, volume{elements,packages}` | ✅ 20260817-05 |
-| `clone_elements` | Z | `elements[]`, `package` (cíl), `confirm` | `items[{…,sourceID,ownedDiagrams}]`, `volume` | ✅ 20260817-05/-07; kvóta -14 |
+| `clone_package` | Z | `package`, `name` — objem vždy ve `volume`; **`confirm` od v0.8 bez účinku** (warning; kvótu kryje ELEVATED potvrzení, §6e/W6) | `guid, id, volume{elements,packages}` | ✅ 20260817-05; migrace W6 20260819-30 |
+| `clone_elements` | Z | `elements[]`, `package` (cíl) — **`confirm` od v0.8 bez účinku** (warning, §6e/W6) | `items[{…,sourceID,ownedDiagrams}]`, `volume` | ✅ 20260817-05/-07; migrace W6 20260819-30 |
 | `import_element_linked_documents` | Z | `documents[{element, rtf_b64 \| file (jen uvnitř baseDir)}]` | `items[{imported}]` | ✅ 20260817-08 |
 | `layout_connectors` | Z | `diagram`, `style` (direct/auto/custom/treeV/treeH/lateralV/lateralH/orthS/orthR), `connectorIDs` filtr | `changed` | ✅ 20260817-12 (viz §6) |
 | `change_connector_visibility` | Z | `diagram`, `connectorIDs[]`, `hidden` | `connectorIDs` (změněné) | ✅ 20260817-09 |
@@ -196,7 +203,7 @@ E2E (UC `FBT UC Scenarios` 11129): deploy -01 → create 3× PRE/PST/ASU -02 (re
 
 ## 6d. Risk Gate — výpočetní část (iterace 4b, v0.7, dávky 20260819-05…19)
 
-Risk-based HITL dle zadání 4b v1.1 (red team GO s podmínkami, dispozice B1–B4/W1–W9 závazné). **Tato fáze = jen výpočet a shadow**: metriky + klasifikace se počítají a vykazují, vynucuje se výhradně BLOCKED. Confirm okruh (ELEVATED → `confirm_required`, nonce, `requests\pending\`, `E_RISK_INTEGRITY`, bezstavová re-klasifikace, migrace `confirm: true` u klonů) je **V2/TBD** — do jeho stavby platí u klonů dosavadní E_QUOTA mechanika beze změny.
+Risk-based HITL dle zadání 4b v1.1 (red team GO s podmínkami, dispozice B1–B4/W1–W9 závazné). **Tato fáze = jen výpočet a shadow**: metriky + klasifikace se počítají a vykazují, vynucuje se výhradně BLOCKED. Confirm okruh (ELEVATED → `confirm_required`, nonce, `requests\pending\`, `E_RISK_INTEGRITY`, bezstavová re-klasifikace, migrace `confirm: true` u klonů) postaven jako **V2 — viz §6e** (od v0.8 ELEVATED shadow končí).
 
 **Tok:** `FB_Main` po existující validaci (E_PARSE/E_REPO/registr) a před exekucí zavolá `FB_RiskGate`. Čistě čtecí (Č) dávky jdou mimo gate (response nemá `risk`). Zápisová dávka dostane `response.risk = { riskLevel, riskReasons[], metrics{writeOps, createOps, updatedExisting, deleteTargets, affectedElements, affectedPackages, affectedDiagrams, moveOps, metricsComplete}, policyValid, payloadHash, elapsedMs, hashMs }`. BLOCKED → `E_RISK_BLOCKED` (dávka celá `skipped`, soubor do `rejected\`, audit se zapíše — bez auditu nejde ladit limity). Kontrakt `FB_Main(Repository, requestText)` nezměněn.
 
@@ -218,6 +225,31 @@ Risk-based HITL dle zadání 4b v1.1 (red team GO s podmínkami, dispozice B1–
 
 **E2E důkazy (vše zelené):** -05 ping prostředí · -06 deploy (5 nových operací + FB_Main/FB_ProcessFolder) · -07 **T5-1** LOW create (writeOps 2, pkg 1, hash 1 ms) · -08 **T5-6a** Č dávka bez `risk` · -09 **T5-6b** `$N` create větev OWN · -10 **T5-6c negativ B3** `updatedExisting: 1` · -11 **T5-4** neresolvovatelný target ELEVATED + E_NOT_FOUND · -12 **T5-5** 501 writeOps → `E_RISK_BLOCKED`, `rejected\`, bulkCount=0 (nic nezapsáno) · -13 **T5-12** create jménem `FB_RiskPolicy` → `E_RISK_BLOCKED` (B4) · -14/-15 **T5-11** nevalidní politika → vše ELEVATED (policyValid:false) · -16/-17 obnova politiky + regrese LOW · -18 **T5-9** 500 kB payload (hashMs 1300, LOW) · -19 důkazní čtení auditu + bulkCount.
 
+## 6e. Risk Gate — confirm okruh (iterace 4b V2, v0.8, dávky 20260819-22…41)
+
+ELEVATED přestává být shadow: **žádný zápis bez lidského potvrzení nad skutečným payloadem** (zadání 4b v1.1 §3 kroky 4–6, §6; dispozice B1/B2/W1/W6 závazné).
+
+**Tok ELEVATED dávky:**
+
+1. `FB_Main` dostane **cestu** k req souboru (kontrakt I5, §1) → jedno binární čtení → SHA-256 surových bajtů (`payloadHash`) i parse z týchž bajtů.
+2. Gate klasifikuje ELEVATED → **žádný zápis**. Executor vygeneruje **jednorázový nonce** (`FB_Nonce` — JScript nemá crypto: SHA-256 přes kombinaci času před/po spin-loopu, počtu iterací spin-loopu, 4× `Math.random()` procesu, 2× `FSO.GetTempName()`, payloadHash+id+identita repa, in-memory čítač; obrana nestojí na kryptografické dokonalosti, ale na tom, že hodnota **není odvoditelná z plaintextu dávky** — B2). Req soubor se přesune do `requests\pending\` (beze změny jména), response `confirm_required` nese souhrn (`risk.summary`: počty per op, targety, packages, diagramy), `riskReasons` (vždy konkrétní důvod, CR §12), `hashPrefix` a — **jen v `res-*.json`** — plný `payloadHash` + `nonce`.
+3. **Potvrzení = výhradně lokální úkon** přes **`FB_ConfirmPending(Repository, path, nonce, payloadHash, channel, approve)`** — nová operace modelu, která **NENÍ v registru FB_Main** (nedosažitelná obsahem dávky žádného kanálu, B1). Volají ji jen UI adaptéry: popup pumpy (kanál `pumpa`), dialog GUI fallbacku (`gui`), stavové okno vrátného (`okno`, iterace 4). UI čte nonce+hash z res souboru.
+4. `FB_ConfirmPending` bezstavově: ověří umístění souboru v `pending\` + nonce a hash **proti res souboru na disku** (nesoulad/chybějící = `E_RISK_CONFIRM`, soubor zůstává v pending\ — nonce se přepisem res „spálí", obnova = vrátit soubor z `pending\` do `requests\` → nová klasifikace s novým nonce) → **přepočte SHA-256 surových bajtů pending souboru** (nesoulad = `E_RISK_INTEGRITY`, nic se neprovede, soubor do `rejected\` + audit — CR §7) → zavolá `FB_Main` nad týmž souborem s in-call confirm kontextem.
+5. `FB_Main` při potvrzeném běhu **re-klasifikuje nad aktuálním stavem modelu** (W1 — model-state TOCTOU): nesouhlasí-li metriky s potvrzeným souhrnem, exekuce neproběhne a vzniká **nové `confirm_required` s novým nonce** (soubor zůstává v pending\, UI nabídne nové kolo). Shoda → exekuce; audit nese pole potvrzení (§8). Fresh BLOCKED → `E_RISK_BLOCKED` + rejected\.
+6. **Zamítnutí** (Ne/Zrušit v dialogu) → `E_RISK_REJECTED`, soubor do `rejected\`, audit (`confirmedByUser: false`). **Bez rozhodnutí** (Storno/timeout) → dávka dál čeká v `pending\`; pumpa ji znovu nabídne po startu/re-attachi, GUI fallback při každém spuštění.
+
+**Vynucení B1 v executoru:** potvrzovací pole v OBSAHU dávky (top-level `confirm`/`nonce`/`payloadHash`/…, op-level `nonce`/`payloadHash`) = `E_RISK_CONFIRM`, dávka do `rejected\`, nic se neprovede — kryje i soubor podvržený přímo do `requests\` (T5-7). Adapterová pravidla (vrátný, Downloads watcher) zůstávají jen druhou obranou.
+
+**Pravidla §6 zadání:** plný `payloadHash` ani `nonce` nikdy do chat verze (jen `hashPrefix`; hlídá vrátný + copilot-instructions); potvrzení nikdy z transportních kanálů; nonce jednorázový (každý další krok res přepíše). Bezstavovost: žádný in-memory stav gate — potvrzení přežije restart EA i pumpy (T5-14: po restartu EA pumpa dávku v `pending\` znovu nabídla, týž hash).
+
+**Migrace E_QUOTA (W6):** op-level `confirm: true` ztrácí účinek — `FB_Main` pole odstraní a přidá warning do response (stará dávka NEspadne na chybu); klony jdou vždy ELEVATED cestou (třída politiky), `E_QUOTA` se už nevydává. Objem klonu se dál vždy vykazuje (`volume`).
+
+**Kanály potvrzení:** pumpa v0.5 = konzolový souhrn + **popup Ano/Ne/Storno s timeoutem 300 s** (vědomá odchylka od zadání „Enter na konzoli": `StdIn.ReadLine` nemá timeout — nezodpovězené potvrzení by navždy zastavilo watcher včetně LOW dávek; popup po timeoutu nechá dávku čekat a pumpa jede dál; lokálnost úkonu je táž). GUI fallback v0.3 = EA dialog `Session.Prompt` YES/NO/CANCEL (fallback `WScript.Shell.Popup` přes FB_ComObj) + po zpracování `requests\` nabídne i dříve čekající dávky v `pending\`.
+
+**Výkon (T5-9 dokončení):** JScript pumpy — hash 492 kB raw-bytes ≈ 1,3 s (v0.7 měření platí, plus ~stejný čas base64+UTF-8 dekódování); **EA runtime (17.1.5) — hash 492 kB textovou cestou = 63 ms** (JS engine EA je na FB_Sha256 řádově rychlejší než WSH JScript); gate běžných dávek 4–15 ms v obou. Rozpočtová past W5 se tedy týká hlavně pumpy; `hashMaxChars` 2 MB je bezpečný strop.
+
+**E2E důkazy (dávky 20260819-22…41):** viz MATICE-PARITY sekce „Risk Gate confirm okruh V2".
+
 ## 7. Chybové kódy
 
 | Kód | Úroveň | Význam |
@@ -225,14 +257,16 @@ Risk-based HITL dle zadání 4b v1.1 (red team GO s podmínkami, dispozice B1–
 | `E_PARSE` | dávka | nevalidní JSON / chybí `ops` → soubor do `rejected\`, bez auditu |
 | `E_REPO` | dávka | deklarace `repo` nesedí na připojený repozitář; nic se neprovede (ani audit) |
 | `E_OP_FORBIDDEN` | op | **nové v 0.2**: zápisová operace není povolena whitelistem operací `FB_OpsAllowed` |
-| `E_QUOTA` | op | **nové v 0.2**: objem klonování nad soft kvótou (100, §12e) bez `confirm: true`; nic se neprovedlo |
+| `E_QUOTA` | op | **historický (0.2–0.7), od v0.8 se NEVYDÁVÁ**: kvótu klonů kryje Risk Gate — klony jsou ELEVATED (potvrzení člověka, §6e/W6); `confirm: true` v dávce = jen warning |
 | `E_UNKNOWN_OP` | op | neznámá operace |
 | `E_ARGS` | op | chybí povinné argumenty |
 | `E_SQL_READONLY` | op | jiný dotaz než SELECT/WITH |
 | `E_WHITELIST` | op | package mimo whitelist (v rámci správného repozitáře) |
 | `E_AMBIGUOUS` | op | **nové v 0.5** (audit B2): `matchByName`/`match: "composite"`/`dedupKey` lookup našel víc kandidátů — response nese `guids`; adresuj `guid`, nebo použij `dedupKey` |
 | `E_RISK_BLOCKED` | dávka | **nové v 0.7** (Risk Gate §6d): klasifikace BLOCKED (prahy politiky / operace BLOCKED / B4 target = konfigurační element) — nic se neprovedlo, soubor do `rejected\`, audit SE zapíše. Žádný jednoklikový override; cesta ven = změna `FB_RiskPolicy` (deploy_src/ručně) nebo ruční práce v EA |
-| `E_RISK_INTEGRITY` | dávka | **rezervováno pro V2** (confirm okruh): nesouhlas hashe payloadu při potvrzení |
+| `E_RISK_INTEGRITY` | dávka | **nové v 0.8** (§6e): obsah dávky se změnil mezi klasifikací a potvrzením (nesouhlas SHA-256 surových bajtů) — nic se neprovedlo, soubor do `rejected\`, audit SE zapíše (bezpečnostní událost) |
+| `E_RISK_CONFIRM` | dávka | **nové v 0.8** (§6e, B1): potvrzovací pole v obsahu dávky (podvržený confirm — soubor do `rejected\`), NEBO neplatný pokus o potvrzení (chybějící/nesouhlasící nonce či hash, soubor mimo `pending\` — dávka zůstává čekat), NEBO ELEVATED bez spočitatelného hashe/duplicitní jméno v `pending\` |
+| `E_RISK_REJECTED` | dávka | **nové v 0.8** (§6e): dávka zamítnuta člověkem v potvrzovacím dialogu (status `rejected`) — nic se neprovedlo, soubor do `rejected\`, audit s `confirmedByUser: false` |
 | `E_NOT_FOUND` | op | cíl nenalezen |
 | `E_EXCEPTION` | op/dávka | neočekávaná výjimka |
 | `E_NO_EXECUTOR` | dávka | v modelu chybí FB_Main |
@@ -252,12 +286,14 @@ Risk-based HITL dle zadání 4b v1.1 (red team GO s podmínkami, dispozice B1–
 3. **Deklarace `repo` v dávce** — kryje směr „dávka pro TEST zpracovaná v PROD".
 4. **Auto-baseline** whitelistovaných packages při startu session pumpy + explicitní pojmenované mikro-baseline `create_baseline` před zápisem (§12c).
 5. **Audit**: každá dávka = Artifact `FB <id>` v `#AI-LOG` (tagy `ai.channel=eafb`, `ai.request`; Notes = souhrn + celý request); každý zapsaný element nese `ai.channel`/`ai.request`.
-6. **Kvóty klonování V3** (§12e): objem se vykazuje vždy (`volume`), nad soft 100 nutné `confirm: true` (= potvrzení uživatele v session), jinak `E_QUOTA`. *(Migrace pod Risk Gate = V2 dle zadání 4b §6.4 — do té doby beze změny.)*
-7. **Risk Gate — výpočetní část** (v0.7, §6d): deterministické metriky + klasifikace každé zápisové dávky (`FB_RiskGate` + politika `FB_RiskPolicy` per repo, fail-closed W9); BLOCKED se vynucuje (`E_RISK_BLOCKED`) vč. ochrany konfiguračních elementů bridge (B4); LOW/ELEVATED shadow — risková pole v response i auditu. Confirm okruh V2.
+6. **Kvóty klonování — od v0.8 pod Risk Gate** (migrace W6, §6e): objem se vykazuje vždy (`volume`); klony jsou třídou politiky ELEVATED → potvrzení člověka nad skutečným payloadem. `confirm: true` v dávce ztratil účinek (warning); `E_QUOTA` se nevydává.
+7. **Risk Gate** (v0.7 výpočet §6d + v0.8 confirm okruh §6e): deterministické metriky + klasifikace každé zápisové dávky (`FB_RiskGate` + politika `FB_RiskPolicy` per repo, fail-closed W9); BLOCKED = `E_RISK_BLOCKED` vč. ochrany konfiguračních elementů bridge (B4); **ELEVATED = vynucené lidské potvrzení** (nonce jen v res, `pending\`, `E_RISK_INTEGRITY`, bezstavová re-klasifikace W1); LOW = auto (B1-A trvá). Potvrzení výhradně `FB_ConfirmPending` (mimo registr operací); potvrzovací pole v obsahu dávky odmítá executor (`E_RISK_CONFIRM`, B1).
 
 ## 9. GUI fallback (bez pumpy) — ověřeno 20260817-23
 
-Menu v EA: **Specialize → AI Bridge → Process requests (File Bridge)** (operace `FB_ProcessFolder`, běží UVNITŘ EA.exe = základ prod strany M365-A). Zpracuje všechny `requests\*.json` stejným životním cyklem jako pumpa (response, `processed\`/`rejected\`, audit, Log). Složky určuje `FB_Config` (baseDir per repo). Výsledek ukáže dialog; chyby se zobrazují (`CHYBA GUI fallbacku: …`), tiché selhání je nepřípustné.
+Menu v EA: **Specialize → AI Bridge → Process requests (File Bridge)** (operace `FB_ProcessFolder`, běží UVNITŘ EA.exe = základ prod strany M365-A). Zpracuje všechny `requests\*.json` stejným životním cyklem jako pumpa (response, `pending\`/`processed\`/`rejected\`, audit, Log). Složky určuje `FB_Config` (baseDir per repo). Výsledek ukáže dialog; chyby se zobrazují (`CHYBA GUI fallbacku: …`), tiché selhání je nepřípustné.
+
+**v0.3 (confirm okruh, §6e):** `FB_Main` dostává cestu (I5); ELEVATED dávka → EA dialog Ano/Ne/Storno se souhrnem (`Session.Prompt` YES/NO/CANCEL, fallback popup přes FB_ComObj) → klik se předá `FB_ConfirmPending` (kanál `gui`). Po zpracování `requests\` nabídne i dříve čekající dávky v `pending\` — tím dostane risk-based HITL i dnešní bankovní klikací režim (M365-A) a potvrzení funguje i po restartu EA.
 
 Provozní poznámky: pumpa nesmí běžet zároveň (sebrala by requesty první); po nasazení nové verze kódu vyžaduje EA runtime **plný restart EA** (§1a).
 
@@ -267,11 +303,11 @@ Provozní poznámky: pumpa nesmí běžet zároveň (sebrala by requesty první)
 
 ## 11. Provoz
 
-- Start: dvojklik `pump.wsf`. Konzole hlásí verzi (`pumpa v0.4`), repozitář, počet operací (Code loader) a session baseline — **zkontrolovat pohledem**.
+- Start: dvojklik `pump.wsf`. Konzole hlásí verzi (`pumpa v0.5 (eafb/0.2, confirm okruh)`), repozitář, počet operací (Code loader) a session baseline — **zkontrolovat pohledem**. Po startu/re-attachi pumpa znovu nabídne dávky čekající v `requests\pending\` (popup; Storno/timeout 300 s = dávka čeká dál).
 - Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte — až **po doběhnutí dávky**; nový kód platí od následující dávky, §6a). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem.
 - Kód pro EA runtime (menu, GUI fallback): po `deploy_src` navíc **restart EA** (§1a).
 - Po každé změně: sync `src/` = commit v repu (dělá Miloš, VS Code GUI).
 
-## 12. Stav modelu (eaexample, po Risk Gate v0.7)
+## 12. Stav modelu (eaexample, po confirm okruhu v0.8)
 
-AICodeBridge el. 11037 (pkg 1052), **76 operací** (od 20260819-06 navíc `FB_Sha256`, `FB_RiskPolicy`, `FB_RiskGate`, `FB_RiskNote`, `FB_RiskAuditTags`; od 20260819-01 `FB_OpConstraints`; od 20260818-41 `FB_DedupFind`) (41× `FB_Op*`/`FB_*` — od 20260818-15/-29/-34 navíc `FB_OpScenarios`, `FB_OpApplyClassifierStereotypes`, `FB_OpFindOrCreateSR`, `FB_ScaffoldConfig` + AI Code Bridge legacy). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) + artefakty iterace 2 (diagramy MCP reference 1136 `FBT MCPRef Logical`/1137 `FBT MCPRef Seq`, bridge 1138 `FBT BLD Statika`/1139 `FBT BLD Seq`/1140 `FBT BLD SeqTest`, zprávy 4814/4815, element 11123 `FBT Regres IT2`, 11060 umístěn na 1132) + MDG probe (el. 11126, diagramy 1141/1143/1144) + **artefakty iterace 2b**: UC `FBT UC Scenarios` 11129 (3 scénáře), lifeliny 11061/11062 + classifier 11060 zkonvertované na Component «IDS-Manager» (dávka -31), pkg `FBT Scaffold Templates` 1059 (šablony: el. 11149–11152, diagramy 1147–1150), pkg `FBT #UNSORTED` 1060 + scaffold `DoBind_AREL2608` 1061 (el. 11157–11160, diagramy 1151–1154, konektory 4816–4818), regres el. `FBT Regres IT2b` 11163 + **artefakty dostavby B2** (dávky 20260818-42…55): elementy `FBT B2 K2A` 11173, `FBT B2 K2B` 11174, `FBT B2 MBN` 11178, `FBT B2 NOMATCH` 11179 + 11182 (záměrná duplicita — důkaz defaultu), `FBT B2 DK original` 11184 (TV `ai.dedup`), lifeliny `FBT B2 LL1` 11188 / `FBT B2 LL2` 11189, regres `FBT Regres B2` 11195; konektor Dependency«use» 4819; zprávy 4823–4825; pkg `FBT B2 PKG` 1062; diagram `FBT B2 Seq` 1155 + **artefakty constraints v0.6** (dávky 20260819-02/-04): 3 internal constrainty PRE/PST/ASU na UC `FBT UC Scenarios` 11129 (žádný nový element) + **artefakty Risk Gate v0.7** (dávky 20260819-07…18, vše v `#FB-TEST`): elementy `FBT RG LOW1` 11206, `FBT RG LOW2` 11207, `FBT RG OWN` 11210, `FBT RG NOPOLICY` 11217, `FBT RG RESTORED` 11220, `FBT RG BIGNOTES` 11222 (~500 kB Notes — kandidát na smazání jako první) — úklid rozhoduje Miloš.
+AICodeBridge el. 11037 (pkg 1052), **81 operací** (od 20260819-22 navíc `FB_ConfirmPending`, `FB_ConfirmSummary`, `FB_FileBytes`, `FB_Utf8Decode`, `FB_Nonce`; od 20260819-06 `FB_Sha256`, `FB_RiskPolicy`, `FB_RiskGate`, `FB_RiskNote`, `FB_RiskAuditTags`; od 20260819-01 `FB_OpConstraints`; od 20260818-41 `FB_DedupFind`) (41× `FB_Op*`/`FB_*` — od 20260818-15/-29/-34 navíc `FB_OpScenarios`, `FB_OpApplyClassifierStereotypes`, `FB_OpFindOrCreateSR`, `FB_ScaffoldConfig` + AI Code Bridge legacy). Packages: `#FB-TEST` 1054 `{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}` (whitelist), `#AI-LOG` 1055 (audit). Testovací artefakty `FBT-*` viz `docs/HANDOFF-2026-08-16.md` + klony z iterace 3 (pkg `FBT-IT1-CLONE` 1058, elementy 11093/11096, diagram `FBT OwnedDiag` 1133) + artefakty iterace 2 (diagramy MCP reference 1136 `FBT MCPRef Logical`/1137 `FBT MCPRef Seq`, bridge 1138 `FBT BLD Statika`/1139 `FBT BLD Seq`/1140 `FBT BLD SeqTest`, zprávy 4814/4815, element 11123 `FBT Regres IT2`, 11060 umístěn na 1132) + MDG probe (el. 11126, diagramy 1141/1143/1144) + **artefakty iterace 2b**: UC `FBT UC Scenarios` 11129 (3 scénáře), lifeliny 11061/11062 + classifier 11060 zkonvertované na Component «IDS-Manager» (dávka -31), pkg `FBT Scaffold Templates` 1059 (šablony: el. 11149–11152, diagramy 1147–1150), pkg `FBT #UNSORTED` 1060 + scaffold `DoBind_AREL2608` 1061 (el. 11157–11160, diagramy 1151–1154, konektory 4816–4818), regres el. `FBT Regres IT2b` 11163 + **artefakty dostavby B2** (dávky 20260818-42…55): elementy `FBT B2 K2A` 11173, `FBT B2 K2B` 11174, `FBT B2 MBN` 11178, `FBT B2 NOMATCH` 11179 + 11182 (záměrná duplicita — důkaz defaultu), `FBT B2 DK original` 11184 (TV `ai.dedup`), lifeliny `FBT B2 LL1` 11188 / `FBT B2 LL2` 11189, regres `FBT Regres B2` 11195; konektor Dependency«use» 4819; zprávy 4823–4825; pkg `FBT B2 PKG` 1062; diagram `FBT B2 Seq` 1155 + **artefakty constraints v0.6** (dávky 20260819-02/-04): 3 internal constrainty PRE/PST/ASU na UC `FBT UC Scenarios` 11129 (žádný nový element) + **artefakty Risk Gate v0.7** (dávky 20260819-07…18, vše v `#FB-TEST`): elementy `FBT RG LOW1` 11206, `FBT RG LOW2` 11207, `FBT RG OWN` 11210, `FBT RG NOPOLICY` 11217, `FBT RG RESTORED` 11220 (11222 `FBT RG BIGNOTES` už v modelu není — smazán mimo bridge, potvrzeno E_NOT_FOUND dávky -39) + **artefakty confirm okruhu v0.8** (dávky 20260819-23…41): elementy `FBT V2 SMOKE`/`DEL1`/`DEL2`/`TOC1` vytvořeny a následně smazány potvrzenými delete dávkami (úklid proveden v testech; po V2 nezůstal žádný nový FBT-V2 artefakt) — úklid starších FBT-* rozhoduje Miloš.
