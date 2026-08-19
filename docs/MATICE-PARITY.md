@@ -1,4 +1,4 @@
-# Matice parity MCP × ea-file-bridge (stav 2026-08-19, po přidání `create_or_update_constraints`; dávky 20260818-* + 20260819-*)
+# Matice parity MCP × ea-file-bridge (stav 2026-08-19, po `create_or_update_constraints` + Risk Gate výpočetní část; dávky 20260818-* + 20260819-*)
 
 Legenda: ✅ E2E ověřeno (v závorce důkazní dávka) · 🔵 nad rámec MCP · ⛔ vědomě vynecháno
 
@@ -66,5 +66,17 @@ Testovací artefakty FBT-B2 k úklidu viz PROTOKOL §12.
 **Regresní běh 2026-08-17** (bod 4 zadání): pozitivní ping+query+create_or_update_elements + `E_WHITELIST`+skipped (20260817-15), `E_REPO` na dávce pro EMR_PROD — nic neprovedeno (20260817-16), `E_SQL_READONLY` na DELETE (20260817-17). Shodné chování jako 2026-08-16. **Regrese po iteraci 2**: ping + query + create (el. 11123) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-11). **Regrese po iteraci 2b**: ping + query + create (el. 11163) + `E_WHITELIST` na pkg 1052 + skipped — shodné chování (20260818-37).
 
 **Sekvenční řetěz Diagram Builder + K1** (dosud šly messages jen na předpřipravený diagram 1131): nový MDG Sequence diagram + place lifelin 11061/11062 + `create_or_update_messages` v jedné dávce přes `$N`, PNG důkaz po reloadu (20260818-09/-10, diagram 1140).
+
+**Iterace 4b — Risk Gate, výpočetní část (2026-08-19, dávky 20260819-05…19; spec = `IT-ANALYSIS/Zadani-EA-File-Bridge-Iterace-4b-Risk-Gate.md` v1.1, PROTOKOL §6d):** deterministické metriky + klasifikace zápisových dávek (`FB_RiskGate`), politika `FB_RiskPolicy` (vzor FB_OpsAllowed, hodnoty limitů = výchozí konfigurace schválená Milošem 2026-08-19), čistá JS `FB_Sha256` (FIPS vektory ověřeny lokálně, E2E shoda s `sha256sum` req souboru). Vynucen jen BLOCKED; ELEVATED shadow. MCP protějšek neexistuje — bridge-only 🔵. Důkazy:
+
+- **(a) T5-1 LOW**: create 2 elementů → `riskLevel: LOW`, writeOps 2, affectedPackages 1, exekuce beze změny; audit tagy `ai.risk.*` na Artifactu (-07, čtení -19).
+- **(b) T5-6 vč. negativu B3**: Č dávka bez `risk` (-08); `$N` na create větev → `updatedExisting: 0` (-09); **`$N` na výsledek `find_elements_by_name` → `updatedExisting: 1`** (-10 — důkaz opravy B3).
+- **(c) T5-4 fail-closed**: neresolvovatelný guid → ELEVATED „Neresolvovatelny target“ + exekuce E_NOT_FOUND (-11).
+- **(d) T5-5 hard limit**: 501 syntetických writeOps → `E_RISK_BLOCKED`, results `skipped`, soubor v `rejected\`, audit zapsán, `COUNT(*) FBT RG BULK% = 0` (-12, kontrola -19). Klasifikace 501 ops = 24 ms.
+- **(e) T5-12 B4**: `create_or_update_elements` se jménem `FB_RiskPolicy` → `E_RISK_BLOCKED` (-13) — dvoudávkový útok na politiku nemožný.
+- **(f) T5-11 W9**: politika bez položky pro repo → vše ELEVATED, `policyValid: false` (-14/-15); obnova + regrese LOW (-16/-17).
+- **(g) T5-9 část (runtime pumpy)**: `FB_Sha256` 62 kB = 143 ms, 500 kB = 1300 ms; gate běžné dávky 4–11 ms (-07…-18). EA runtime měření zbývá (restart EA).
+
+Confirm okruh (nonce, `pending\`, `E_RISK_INTEGRITY`, migrace `confirm: true`) = **V2/TBD** — samostatné navazující vlákno; do té doby E_QUOTA mechanika klonů beze změny.
 
 **M365 části** (Downloads watcher, OneDrive/SharePoint responses, Confluence noha) — vědomě mimo rozsah, čekají na vyhodnocení POC fáze 3.

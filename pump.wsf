@@ -154,7 +154,10 @@ function processFile(repo, bridge, file) {
         rejected = true;
     } else {
         respText = "" + bridge.FB_Main(repo, text);
-        rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0);
+        // rejected: E_PARSE (nevalidni JSON) + E_RISK_BLOCKED (iterace 4b -
+        // BLOCKED davka patri do rejected\, zadne prezpracovani)
+        rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
+            || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0);
     }
 
     writeUtf8(DIR_RES + "\\" + responseName(name), respText);

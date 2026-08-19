@@ -84,7 +84,9 @@ for (var i = 0; i < files.length; i++) {
     var f = files[i];
     var text = readUtf8(f.path);
     var respText = "" + this.FB_Main(Repository, text);
-    var rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0);
+    // rejected: E_PARSE + E_RISK_BLOCKED (iterace 4b - BLOCKED do rejected\)
+    var rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
+        || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0);
     writeUtf8(DIR_RES + "\\" + responseName(f.name), respText);
     var stamped = f.name.replace(/\.json$/i, "") + "." + ts() + ".json";
     fso.MoveFile(f.path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
