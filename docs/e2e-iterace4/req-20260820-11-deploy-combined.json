@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260820-11",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": ["FB_ShowInBrowser","FB_QcRun","FB_ChatRender","FB_ResolveBaseDir","FB_Config","FB_ClipboardImport","FB_ProcessFolder","FB_GatekeeperLaunch","FB_OpDiagramImage","FB_OpLinkedDocExport","FB_OpLinkedDocImport","FB_Process","FB_Status"] }
+  ]
+}
