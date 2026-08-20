@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-21",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "get_selected_context" }
+  ]
+}
