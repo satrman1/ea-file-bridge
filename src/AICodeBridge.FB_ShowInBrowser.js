@@ -1,9 +1,26 @@
 // AICodeBridge.FB_ShowInBrowser(Repository, resp)
 // INTERAKTIVNI rezimy (clipboard import, GUI fallback): po exekuci ukaze
-// v Project browseru posledni dotceny prvek a obnovi strom dotcenych balicku,
-// aby uzivatel VIDEL, co vzniklo/zmenilo se. NEvola se z pumpy/vratneho -
-// tam nikdo u EA nesedi a slo by o kradez focusu. Best-effort v try/catch:
-// je to UX navic, ne kontrakt (pri chybe se nic nedeje).
+// v Project browseru posledni dotceny prvek a obnovi strom dotcenych balicku.
+// !! DEFAULT VYPNUTO (lekce 2026-08-20): Repository.ShowInProjectView(el)
+// v EA runtime hodila NEZACHYTITELNOU COM chybu (par. 1a/4 rodina) -> spadl
+// CELY add-in a EA ho odpojil (uzivatel musel obnovit pres Manage Add-Ins).
+// Try/catch to nechyti (COM chyba mimo JS). Zapinat jen po overeni jineho,
+// bezpecneho zpusobu navigace v browseru. Zapnuti: FB_Config polozka
+// showInBrowser: true (per repo). Pozorovatelnost stejne kryje FB_LogChanges
+// (Output tab s cestou) - to je hlavni kanal "co a kde".
+var self = this;
+var enabled = false;
+try {
+    var cfgs = this.FB_Config();
+    var rid = ("" + this.FB_RepoId(Repository)).toUpperCase();
+    for (var ci = 0; ci < cfgs.length; ci++) {
+        if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) {
+            enabled = (cfgs[ci].showInBrowser === true);
+            break;
+        }
+    }
+} catch (eCfg) { enabled = false; }
+if (!enabled) { return false; }
 var results = (resp && resp.results) ? resp.results : [];
 var lastEl = null;
 var pkgIds = {};

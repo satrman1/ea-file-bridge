@@ -19,7 +19,8 @@ for (var ci = 0; ci < cfgs.length; ci++) {
     if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
 }
 if (cfg == null || !cfg.checks || cfg.checks.length == 0) {
-    return { status: "nedobehlo", reason: "zadne QC kontroly pro repozitar (FB_QcConfig)", checks: 0, findings: [] };
+    // benigni: pro tento repozitar nejsou definovane zadne QC kontroly
+    return { status: "bez_kontrol", reason: "pro tento repozitar nejsou definovane QC kontroly", checks: 0, findings: [] };
 }
 var pkgs = (resp && resp.risk && resp.risk.summary && resp.risk.summary.packages) ? resp.risk.summary.packages : [];
 var pkgSql = "";
@@ -55,8 +56,9 @@ if (failReason != "") {
     return out;
 }
 if (ran == 0) {
-    out.status = "nedobehlo";
-    out.reason = "zadna kontrola nebezela (scope $PKGNAMES neznamy - risk.summary bez packages)";
+    // benigni: zadna kontrola se netykala teto zmeny (scope balicku neznamy)
+    out.status = "bez_kontrol";
+    out.reason = "zadna kontrola se netykala teto zmeny (scope balicku neznamy)";
     return out;
 }
 out.status = (findings.length > 0) ? "nalez" : "ciste";

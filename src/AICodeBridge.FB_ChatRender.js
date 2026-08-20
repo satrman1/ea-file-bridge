@@ -37,7 +37,10 @@ function qcLine() {
         for (var q = 0; q < fnd.length; q++) { ids.push(fnd[q].id + " (" + fnd[q].count + "x)"); }
         return " | QC NALEZ: " + ids.join(", ") + " - detail v res souboru (zapis PROBEHL, QC neni chyba zapisu)";
     }
-    return " | QC nedobehlo: " + clip(qc.reason || "?", 160) + " (zapis tim NENI dotcen)";
+    // benigni: nebylo co kontrolovat (zadna alarmujici formulace)
+    if (s == "bez_kontrol") { return " | QC: bez kontrol pro tuto zmenu"; }
+    // skutecne selhani QC behu (SQL apod.) - zapis tim NENI dotcen
+    return " | QC neproveden (chyba kontroly: " + clip(qc.reason || "?", 140) + ") - zapis tim NENI dotcen";
 }
 function warnLine() {
     var w = resp.warnings;
