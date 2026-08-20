@@ -6,15 +6,19 @@
 
 **Obnova po pádu:** Specialize → Manage Add-Ins → enable AICodeBridge → **plný restart EA**. Čítač kroků restart nepřežije — aby ses nemusel proklikávat znovu (a nespadl na tomtéž kroku), nastav v `FB_Config` položku `navProbeStart: <číslo dalšího kroku>` (+ deploy_src FB_Config + restart) a pokračuj.
 
-## Kroky
+## Kroky — VÝSLEDKY 2026-08-20 (živě, eaexample EA 17.1.5)
 
 | # | Volání | Hypotéza | Výsledek (OK/PÁD) |
 |---|---|---|---|
-| 1 | `RefreshModelView(0)` — celý model | refresh je bezpečný | |
-| 2 | `RefreshModelView(pkg)` — package bridge | dtto na konkrétní pkg | |
-| 3 | `ShowInProjectView(GetElementByID)` | menu (user-gesture) kontext možná past nespustí | |
-| 4 | `ShowInProjectView(GetElementByGuid)` | jiná cesta k témuž objektu | |
-| 5 | `RunModelSearch("FB_Changes", "")` | okno hledání ≠ browser navigace — možná bezpečná auto-cesta | |
+| 1 | `RefreshModelView(0)` — celý model | refresh je bezpečný | **OK** — ale sbalí celý strom browseru (UX vedlejší efekt, pro auto-použití nevhodné) |
+| 2 | `RefreshModelView(pkg)` — package bridge | dtto na konkrétní pkg | **OK** |
+| 3 | `ShowInProjectView(GetElementByID)` | menu (user-gesture) kontext možná past nespustí | **POTVRZENO JINOU CESTOU** — `ShowInProjectView(GetElementByID)` z output-click handleru (`EA_OnOutputItemDoubleClicked`) opakovaně funguje bez pádu = **hypotéza b1 POTVRZENA**: past §1a/4 je specifická pro volání během zpracování dávky, user-gesture kontext je bezpečný |
+| 4 | `ShowInProjectView(GetElementByGuid)` | jiná cesta k témuž objektu | vědomě nedokončeno (viz Závěr) |
+| 5 | `RunModelSearch("FB_Changes", "")` | okno hledání ≠ browser navigace — možná bezpečná auto-cesta | vědomě nedokončeno (viz Závěr) |
+
+## Závěr (rozhodnutí Miloš 2026-08-20)
+
+**Output proklik (dvojklik → handler → ShowInProjectView) = finální řešení zvýraznění — „nejlepší varianta, na zbytek nepálit čas".** Kroky 4–5 i fáze D (auto-highlight na konci dávky přes `FB_ShowInBrowser`) se NEDOKONČUJÍ; `FB_ShowInBrowser` zůstává trvale default vypnuto, pozorovatelnost kryje proklik z Output tabu + search FB_Changes. Menu položka „Nav spike" může z FB_Config zmizet (`navProbe: false`) po doladění zbytku E2E — debug výpis dvojkliku na ní visí taky.
 
 ## Fáze D (jen když kroky 3+4 přežily)
 
