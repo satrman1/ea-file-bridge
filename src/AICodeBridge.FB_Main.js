@@ -157,6 +157,7 @@ if (warnW6.length > 0) { resp.warnings = warnW6; }
 var REG = {
     "ping":                              { fn: "FB_OpPing", w: false },
     "query":                             { fn: "FB_OpQuery", w: false },
+    "get_selected_context":              { fn: "FB_OpSelectedContext", w: false },
     "find_elements_by_name":             { fn: "FB_OpFindElements", w: false },
     "find_packages_by_name":             { fn: "FB_OpFindPackages", w: false },
     "get_elements_information":          { fn: "FB_OpGetElements", w: false },
