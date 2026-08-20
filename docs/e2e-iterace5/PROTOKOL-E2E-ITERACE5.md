@@ -13,7 +13,7 @@ Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize 
 
 ## K2 — prescan po restartu
 
-3. Pusť `req-20260821-00-prescan.json` → v odpovědi `cnt` = **94** operací na AICodeBridge (87 + FB_InterpretError z nenasazené -12 + 6 nových: FB_AccessGroups, FB_UserAccess, FB_Changes, FB_NavProbe, FB_OpSelectedContext, FB_InBranch). Nižší číslo = deploy neprošel celý.
+3. Pusť `req-20260821-00-prescan.json` → v odpovědi `cnt` = **101** operací na AICodeBridge = 87 (v0.9) + 7 (clipboard/UX vlna 08-20: FB_ClipboardImport, FB_ClipboardSearch, FB_ElementPath, FB_LogChanges, FB_ShowInBrowser, FB_Status, FB_ResolveBaseDir) + 1 (FB_InterpretError z nenasazené -12) + 6 (iterace 5: FB_AccessGroups, FB_UserAccess, FB_Changes, FB_NavProbe, FB_OpSelectedContext, FB_InBranch). Nižší číslo = deploy neprošel celý. **✅ Živě ověřeno 2026-08-20: `cnt: 101`** (dávka -00; původní očekávání 94 bylo podpočítané — §12 nezahrnoval clipboard/UX vlnu).
 4. V menu Specialize → AI Bridge musí být nová položka **„Nav spike (test navigace)"** (jen doma — `navProbe: true`).
 
 ## K3 — Output proklik (B-V1)
