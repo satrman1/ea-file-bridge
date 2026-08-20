@@ -94,7 +94,8 @@ function checkBudget() {
 
 // --- B4: chranene konfiguracni elementy bridge ---
 var PROT = { "AICODEBRIDGE": 1, "FB_RISKPOLICY": 1, "FB_OPSALLOWED": 1,
-             "FB_CONFIG": 1, "FB_SCAFFOLDCONFIG": 1, "FB_WHITELIST": 1 };
+             "FB_CONFIG": 1, "FB_SCAFFOLDCONFIG": 1, "FB_WHITELIST": 1,
+             "FB_ACCESSGROUPS": 1 }; // FB_AccessGroups = iterace 5 (A)
 var bridgeGuid = "", bridgeId = -1;
 try {
     var br = this.FB_XmlRows(Repository.SQLQuery(

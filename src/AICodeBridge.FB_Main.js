@@ -256,6 +256,34 @@ for (var wi = 0; wi < req.ops.length; wi++) {
     var wname = "" + (req.ops[wi] && req.ops[wi].op ? req.ops[wi].op : "?");
     if (!REG[wname] || REG[wname].w) { writesInBatch++; }
 }
+// --- iterace 5 (A): pristup k WRITE ficuram add-inu pres EA security
+// skupinu (FB_AccessGroups + FB_UserAccess). Vynucuje EXECUTOR - jedna
+// mechanika kryje vsechny kanaly (pumpa/clipboard/GUI/vratny), stejny
+// princip jako Risk Gate. Cteci davky bez omezeni; security vypnuta =
+// vse povoleno (rozhodnuti Milos 2026-08-20). Fail-closed: nejistota
+// pristupu nikdy nepusti zapis. ---
+if (writesInBatch > 0) {
+    var acc = null;
+    try { acc = this.FB_UserAccess(Repository); }
+    catch (eAcc) { acc = { securityEnabled: true, login: "", access: "read",
+        reason: "FB_UserAccess selhal: " + eAcc.message + " - fail-closed read" }; }
+    if (!acc || ("" + acc.access) != "write") {
+        resp.code = "E_ADDIN_ACCESS";
+        resp.message = "Zapisove ficury bridge nejsou pro uzivatele '" + (acc ? acc.login : "?")
+            + "' povolene (EA security skupiny, FB_AccessGroups): " + (acc ? acc.reason : "?")
+            + " Cteci operace funguji; o zarazeni do write skupiny pozadej spravce EA. Nic nebylo provedeno.";
+        for (var ai2 = 0; ai2 < req.ops.length; ai2++) {
+            resp.results.push({ op: "" + (req.ops[ai2] && req.ops[ai2].op ? req.ops[ai2].op : "?"), status: "skipped" });
+        }
+        try {
+            var agA = this.FB_Audit(Repository, reqId,
+                "error E_ADDIN_ACCESS: " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + resp.message, "" + reqText);
+            resp.audit = { aiLogGuid: agA };
+        } catch (e3a) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3a.message }; }
+        this.Log(Repository, "FB " + reqId + " -> E_ADDIN_ACCESS (" + (acc ? acc.login : "?") + ": " + (acc ? acc.reason : "?") + ")");
+        return this.FB_JsonStringify(resp);
+    }
+}
 // confirm kontext (nastavuje VYHRADNE FB_ConfirmPending po overeni nonce
 // + hashe proti res souboru; in-call stav, nikdy neprezije volani)
 var ctx = this._fbConfirmCtx || null;
