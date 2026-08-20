@@ -681,6 +681,32 @@ t("deploy_src: hlavicka bez zavorek (EA_ handler) -> signatura se nesaha", funct
     ok(!r.paramsSynced, "zadny sync");
 });
 
+t("deploy_src: nova operace se jmenem Signalu -> zalozi se jako RECEPTION", function () {
+    memFs.folders["C:\\HARNSRC3\\"] = 1;
+    memFs.files["C:\\HARNSRC3\\AICodeBridge.EA_OnOutputItemDoubleClicked.js"] =
+        "// AICodeBridge.EA_OnOutputItemDoubleClicked(Repository, TabName, LineText, ID)\nreturn;\n";
+    var methods = mkColl(function (n) {
+        return { Name: n, Code: "", StyleEx: "", Parameters: mkColl(function (pn) { return { Name: pn, Position: 0, Update: function () { } }; }),
+            Update: function () { return true; }, GetLastError: function () { return ""; } };
+    });
+    var el = { Methods: methods };
+    var repo = mkRepo({ sqlRules: [
+        { re: /Object_Type = 'Signal'/i, rows: [{ ea_guid: "{SIG-DBLCLK}" }] },
+        { re: /AICodeBridge/i, rows: [{ Object_ID: 11037 }] }
+    ] });
+    repo.GetElementByID = function () { return el; };
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", srcDir: "C:\\HARNSRC3\\" }]; };
+    var r = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src", only: ["EA_OnOutputItemDoubleClicked"] }, "t-dep4");
+    B.FB_Config = origCfg;
+    eq(r.status, "ok", r.message || "");
+    eq(r.created.length, 1);
+    var m = methods._items[0];
+    eq(m.StyleEx, "Reception=1;SignalGUID={SIG-DBLCLK};", "operace ma byt reception");
+    eq(m.Parameters.Count, 4, "signatura z hlavicky (4 parametry)");
+    ok(r.receptions && r.receptions.length === 1, "response ma nest receptions");
+});
+
 // --- regrese jadra: FB_Main ping (legacy textovy kontrakt drzi)
 t("FB_Main: ping davka -> done + echo", function () {
     delete B._fbAccessCache;

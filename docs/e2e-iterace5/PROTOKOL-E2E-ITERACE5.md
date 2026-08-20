@@ -28,6 +28,13 @@ Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize 
 - K3c: **PLNÝ restart EA** (EA runtime musí Log překompilovat s novou signaturou).
 - K3d: pusť `req-20260821-05-uxwrite2.json` → řádek `[upraveno] "FBT IT5 UX" @ …` → dvojklik → skok v browseru. ✅/❌.
 
+**⚠ Nález 2 z živého běhu (K3d ❌ i s opravenou signaturou): u CUSTOM Output tabu EA dvojklikem nativně NEnaviguje** — tvrzení GUI-KATALOGU §5 platilo nejspíš jen pro handler vendor demo add-inu. Dvojklik vysílá broadcast a obsloužit ho musí **reception** `EA_OnOutputItemDoubleClicked` (t_operation se `StyleEx Reception=1;SignalGUID=…` — ověřeno čtecími dávkami -08/-09; Signal v modelu = el. 10303). Nový handler volá `ShowInProjectView` z user-gesture kontextu = **zároveň živý spike b1** (může spadnout — pak Manage Add-Ins + restart a `FB_Config.outputNav: false`). Pokračování (deploje PUMPOU):
+
+- K3e: pusť `req-20260821-10-deploy-deploysrc-reception.json` (deploy_src umí zakládat receptions) → Ano.
+- K3f: pusť `req-20260821-11-deploy-dblclick.json` → Ano → response musí nést **`created: ["EA_OnOutputItemDoubleClicked"]`** a **`receptions: ["EA_OnOutputItemDoubleClicked -> Signal {5F05064B-…}"]`**.
+- K3g: **PLNÝ restart EA**.
+- K3h: pusť `req-20260821-12-uxwrite3.json` → řádek `[upraveno] "FBT IT5 UX" @ …` → **dvojklik** → skok v browseru. Výsledek zapiš (✅ = K3 i spike b1 potvrzeny; ❌ pád add-inu = spike b1 vyvrácen → obnova, `outputNav: false`, navigace zůstává na FB_Changes).
+
 ## K4 — search FB_Changes (B-V2)
 
 7. **Jednorázově** založ hledání: Find in Project (Ctrl+F) → New Search → jméno `FB_Changes` → Group Type **Search** → „Add-in Name and method" = `AICodeBridge.FB_Changes` (**TEČKA**, ne lomítko — lekce T4-0a).

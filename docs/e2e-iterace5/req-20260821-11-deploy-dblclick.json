@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-11",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": ["EA_OnOutputItemDoubleClicked"] }
+  ]
+}

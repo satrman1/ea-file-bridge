@@ -41,7 +41,17 @@ function readUtf8(path) {
 // mapa existujicich operaci
 var have = {};
 for (var i = 0; i < el.Methods.Count; i++) { have["" + el.Methods.GetAt(i).Name] = el.Methods.GetAt(i); }
-var updated = [], createdOps = [], skipped = [], warns = [], paramsSynced = [];
+var updated = [], createdOps = [], skipped = [], warns = [], paramsSynced = [], receptions = [];
+function signalGuidFor(opName) {
+    // v0.10 (K3 korekce): EA_ broadcast handler musi byt RECEPTION - t_operation
+    // se StyleEx 'Reception=1;SignalGUID={...};' na Signal z Broadcast Types.
+    // Kdyz v modelu existuje Signal tehoz jmena jako operace, vraci jeho GUID.
+    try {
+        var sx = "" + Repository.SQLQuery("SELECT ea_guid FROM t_object WHERE Object_Type = 'Signal' AND Name = '" + opName.replace(/'/g, "''") + "'");
+        var sm = /<ea_guid>([^<]+)<\/ea_guid>/i.exec(sx);
+        return sm ? sm[1] : "";
+    } catch (eSg) { return ""; }
+}
 function headerParams(opName, code) {
     // parametry z hlavicky "// AICodeBridge.Nazev(a, b)"; null = hlavicka
     // bez zavorek (EA_ lifecycle handlery) - signatura se NEsaha
@@ -79,6 +89,12 @@ for (; !en.atEnd(); en.moveNext()) {
         }
         meth.Parameters.Refresh();
         createdOps.push(opName);
+        // reception pro broadcast handlery (jmeno operace = jmeno Signalu)
+        var sgNew = signalGuidFor(opName);
+        if (sgNew != "") {
+            meth.StyleEx = "Reception=1;SignalGUID=" + sgNew + ";";
+            receptions.push(opName + " -> Signal " + sgNew);
+        }
     } else {
         // v0.10 - SYNC SIGNATURY existujici operace (lekce K3 iterace 5):
         // drive se u existujici operace prepisoval JEN Code - pridany parametr
@@ -103,6 +119,14 @@ for (; !en.atEnd(); en.moveNext()) {
                 paramsSynced.push(opName + ": (" + haveP.join(", ") + ") -> (" + wantP.join(", ") + ")");
             }
         }
+        // sync reception flagu i u existujici operace (kdyz je v modelu Signal
+        // tehoz jmena a StyleEx ho jeste nenese - napr. operace zalozena
+        // starym deploy_src pred touto korekci)
+        var sgFix = signalGuidFor(opName);
+        if (sgFix != "" && ("" + meth.StyleEx).indexOf("Reception=1") < 0) {
+            meth.StyleEx = "Reception=1;SignalGUID=" + sgFix + ";";
+            receptions.push(opName + " -> Signal " + sgFix + " (doplneno na existujici)");
+        }
     }
     meth.Code = code;
     if (!meth.Update()) { warns.push(opName + ": Update selhal: " + meth.GetLastError()); continue; }
@@ -112,6 +136,7 @@ el.Methods.Refresh();
 var res = { op: "deploy_src", status: "ok", updated: updated, created: createdOps,
     count: updated.length, reloadCode: true };
 if (paramsSynced.length > 0) { res.paramsSynced = paramsSynced; }
+if (receptions.length > 0) { res.receptions = receptions; }
 if (skipped.length > 0) { res.skipped = skipped; }
 if (warns.length > 0) { res.warnings = warns; }
 return res;
