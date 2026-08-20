@@ -291,6 +291,27 @@ Rozhodnutí Miloše 2026-08-20 (analytická iterace před stavbou): security off
 
 **(A) Write fíčury add-inu za EA security skupinou.** Vrstvy autorizace (nezaměňovat, viz komentář `FB_AccessGroups`): (1) KDO smí add-in používat = **per-user aktivace** add-inu v EA (Manage Add-Ins; EA nativní, žádný kód bridge; audit aktivací = SQL dotaz správce); (2) KDO smí **write fíčury** = členství v EA security skupině dle `FB_AccessGroups` `{repo, writeGroups[]}` — vynucuje **executor** (`FB_Main`, před Risk Gate) → `E_ADDIN_ACCESS`, jedna mechanika kryje všechny kanály (pumpa/clipboard/GUI/vrátný); (3) KAM smí zapisovat = EA balíčkové skupiny / `@F002_Write` (platí i přes API; bridge jen překládá chybu — `FB_InterpretError`, `E_PERMISSION`/`E_LOCKED`); (4) co smí AI kanál = `FB_Whitelist` + `FB_OpsAllowed`. `FB_UserAccess`: `Repository.IsSecurityEnabled` (false → „write", vše povoleno) + `GetCurrentLoginUser(false)` + členství SQL `t_secuser` ⋈ `t_secuser_group` ⋈ `t_secgroup` (**⚠ jména tabulek ověřit v bance čtecí dávkou** — zadání zmiňovalo `t_secmember`, standardní schéma má `t_secuser_group`; SQL běží JEN při zapnuté security, na dev .qea se nespustí — lekce §6a/3). Fail-closed: repo bez položky / login nezjištěn / SQL selže → „read" s důvodem. Cache per repo+login na session (změna členství = restart EA). `FB_AccessGroups` přidána mezi B4 chráněné elementy (`FB_RiskGate`).
 
+**Vrstva 1 (aktivace add-inu) — úložiště a audit (SELECT od Miloše, 2026-08-20):** per-user/per-group aktivace in-model add-inů bydlí v **`t_xrefsystem`** — `Type` = `UserSettings` (uživatel) / **`GroupSettings` (skupina!)**, `Client` = `t_secuser.UserID` / `t_secgroup.GroupID`, `Supplier` = `ea_guid` add-in objektu. Existence `GroupSettings` znamená, že správce EA umí aktivaci add-inu řídit i **na úrovni security skupiny** nativně — vrstva 1 tedy není jen individuální opt-in. Audit „kdo má add-in aktivovaný":
+
+```sql
+SELECT t_xrefsystem.Type
+     , t_secuser.FirstName + ' ' + t_secuser.Surname AS FullName
+     , t_secuser.UserLogin
+     , t_secgroup.GroupName
+     , t_xrefsystem.Client
+     , t_xrefsystem.Supplier
+     , t_object.Name
+FROM ((t_xrefsystem
+LEFT JOIN t_secuser  ON t_xrefsystem.Client   = t_secuser.UserID)
+LEFT JOIN t_secgroup ON t_xrefsystem.Client   = t_secgroup.GroupID)
+LEFT JOIN t_object   ON t_xrefsystem.Supplier = t_object.ea_guid
+WHERE t_xrefsystem.Type IN ('UserSettings', 'GroupSettings')
+  AND (t_secuser.UserLogin IS NOT NULL OR t_secgroup.GroupName IS NOT NULL)
+ORDER BY t_xrefsystem.Supplier, t_xrefsystem.Type, t_xrefsystem.Client
+```
+
+(Dialekt: string konkatenace `+` = MS SQL; na SQLite `||`. Potvrzuje i jména tabulek `t_secuser`/`t_secgroup` použitá ve `FB_UserAccess`.)
+
 **(B) Bezpečné zvýraznění dotčených prvků (po pádu `ShowInProjectView`, §1a/4).** Tři cesty, žádná nevolá navigační COM z add-inu:
 - **Output proklik (V1):** `Log(Repository, msg, id)` má volitelný 3. parametr — `WriteOutput` s platným ElementID dělá z řádku **nativně navigovatelný** dvojklik (GUI-KATALOG §5, ověřeno ✅ 07/2026). `FB_LogChanges` předává ElementID vytvořených/upravených prvků (package přes `Package.Element.ElementID`; smazané id 0 — není kam skočit). Funguje ve všech kanálech vč. pumpy.
 - **Add-in Search `FB_Changes` (V2):** dotčené prvky dávky jako výsledková sada ve Find in Project (`XMLResults.val` = ReportViewData s CLASSGUID/CLASSTYPE → dvojklik = nativní navigace EA). SearchText = id dávky; prázdný = poslední zapisová dávka session (`_fbLastWriteReqId`, nastavuje `FB_Main`). Zdroj = tagy `ai.request` (`t_objectproperties`, standardní sloupce); audit Artifacty „FB &lt;id&gt;" se vynechávají; strop 200 řádků. **Jednorázová definice hledání:** Find in Project → New Search → Group Type Search → „Add-in Name and method" = `AICodeBridge.FB_Changes` (separátor TEČKA, lekce T4-0a).

@@ -2,7 +2,7 @@
 
 Klikací návod pro živé ověření u stroje (eaexample, EA 17.1.5). Dávky `req-20260821-*` v této složce. Offline harness prošel **131/131** — tady se ověřuje jen to, co mock nechytí (nativní navigace, EA runtime, dual-runtime pasti §1a/4).
 
-**Předpoklad:** nasazené dávky iterace 4 (`e2e-iterace4/req-20260820-09…12`, nebo combined -11 + -12) + restart EA. Pokud ne, nasaď je před krokem K1 (stačí v téže seanci — restart EA je pak jen jeden).
+**Předpoklad:** nasazené dávky iterace 4 — dle `requests\processed\` máš k 2026-08-20 nasazeno -00/-06/-07/-08/**-11** (combined). Dávka **-12 (FB_InterpretError) nasazená NENÍ — je proto přibalená do deploy dávky -01 níže**, samostatně ji nepouštěj.
 
 Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize → AI Bridge → Zpracovat dávku ze schránky), nebo pumpou (soubor do `requests\`). U deploy dávek čekej potvrzovací dialog (deploy_src = ELEVATED) → **Ano**.
 
@@ -13,7 +13,7 @@ Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize 
 
 ## K2 — prescan po restartu
 
-3. Pusť `req-20260821-00-prescan.json` → v odpovědi `cnt` = **93** operací na AICodeBridge (87 + 6 nových: FB_AccessGroups, FB_UserAccess, FB_Changes, FB_NavProbe, FB_OpSelectedContext, FB_InBranch). Nižší číslo = deploy neprošel celý.
+3. Pusť `req-20260821-00-prescan.json` → v odpovědi `cnt` = **94** operací na AICodeBridge (87 + FB_InterpretError z nenasazené -12 + 6 nových: FB_AccessGroups, FB_UserAccess, FB_Changes, FB_NavProbe, FB_OpSelectedContext, FB_InBranch). Nižší číslo = deploy neprošel celý.
 4. V menu Specialize → AI Bridge musí být nová položka **„Nav spike (test navigace)"** (jen doma — `navProbe: true`).
 
 ## K3 — Output proklik (B-V1)
