@@ -119,13 +119,22 @@ for (; !en.atEnd(); en.moveNext()) {
                 paramsSynced.push(opName + ": (" + haveP.join(", ") + ") -> (" + wantP.join(", ") + ")");
             }
         }
-        // sync reception flagu i u existujici operace (kdyz je v modelu Signal
-        // tehoz jmena a StyleEx ho jeste nenese - napr. operace zalozena
-        // starym deploy_src pred touto korekci)
+        // sync reception i u existujici operace: (a) StyleEx bez Reception=1
+        // (operace zalozena starym deploy_src), (b) SignalGUID NESOUHLASI
+        // s lokalnim Signalem tehoz jmena - typicky add-in PRENESENY z jineho
+        // modelu (element copy / XMI): receptions nesou CIZI SignalGUID a
+        // handlery by tise mlcely. Lookup vzdy podle JMENA v CILOVEM modelu.
         var sgFix = signalGuidFor(opName);
-        if (sgFix != "" && ("" + meth.StyleEx).indexOf("Reception=1") < 0) {
-            meth.StyleEx = "Reception=1;SignalGUID=" + sgFix + ";";
-            receptions.push(opName + " -> Signal " + sgFix + " (doplneno na existujici)");
+        if (sgFix != "") {
+            var wantStyle = "Reception=1;SignalGUID=" + sgFix + ";";
+            var haveStyle = "" + meth.StyleEx;
+            if (haveStyle.indexOf("Reception=1") < 0) {
+                meth.StyleEx = wantStyle;
+                receptions.push(opName + " -> Signal " + sgFix + " (doplneno na existujici)");
+            } else if (haveStyle.toUpperCase().indexOf(("SignalGUID=" + sgFix + ";").toUpperCase()) < 0) {
+                meth.StyleEx = wantStyle;
+                receptions.push(opName + " -> Signal " + sgFix + " (prepnuto z ciziho GUID - preneseny add-in)");
+            }
         }
     }
     meth.Code = code;

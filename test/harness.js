@@ -740,6 +740,30 @@ t("deploy_src: hlavicka bez zavorek (EA_ handler) -> signatura se nesaha", funct
     ok(!r.paramsSynced, "zadny sync");
 });
 
+t("deploy_src: preneseny add-in s cizim SignalGUID -> reception se prepne na lokalni", function () {
+    memFs.folders["C:\\HARNSRC4\\"] = 1;
+    memFs.files["C:\\HARNSRC4\\AICodeBridge.EA_MenuClick.js"] =
+        "// AICodeBridge.EA_MenuClick - obsluha kliknuti\nreturn;\n"; // bez zavorek se signatura nesaha, ale StyleEx ANO (jmeno = Signal)
+    var parColl = mkColl(function (n) { return { Name: n, Position: 0, Update: function () { } }; });
+    parColl.AddNew("Repository", "String");
+    var meth = { Name: "EA_MenuClick", Code: "x",
+        StyleEx: "Reception=1;SignalGUID={CIZI-GUID-Z-JINEHO-MODELU};",
+        Parameters: parColl, Update: function () { return true; }, GetLastError: function () { return ""; } };
+    var methods = mkColl(); methods._items.push(meth);
+    var el = { Methods: methods };
+    var repo = mkRepo({ sqlRules: [
+        { re: /Object_Type = 'Signal'/i, rows: [{ ea_guid: "{LOKALNI-SIG}" }] },
+        { re: /AICodeBridge/i, rows: [{ Object_ID: 11037 }] }
+    ] });
+    repo.GetElementByID = function () { return el; };
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", srcDir: "C:\\HARNSRC4\\" }]; };
+    var r = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src", only: ["EA_MenuClick"] }, "t-dep5");
+    B.FB_Config = origCfg;
+    eq(r.status, "ok");
+    eq(meth.StyleEx, "Reception=1;SignalGUID={LOKALNI-SIG};", "SignalGUID se mel prepnout na lokalni");
+    ok(r.receptions && ("" + r.receptions[0]).indexOf("prepnuto") >= 0, "response ma hlasit prepnuti");
+});
 t("deploy_src: nova operace se jmenem Signalu -> zalozi se jako RECEPTION", function () {
     memFs.folders["C:\\HARNSRC3\\"] = 1;
     memFs.files["C:\\HARNSRC3\\AICodeBridge.EA_OnOutputItemDoubleClicked.js"] =
