@@ -638,28 +638,15 @@ function mkInfo(props) {
         Get: function (i) { return props[i]; }
     };
 }
-t("dblclick handler: Info s pojmenovanymi props -> ShowInProjectView", function () {
-    var repo = mkRepo();
-    repo._addPackage({ id: 1, name: "Model" });
-    var el = repo._addElement({ id: 42, name: "NovyPrvek", packageID: 1 });
-    B.EA_OnOutputItemDoubleClicked.call(B, repo, mkInfo([
-        { Name: "TabName", Value: "AI Bridge" },
-        { Name: "LineText", Value: "[vytvoreno] ..." },
-        { Name: "ID", Value: 42 }
-    ]));
-    eq(repo._shown.length, 1, "melo se navigovat");
-    eq(repo._shown[0].ElementID, 42);
-});
-t("dblclick handler: Info bez jmen (pozicni fallback 0=tab,2=id)", function () {
+t("dblclick handler: zabalene EventProperty argumenty (.Value) -> ShowInProjectView", function () {
+    // realny tvar dle ziveho debugu v3: kazdy argument = objekt s .Value
     var repo = mkRepo();
     repo._addPackage({ id: 1, name: "Model" });
     repo._addElement({ id: 42, name: "NovyPrvek", packageID: 1 });
-    B.EA_OnOutputItemDoubleClicked.call(B, repo, mkInfo([
-        { Name: "", Value: "AI Bridge" },
-        { Name: "", Value: "radek" },
-        { Name: "", Value: "42" }
-    ]));
-    eq(repo._shown.length, 1, "pozicni fallback ma navigovat");
+    B.EA_OnOutputItemDoubleClicked.call(B, repo,
+        { Value: "AI Bridge" }, { Value: "[vytvoreno] ..." }, { Value: 42 });
+    eq(repo._shown.length, 1, "melo se navigovat");
+    eq(repo._shown[0].ElementID, 42);
 });
 t("dblclick handler: pozicni argumenty (jako EA_MenuClick) -> ShowInProjectView", function () {
     var repo = mkRepo();
