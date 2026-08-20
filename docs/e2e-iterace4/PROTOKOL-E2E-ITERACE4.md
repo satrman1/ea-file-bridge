@@ -7,9 +7,10 @@ Zadání: `Zadani-EA-File-Bridge-Iterace-4-AI-Import-Rezim.md` v1.1, §6/§9 + k
 ## Jednorázová příprava (dělá Miloš)
 
 1. **Deploy kódu do modelu.** Pumpa běží (dvojklik `pump.wsf`) → zkopíruj obsah `req-20260820-00-deploy.json` do `requests\` (nebo pošli přes Copilota). Očekávaně: `deploy_src` založí nové operace `FB_Gatekeeper`, `FB_GatekeeperLaunch`, `FB_Process`, `FB_ChatRender`, `FB_QcRun`, `FB_QcConfig` a přepíše `FB_Main`, `EA_GetMenuItems`, `EA_MenuClick`. Response `reloadCode:true`.
-2. **Plný restart EA** (ne reload — §1a; kvůli menu + EA runtime FB_Process).
-3. **Model Search „FB_Process"** (jednorázově, vzor T4-0a): *Find in Project → nový search*, **Group Type = Search**, **Add-in Name and method = `AICodeBridge.FB_Process`** (separátor **TEČKA**, ne lomítko — jinak se metoda tiše nezavolá). Uložit jako `FB_Process`.
-4. **(volitelně) `gk-config.json`** vedle pumpy pro zrychlené testy reapu / debug okno:
+2. **Vypni pumpu** (zavři okno konzole) — pumpa a vrátný se NIKDY nesmí potkat nad `requests\` (PROTOKOL §9a): kdo dřív přijde, sebere dávku, a testy vrátného by „záhadně mizely". Pumpa zůstává vypnutá po celý E2E (i při restartu vrátného v E8).
+3. **Plný restart EA** (ne reload — §1a; kvůli menu + EA runtime FB_Process).
+4. **Model Search „FB_Process"** (jednorázově, vzor T4-0a): *Find in Project → nový search*, **Group Type = Search**, **Add-in Name and method = `AICodeBridge.FB_Process`** (separátor **TEČKA**, ne lomítko — jinak se metoda tiše nezavolá). Uložit jako `FB_Process`.
+5. **(volitelně) `gk-config.json`** vedle pumpy pro zrychlené testy reapu / debug okno:
    `{ "reapTimeoutMin": 1, "reattachSec": 5, "healthSec": 5, "reapGraceSec": 10, "debug": true }`
    `debug:true` nechá konzoli PS viditelnou (uvidíš případnou parse chybu kanonu).
 
