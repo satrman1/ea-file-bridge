@@ -64,7 +64,18 @@ Klikni **Ukoncit rezim** (nebo zavři okno). Do schránky ti spadne **závěreč
 
 ## Když něco nehraje
 
-**Antivirus (Norton) zablokoval spuštění.** Když se místo okna objeví „CHYBA launcheru vrátného" nebo Norton hlásí `IDP.HELU.CMD.*` / „detekce pomocí příkazového řádku", antivirus zablokoval spuštění PowerShellu z EA. To je očekávané téma (je to přesně to riziko „AI spouští procesy", které řešíme s bezpečností pro banku). Doma to obejdeš takto: v Norton otevři **Zabezpečení → Historie**, najdi zablokovanou položku `powershell.exe` a dej **Obnovit / Povolit** (případně „už neblokovat"). Pak zapni režim znovu. Pokud to Norton blokuje i podruhé, dej mi vědět — je to důležitý údaj pro bezpečnostní schválení (R5), ne jen domácí potíž.
+**Antivirus (Norton) zablokoval spuštění.** Když se místo okna objeví „CHYBA launcheru vrátného" nebo Norton hlásí `powershell` jako hrozbu (`IDP.HELU.CMD.*`, `CMD:Powershell-AP [Drp]` / „Dropper"), antivirus zablokoval spuštění PowerShellu z EA. To je očekávané téma — vrátný je dlouhoběžící PowerShell hlídající schránku, což antivirus vidí jako podezřelé chování (to samé riziko „AI spouští procesy", které řešíme s bezpečností pro banku). Pokud to Norton blokuje, **neper se s ním výjimkami** — použij místo vrátného **ruční režim ze schránky** (viz níže), který PowerShell vůbec nepotřebuje. A dej mi vědět, že to Norton blokuje — je to důležitý údaj pro bezpečnostní schválení (R5), ne jen domácí potíž.
+
+## Když antivirus blokuje vrátného: ruční režim ze schránky (bez PowerShellu)
+
+Pokud nechceš (nebo nemůžeš kvůli antiviru) používat automatický režim, máš v tomtéž menu položku **Zpracuj dávku ze schránky (File Bridge)**. Funguje celá uvnitř EA, nic nespouští:
+
+1. V Copilotu klikni **Copy** na dávce.
+2. V EA: **Specialize → AI Bridge → Zpracuj dávku ze schránky (File Bridge)**.
+3. EA si samo přečte dávku ze schránky, zpracuje ji a **odpověď ti vloží zpět do schránky** (a ukáže ji v okně). Přepni do Copilota, **Ctrl+V**.
+4. U mazání/klonování se objeví dialog **Ano / Ne / Storno** — stejné potvrzení jako u automatického režimu, jen jako okénko EA.
+
+Rozdíl proti automatickému režimu: musíš na každou dávku kliknout do menu (není to samočinné). Zato to antivirus neřeší, protože se nespouští žádný PowerShell. Úplně stejně funguje i **Process requests (File Bridge)** — jen tam dávku místo Copy uložíš jako soubor do složky `requests`.
 
 **Okno se vůbec neobjevilo (a antivirus mlčí).** Zkus zapnout režim s viditelnou konzolí: vytvoř vedle pumpy soubor `gk-config.json` s obsahem `{ "debug": true }` a zapni režim znovu — otevře se černé okno PowerShellu, kde uvidíš, kde se to zaseklo. (Pošli mi ten výpis.)
 

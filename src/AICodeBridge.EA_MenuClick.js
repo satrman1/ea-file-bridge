@@ -13,6 +13,18 @@ if (ItemName == "Zapnout AI import rezim (vratny)") {
     try { Session.Output("[AI Bridge] " + outG); } catch (eOG) { }
     Session.Prompt("AI import rezim:\n\n" + outG, 0);
 }
+else if (ItemName == "Zpracuj davku ze schranky (File Bridge)") {
+    // plne rucni clipboard rezim (fallback bez PowerShellu) - cte davku ze
+    // schranky zevnitr EA, zpracuje, chat verzi vlozi zpet do schranky
+    var outC = "";
+    try {
+        outC = "" + this.FB_ClipboardImport(Repository);
+    } catch (eCl) {
+        outC = "CHYBA clipboard rezimu: " + eCl.message;
+    }
+    try { Session.Output("[AI Bridge] " + outC); } catch (eOC) { }
+    Session.Prompt("File Bridge - davka ze schranky:\n\n" + outC, 0);
+}
 else if (ItemName == "Process requests (File Bridge)") {
     var out = "";
     try {

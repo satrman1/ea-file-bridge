@@ -329,7 +329,15 @@ Menu v EA: **Specialize → AI Bridge → Process requests (File Bridge)** (oper
 
 Provozní poznámky: pumpa nesmí běžet zároveň (sebrala by requesty první); po nasazení nové verze kódu vyžaduje EA runtime **plný restart EA** (§1a).
 
-**Menu add-inu (v0.9):** Specialize → AI Bridge → **Zapnout AI import rezim (vratny)** (launcher §6f), **Process requests (File Bridge)** (GUI fallback §9), Process requests (#AI-CODE), About AI Bridge.
+**Menu add-inu (v0.9):** Specialize → AI Bridge → **Zapnout AI import rezim (vratny)** (launcher §6f), **Zpracuj davku ze schranky (File Bridge)** (clipboard režim bez PowerShellu §9b), **Process requests (File Bridge)** (GUI fallback §9), Process requests (#AI-CODE), About AI Bridge.
+
+## 9b. Clipboard režim — plně ruční fallback bez PowerShellu (v0.9, 2026-08-20)
+
+Vznikl jako reakce na to, že vrátný (persistentní `powershell.exe` hlídající schránku ve smyčce) je pro AV **Dropper** (Norton `CMD:Powershell-AP [Drp]`, Auto-Protect — infostealer signatura, red team W1; potvrzeno naživo 2026-08-20). Rozdíl proti produkčnímu precedentu (JIRA formulář): tamní powershell dělá krátkou bounded úlohu a skončí; vrátný je dlouhoběžící clipboard watcher — jiná třída chování.
+
+**`FB_ClipboardImport`** (menu „Zpracuj davku ze schranky"): běží **celý uvnitř EA.exe, žádný powershell, žádný watcher** → pro AV neviditelné. Na klik přečte dávku ze schránky zevnitř EA (COM `htmlfile` → `clipboardData.getData`), zdedupuje (id+hash, W5), odmítne obsah s potvrzovacími poli (druhá obrana B1), materializuje `req-*.json`, zavolá `FB_Main` (kontrakt I5, cesta) a chat verzi (`FB_ChatRender`) vloží zpět do schránky (`clipboardData.setData`) + ukáže v EA dialogu. ELEVATED dávka → EA dialog Ano/Ne/Storno → `FB_ConfirmPending` **kanál `gui`** (confirm okruh §6e beze změny). UX: Copy → klik → Ctrl+V; klik za dávku (jako M365-A), ale s pohodlím schránky. Registr operací beze změny (menu-only, mimo `REG`).
+
+Vztah k ostatním režimům: **AI import režim (vrátný)** = plně automatický, ale AV-optika (R3/W1 → R5 C-A); **clipboard režim** = klik za dávku, AV-neviditelné, Copy/Ctrl+V pohodlí; **Process requests (File Bridge)** = klik za dávku, dávka jako soubor v `requests\` (žádná schránka). Poslední dva běží uvnitř EA a nevyžadují powershell — vhodné, kde AV/EDR blokuje vrátného. ⚠ Čtení schránky přes `htmlfile` v EA runtime = ověřit naživo (možná dual-runtime COM past §1a; kód má fail-safe hlášku).
 
 ## 9a. Vrátný — AI import režim
 
