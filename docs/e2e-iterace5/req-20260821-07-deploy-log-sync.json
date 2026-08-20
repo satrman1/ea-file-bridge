@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-07",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": ["Log"] }
+  ]
+}

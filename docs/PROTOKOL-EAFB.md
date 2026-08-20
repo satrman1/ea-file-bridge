@@ -406,7 +406,7 @@ Nad velkým repozitářem (1,5M prvků) uživatel potřebuje vidět **co a kde**
 ## 11. Provoz
 
 - Start: dvojklik `pump.wsf`. Konzole hlásí verzi (`pumpa v0.5 (eafb/0.2, confirm okruh)`), repozitář, počet operací (Code loader) a session baseline — **zkontrolovat pohledem**. Po startu/re-attachi pumpa znovu nabídne dávky čekající v `requests\pending\` (popup; Storno/timeout 300 s = dávka čeká dál).
-- Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte — až **po doběhnutí dávky**; nový kód platí od následující dávky, §6a). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem.
+- Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte — až **po doběhnutí dávky**; nový kód platí od následující dávky, §6a). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem. **Od v0.10 deploy_src synchronizuje i SIGNATURU existující operace** (lekce K3 iterace 5: dřív se přidaný parametr v hlavičce tiše nepropsal — model držel starý počet parametrů, EA runtime metodu kompiloval bez něj a fíčura tiše degradovala; změny hlásí `paramsSynced` v response; hlavičky bez závorek — EA_ handlery — se nesahají). deploy_src je **JScript-only** (ActiveXObject/Enumerator) — pouštět pumpou, ne clipboard režimem.
 - Kód pro EA runtime (menu, GUI fallback): po `deploy_src` navíc **restart EA** (§1a).
 - Po každé změně: sync `src/` = commit v repu (dělá Miloš, VS Code GUI).
 

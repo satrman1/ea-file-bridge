@@ -21,6 +21,13 @@ Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize 
 5. Pusť `req-20260821-04-uxwrite.json` (LOW zápis, bez dialogu).
 6. Otevři Output tab **„AI Bridge"** → řádek `[vytvoreno] "FBT IT5 UX" @ …` → **DVOJKLIK na řádek** → Project browser označí prvek FBT IT5 UX. ✅/❌ zapsat.
 
+**⚠ Nález z 1. běhu (2026-08-20): dvojklik NEFUNGOVAL — příčina v deploy_src, ne v mechanismu.** `deploy_src` u existující operace přepisoval jen Code, signaturu ne → `Log` v modelu zůstal 2-parametrový, EA runtime ho kompiloval bez `id` (`typeof id == "undefined"` → 0) → WriteOutput bez navigačního ID. Oprava = sync signatur v deploy_src (`paramsSynced` v response). **Postup opravy (POUZE PUMPOU — deploy_src je JScript-only, v clipboard režimu spadne na ActiveXObject):**
+
+- K3a: pusť `req-20260821-06-deploy-fix-deploysrc.json` (nasadí opravený deploy_src; pumpa si nový kód přenačte až PO doběhnutí dávky — §6a).
+- K3b: pusť `req-20260821-07-deploy-log-sync.json` (už novým deploy_src) → response musí nést **`paramsSynced: ["Log: (Repository, msg) -> (Repository, msg, id)"]`**.
+- K3c: **PLNÝ restart EA** (EA runtime musí Log překompilovat s novou signaturou).
+- K3d: pusť `req-20260821-05-uxwrite2.json` → řádek `[upraveno] "FBT IT5 UX" @ …` → dvojklik → skok v browseru. ✅/❌.
+
 ## K4 — search FB_Changes (B-V2)
 
 7. **Jednorázově** založ hledání: Find in Project (Ctrl+F) → New Search → jméno `FB_Changes` → Group Type **Search** → „Add-in Name and method" = `AICodeBridge.FB_Changes` (**TEČKA**, ne lomítko — lekce T4-0a).

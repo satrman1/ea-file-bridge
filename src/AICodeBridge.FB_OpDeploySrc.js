@@ -41,7 +41,19 @@ function readUtf8(path) {
 // mapa existujicich operaci
 var have = {};
 for (var i = 0; i < el.Methods.Count; i++) { have["" + el.Methods.GetAt(i).Name] = el.Methods.GetAt(i); }
-var updated = [], createdOps = [], skipped = [], warns = [];
+var updated = [], createdOps = [], skipped = [], warns = [], paramsSynced = [];
+function headerParams(opName, code) {
+    // parametry z hlavicky "// AICodeBridge.Nazev(a, b)"; null = hlavicka
+    // bez zavorek (EA_ lifecycle handlery) - signatura se NEsaha
+    var hm = new RegExp("AICodeBridge\\." + opName + "\\s*\\(([^)]*)\\)").exec(code.substring(0, 500));
+    if (!hm) { return null; }
+    var out = [];
+    if (hm[1].replace(/\s/g, "") != "") {
+        var raw = hm[1].split(",");
+        for (var pj = 0; pj < raw.length; pj++) { out.push(raw[pj].replace(/^\s+|\s+$/g, "")); }
+    }
+    return out;
+}
 var en = new Enumerator(fso.GetFolder(cfg.srcDir).Files);
 for (; !en.atEnd(); en.moveNext()) {
     var f = en.item();
@@ -53,12 +65,9 @@ for (; !en.atEnd(); en.moveNext()) {
     var meth = have[opName];
     if (!meth) {
         // zalozit operaci; signatura z hlavicky "// AICodeBridge.Nazev(a, b)"
-        var params = [];
-        var hm = new RegExp("AICodeBridge\\." + opName + "\\s*\\(([^)]*)\\)").exec(code.substring(0, 500));
-        if (hm && hm[1].replace(/\s/g, "") != "") {
-            var raw = hm[1].split(",");
-            for (var pj = 0; pj < raw.length; pj++) { params.push(raw[pj].replace(/^\s+|\s+$/g, "")); }
-        } else {
+        var params = headerParams(opName, code);
+        if (params == null) {
+            params = [];
             warns.push(opName + ": hlavicka se signaturou nenalezena - operace zalozena BEZ parametru (zkontroluj!)");
         }
         meth = el.Methods.AddNew(opName, "String");
@@ -70,6 +79,30 @@ for (; !en.atEnd(); en.moveNext()) {
         }
         meth.Parameters.Refresh();
         createdOps.push(opName);
+    } else {
+        // v0.10 - SYNC SIGNATURY existujici operace (lekce K3 iterace 5):
+        // drive se u existujici operace prepisoval JEN Code - pridany parametr
+        // v hlavicce se do modelu TISE nepropsal, EA runtime metodu kompiloval
+        // bez nej (typeof novy_param == "undefined") a ficura tise degradovala
+        // (Log bez id -> WriteOutput 0 -> mrtvy dvojklik v Output tabu).
+        // Porovnava se jmeno+poradi z hlavicky vs. model; lisi-li se,
+        // parametry se prestavi. Hlavicka bez zavorek (EA_ handlery) = nesaha se.
+        var wantP = headerParams(opName, code);
+        if (wantP != null) {
+            var haveP = [];
+            for (var hp = 0; hp < meth.Parameters.Count; hp++) { haveP.push("" + meth.Parameters.GetAt(hp).Name); }
+            if (haveP.join(",") != wantP.join(",")) {
+                for (var dp = meth.Parameters.Count - 1; dp >= 0; dp--) { meth.Parameters.DeleteAt(dp, false); }
+                meth.Parameters.Refresh();
+                for (var np = 0; np < wantP.length; np++) {
+                    var par2 = meth.Parameters.AddNew(wantP[np], "String");
+                    par2.Position = np;
+                    par2.Update();
+                }
+                meth.Parameters.Refresh();
+                paramsSynced.push(opName + ": (" + haveP.join(", ") + ") -> (" + wantP.join(", ") + ")");
+            }
+        }
     }
     meth.Code = code;
     if (!meth.Update()) { warns.push(opName + ": Update selhal: " + meth.GetLastError()); continue; }
@@ -78,6 +111,7 @@ for (; !en.atEnd(); en.moveNext()) {
 el.Methods.Refresh();
 var res = { op: "deploy_src", status: "ok", updated: updated, created: createdOps,
     count: updated.length, reloadCode: true };
+if (paramsSynced.length > 0) { res.paramsSynced = paramsSynced; }
 if (skipped.length > 0) { res.skipped = skipped; }
 if (warns.length > 0) { res.warnings = warns; }
 return res;

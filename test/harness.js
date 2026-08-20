@@ -53,7 +53,25 @@ function MockFso() {
     this.GetFileName = function (p) { var s = norm(p); return s.substring(s.lastIndexOf("\\") + 1); };
     this.GetTempName = function () { return "tmp" + Math.floor(Math.random() * 1e6) + ".tmp"; };
     this.BuildPath = function (a, b) { return norm(a) + "\\" + b; };
+    this.GetFolder = function (p) {
+        var prefix = norm(p);
+        var out = [];
+        for (var k in memFs.files) {
+            if (k.indexOf(prefix) === 0 && k.substring(prefix.length).indexOf("\\") < 0) {
+                out.push({ Name: k.substring(prefix.length), Path: k });
+            }
+        }
+        return { Files: out };
+    };
 }
+// WSH Enumerator (JScript) - iterace nad kolekci/polem
+global.Enumerator = function (coll) {
+    var items = (coll && coll._items) ? coll._items : (coll || []);
+    var idx = 0;
+    this.atEnd = function () { return idx >= items.length; };
+    this.moveNext = function () { idx++; };
+    this.item = function () { return items[idx]; };
+};
 function MockAdoStream() {
     var self = this;
     this.Type = 2; this.Charset = "utf-8"; this._buf = "";
@@ -599,6 +617,68 @@ t("FB_NavProbe: kazde volani = 1 krok, loguje START/OK, cykluje", function () {
     contains(out2, "krok 2");
     ok(repo._output.length >= 2, "kroky se maji logovat do Output");
     delete B._fbNavStep;
+});
+
+// --- deploy_src: sync signatury existujici operace (lekce K3 iterace 5 -
+// zmena hlavicky se drive tise nepropsala, Log bez id = mrtvy dvojklik)
+t("deploy_src: existujici operace s novym parametrem -> parametry se prestavi", function () {
+    memFs.folders["C:\\HARNSRC\\"] = 1;
+    memFs.files["C:\\HARNSRC\\AICodeBridge.Log.js"] = "// AICodeBridge.Log(Repository, msg, id)\nreturn 0;\n";
+    var parColl = mkColl(function (n) { return { Name: n, Position: 0, Update: function () { } }; });
+    parColl.AddNew("Repository", "String"); parColl.AddNew("msg", "String");
+    var meth = { Name: "Log", Code: "stary kod", Parameters: parColl,
+        Update: function () { return true; }, GetLastError: function () { return ""; } };
+    var methods = mkColl(); methods._items.push(meth);
+    var el = { Methods: methods };
+    var repo = mkRepo({ sqlRules: [{ re: /AICodeBridge/i, rows: [{ Object_ID: 11037 }] }] });
+    repo.GetElementByID = function () { return el; };
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", srcDir: "C:\\HARNSRC\\" }]; };
+    var r = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src", only: ["Log"] }, "t-dep");
+    B.FB_Config = origCfg;
+    eq(r.status, "ok", r.message || "");
+    ok(meth.Code.indexOf("AICodeBridge.Log(Repository, msg, id)") >= 0, "Code se nepropsal");
+    eq(parColl.Count, 3, "parametry se maji prestavet na 3");
+    eq(parColl.GetAt(2).Name, "id");
+    ok(r.paramsSynced && r.paramsSynced.length === 1, "response ma nest paramsSynced");
+});
+t("deploy_src: shodna signatura -> parametry se nesahaji (paramsSynced prazdne)", function () {
+    memFs.folders["C:\\HARNSRC\\"] = 1;
+    memFs.files["C:\\HARNSRC\\AICodeBridge.Log.js"] = "// AICodeBridge.Log(Repository, msg, id)\nreturn 0;\n";
+    var parColl = mkColl(function (n) { return { Name: n, Position: 0, Update: function () { } }; });
+    parColl.AddNew("Repository", "String"); parColl.AddNew("msg", "String"); parColl.AddNew("id", "String");
+    var meth = { Name: "Log", Code: "x", Parameters: parColl,
+        Update: function () { return true; }, GetLastError: function () { return ""; } };
+    var methods = mkColl(); methods._items.push(meth);
+    var el = { Methods: methods };
+    var repo = mkRepo({ sqlRules: [{ re: /AICodeBridge/i, rows: [{ Object_ID: 11037 }] }] });
+    repo.GetElementByID = function () { return el; };
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", srcDir: "C:\\HARNSRC\\" }]; };
+    var r = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src", only: ["Log"] }, "t-dep2");
+    B.FB_Config = origCfg;
+    eq(r.status, "ok");
+    eq(parColl.Count, 3);
+    ok(!r.paramsSynced, "beze zmeny nema byt paramsSynced");
+});
+t("deploy_src: hlavicka bez zavorek (EA_ handler) -> signatura se nesaha", function () {
+    memFs.folders["C:\\HARNSRC2\\"] = 1;
+    memFs.files["C:\\HARNSRC2\\AICodeBridge.EA_Connect.js"] = "// AICodeBridge.EA_Connect - inicializace\nreturn \"\";\n";
+    var parColl = mkColl(function (n) { return { Name: n, Position: 0, Update: function () { } }; });
+    parColl.AddNew("Repository", "String");
+    var meth = { Name: "EA_Connect", Code: "x", Parameters: parColl,
+        Update: function () { return true; }, GetLastError: function () { return ""; } };
+    var methods = mkColl(); methods._items.push(meth);
+    var el = { Methods: methods };
+    var repo = mkRepo({ sqlRules: [{ re: /AICodeBridge/i, rows: [{ Object_ID: 11037 }] }] });
+    repo.GetElementByID = function () { return el; };
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", srcDir: "C:\\HARNSRC2\\" }]; };
+    var r = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src", only: ["EA_Connect"] }, "t-dep3");
+    B.FB_Config = origCfg;
+    eq(r.status, "ok");
+    eq(parColl.Count, 1, "handler bez zavorek se nesmi sahat");
+    ok(!r.paramsSynced, "zadny sync");
 });
 
 // --- regrese jadra: FB_Main ping (legacy textovy kontrakt drzi)
