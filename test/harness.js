@@ -661,6 +661,14 @@ t("dblclick handler: Info bez jmen (pozicni fallback 0=tab,2=id)", function () {
     ]));
     eq(repo._shown.length, 1, "pozicni fallback ma navigovat");
 });
+t("dblclick handler: pozicni argumenty (jako EA_MenuClick) -> ShowInProjectView", function () {
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    repo._addElement({ id: 42, name: "NovyPrvek", packageID: 1 });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, "AI Bridge", "[vytvoreno] ...", 42);
+    eq(repo._shown.length, 1, "pozicni tvar ma navigovat");
+    eq(repo._shown[0].ElementID, 42);
+});
 t("dblclick handler: cizi tab -> zadna navigace", function () {
     var repo = mkRepo();
     repo._addElement({ id: 42, name: "X", packageID: 1 });

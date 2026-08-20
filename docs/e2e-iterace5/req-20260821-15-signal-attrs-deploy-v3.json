@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-15",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "query", "sql": "SELECT Object_ID, Name, Pos, Type FROM t_attribute WHERE Object_ID IN (10303, 10306) ORDER BY Object_ID, Pos" },
+    { "op": "deploy_src", "only": ["EA_OnOutputItemDoubleClicked"] }
+  ]
+}
