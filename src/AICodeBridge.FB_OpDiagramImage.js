@@ -21,9 +21,7 @@ var cfg = null;
 for (var ci = 0; ci < cfgs.length; ci++) {
     if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
 }
-if (cfg == null || !cfg.baseDir) {
-    return { op: "get_diagram_image", status: "error", code: "E_ARGS", message: "FB_Config nema baseDir pro repozitar " + this.FB_RepoId(Repository) + " - export nema kam psat." };
-}
+if (cfg == null || !cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository) }; }
 var fso = this.FB_ComObj("Scripting.FileSystemObject");
 var imgDir = cfg.baseDir + "\\responses\\images";
 if (!fso.FolderExists(cfg.baseDir + "\\responses")) { fso.CreateFolder(cfg.baseDir + "\\responses"); }

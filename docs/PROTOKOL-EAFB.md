@@ -355,6 +355,7 @@ Nad velkým repozitářem (1,5M prvků) uživatel potřebuje vidět **co a kde**
 - **Jasný baseline** (`FB_SessionStart`): „Session baseline vytvořen nad: <cesty balíčků>" místo holého počtu.
 - **Menu „Stav bridge (kam zapisuje / co čte)"** (`FB_Status`): repo identita, whitelist balíčky **s cestou** (kam smí zápis), složka výměny, poznámka že čtení je kdekoli. Odpovídá na „kam zapisuješ / co čteš".
 - **Úklid menu**: odebrána legacy položka „Process requests (#AI-CODE)"; položky přejmenovány lidsky a seřazeny (schránka → složka → vrátný → stav → about).
+- **Složka výměny per-user + default** (`FB_ResolveBaseDir`, 2026-08-20): `FB_Config.baseDir` je nově volitelný — bez položky pro daný repozitář se použije default (složka modelu `\EA-File-Bridge` u `.qea`, jinak `%USERPROFILE%\Documents\EA-File-Bridge\<repo>`); strukturu složek založí sám. Každý si může nastavit svou v `FB_Config`, bez nastavení to funguje. Zapojeno do všech konzumentů baseDir (clipboard, GUI fallback, vrátný, diagram image, linked docs, status).
 - **Rychlá klávesová cesta** (`FB_ClipboardSearch`): clipboard režim lze vyvolat i z vyhledávacího pole EA (Add-in Search „FB_Clipboard", separátor tečka) — bez otevírání menu.
 
 ## 10. SQL dialekty

@@ -65,14 +65,9 @@ try {
     cmd = "" + parts[0];
     if (cmd == "ping") {
         var tok = ("" + (parts[1] || "x")).replace(/[^0-9A-Za-z-]/g, "");
-        var cfgs = this.FB_Config();
-        var rid = ("" + this.FB_RepoId(Repository)).toUpperCase();
-        var cfg = null;
-        for (var ci = 0; ci < cfgs.length; ci++) {
-            if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
-        }
-        if (cfg != null && cfg.baseDir) {
-            wU8(cfg.baseDir + "\\responses\\gk-ping-" + tok + ".json", this.FB_JsonStringify({
+        var baseDirP = this.FB_ResolveBaseDir(Repository);
+        if (baseDirP) {
+            wU8(baseDirP + "\\responses\\gk-ping-" + tok + ".json", this.FB_JsonStringify({
                 repository: "" + this.FB_RepoId(Repository),
                 connection: "" + Repository.ConnectionString,
                 time: ts()
@@ -132,14 +127,10 @@ try {
     // confirm - nonce/hash se nesmi logovat)
     try { this.Log(Repository, "FB vratny CHYBA (" + cmd + "): " + eTop.message); } catch (eL) { }
     try {
-        var cfgsE = this.FB_Config();
-        var ridE = ("" + this.FB_RepoId(Repository)).toUpperCase();
-        for (var ce = 0; ce < cfgsE.length; ce++) {
-            if (ridE.indexOf(("" + cfgsE[ce].repo).toUpperCase()) >= 0) {
-                wU8(cfgsE[ce].baseDir + "\\responses\\gk-error-" + ts() + ".txt",
-                    "FB_Process CHYBA | prikaz: " + cmd + " | " + eTop.message);
-                break;
-            }
+        var baseDirE = this.FB_ResolveBaseDir(Repository);
+        if (baseDirE) {
+            wU8(baseDirE + "\\responses\\gk-error-" + ts() + ".txt",
+                "FB_Process CHYBA | prikaz: " + cmd + " | " + eTop.message);
         }
     } catch (eE) { }
     return "T";

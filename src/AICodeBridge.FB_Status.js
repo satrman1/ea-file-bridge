@@ -35,14 +35,7 @@ lines.push("CTENI (dotazy SELECT / get_*) je povoleno kdekoli v modelu.");
 lines.push("Kazda zapisova davka je klasifikovana (Risk Gate); mazani, klonovani");
 lines.push("a hromadne zmeny vyzaduji tve potvrzeni v dialogu.");
 lines.push("");
-var cfgs = [];
-try { cfgs = this.FB_Config(); } catch (eC) { cfgs = []; }
-for (var c = 0; c < cfgs.length; c++) {
-    if (ridU.indexOf(("" + cfgs[c].repo).toUpperCase()) >= 0) {
-        lines.push("Slozka vymeny souboru: " + cfgs[c].baseDir);
-        break;
-    }
-}
+lines.push("Slozka vymeny souboru: " + this.FB_ResolveBaseDir(Repository));
 lines.push("Zmeny se prubezne vypisuji do Output tabu 'AI Bridge' (cesta + operace).");
 var txt = lines.join("\n");
 try { this.Log(Repository, txt); } catch (eL) { }

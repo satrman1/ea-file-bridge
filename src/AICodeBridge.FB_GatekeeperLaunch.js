@@ -30,9 +30,7 @@ var ridU = rid.toUpperCase();
 for (var ci = 0; ci < cfgs.length; ci++) {
     if (ridU.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
 }
-if (cfg == null || !cfg.baseDir) {
-    return "CHYBA: FB_Config nema baseDir pro repozitar " + rid + " - vratny se nespusti.";
-}
+if (cfg == null || !cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository) }; }
 // defaulty (W3 par. 1) + volitelny gk-config.json override
 var gk = { reapTimeoutMin: 10, reattachSec: 10, healthSec: 15, reapGraceSec: 30, stuckSec: 20, dlDir: "", debug: false };
 try {

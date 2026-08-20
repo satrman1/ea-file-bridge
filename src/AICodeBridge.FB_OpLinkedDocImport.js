@@ -16,9 +16,7 @@ var cfg = null;
 for (var ci = 0; ci < cfgs.length; ci++) {
     if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
 }
-if (cfg == null || !cfg.baseDir) {
-    return { op: "import_element_linked_documents", status: "error", code: "E_ARGS", message: "FB_Config nema baseDir pro repozitar " + this.FB_RepoId(Repository) + "." };
-}
+if (cfg == null || !cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository) }; }
 var fso = this.FB_ComObj("Scripting.FileSystemObject");
 var items = [];
 for (var i = 0; i < op.documents.length; i++) {

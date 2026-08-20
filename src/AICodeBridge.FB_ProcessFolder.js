@@ -25,9 +25,7 @@ var cfg = null;
 for (var ci = 0; ci < cfgs.length; ci++) {
     if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
 }
-if (cfg == null || !cfg.baseDir) {
-    return "FB_Config nema baseDir pro repozitar " + this.FB_RepoId(Repository) + " - neni co zpracovat.";
-}
+if (cfg == null || !cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository) }; }
 var fso = this.FB_ComObj("Scripting.FileSystemObject");
 var DIR_REQ = cfg.baseDir + "\\requests";
 var DIR_RES = cfg.baseDir + "\\responses";
