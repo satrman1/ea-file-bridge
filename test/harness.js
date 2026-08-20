@@ -616,7 +616,7 @@ t("FB_Main: ping davka -> done + echo", function () {
 t("FB_Main: E_REPO pri neshode deklarace repo", function () {
     var repo = mainRepoBase({});
     var out = B.FB_Main.call(B, repo, JSON.stringify({
-        protocol: "eafb/0.2", id: "t-repo", repo: "EMR_PROD",
+        protocol: "eafb/0.2", id: "t-repo", repo: "JINY_REPOZITAR",
         ops: [{ op: "ping" }]
     }));
     var resp = JSON.parse(out);
