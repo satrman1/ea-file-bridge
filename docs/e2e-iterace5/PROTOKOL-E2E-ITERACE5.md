@@ -35,6 +35,12 @@ Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize 
 - K3g: **PLNÝ restart EA**.
 - K3h: pusť `req-20260821-12-uxwrite3.json` → řádek `[upraveno] "FBT IT5 UX" @ …` → **dvojklik** → skok v browseru. Výsledek zapiš (✅ = K3 i spike b1 potvrzeny; ❌ pád add-inu = spike b1 vyvrácen → obnova, `outputNav: false`, navigace zůstává na FB_Changes).
 
+**⚠ Nálezy 3+4 z živého běhu (K3h ❌ bez pádu + spike 2× krok 1):** (3) model-based add-in dostává broadcast jako **`(Repository, Info)`** s `Info.Get(i).Value` (EventProperties, vendor vzor EA_OnPreDeleteAttribute) — ne COM signaturu (TabName, LineText, ID); handler přepsán, čte jménem i pozicí. (4) **EA runtime nedrží `this._fb*` mezi invokacemi** (§1a/5) — čítač spiku, `_fbLastWriteReqId` i W8 flag nově přežívají ve state souborech `<baseDir>\state-*.txt` (`FB_StateFile`). Bonus nález: `RefreshModelView(0)` (krok 1 spiku) **sbalí strom browseru**. Pokračování:
+
+- K3i: PUMPOU pusť `req-20260821-13-deploy-info-statefile.json` → Ano → v response zkontroluj **`paramsSynced` obsahuje `EA_OnOutputItemDoubleClicked: (Repository, TabName, LineText, ID) -> (Repository, Info)`** a `created: ["FB_StateFile"]`.
+- K3j: vypni pumpu → **PLNÝ restart EA**.
+- K3k: pusť `req-20260821-14-uxwrite4.json` (clipboard režim OK) → dvojklik na řádek `[upraveno] …`. Díky `navProbe: true` se při dvojkliku zapíše i řádek **`dblclick debug: tab='…' id=… line='…'`** do Output tabu — kdyby navigace zase nešla, tenhle řádek prozradí, co v Info skutečně přišlo (pošli screenshot). ✅ = skok v browseru; pád add-inu = spike b1 ❌.
+
 ## K4 — search FB_Changes (B-V2)
 
 7. **Jednorázově** založ hledání: Find in Project (Ctrl+F) → New Search → jméno `FB_Changes` → Group Type **Search** → „Add-in Name and method" = `AICodeBridge.FB_Changes` (**TEČKA**, ne lomítko — lekce T4-0a).

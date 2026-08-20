@@ -28,6 +28,10 @@ function infoRow(msg) {
 }
 var reqId = ("" + (SearchText || "")).replace(/^\s+|\s+$/g, "");
 if (reqId == "") { reqId = "" + (this._fbLastWriteReqId || ""); }
+if (reqId == "") {
+    // par. 1a/5: v EA runtime in-memory hodnota neprezije invokaci -> state soubor
+    try { reqId = "" + this.FB_StateFile(Repository, "lastwrite"); } catch (eSf) { reqId = ""; }
+}
 var rowsOut = [];
 if (reqId == "") {
     rowsOut.push(infoRow("Zadna zapisova davka v teto session - zadej id davky jako hledany text (napr. 20260821-04)"));

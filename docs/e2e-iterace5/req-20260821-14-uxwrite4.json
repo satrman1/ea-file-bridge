@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-14",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "create_or_update_elements", "elements": [
+      { "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT IT5 UX", "type": "Class", "matchByName": true, "notes": "Regenerace radku pro K3 po korekci handleru na (Repository, Info). FBT-*, po testech smazat." }
+    ] }
+  ]
+}

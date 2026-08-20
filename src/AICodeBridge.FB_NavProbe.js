@@ -22,6 +22,13 @@ var self = this;
 function L(m) { try { self.Log(Repository, m); } catch (e) { } }
 var step = (typeof this._fbNavStep == "number") ? this._fbNavStep : 0;
 if (step == 0) {
+    // par. 1a/5 (zivy nalez 08-20: klik 2x = 2x krok 1): EA runtime nedrzi
+    // this._fb* mezi invokacemi -> citac prezije v souboru (FB_StateFile)
+    var sf = "";
+    try { sf = "" + this.FB_StateFile(Repository, "navprobe"); } catch (eSf) { sf = ""; }
+    if (/^[1-5]$/.test(sf)) { step = parseInt(sf, 10); }
+}
+if (step == 0) {
     step = 1;
     try {
         var cfgs = this.FB_Config();
@@ -47,7 +54,7 @@ try {
 } catch (eBr) { }
 if (bridgeId < 0) { return "NavProbe: element AICodeBridge nenalezen - sonda nema cil."; }
 var DESC = {
-    1: "RefreshModelView(0) - cely model",
+    1: "RefreshModelView(0) - cely model (POZOR: sbali strom browseru - nalez 08-20)",
     2: "RefreshModelView(" + bridgePkg + ") - package bridge",
     3: "ShowInProjectView(GetElementByID " + bridgeId + ")",
     4: "ShowInProjectView(GetElementByGuid)",
@@ -71,4 +78,5 @@ if (step == 1) {
 }
 L("NavProbe krok " + step + ": OK");
 this._fbNavStep = (step >= 5) ? 1 : (step + 1);
+try { this.FB_StateFile(Repository, "navprobe", "" + this._fbNavStep); } catch (eSv) { }
 return "NavProbe krok " + step + " (" + DESC[step] + "): OK. Dalsi klik = krok " + this._fbNavStep + ".";

@@ -290,6 +290,11 @@ if (writesInBatch > 0) {
 var ctx = this._fbConfirmCtx || null;
 var confirmedRun = (ctx != null && reqPath != "" && ("" + ctx.path) == reqPath.toLowerCase());
 if (writesInBatch > 0) {
+    // W8 pres soubor (par. 1a/5): EA runtime nedrzi this._fb* mezi invokacemi
+    // -> flag "prvni zapis po E_EXCEPTION" cte i ze state souboru
+    try {
+        if (this._fbPrevExc !== true && ("" + this.FB_StateFile(Repository, "w8")) == "1") { this._fbPrevExc = true; }
+    } catch (eW8r) { }
     try {
         risk = this.FB_RiskGate(Repository, req, REG);
     } catch (eRG) {
@@ -497,8 +502,9 @@ if (writesInBatch > 0 && okc > 0) {
     // pozorovatelnost (Miloš UX): vypis zmen s teckovou cestou do Output tabu
     try { this.FB_LogChanges(Repository, resp); } catch (eLc) { }
     // iterace 5 (B-V2): posledni zapisova davka pro Add-in Search FB_Changes
-    // (prazdny SearchText = tato davka; in-memory, zanika restartem EA)
-    try { this._fbLastWriteReqId = reqId; } catch (eLr) { }
+    // (prazdny SearchText = tato davka); in-memory pro pumpu + state soubor
+    // pro EA runtime (par. 1a/5 - this._fb* tam neprezije invokaci)
+    try { this._fbLastWriteReqId = reqId; this.FB_StateFile(Repository, "lastwrite", reqId); } catch (eLr) { }
 }
 var summary = resp.status + ": " + req.ops.length + " ops (" + okc + " ok, " + errc + " chyb)"
     + this.FB_RiskNote(risk);
@@ -517,8 +523,8 @@ try {
     for (var xi = 0; xi < resp.results.length; xi++) {
         if (resp.results[xi] && resp.results[xi].code == "E_EXCEPTION") { anyExc = true; break; }
     }
-    if (anyExc) { this._fbPrevExc = true; }
-    else if (writesInBatch > 0) { this._fbPrevExc = false; }
+    if (anyExc) { this._fbPrevExc = true; try { this.FB_StateFile(Repository, "w8", "1"); } catch (eW8a) { } }
+    else if (writesInBatch > 0) { this._fbPrevExc = false; try { this.FB_StateFile(Repository, "w8", null); } catch (eW8b) { } }
 } catch (eW8) { }
 this.Log(Repository, "FB " + reqId + " -> " + summary);
 return this.FB_JsonStringify(resp);

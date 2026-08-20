@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-13",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": ["FB_StateFile", "FB_Main", "FB_Changes", "FB_NavProbe", "EA_OnOutputItemDoubleClicked"] }
+  ]
+}

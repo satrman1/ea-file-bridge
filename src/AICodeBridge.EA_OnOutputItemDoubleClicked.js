@@ -1,32 +1,56 @@
-// AICodeBridge.EA_OnOutputItemDoubleClicked - dvojklik na radek Output tabu
-// (broadcast handler; EA ho doruci jen kdyz ma add-in RECEPTION na signal
-// EA_OnOutputItemDoubleClicked z Broadcast Types - viz par. 6g/B).
-// Signatura dle Sparx: (Repository, TabName, LineText, ID).
-// Iterace 5 K3 korekce: u CUSTOM Output tabu EA dvojklikem NEnaviguje sama -
-// cervencove "nativni" chovani v GUI-KATALOGU par. 5 slo pres handler vendor
-// demo add-inu. Navigaci na prvek z radku tabu "AI Bridge" (ID = ElementID,
-// plni FB_LogChanges pres Log) proto dela tento handler.
-// !! SPIKE b1 (par. 1a/4): ShowInProjectView volane na KONCI DAVKY drive
-// shodilo cely add-in nezachytitelnou COM chybou. TADY bezi z user-gesture
-// kontextu (dvojklik v GUI) - hypoteza: past se nespusti. Kdyz add-in po
-// dvojkliku zmizi ze Specialize -> pad potvrzen: obnova Manage Add-Ins +
-// restart EA a handler vypnout pres FB_Config outputNav: false.
-if (("" + TabName) != "AI Bridge") { return; }
-var eid = parseInt(ID, 10);
-if (!eid || eid <= 0) { return; }
+// AICodeBridge.EA_OnOutputItemDoubleClicked(Repository, Info)
+// Dvojklik na radek Output tabu (broadcast; RECEPTION na signal
+// EA_OnOutputItemDoubleClicked - zaklada/synchronizuje deploy_src, par. 6g/B).
+// !! KOREKCE ze zivych testu K3 (2026-08-20): model-based add-in NEDOSTAVA
+// COM signaturu (TabName, LineText, ID) - broadcast prijde jako
+// (Repository, Info), kde Info = EventProperties (vendor vzor
+// EA_OnPreDeleteAttribute: Info.Get(i).Value). Jmena properties nejsou
+// dokumentovana -> cte se defenzivne dle jmena (tab/line/id) I pozice
+// (0=tab, 1=text, 2=id).
+// Navigace = ShowInProjectView z USER-GESTURE kontextu (zivy spike b1 -
+// puvodni pad par. 1a/4 byl na konci davky, tady je jiny kontext).
+// Vypinac pro pripad padu: FB_Config.outputNav: false. Debug vypis hodnot
+// jen s FB_Config.navProbe: true (dev).
+var tab = "", line = "", id = 0;
+try {
+    var vals = [];
+    var n = 0;
+    try { n = Info.Count; } catch (eN0) { n = 0; }
+    for (var i = 0; i < n; i++) {
+        var p = null, nm = "", v = null;
+        try { p = Info.Get(i); } catch (eG) { p = null; }
+        if (p == null) { vals.push(null); continue; }
+        try { nm = ("" + p.Name).toLowerCase(); } catch (eNm) { nm = ""; }
+        try { v = p.Value; } catch (eV) { v = null; }
+        vals.push(v);
+        if (nm.indexOf("tab") >= 0) { tab = "" + v; }
+        else if (nm.indexOf("line") >= 0 || nm.indexOf("text") >= 0) { line = "" + v; }
+        else if (nm.indexOf("id") >= 0) { id = parseInt(v, 10) || 0; }
+    }
+    if (tab == "" && vals.length > 0 && vals[0] != null) { tab = "" + vals[0]; }
+    if (id == 0 && vals.length > 2 && vals[2] != null) { id = parseInt(vals[2], 10) || 0; }
+} catch (eI) { }
+var dbg = false, navOff = false;
 try {
     var cfgs = this.FB_Config();
     var rid = ("" + this.FB_RepoId(Repository)).toUpperCase();
     for (var ci = 0; ci < cfgs.length; ci++) {
         if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) {
-            if (cfgs[ci].outputNav === false) { return; } // vypinac po pripadnem padu
+            dbg = (cfgs[ci].navProbe === true);
+            navOff = (cfgs[ci].outputNav === false);
             break;
         }
     }
 } catch (eCf) { }
+if (dbg) {
+    try { this.Log(Repository, "dblclick debug: tab='" + tab + "' id=" + id + " line='" + ("" + line).substring(0, 60) + "'"); } catch (eL) { }
+}
+if (navOff) { return; }
+if (tab != "AI Bridge") { return; }
+if (!id || id <= 0) { return; }
 try {
-    var el = Repository.GetElementByID(eid);
+    var el = Repository.GetElementByID(id);
     if (el) { Repository.ShowInProjectView(el); }
 } catch (eNav) {
-    try { Session.Output("[AI Bridge] Navigace na element " + eid + " selhala: " + eNav.message); } catch (eO) { }
+    try { this.Log(Repository, "Navigace na element " + id + " selhala: " + eNav.message); } catch (eO) { }
 }

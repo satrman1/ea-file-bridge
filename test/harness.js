@@ -603,20 +603,84 @@ t("find_elements_by_name bez scope: chovani beze zmeny (oba nalezy)", function (
     eq(r.count, 2, "bez scope se nic filtrovat nesmi");
 });
 
+// --- FB_StateFile (par. 1a/5): perzistentni mini-stav v baseDir
+t("FB_StateFile: write -> read -> delete", function () {
+    var repo = mkRepo();
+    B.FB_StateFile.call(B, repo, "harness", "hodnota-42");
+    eq(B.FB_StateFile.call(B, repo, "harness"), "hodnota-42");
+    B.FB_StateFile.call(B, repo, "harness", null);
+    eq(B.FB_StateFile.call(B, repo, "harness"), "", "po delete ma byt prazdno");
+});
+
 // --- FB_NavProbe (iterace 5, B-V3 spike): krokovaci sonda navigace
-t("FB_NavProbe: kazde volani = 1 krok, loguje START/OK, cykluje", function () {
+t("FB_NavProbe: krok prezije i ztratu in-memory stavu (EA runtime, par. 1a/5)", function () {
     var repo = mkRepo({ sqlRules: [
         { re: /AICodeBridge/i, rows: [{ Object_ID: 11037, ea_guid: "{BRIDGE}" }] }
     ] });
     repo._addElement({ id: 11037, guid: "{BRIDGE}", name: "AICodeBridge", packageID: 1 });
     repo._addPackage({ id: 1, name: "Model" });
     delete B._fbNavStep;
+    B.FB_StateFile.call(B, repo, "navprobe", null); // cisty start
     var out1 = "" + B.FB_NavProbe.call(B, repo);
     contains(out1, "krok 1");
+    delete B._fbNavStep; // simulace EA runtime: nova instance mezi kliky
     var out2 = "" + B.FB_NavProbe.call(B, repo);
-    contains(out2, "krok 2");
+    contains(out2, "krok 2", "citac musi prezit ve state souboru");
     ok(repo._output.length >= 2, "kroky se maji logovat do Output");
     delete B._fbNavStep;
+    B.FB_StateFile.call(B, repo, "navprobe", null);
+});
+
+// --- EA_OnOutputItemDoubleClicked (K3 korekce): (Repository, Info) + navigace
+function mkInfo(props) {
+    return {
+        Count: props.length,
+        Get: function (i) { return props[i]; }
+    };
+}
+t("dblclick handler: Info s pojmenovanymi props -> ShowInProjectView", function () {
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    var el = repo._addElement({ id: 42, name: "NovyPrvek", packageID: 1 });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, mkInfo([
+        { Name: "TabName", Value: "AI Bridge" },
+        { Name: "LineText", Value: "[vytvoreno] ..." },
+        { Name: "ID", Value: 42 }
+    ]));
+    eq(repo._shown.length, 1, "melo se navigovat");
+    eq(repo._shown[0].ElementID, 42);
+});
+t("dblclick handler: Info bez jmen (pozicni fallback 0=tab,2=id)", function () {
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    repo._addElement({ id: 42, name: "NovyPrvek", packageID: 1 });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, mkInfo([
+        { Name: "", Value: "AI Bridge" },
+        { Name: "", Value: "radek" },
+        { Name: "", Value: "42" }
+    ]));
+    eq(repo._shown.length, 1, "pozicni fallback ma navigovat");
+});
+t("dblclick handler: cizi tab -> zadna navigace", function () {
+    var repo = mkRepo();
+    repo._addElement({ id: 42, name: "X", packageID: 1 });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, mkInfo([
+        { Name: "TabName", Value: "Script" },
+        { Name: "LineText", Value: "x" },
+        { Name: "ID", Value: 42 }
+    ]));
+    eq(repo._shown.length, 0);
+});
+t("FB_Changes: fallback na state soubor lastwrite (EA runtime)", function () {
+    var repo = mkRepo({ sqlRules: changesSqlRules("t-ch-4") });
+    repo._addPackage({ id: 1, name: "Model" });
+    repo._addElement({ id: 42, guid: "{CHANGED-42}", name: "NovyPrvek", packageID: 1 });
+    delete B._fbLastWriteReqId;
+    B.FB_StateFile.call(B, repo, "lastwrite", "t-ch-4");
+    var holder = { val: "" };
+    B.FB_Changes.call(B, repo, "", holder);
+    contains(holder.val, "t-ch-4", "id se ma vzit ze state souboru");
+    B.FB_StateFile.call(B, repo, "lastwrite", null);
 });
 
 // --- deploy_src: sync signatury existujici operace (lekce K3 iterace 5 -
