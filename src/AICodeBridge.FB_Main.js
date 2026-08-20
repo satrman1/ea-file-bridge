@@ -467,6 +467,9 @@ if (writesInBatch > 0 && okc > 0) {
     catch (eQc) { resp.qc = { status: "nedobehlo", reason: "FB_QcRun selhal: " + eQc.message, checks: 0, findings: [] }; }
     // pozorovatelnost (Miloš UX): vypis zmen s teckovou cestou do Output tabu
     try { this.FB_LogChanges(Repository, resp); } catch (eLc) { }
+    // iterace 5 (B-V2): posledni zapisova davka pro Add-in Search FB_Changes
+    // (prazdny SearchText = tato davka; in-memory, zanika restartem EA)
+    try { this._fbLastWriteReqId = reqId; } catch (eLr) { }
 }
 var summary = resp.status + ": " + req.ops.length + " ops (" + okc + " ok, " + errc + " chyb)"
     + this.FB_RiskNote(risk);

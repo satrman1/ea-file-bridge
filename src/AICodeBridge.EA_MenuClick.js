@@ -34,6 +34,15 @@ else if (ItemName == "Stav bridge (kam zapisuje / co cte)") {
     catch (eSt) { outS = "CHYBA nacteni stavu: " + eSt.message; }
     Session.Prompt(outS, 0);
 }
+else if (ItemName == "Nav spike (test navigace)") {
+    // SPIKE iterace 5 (B-V3): krokovaci sonda navigacnich COM volani.
+    // Pad kroku NENI zachytitelny (par. 1a/4) - vyhodnoceni podle Output
+    // tabu (START bez OK). Postup: docs/e2e-iterace5/SPIKE-NAV.md.
+    var outN = "";
+    try { outN = "" + this.FB_NavProbe(Repository); }
+    catch (eNv) { outN = "CHYBA NavProbe (zachytitelna JS vetev): " + eNv.message; }
+    Session.Prompt("Nav spike:\n\n" + outN, 0);
+}
 else if (ItemName == "About AI Bridge")
     Session.Prompt("AI Code Bridge + EA File Bridge (eafb/0.2)\n"
         + "Executor: operace FB_* (kanon = ea-file-bridge/src, runtime = model).\n"

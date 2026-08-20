@@ -11,7 +11,12 @@
 //              a operace export/import_element_linked_documents (soubory
 //              se pisou VYHRADNE dovnitr baseDir - zadne cizi cesty).
 //   srcDir:  slozka kanonu kodu pro deploy_src (dev operace; v bance deny).
+//   showInBrowser: true = zapne FB_ShowInBrowser (default VYPNUTO - lekce
+//            2026-08-20, ShowInProjectView pad; zapinat az po zavere spiku
+//            B-V3, viz docs/e2e-iterace5/SPIKE-NAV.md).
+//   navProbe: true = ukaze menu polozku "Nav spike (test navigace)"
+//            (iterace 5 B-V3; jen dev repo, do PROD sablon NEpatri).
 // eaexample (dev stanice):
 return [
-    { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\" }
+    { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true }
 ];
