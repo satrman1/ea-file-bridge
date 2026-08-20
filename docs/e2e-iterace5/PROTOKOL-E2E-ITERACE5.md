@@ -68,7 +68,7 @@ Na eaexample je security vypnutá → gate se neuplatní; logiku kryje harness. 
 
 ## Úklid
 
-`FBT IT5 UX` smazat po testech (delete dávka → ELEVATED → potvrdit), nebo nechat do hromadného úklidu FBT-*.
+**Rozhodnutí Miloš 2026-08-21: úklid v eaexample se NEDĚLÁ** — eaexample je dev pískoviště, těžiště testů se přesouvá do QEAX. `FBT IT5 UX` (+ starší FBT-*) tam zůstávají; dávka `req-20260821-23-uklid.json` je připravená, ale nepouští se (kdyby se někdy uklízelo hromadně).
 
 ## Výsledky (živě 2026-08-20, eaexample EA 17.1.5)
 
