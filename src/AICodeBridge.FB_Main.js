@@ -446,7 +446,13 @@ for (var i = 0; i < req.ops.length; i++) {
             if (!r) { r = { op: name, status: "error", code: "E_EXCEPTION", message: "Operace nevratila vysledek." }; }
             if (!r.op) { r.op = name; }
         } catch (e2) {
-            r = { op: name, status: "error", code: "E_EXCEPTION", message: "" + e2.message };
+            // interpretace znamych EA chyb (odepreny zapis = EA security /
+            // zamek) na citelny kod+hlasku; jinak generic E_EXCEPTION
+            var interp = null;
+            try { interp = this.FB_InterpretError(e2.message); } catch (eIn) { interp = null; }
+            r = interp
+                ? { op: name, status: "error", code: interp.code, message: interp.message }
+                : { op: name, status: "error", code: "E_EXCEPTION", message: "" + e2.message };
         }
     }
     resp.results.push(r);

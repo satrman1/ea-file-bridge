@@ -299,6 +299,8 @@ Kontinuální odbavování dávek z M365 Copilota **bez pumpy**: jedním kliknut
 | `E_RISK_INTEGRITY` | dávka | **nové v 0.8** (§6e): obsah dávky se změnil mezi klasifikací a potvrzením (nesouhlas SHA-256 surových bajtů) — nic se neprovedlo, soubor do `rejected\`, audit SE zapíše (bezpečnostní událost) |
 | `E_RISK_CONFIRM` | dávka | **nové v 0.8** (§6e, B1): potvrzovací pole v obsahu dávky (podvržený confirm — soubor do `rejected\`), NEBO neplatný pokus o potvrzení (chybějící/nesouhlasící nonce či hash, soubor mimo `pending\` — dávka zůstává čekat), NEBO ELEVATED bez spočitatelného hashe/duplicitní jméno v `pending\` |
 | `E_RISK_REJECTED` | dávka | **nové v 0.8** (§6e): dávka zamítnuta člověkem v potvrzovacím dialogu (status `rejected`) — nic se neprovedlo, soubor do `rejected\`, audit s `confirmedByUser: false` |
+| `E_PERMISSION` | op | **nové v 0.9**: EA odmítla zápis do cílového balíčku — uživatel nemá práva (EA security: balíčková skupina / `@F002_Write`, platí i přes API). NENÍ chyba bridge; bridge per-user autorizaci **záměrně nedrží** (duplicita s EA), jen chybu interpretuje (`FB_InterpretError`). ⚠ Přesný text EA hlášky ověřit naživo v bance s omezeným uživatelem |
+| `E_LOCKED` | op | **nové v 0.9**: cílový prvek/balíček je zamčený (EA locking) — zápis počká na uvolnění zámku |
 | `E_NOT_FOUND` | op | cíl nenalezen |
 | `E_EXCEPTION` | op/dávka | neočekávaná výjimka |
 | `E_NO_EXECUTOR` | dávka | v modelu chybí FB_Main |
