@@ -59,12 +59,33 @@ function clipRead() {
     var t = html.parentWindow.clipboardData.getData("Text");
     return (t === null || typeof t == "undefined") ? "" : ("" + t);
 }
+// LEKCE 2026-08-20 (naziво): htmlfile.setData v EA runtime TISE nic nezapise
+// (getData funguje, setData ne - schranka drzela puvodni davku). Proto:
+// (1) zkus setData + OVER read-backem, jestli se fakt zapsalo;
+// (2) fallback = clip.exe (bezny nastroj Windows, ZADNY powershell): temp
+//     UTF-16LE (ADODB "unicode" = LE+BOM, clip.exe cte korektne vc. diakritiky)
+//     -> cmd /c clip < temp -> smaz temp. cmd+clip neni malware vzor (na rozdil
+//     od powershellu), AV to neresi.
 function clipWrite(s) {
+    s = "" + s;
     try {
         var html = self.FB_ComObj("htmlfile");
-        html.parentWindow.clipboardData.setData("Text", "" + s);
+        html.parentWindow.clipboardData.setData("Text", s);
+        var chk = "" + html.parentWindow.clipboardData.getData("Text");
+        if (chk === s) { return true; }
+    } catch (eCW) { }
+    try {
+        var tmp = DIR_RES + "\\_clip.tmp";
+        var st = self.FB_ComObj("ADODB.Stream");
+        st.Type = 2; st.Charset = "unicode"; st.Open();
+        st.WriteText(s);
+        st.SaveToFile(tmp, 2);
+        st.Close();
+        var sh = self.FB_ComObj("WScript.Shell");
+        sh.Run('cmd /c clip < "' + tmp + '"', 0, true);
+        if (fso.FileExists(tmp)) { fso.DeleteFile(tmp); }
         return true;
-    } catch (eCW) { return false; }
+    } catch (eClip) { return false; }
 }
 // --- EA dialog Ano/Ne/Storno (kanal "gui"); fallback WScript.Shell.Popup ---
 function askUser(text) {
