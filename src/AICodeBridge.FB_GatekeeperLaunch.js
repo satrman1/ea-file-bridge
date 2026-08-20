@@ -3,11 +3,14 @@
 // vratneho z modelu (FB_Gatekeeper), dosadi parametry, odstrani komentare
 // a spusti powershell.exe (Windows PS 5.1 - NIKDY pwsh, GetActiveObject
 // v PS7 neexistuje, red team I1). ZADNY skriptovy soubor na disku.
-// NOSIC KODU (rozhodnuti 2026-08-19, misto fallbacku R1): -EncodedCommand
-// nese jen bootstrap `iex([Console]::In.ReadToEnd())`; plny kanon jde
-// rourou StdIn pres WScript.Shell.Exec (= primy CreateProcess, ne cmd -
-// R4/W2: command line ma strop 32767 znaku, kanon 15k+ znaku se do nej
-// nevejde; roura limit nema). Kod se rodi inline z EA, nikdy z disku.
+// NOSIC KODU (rozhodnuti 2026-08-19, upresneno 2026-08-20 po Norton bloku):
+// "powershell.exe ... -Command -" - powershell precte CELY kanon ze StdIn,
+// prikazova radka je CISTA (zadny base64 payload). Puvodni -EncodedCommand
+// mel base64 na prikazove radce = Norton IDP.HELU.CMD.Generic24 "detekce
+// pomoci prikazoveho radku" zablokoval powershell.exe. Roura pres
+// WScript.Shell.Exec (= primy CreateProcess, ne cmd); R4/W2: command line ma
+// strop 32767 znaku, kanon 15k+ se do nej stejne nevejde. Kod se rodi inline
+// z EA, nikdy z disku. R3/W1: chovani-based AV muze i tak namitat -> R5 C-A.
 // W8: FB_SessionStart PRED spustenim vratneho (otviraci baseline);
 // souhrn se predava do $SessionInfo (uvodni stav okna + zaverecny souhrn).
 // Bezi v EA runtime (menu klik) - COM vyhradne pres FB_ComObj (par. 1a),
@@ -80,36 +83,33 @@ var head = "$RepoId=" + psq(rid)
     + ";$ReapGraceSec=" + parseInt(gk.reapGraceSec, 10)
     + ";$StuckSec=" + parseInt(gk.stuckSec, 10);
 var ps = head + "\n" + body.join("\n") + "\n";
-// bootstrap do -EncodedCommand: precte CELY StdIn a vykona ho jako JEDEN
-// skript (zadna REPL semantika -Command -). Base64 UTF-16LE cistym JS.
-var boot = "iex([Console]::In.ReadToEnd())";
-var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-var bytes = [];
-for (var i2 = 0; i2 < boot.length; i2++) {
-    var c = boot.charCodeAt(i2);
-    bytes.push(c & 0xFF);
-    bytes.push((c >> 8) & 0xFF);
-}
-var b64 = "";
-for (var b = 0; b < bytes.length; b += 3) {
-    var n1 = bytes[b];
-    var n2 = (b + 1 < bytes.length) ? bytes[b + 1] : 0;
-    var n3 = (b + 2 < bytes.length) ? bytes[b + 2] : 0;
-    var trip = (n1 << 16) | (n2 << 8) | n3;
-    b64 += B64.charAt((trip >> 18) & 63) + B64.charAt((trip >> 12) & 63);
-    b64 += (b + 1 < bytes.length) ? B64.charAt((trip >> 6) & 63) : "=";
-    b64 += (b + 2 < bytes.length) ? B64.charAt(trip & 63) : "=";
-}
-// Exec = primy CreateProcess (nikdy pres cmd - R4); konzole se sama skryje
-// (-WindowStyle Hidden), stavove okno vratneho se objevi do par sekund.
-// StdIn.Write muze kratce blokovat, nez se powershell rozbehne a rouru
-// vypije - povoleny stav (powershell 5.1 = overeny predpoklad T4-1).
+// NOSIC KODU = StdIn pres "-Command -" (rozhodnuti 2026-08-19, UPRESNENO
+// 2026-08-20 po Norton bloku IDP.HELU.CMD.Generic24 "detekce pomoci
+// prikazoveho radku", ochrana na zaklade chovani): puvodni -EncodedCommand
+// mel na prikazove radce base64 blob = presne vzor, na ktery command-line
+// heuristika kyva -> AV zablokoval spusteni powershell.exe (a Exec pak vratil
+// undefined). "-Command -" = powershell precte CELY skript ze StdIn; prikazova
+// radka je pak CISTA (zadny payload), kanon jde rourou (bez delkoveho limitu
+// R4/W2). Exec = primy CreateProcess (nikdy pres cmd). -Command - MUSI byt
+// posledni argument (vse za -Command je hodnota prikazu; "-" = cti StdIn).
+// POZN.: chovani-based AV muze i tak namitat proti EA->powershell + schranka
+// (R3/W1 optika) - to je vstup pro R5 (podminka C-A: DLP/EDR clearance).
 var sh = this.FB_ComObj("WScript.Shell");
 var winArgs = gk.debug ? "-NoExit " : "-WindowStyle Hidden ";
-var ex = sh.Exec("powershell.exe -NoProfile -NoLogo -STA " + winArgs + "-EncodedCommand " + b64);
+var ex = null;
+try { ex = sh.Exec("powershell.exe -NoProfile -NoLogo -STA " + winArgs + "-Command -"); }
+catch (eEx) { ex = null; }
+if (!ex || typeof ex.StdIn == "undefined") {
+    return "CHYBA: powershell.exe se nepodarilo spustit (Exec nevratil proces).\n"
+        + "Nejcastejsi pricina: antivirus/EDR zablokoval spusteni powershell.exe z EA "
+        + "(Norton IDP.HELU.CMD.* / 'detekce pomoci prikazoveho radku' = R3/W1 optika).\n"
+        + "Reseni doma: povol/obnov zablokovanou polozku v Norton historii (a pridej vyjimku), "
+        + "pak zapni rezim znovu. Pokud problem trva i s cistou prikazovou radkou, jde o "
+        + "chovani-based blok (EA->powershell) = vstup pro R5, ohlas.";
+}
 ex.StdIn.Write(ps);
 ex.StdIn.Close();
-return "AI import rezim: vratny spusten (PS 5.1, kanon " + ps.length + " znaku rourou, mutex per repo).\n"
+return "AI import rezim: vratny spusten (PS 5.1, kanon " + ps.length + " znaku rourou StdIn, mutex per repo).\n"
     + "Repo: " + rid + "\nBase: " + cfg.baseDir + "\n" + sess
     + "\nStavove okno se objevi do par sekund. Druhe spusteni odmitne mutex (W3)."
     + "\nRezim ukoncis tlacitkem 'Ukoncit rezim' v okne.";

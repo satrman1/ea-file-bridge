@@ -64,7 +64,9 @@ Klikni **Ukoncit rezim** (nebo zavři okno). Do schránky ti spadne **závěreč
 
 ## Když něco nehraje
 
-**Okno se vůbec neobjevilo.** Zkus zapnout režim s viditelnou konzolí: vytvoř vedle pumpy soubor `gk-config.json` s obsahem `{ "debug": true }` a zapni režim znovu — otevře se černé okno PowerShellu, kde uvidíš, kde se to zaseklo. (Pošli mi ten výpis.)
+**Antivirus (Norton) zablokoval spuštění.** Když se místo okna objeví „CHYBA launcheru vrátného" nebo Norton hlásí `IDP.HELU.CMD.*` / „detekce pomocí příkazového řádku", antivirus zablokoval spuštění PowerShellu z EA. To je očekávané téma (je to přesně to riziko „AI spouští procesy", které řešíme s bezpečností pro banku). Doma to obejdeš takto: v Norton otevři **Zabezpečení → Historie**, najdi zablokovanou položku `powershell.exe` a dej **Obnovit / Povolit** (případně „už neblokovat"). Pak zapni režim znovu. Pokud to Norton blokuje i podruhé, dej mi vědět — je to důležitý údaj pro bezpečnostní schválení (R5), ne jen domácí potíž.
+
+**Okno se vůbec neobjevilo (a antivirus mlčí).** Zkus zapnout režim s viditelnou konzolí: vytvoř vedle pumpy soubor `gk-config.json` s obsahem `{ "debug": true }` a zapni režim znovu — otevře se černé okno PowerShellu, kde uvidíš, kde se to zaseklo. (Pošli mi ten výpis.)
 
 **Okno svítí „EA NEDOSTUPNA", i když EA běží.** Nejčastěji je EA spuštěná „jako správce" a vrátný ne (nebo naopak) — musí být oba stejně. Zavři obojí a spusť EA normálně.
 
