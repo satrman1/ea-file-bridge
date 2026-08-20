@@ -15,9 +15,26 @@
 //  3 ShowInProjectView(GetElementByID)
 //  4 ShowInProjectView(GetElementByGuid)
 //  5 RunModelSearch("FB_Changes", "") - automaticke otevreni vysledku hledani
+// Zotaveni po padu: pad kroku N zabije i in-memory citac (restart EA);
+// zbyle kroky se testuji pres FB_Config navProbeStart: N+1 (vychozi krok
+// po restartu) - viz SPIKE-NAV.md.
 var self = this;
 function L(m) { try { self.Log(Repository, m); } catch (e) { } }
-var step = (typeof this._fbNavStep == "number") ? this._fbNavStep : 1;
+var step = (typeof this._fbNavStep == "number") ? this._fbNavStep : 0;
+if (step == 0) {
+    step = 1;
+    try {
+        var cfgs = this.FB_Config();
+        var rid = ("" + this.FB_RepoId(Repository)).toUpperCase();
+        for (var ci = 0; ci < cfgs.length; ci++) {
+            if (rid.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) {
+                if (typeof cfgs[ci].navProbeStart == "number") { step = cfgs[ci].navProbeStart; }
+                break;
+            }
+        }
+    } catch (eCf) { step = 1; }
+    if (step < 1 || step > 5) { step = 1; }
+}
 var bridgeId = -1, bridgeGuid = "", bridgePkg = 0;
 try {
     var br = this.FB_XmlRows(Repository.SQLQuery(

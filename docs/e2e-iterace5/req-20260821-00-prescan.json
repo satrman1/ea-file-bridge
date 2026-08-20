@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-00",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "ping", "echo": "prescan iterace 5" },
+    { "op": "query", "sql": "SELECT COUNT(*) AS cnt FROM t_operation op INNER JOIN t_object o ON o.Object_ID = op.Object_ID WHERE o.Name = 'AICodeBridge' AND o.Stereotype = 'JavascriptAddin'" }
+  ]
+}

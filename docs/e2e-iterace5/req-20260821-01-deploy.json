@@ -1,0 +1,13 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-01",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": [
+      "Log", "FB_LogChanges", "FB_Changes", "FB_NavProbe",
+      "FB_AccessGroups", "FB_UserAccess", "FB_RiskGate",
+      "FB_OpSelectedContext", "FB_InBranch", "FB_OpFindElements", "FB_OpFindPackages",
+      "FB_Config", "FB_Main", "EA_GetMenuItems", "EA_MenuClick"
+    ] }
+  ]
+}

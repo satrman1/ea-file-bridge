@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-04",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "create_or_update_elements", "elements": [
+      { "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT IT5 UX", "type": "Class", "notes": "Testovaci prvek iterace 5 - proklik z Output tabu + FB_Changes. Po testech smazat (FBT-*)." }
+    ] }
+  ]
+}
