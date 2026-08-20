@@ -147,6 +147,8 @@ for (var i = 0; i < files.length; i++) {
     // jednoho cteni); text uz se zde necte
     var respText = "" + this.FB_Main(Repository, f.path);
     writeUtf8(DIR_RES + "\\" + responseName(f.name), respText);
+    // interaktivni rezim: ukaz v Project browseru, co vzniklo (UX)
+    try { this.FB_ShowInBrowser(Repository, this.FB_JsonParse(respText)); } catch (eSb) { }
     if (respText.indexOf("\"status\":\"confirm_required\"") >= 0) {
         // executor soubor presunul do pending\ - zadny presun zde; nabidnout dialog
         this.Log(Repository, "FB GUI fallback: " + f.name + " ceka na potvrzeni (pending\\)");

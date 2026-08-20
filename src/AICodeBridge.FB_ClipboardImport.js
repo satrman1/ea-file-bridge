@@ -170,6 +170,8 @@ if (respText.indexOf("\"status\":\"confirm_required\"") >= 0) {
         fso.MoveFile(reqPath, (rejected ? DIR_REJ : DIR_PROC) + "\\" + reqName.replace(/\.json$/i, "") + "." + ts() + ".json");
     }
 }
+// interaktivni rezim: ukaz v Project browseru, co vzniklo (UX pozorovatelnost)
+try { this.FB_ShowInBrowser(Repository, this.FB_JsonParse(respText)); } catch (eSb) { }
 // chat verze -> zpet do schranky + do dialogu (par. 3.3; nikdy nonce/plny hash)
 var chat = "";
 try {

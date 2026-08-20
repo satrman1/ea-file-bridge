@@ -23,6 +23,11 @@ for (var i = 0; i < op.targets.length; i++) {
         if (el == null) { return fail(i, "E_NOT_FOUND", "element nenalezen"); }
         var chkE = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
         if (chkE != null) { return fail(i, chkE.code, chkE.message); }
+        // jmeno + cesta JESTE PRED smazanim (po smazani uz je nezjistis) -
+        // aby FB_LogChanges/dialog ukazal, CO se smazalo a KDE (UX)
+        var delName = "" + el.Name;
+        var delPath = "?";
+        try { delPath = this.FB_ElementPath(Repository, "element", el); } catch (eDp) { }
         found = false;
         if (el.ParentID > 0) {
             var owner = Repository.GetElementByID(el.ParentID);
@@ -36,7 +41,7 @@ for (var i = 0; i < op.targets.length; i++) {
             }
         }
         if (!found) { return fail(i, "E_EXCEPTION", "element se nepodarilo najit v kolekci vlastnika"); }
-        items.push({ type: "Element", id: el.ElementID, deleted: true });
+        items.push({ type: "Element", id: el.ElementID, name: delName, path: delPath, deleted: true });
     } else if (typ == "PACKAGE") {
         var pkg = this.FB_ResolvePkg(Repository, t.guid || t.id);
         if (pkg == null) { return fail(i, "E_NOT_FOUND", "package nenalezen"); }

@@ -345,6 +345,18 @@ Vztah k ostatním režimům: **AI import režim (vrátný)** = plně automatick�
 
 Kontinuální kanál bez pumpy (§6f): menu **Zapnout AI import rezim** spustí PS proces (kanon z `FB_Gatekeeper`, StdIn carrier). Stavové okno drží semafor + frontu; potvrzování ELEVATED dávek kanálem `okno` (`FB_ConfirmPending`). Vrátný a pumpa se **nikdy nespouští zároveň** (oba by četli `requests\`); single-instance mutex (§13) chrání jen proti dvěma vrátným. Add-in Search „FB_Process" musí být v modelu jednorázově založen (§6f, T4-0a). Klikací návod: `docs/NAVOD-VRATNY-AI-IMPORT.md`.
 
+## 9c. UX / pozorovatelnost (v0.9, 2026-08-20 — Milošova zpětná vazba)
+
+Nad velkým repozitářem (1,5M prvků) uživatel potřebuje vidět **co a kde** se děje. Přidáno:
+
+- **Výpis změn do Output tabu „AI Bridge"** (`FB_LogChanges`, volá `FB_Main` po každé zápisové dávce, všechny kanály): řádek na prvek `[vytvořeno|upraveno|smazáno] "jméno" @ Model.Domain.…` — **tečková cesta** jak v EA browseru (`FB_ElementPath`, chodí parent packages/elementy). Mazání nese jméno+cestu zachycené **před** smazáním (`FB_OpDelete`).
+- **Zvýraznění v Project browseru** (`FB_ShowInBrowser`, jen interaktivní režimy clipboard/GUI fallback — NE pumpa/vrátný): po dávce `ShowInProjectView` posledního prvku + `RefreshModelView` dotčených packages, ať uživatel vidí, co vzniklo. Best-effort.
+- **Lidský confirm dialog** (`FB_ConfirmSummary` přepsán): headline „Chystá se SMAZAT 2 prvky" / „vytvořit 3 a upravit 1 v 2 balících", pak co+kde+proč plainu; technická patička (id, otisk = hashPrefix, počet zápisů) až dole. Žádný metrický žargon nahoře, nikdy plný hash/nonce.
+- **Jasný baseline** (`FB_SessionStart`): „Session baseline vytvořen nad: <cesty balíčků>" místo holého počtu.
+- **Menu „Stav bridge (kam zapisuje / co čte)"** (`FB_Status`): repo identita, whitelist balíčky **s cestou** (kam smí zápis), složka výměny, poznámka že čtení je kdekoli. Odpovídá na „kam zapisuješ / co čteš".
+- **Úklid menu**: odebrána legacy položka „Process requests (#AI-CODE)"; položky přejmenovány lidsky a seřazeny (schránka → složka → vrátný → stav → about).
+- **Rychlá klávesová cesta** (`FB_ClipboardSearch`): clipboard režim lze vyvolat i z vyhledávacího pole EA (Add-in Search „FB_Clipboard", separátor tečka) — bez otevírání menu.
+
 ## 10. SQL dialekty
 
 `query` běží v dialektu připojeného repozitáře: lokální `.qea` = SQLite, bankovní repozitář = MS SQL 2022. Executor SQL jen provádí — dialekt hlídá autor dotazu (skilly / copilot-instructions / ea-sql-expert).

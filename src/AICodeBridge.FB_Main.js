@@ -459,6 +459,8 @@ resp.status = failed ? "error" : "done";
 if (writesInBatch > 0 && okc > 0) {
     try { resp.qc = this.FB_QcRun(Repository, req, resp); }
     catch (eQc) { resp.qc = { status: "nedobehlo", reason: "FB_QcRun selhal: " + eQc.message, checks: 0, findings: [] }; }
+    // pozorovatelnost (Miloš UX): vypis zmen s teckovou cestou do Output tabu
+    try { this.FB_LogChanges(Repository, resp); } catch (eLc) { }
 }
 var summary = resp.status + ": " + req.ops.length + " ops (" + okc + " ok, " + errc + " chyb)"
     + this.FB_RiskNote(risk);

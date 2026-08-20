@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260820-08",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": ["FB_ElementPath","FB_LogChanges","FB_Status","FB_ShowInBrowser","FB_ClipboardSearch","FB_Main","FB_ConfirmSummary","FB_SessionStart","FB_OpDelete","FB_ClipboardImport","FB_ProcessFolder","EA_GetMenuItems","EA_MenuClick"] }
+  ]
+}

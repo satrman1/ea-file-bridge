@@ -1,41 +1,53 @@
 // AICodeBridge.FB_ConfirmSummary(resp)
-// Lidsky citelny souhrn confirm_required response pro potvrzovaci UI
-// (konzole pumpy, dialog GUI fallbacku, stavove okno vratneho - I6:
-// vzdy id + souhrn KONKRETNI davky). Vstup: parsovany response objekt.
-// Vraci viceradkovy text. NIKDY neobsahuje plny hash ani nonce (par. 6.3)
-// - jen prefix hashe pro identifikaci.
+// LIDSKY souhrn confirm_required davky pro potvrzovaci dialog (pumpa / GUI
+// fallback / stavove okno vratneho). Cil (Milosova UX zpetna vazba 2026-08-20):
+// nejdriv CO SE STANE a KDE, plainu; technicka metrika + hashPrefix az dole
+// jako mala paticka. NIKDY plny hash/nonce (par. 6.3) - jen prefix.
+// Vstup: parsovany response objekt (status confirm_required).
 if (resp === null || typeof resp == "undefined") { return "(zadna response)"; }
 var risk = resp.risk || {};
 var m = risk.metrics || {};
 var sm = risk.summary || {};
-var lines = [];
-lines.push("Davka: " + (resp.id || "?") + "   riskLevel: " + (risk.riskLevel || "?"));
-if (resp.confirm && resp.confirm.hashPrefix) {
-    lines.push("payloadHash (prefix): " + resp.confirm.hashPrefix + "...");
+var L = [];
+// --- headline: co se chysta ---
+var del = (typeof m.deleteTargets == "number") ? m.deleteTargets : 0;
+var creat = (typeof m.createOps == "number") ? m.createOps : 0;
+var upd = (typeof m.updatedExisting == "number") ? m.updatedExisting : 0;
+var pkgs = (sm.packages && sm.packages.length) ? sm.packages : [];
+var head;
+if (del > 0) {
+    head = "Chysta se SMAZAT " + del + " " + (del == 1 ? "prvek" : (del < 5 ? "prvky" : "prvku")) + " z modelu.";
+} else {
+    var partsH = [];
+    if (creat > 0) { partsH.push("vytvorit " + creat); }
+    if (upd > 0) { partsH.push("upravit " + upd); }
+    if (partsH.length == 0) { partsH.push("zapsat"); }
+    head = "Chysta se " + partsH.join(" a ") + " "
+        + ((creat + upd) == 1 ? "prvek" : "prvku")
+        + (pkgs.length > 0 ? " v " + pkgs.length + " " + (pkgs.length == 1 ? "balicku" : "balicich") : "") + ".";
 }
-var cnt = [];
-if (sm.ops) {
-    for (var k in sm.ops) {
-        if (typeof sm.ops[k] != "function") { cnt.push(sm.ops[k] + "x " + k); }
-    }
+L.push(head);
+L.push("");
+// --- kde + ktere ---
+if (sm.targets && sm.targets.length > 0) {
+    L.push((del > 0 ? "Ke smazani: " : "Prvky: ") + sm.targets.join(", "));
 }
-if (cnt.length > 0) { lines.push("Operace: " + cnt.join(", ")); }
-lines.push("Metriky: writeOps=" + (m.writeOps != null ? m.writeOps : "?")
-    + ", deleteTargets=" + (m.deleteTargets != null ? m.deleteTargets : "?")
-    + ", updatedExisting=" + (m.updatedExisting != null ? m.updatedExisting : "?")
-    + ", affectedElements=" + (m.affectedElements != null ? m.affectedElements : "?")
-    + ", affectedPackages=" + (m.affectedPackages != null ? m.affectedPackages : "?")
-    + ", affectedDiagrams=" + (m.affectedDiagrams != null ? m.affectedDiagrams : "?"));
-function listLine(label, arr) {
-    if (arr && arr.length > 0) { lines.push(label + ": " + arr.join(", ")); }
-}
-listLine("Targety", sm.targets);
-listLine("Packages", sm.packages);
-listLine("Diagramy", sm.diagrams);
+if (pkgs.length > 0) { L.push("Balicky: " + pkgs.join(", ")); }
+if (sm.diagrams && sm.diagrams.length > 0) { L.push("Diagramy: " + sm.diagrams.join(", ")); }
+// --- proc se ptam (plainu, prvni konkretni duvod) ---
 if (risk.riskReasons && risk.riskReasons.length > 0) {
-    lines.push("Duvody (CR par. 12 - vzdy konkretni):");
-    for (var i = 0; i < risk.riskReasons.length; i++) {
-        lines.push("  - " + risk.riskReasons[i]);
+    L.push("");
+    L.push("Proc potvrzeni: " + risk.riskReasons[0]);
+    if (risk.riskReasons.length > 1) {
+        L.push("  (+ " + (risk.riskReasons.length - 1) + " dalsi duvod/y - viz res soubor)");
     }
 }
-return lines.join("\n");
+// --- akce ---
+L.push("");
+L.push("Ano = provest  |  Ne = zahodit  |  Storno = rozhodnout pozdeji");
+// --- mala technicka paticka (kontrola integrity; NE plny hash) ---
+var foot = "id " + (resp.id || "?");
+if (resp.confirm && resp.confirm.hashPrefix) { foot += " | otisk " + resp.confirm.hashPrefix + "…"; }
+if (typeof m.writeOps == "number") { foot += " | zapisu " + m.writeOps; }
+L.push("(" + foot + ")");
+return L.join("\n");
