@@ -60,13 +60,11 @@ Dávky pouštěj **clipboard režimem** (Copy obsahu req souboru → Specialize 
 
 13. Postupuj podle **`SPIKE-NAV.md`** (5 kroků po jednom kliku; výsledky zapiš tam). Až po závěru spiku případně zapínat `showInBrowser`.
 
-## K8 — feature A (doma jen částečně)
+## K8 — feature A živě: NEJDŘÍV DOMA V QEAX (rozhodnutí 2026-08-20), pak banka
 
-Doma je EA security **vypnutá** → gate se neuplatní (vše povoleno — rozhodnutí 2026-08-20); logiku kryje harness (9 testů). **V bance** (až s kurýrem):
+Na eaexample je security vypnutá → gate se neuplatní; logiku kryje harness. **Živý test běží doma v QEAX modelu se zapnutou security** (E2E model s existujícím vendor add-inem) = zároveň generálka na bankovní nasazení do repa s cizím add-inem. Kompletní plán = **`IT-ANALYSIS\zaprah-vlaken-2026-08-21.md`** (samostatné vlákno). Připraveno předem (2026-08-20/21): MCP recon QEAX (signály Add-In Events kompletní, ExtendedPropertiesAddin 2076), balíčky **#FB-TEST (685)** a **#AI-LOG (686)** založeny přes MCP pod Test Data (377), deploy_src umí přepnout receptions na lokální SignalGUID (přenos add-inu mezi modely, commit c46a8ec). Testy: A1 člen skupiny zapíše (+proklik), A2 nečlen → `E_ADDIN_ACCESS` (čtení projde; pozor cache FB_UserAccess = změna členství chce plný restart EA), A3 zápis bez balíčkových práv → syrová EA hláška → přesný vzor do `FB_InterpretError`, A4 `t_xrefsystem` UserSettings/GroupSettings (aktivace add-inu).
 
-14. Čtecí dávkou ověř jména tabulek: `query` `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 't_sec%'` (MS SQL). Očekávané: `t_secuser`, `t_secgroup`, `t_secuser_group`. Pokud se vazební tabulka jmenuje jinak → upravit SQL ve `FB_UserAccess`.
-15. Do `FB_AccessGroups` doplnit bankovní repo + skutečné jméno write skupiny (jen v korporátním repu, ne tady — pravidlo očisty).
-16. Test s omezeným uživatelem (bez write skupiny): zapisová dávka → `E_ADDIN_ACCESS`, čtecí projde; člen skupiny: zápis projde.
+**V bance potom** (s kurýrem): čtecí dávkou jména tabulek (`INFORMATION_SCHEMA … LIKE 't_sec%'`, čekáme `t_secuser`/`t_secgroup`/`t_secuser_group`), `FB_AccessGroups` se skutečnou skupinou JEN v korporátním repu (pravidlo očisty), test s omezeným uživatelem.
 
 ## Úklid
 
@@ -82,4 +80,4 @@ Doma je EA security **vypnutá** → gate se neuplatní (vše povoleno — rozho
 | K5 kontext (3 případy) | ✅ | -02 element FBT IT5 UX (path+branch+`inWhitelist:true`), -21 AICodeBridge (`inWhitelist:false`+note), -22 kořen (`type:Package`); `currentDiagram` se vrací vždy |
 | K6 scope | ✅ | -03: bez scope count 1, se scope #FB-TEST count 0 + `scope` blok s cestou |
 | K7 spike | ✅ uzavřen | kroky 1–2 OK (krok 1 sbalí strom), **b1 potvrzen prokllikem** (ShowInProjectView z user-gesture bez pádu); kroky 4–5 + fáze D se nestaví — viz SPIKE-NAV.md |
-| K8 banka | ⏳ | čeká na kurýra (t_sec* tabulky, FB_AccessGroups, omezený uživatel) |
+| K8 security živě | ⏳ | nejdřív DOMA v QEAX (zápřah `zaprah-vlaken-2026-08-21.md`; #FB-TEST 685 + #AI-LOG 686 už založeny přes MCP), pak banka s kurýrem |
