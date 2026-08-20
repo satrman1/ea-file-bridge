@@ -72,13 +72,14 @@ Doma je EA security **vypnutá** → gate se neuplatní (vše povoleno — rozho
 
 `FBT IT5 UX` smazat po testech (delete dávka → ELEVATED → potvrdit), nebo nechat do hromadného úklidu FBT-*.
 
-## Výsledky (vyplnit)
+## Výsledky (živě 2026-08-20, eaexample EA 17.1.5)
 
 | Krok | Výsledek | Poznámka |
 |---|---|---|
-| K2 cnt=93 | | |
-| K3 dvojklik Output | | |
-| K4 FB_Changes | | |
-| K5 kontext (3 případy) | | |
-| K6 scope | | |
-| K7 spike | | viz SPIKE-NAV.md |
+| K2 počet operací | ✅ | `cnt: 101` (dávka -00; očekávání opraveno z 94 — §12 nepočítal clipboard/UX vlnu) |
+| K3 dvojklik Output | ✅ | po 5 iteracích ladění (K3a–K3k + v3–v5): sync signatur deploy_src → reception `EA_OnOutputItemDoubleClicked` → argumenty = zabalené objekty s `.val` (dávky -05…-20); **skok v browseru funguje** |
+| K4 FB_Changes | ⚠ vypuštěno | alternativa ke K3, K3 funguje → netestuje se dál (rozhodnutí Miloš). Pozorování z dřívějšího pokusu (po paměti, neretestováno): výsledek dohledal balíček místo elementu a proklik nešel ani Alt+G — kdyby se search někdy oživoval, začít tady |
+| K5 kontext (3 případy) | ✅ | -02 element FBT IT5 UX (path+branch+`inWhitelist:true`), -21 AICodeBridge (`inWhitelist:false`+note), -22 kořen (`type:Package`); `currentDiagram` se vrací vždy |
+| K6 scope | ✅ | -03: bez scope count 1, se scope #FB-TEST count 0 + `scope` blok s cestou |
+| K7 spike | ✅ uzavřen | kroky 1–2 OK (krok 1 sbalí strom), **b1 potvrzen prokllikem** (ShowInProjectView z user-gesture bez pádu); kroky 4–5 + fáze D se nestaví — viz SPIKE-NAV.md |
+| K8 banka | ⏳ | čeká na kurýra (t_sec* tabulky, FB_AccessGroups, omezený uživatel) |

@@ -108,9 +108,9 @@ Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whiteli
 |---|---|---|---|---|
 | `ping` | Č | `echo` | `echo, eaVersion, repository, connection, time` | ✅ |
 | `query` | Č | `sql` (jen SELECT/WITH; dialekt dle repa) | `rowCount, rows[]` (vrací i GUIDy) | ✅ |
-| `get_selected_context` | Č | — | **v0.10 (C)**: aktuální výběr v Project browseru + aktivní diagram: `selected, context{type,guid,id,name,path,branchGuid,branchId,inWhitelist,whitelistNote}, selectedElements[], currentDiagram` | 🔨 harness; živě 20260821-* |
-| `find_elements_by_name` | Č | `name`, `exactMatch`, **`scope` (v0.10: GUID\|id package — omezí na VĚTEV, typicky `branchGuid` z get_selected_context)** | `items[{guid,id,name,type}]`, `scope?` | ✅ (scope 🔨) |
-| `find_packages_by_name` | Č | `name`, `exactMatch`, **`scope` (v0.10, dtto)** | `items[{guid,id,name}]`, `scope?` | ✅ (scope 🔨) |
+| `get_selected_context` | Č | — | **v0.10 (C)**: aktuální výběr v Project browseru + aktivní diagram: `selected, context{type,guid,id,name,path,branchGuid,branchId,inWhitelist,whitelistNote}, selectedElements[], currentDiagram` | ✅ 20260821-02/-21/-22 (element in/mimo whitelist, package) |
+| `find_elements_by_name` | Č | `name`, `exactMatch`, **`scope` (v0.10: GUID\|id package — omezí na VĚTEV, typicky `branchGuid` z get_selected_context)** | `items[{guid,id,name,type}]`, `scope?` | ✅ (scope 20260821-03) |
+| `find_packages_by_name` | Č | `name`, `exactMatch`, **`scope` (v0.10, dtto)** | `items[{guid,id,name}]`, `scope?` | ✅ (scope harness) |
 | `get_elements_information` | Č | `elements[]` (guid\|id\|jméno\|$ref), `brief` | plný dump vč. atributů, operací, TV (RefGUID rozpřaženě), konektorů, owned diagramů | ✅ |
 | `get_packages_information` | Č | `packages[]` | dump package | ✅ |
 | `get_connectors_information` | Č | `connectors[]` \| `element` | dump konektorů | ✅ |
