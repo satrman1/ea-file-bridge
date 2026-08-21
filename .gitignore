@@ -2,6 +2,10 @@
 requests/
 responses/
 
+# perzistentni stav bridge (FB_StateFile v baseDir) - stanice-zavisly runtime,
+# ne kanon: id posledni zapisove davky, citac spiku, W8 flag
+state-*.txt
+
 # testovaci PNG (generalka P6)
 *.png
 
