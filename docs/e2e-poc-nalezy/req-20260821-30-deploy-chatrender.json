@@ -1,0 +1,8 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-30",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "deploy_src", "only": ["FB_ChatRender"] }
+  ]
+}

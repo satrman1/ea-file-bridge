@@ -1,0 +1,23 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-33",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "create_or_update_scenarios",
+      "element": "FBT N7 UC",
+      "scenarios": [
+        { "name": "BE-N7", "type": "Basic Path", "steps": [
+          { "text": "Clen predlozi identifikator.", "kind": "actor" },
+          { "text": "System overi narok na vstup.", "kind": "system" },
+          { "text": "System povoli vstup a zaznamena prichod.", "kind": "system" }
+        ] },
+        { "name": "AF-N7-1", "type": "Alternate",
+          "attachTo": { "scenario": "BE-N7", "step": 2 },
+          "join": "BE-N7",
+          "steps": [
+            { "text": "System vyhodnoti narok jako podmineny.", "kind": "system" },
+            { "text": "System si vyzada dodatecne overeni.", "kind": "system" }
+          ] }
+      ] }
+  ]
+}

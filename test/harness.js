@@ -790,6 +790,101 @@ t("deploy_src: nova operace se jmenem Signalu -> zalozi se jako RECEPTION", func
     ok(r.receptions && r.receptions.length === 1, "response ma nest receptions");
 });
 
+// --- FB_ChatRender: op-level warnings v chat ACK (nalez POC N-7, 2026-08-21)
+// Executor rekne "join '2' neni v davce - Join nezapsan" uz napoprve, ale chat
+// verze to drive nenesla -> agent psal opravne davky naslepo. Testy hlidaji:
+// (1) warning se propise a je v PRVNIM radku (prezije orez rozpoctem),
+// (2) bezwarningova davka ma ACK BEZE ZMENY.
+function chat(resp) { return "" + B.FB_ChatRender.call(B, resp); }
+
+t("ChatRender: op-level warning -> pocet + text v prvnim radku ACK", function () {
+    var out = chat({
+        status: "done", id: "20260821-83",
+        results: [
+            { op: "create_or_update_elements", status: "ok" },
+            { op: "create_or_update_scenarios", status: "ok",
+              warnings: ["scenarios[1]: join '2' neni v davce - Join nezapsan"] }
+        ]
+    });
+    var first = out.split("\n")[0];
+    contains(first, "EAFB OK 20260821-83: 2/2 ops");
+    contains(first, "1 WARNING:", "pocet warningu patri do prvniho radku");
+    contains(first, "join '2' neni v davce");
+    contains(out, "op[1] create_or_update_scenarios:", "vypis ma nest index a jmeno operace");
+    contains(out, "OPRAVNOU davkou", "ACK ma rict, co s warningem delat");
+});
+
+t("ChatRender: bez warningu -> ACK beze zmeny (zadny prazdny segment)", function () {
+    var out = chat({
+        status: "done", id: "t-nw",
+        results: [{ op: "create_or_update_elements", status: "ok" }]
+    });
+    eq(out, "EAFB OK t-nw: 1/1 ops", "bezwarningovy ACK se nesmi zhorsit");
+    ok(out.toUpperCase().indexOf("WARNING") < 0, "zadna zminka o warninzich");
+});
+
+t("ChatRender: vice warningu z vice operaci -> pocet sedi, davkove i op-level", function () {
+    var out = chat({
+        status: "done", id: "t-mw",
+        warnings: ["op[0]: pole confirm ignorovano (W6)"],
+        results: [
+            { op: "clone_package", status: "ok" },
+            { op: "create_or_update_scenarios", status: "ok", warnings: ["w1", "w2"] }
+        ]
+    });
+    contains(out.split("\n")[0], "3 WARNINGS:");
+    contains(out, "davka: op[0]: pole confirm ignorovano (W6)");
+    contains(out, "- op[1] create_or_update_scenarios: w1");
+    contains(out, "- op[1] create_or_update_scenarios: w2");
+});
+
+t("ChatRender: warningy prezijou i chybu v pozdejsi operaci", function () {
+    var out = chat({
+        status: "error", id: "t-ew",
+        results: [
+            { op: "create_or_update_scenarios", status: "ok", warnings: ["join nezapsan"] },
+            { op: "create_or_update_constraints", status: "error", code: "E_NOT_FOUND", message: "element neni" }
+        ]
+    });
+    contains(out, "EAFB CHYBA t-ew v op[1]");
+    contains(out.split("\n")[0], "1 WARNING:");
+    contains(out, "op[0] create_or_update_scenarios: join nezapsan");
+});
+
+t("ChatRender: mnoho warningu -> rozpocet + ukazatel na res soubor (W10)", function () {
+    var many = [];
+    for (var i = 0; i < 40; i++) { many.push("warning cislo " + i + " s dostatecne dlouhym textem, aby se vycet nevesel"); }
+    var out = chat({
+        status: "done", id: "t-bw",
+        results: [{ op: "create_or_update_messages", status: "ok", warnings: many }]
+    });
+    contains(out.split("\n")[0], "40 WARNINGS:");
+    contains(out, "plny vycet v res-t-bw.json", "zadny tichy cut - vzdy ukazatel");
+    ok(out.length <= 1500, "ACK musi zustat v rozpoctu, delka " + out.length);
+});
+
+t("ChatRender: confirm_required nese hashPrefix, NIKDY nonce ani plny hash", function () {
+    var out = chat({
+        status: "confirm_required", id: "t-cr",
+        confirm: { hashPrefix: "a1b2c3d4e5f6", nonce: "TAJNY-NONCE" },
+        payloadHash: "a1b2c3d4e5f6aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        risk: { riskReasons: ["affectedPackages 2 > 1"] },
+        results: []
+    });
+    contains(out, "EAFB CEKA NA POTVRZENI t-cr");
+    contains(out, "a1b2c3d4e5f6");
+    ok(out.indexOf("TAJNY-NONCE") < 0, "nonce se do chatu nikdy nedostane");
+    ok(out.indexOf("a1b2c3d4e5f6aaaa") < 0, "plny payloadHash se do chatu nikdy nedostane");
+});
+
+t("ChatRender: query 0 radku = 'dotaz nic nevratil', ne 'data neexistuji' (T4-3c)", function () {
+    var out = chat({
+        status: "done", id: "t-q0",
+        results: [{ op: "query", status: "ok", rowCount: 0, rows: [] }]
+    });
+    contains(out, "ne 'data neexistuji'");
+});
+
 // --- regrese jadra: FB_Main ping (legacy textovy kontrakt drzi)
 t("FB_Main: ping davka -> done + echo", function () {
     delete B._fbAccessCache;

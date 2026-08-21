@@ -1,6 +1,8 @@
 # Protokol eafb/0.2 — EA File Bridge
 
-2026-08-20 · **v0.10** (dokumentační verze; protokol na drátě zůstává `eafb/0.2`) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + iterace 2 Diagram Builder (dávky 20260818-01…11) + iterace 2b Scenarios/Classifier/Scaffold (dávky 20260818-14…37) + dostavba idempotence dle auditu B2 (dávky 20260818-40…55) + constraints (dávky 20260819-01…04) + Risk Gate výpočetní část (dávky 20260819-05…19) + Risk Gate confirm okruh V2 (dávky 20260819-22…41) + **vrátný / AI import režim (offline harness 49/49; živý klikací E2E = dávky 20260820-* u Miloše, viz `docs/e2e-iterace4/`)** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 + `…Iterace-4b-Risk-Gate.md` v1.1 + **`…Iterace-4-AI-Import-Rezim.md` v1.1**.
+2026-08-21 · **v0.11** (dokumentační verze; protokol na drátě zůstává `eafb/0.2`) · Ověřeno E2E na eaexample: iterace 1 (dávky 20260816-02…17) + iterace 3 (dávky 20260817-01…23) + iterace 2 Diagram Builder (dávky 20260818-01…11) + iterace 2b Scenarios/Classifier/Scaffold (dávky 20260818-14…37) + dostavba idempotence dle auditu B2 (dávky 20260818-40…55) + constraints (dávky 20260819-01…04) + Risk Gate výpočetní část (dávky 20260819-05…19) + Risk Gate confirm okruh V2 (dávky 20260819-22…41) + **vrátný / AI import režim (offline harness 49/49; živý klikací E2E = dávky 20260820-* u Miloše, viz `docs/e2e-iterace4/`)** + iterace 5 (dávky 20260821-01…22) + **propsání nálezů POC choreografie (dávky 20260821-60…88, §6h)** · Offline harness v repu: `test/harness.js` — **150/150 PASS** · Zadání: `IT-ANALYSIS/Zadani-EA-File-Bridge.md` v1.6 + `…Iterace-4b-Risk-Gate.md` v1.1 + **`…Iterace-4-AI-Import-Rezim.md` v1.1**.
+
+Změny v0.11 proti v0.10 (**propsání nálezů POC choreografie 2026-08-21**, `IT-ANALYSIS/M365/02-use-case-model/POC-protokol-R1.md` §5/§8.4 + `POC-protokol-R2.md`; nálezy N-1…N-7, viz **§6h**): **(a) chat ACK nese op-level `warnings`** — `FB_ChatRender` sesbírá `resp.warnings` i `results[i].warnings` a dá **počet + první warning do prvního řádku** ACK (`… | 1 WARNING: …`), plný výčet zůstává v `res-<id>.json`; bezwarningová dávka má ACK **beze změny** (N-7, nejcennější nález POC — warning „join '2' neni v davce" byl v response hned napoprvé, ale agent ho neměl jak vidět, což stálo 25 % dávek běhu). **(b) dokumentace dorovnána na kity rev. b**: `join` = **jméno scénáře**, ne číslo kroku (N-1, §6b); `moveOps = 0` je **záměr s dopadem falešného OK** — přesun elementu mezi packages bridge neumí a hlásí `ok` (N-2, §6d); revize §5a/7 — spouštěč BLOCKED byl `matchByName` × `$N`, ne velikost dávky (N-5); **jak si ověřit názvy sloupců** (`sqlite_master`/`INFORMATION_SCHEMA`, kvótování, falešná nula, §10, N-4). Nová sekce **§3a Warnings** (sémantika). Registr operací i drátový protokol beze změny; harness **150/150** PASS.
 
 Změny v0.10 proti v0.9 (**iterace 5**, rozhodnutí Miloš 2026-08-20, viz §6g): **(A) write fíčury add-inu za EA security skupinou** — `FB_AccessGroups` (konfigurace, chráněná B4) + `FB_UserAccess` (členství SQL nad `t_secuser`/`t_secgroup`/`t_secuser_group`, fail-closed, cache per session) + gate ve `FB_Main` → nový kód **`E_ADDIN_ACCESS`**; security vypnutá = vše povoleno; read přístup = per-user aktivace add-inu (EA nativní). **(B) bezpečné zvýraznění dotčených prvků** — Output řádky změn nesou ElementID; dvojklik obsluhuje reception handler **`EA_OnOutputItemDoubleClicked`** (korekce z živého E2E: u custom tabu EA nativně nenaviguje — viz §6g/B), Add-in Search **`FB_Changes`** (dotčené prvky dávky přes tagy `ai.request`, CLASSGUID/CLASSTYPE), spike **`FB_NavProbe`** (za `FB_Config.navProbe`, viz `e2e-iterace5/SPIKE-NAV.md`); `FB_ShowInBrowser` zůstává default vypnuto do závěru spiku. **(C) kontext = výběr v browseru** — nová Č operace **`get_selected_context`** (registr 39 → **40**) + volitelný **`scope`** (větev) na `find_elements_by_name`/`find_packages_by_name` (`FB_InBranch`); předání kontextu KLIENTSKY (Copilot vloží GUIDy do dávky — žádný server-side default, deterministický retry §5a). Offline harness přesunut **do repa** (`test/harness.js`, 131/131 PASS).
 
@@ -100,6 +102,35 @@ Reference se rozresolvují rekurzivně v celém objektu opu (i uvnitř polí `ta
 
 Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, created}` u dávkových operací) — kvůli `$N` referencím. **`confirm_required` (v0.8)**: žádný zápis neproběhl, dávka čeká v `pending\`; top-level blok `confirm` s nonce žije **výhradně v `res-*.json`** — do chat verze smí jen `hashPrefix` (§6e pravidla). `rejected` = dávka zamítnuta člověkem (`E_RISK_REJECTED`).
 
+## 3a. Warnings — sémantika a propsání do chat ACK (v0.11, nález POC N-7)
+
+**Co warning znamená:** operace skončila `status: "ok"`, **zápis proběhl**, ale **část deklarovaného záměru se nepropsala** — a executor přesně ví která. Warning tedy **není** chyba (nemá `code`, nezastaví dávku, nespustí stop-on-error) a **není** ani QC nález (QC je kontrola *po* zápisu, §3.4/W6). Je to *tichá díra mezi zadáním a výsledkem*, kterou nic jiného neohlásí: počty souhlasí, `status` je `ok`, ACK vypadal dřív úplně čistě.
+
+**Dvě úrovně, obě v response:**
+
+| pole | kdo plní | příklad |
+|---|---|---|
+| `results[i].warnings[]` — **op-level** | 13 zápisových operací (`elements`, `package`, `connectors`, `messages`, `attributes`, `operations`, `scenarios`, `constraints`, `diagram`, `apply_classifier_stereotypes`, `find_or_create_referencing_sr`, `deploy_src`) | `scenarios[1]: join '2' neni v davce - Join nezapsan`; chybějící šablona ve scaffoldu (§6b) |
+| `warnings[]` — **dávkové** | `FB_Main` | migrace W6: `confirm: true` v dávce ignorováno (§6e) |
+
+**Chat ACK (od v0.11):** `FB_ChatRender` obě úrovně sloučí a vykáže je takto:
+
+```
+EAFB OK 20260821-83: 6/6 ops | 1 WARNING: scenarios[1]: join '2' neni v davce - Join nezapsan | QC ciste (3 kontrol)
+Warnings (zapis PROBEHL, cast zameru se ale nepropsala - resit OPRAVNOU davkou, ne preposlanim):
+- op[4] create_or_update_scenarios: scenarios[1]: join '2' neni v davce - Join nezapsan
+```
+
+Pravidla tvaru (kontrakt, hlídá harness):
+
+1. **Počet + první warning jsou v PRVNÍM řádku** (`| N WARNING:` / `| N WARNINGS:`) — právě proto, aby přežily deterministický ořez rozpočtem (W10, 1500 znaků). Segment stojí **před** QC segmentem.
+2. **Bezwarningová dávka má ACK beze změny** — žádný prázdný segment, žádný „0 warnings". Regrese je v harness testu.
+3. Výpis pod prvním řádkem má vlastní rozpočet (500 znaků) a při přetečení končí ukazatelem `(dalsich N - plny vycet v res-<id>.json)` — **nikdy tichý ořez** (W10).
+4. Warningy se vykazují i v **chybové** větvi ACK (`EAFB CHYBA …`) — warning z operace, která doběhla před chybou, nesmí zmizet.
+5. Warning se řeší **opravnou dávkou dle textu warningu** (§5a), nikdy přeposláním téže dávky.
+
+**Pro klienta (Copilot/skill):** ACK je pořád jen výcuc (I3) — u dávek se scénáři, constrainty a zprávami si po zápisu vyžádej `res-<id>.json` a warningy si přečti celé. Nově ale **víš z ACK, že tam nějaké jsou**, a nemusíš to hádat.
+
 ## 4. Registr operací (40; zrcadlo MCP toolů)
 
 Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whitelistu packages), Č = čtecí (povolena vždy). Stav ✅ = E2E ověřeno (iterace 1 = dávky 20260816-*, iterace 3 = 20260817-*, iterace 2 = 20260818-*).
@@ -141,7 +172,7 @@ Legenda: Z = zápisová (podléhá whitelistu operací `FB_OpsAllowed` i whiteli
 | `get_diagram_image` | Č | `diagrams[]` \| `diagram`, `inline` | `items[{file,size,png_b64?}]`; PNG jen do `<baseDir>\responses\images\` | ✅ 20260818-08/-10 |
 | `update_diagram_properties` | Z | `diagrams[{diagram, name, author, version, showDetails, styleEx}]` (K6, konvence §7e) | `items[]` | ✅ 20260817-13 |
 | `set_diagram_object_style` | Z | `diagram`, `objects[{elementID, backgroundColor{red,green,blue}, fontColor, borderColor, borderWidth, reset}]` (K9) | `changedElementIDs` | ✅ 20260817-13 |
-| `create_or_update_scenarios` | Z | `element`, `scenarios[{name, type: Basic Path\|Alternate\|Exception, notes, steps[{text, kind: actor\|system, uses, results, state}], attachTo{scenario, step}, join}]` — deterministický rebuild (V2d); mechanika §6b | `items[{guid,name,type,steps}], removed, readback` | ✅ 20260818-28 (UI potvrzeno) |
+| `create_or_update_scenarios` | Z | `element`, `scenarios[{name, type: Basic Path\|Alternate\|Exception, notes, steps[{text, kind: actor\|system, uses, results, state}], attachTo{scenario, step}, **`join` = JMÉNO scénáře v téže dávce** (ne číslo kroku — N-1, §6b)}]` — deterministický rebuild (V2d); mechanika §6b | `items[{guid,name,type,steps}], removed, readback` | ✅ 20260818-28 (UI potvrzeno) |
 | `create_or_update_constraints` | Z | `element`, `constraints[{name, type: Pre-condition\|Post-condition\|Invariant (tolerantně i metodické „Assumption [Invariant]" ap. — base typ ze závorky), notes, status?}]` — deterministický rebuild (V2d); mechanika §6c | `items[{name,type,created}], removed, readback{api,tableRowCount}` | ✅ 20260819-02…04 |
 | `apply_classifier_stereotypes` | Z | `diagram`, `elementIDs[]` filtr — objektům s classifierem dorovná Type+stereotyp dle classifiera (Component→Component, Interface/Class→Object); idempotentní | `items[{elementID,oldType,newType,oldStereotype,stereotype,changed}], changedCount` | ✅ 20260818-31 (2. běh 0 změn) |
 | `find_or_create_referencing_sr` | Z | `operation`, `packageName`, `targetPackage` (default `unsortedPkg` z `FB_ScaffoldConfig`), `author` — katalog-first: najde SR přes TV `505-1 Operation Link`, jinak založí service pkg + version/SR/ImpactView/DTO diagramy + SR/DTO/Req/Res + vazby + place | `found` + `items[]` NEBO `created{...}, counts, tag505` | ✅ 20260818-35/-36 |
@@ -176,6 +207,7 @@ Referenční audit: `docs/AUDIT-B2-IDEMPOTENCE-2026-08.md` (verdikty K1–K4). P
 4. **`E_AMBIGUOUS`**: match/dedupKey lookup našel >1 kandidáta — response nese `guids` (výčet). Řešení: adresovat konkrétní `guid`, nebo u konektorů poslat `dedupKey` (create pak založí nový, jednoznačně klíčovaný).
 5. **Vazba na modal hang** (T4-3): po zotavení z visící pumpy odklikem hrozí falešné OK `rowCount: 0` — právě tam vzniknou duplicity nepozorovaně. Retry po každém zotavení proto **výhradně** s `match`/`dedupKey`, nebo přes kontrolní čtení + opravnou dávku dle bodu 2.
 6. Výchozí chování beze změny: create bez opt-in polí je vždy `AddNew` — dávky, které duplicitní jména legitimně chtějí (nepojmenované lifeliny, opakovaná jména v různých kontextech), fungují jako dřív.
+7. ⚠ **`matchByName` × `$N` se sčítají do riskových prahů** (lekce 2026-08-21, dávka 20260821-61, kulisa SportHub): opt-in idempotence je pro Risk Gate **nejistota** — `matchByName`/`dedupKey` konzervativně přičítá `updatedExisting` (§6d) a `$N` reference v takové dávce nejde přiřadit ke create větvi (fail-closed B3), takže cíle počítají jako **existující** prvky a jejich packages jako **cizí**. Scaffold „package + podpackages + obsah" s `matchByName: true` proto spadl na `E_RISK_BLOCKED` (`affectedPackages 6 > 5`), přestože nic v modelu neexistovalo. Praktické pravidlo pro klienty (Copilot, skilly, vrátný): **strukturu zakládej po dávkách s jednou cílovou package** (`affectedPackages > 1` je práh ELEVATED) a GUIDy z předchozí response adresuj přímo; `matchByName` zapínej tam, kde je retry pravděpodobný, ne plošně — když recon prokázal, že cíl neexistuje, je create bez opt-in polí levnější i pro gate. Není to chyba gate (fail-closed je záměr), ale past sestavování dávek. **Protidůkaz k dřívějšímu doporučení „dělit dávky podle velikosti" (nález N-5, POC R1):** táž práce poslaná jako **jedna** dávka o 6 operacích (`writeOps 19`, `createOps 9`, `affectedPackages 2`) **bez** `matchByName` skončila jako ELEVATED a po potvrzení proběhla bez problému. Spouštěčem BLOCKED tedy nebyla velikost, ale kombinace opt-in idempotence a `$N`. Pravidlo zní: **strukturu zakládej po dávkách s jednou cílovou package** (`affectedPackages > 1` je práh ELEVATED, ne BLOCKED) a **`matchByName`/`dedupKey` zapínej jen tam, kde je retry pravděpodobný** — ne plošně a ne jako „pro jistotu". Salámování dávek podle velikosti se tím **ruší** jako doporučení.
 
 ## 6. Poznámky z E2E iterace 3
 
@@ -197,6 +229,7 @@ Referenční audit: `docs/AUDIT-B2-IDEMPOTENCE-2026-08.md` (verdikty K1–K4). P
 ## 6b. Iterace 2b — Scenarios, Classifier Stereotypes, SR Scaffold (dávky 20260818-14…37)
 
 - **`create_or_update_scenarios`** — strukturované scénáře do Scenarios tab (revize U2; metodické propsání do §7e/skillů řeší navazující vlákno). Úložiště: `t_objectscenarios`, kroky = XML v `XMLContent` (`<path><step name guid level uses result state trigger link/></path>`; `trigger` 1=Actor, 0=System; větev = child kroku `<extension guid="{ScenarioGUID větve}" join="{GUID pokračování|''}" level="Na"/>`). **⚠ Zásadní lekce (spike -18/-20/-24/-26): JAKÝKOLI Step API zápis mimo prostý `Steps.AddNew(text, 0)`** — AddNew s typem Actor, vlastnost `StepType`, `Extensions.AddNew`, i pozdější `Step.Update()` — **krok přemístí (reinsert) a pořadí scénáře se rozpadne.** Executor proto jede ve 3 průchodech: (1) scénáře + kroky všechny jako System, (2) jen sběr větví, (3) trigger atributy + `<extension>` elementy přepisem `XMLContent` + `Update()` jako poslední zápis (EA `XMLContent` persistuje 1:1, dávka -24). Update scénářů = deterministický rebuild V2d (smaž vše + zapiš znovu, `removed` v response). E2E: dávka -28, Scenarios tab vizuálně potvrzen (pořadí, actor glyfy, větve A1/E1 na krocích 2/4).
+  - ⚠ **`join` = JMÉNO scénáře, kam se tok vrací** (nález N-1, POC 2026-08-21). Executor ho resolvuje jako scénář **v téže dávce** (`findMade(mdef.join)` → `ScenarioGUID`); **číslo kroku je neresolvovatelné** a skončí warningem `scenarios[i]: join 'X' neni v davce - Join nezapsan` (dávka jinak proběhne — viz §3a). Prázdný `join` = větev končí. **Sémantické omezení, které musí znát už analýza:** EA neumí návrat na *konkrétní krok* — `join` nese GUID **scénáře**, takže návrh „návrat do kroku 2 BE" se do modelu propíše jen jako „návrat do BE95003". Formulovat návrat na úrovni scénáře, ne kroku (propsáno i do `Skilly/use-case-analyst/references/scenario-rules.md` a `_shared/emr-zapis-pravidla.md` — mimo toto repo).
 - **`apply_classifier_stereotypes`** — port `Scripts/ITAN-Apply Classifier Stereotypes on SD.vbs`: objektům na diagramu s `ClassifierID` dorovná Type + stereotyp dle classifiera (Component → Component; Interface/Class → Object; jiné typy se nechávají — parita s VBS). Idempotentní: shoda = žádný zápis. E2E dávka -31: 1. běh 2× Object→Component + IDS-Manager, 2. běh `changedCount: 0`, `t_object` readback sedí.
 - **`find_or_create_referencing_sr`** — port `Scripts/ITAN-Find or Create Referencing Service Realization.vbs` (SR větev; SR×PR fork = pozdější update, viz itan-skripty). Katalog-first (§7e): SQL přes TV `505-1 Operation Link`; nález → `found: true` + items (žádný zápis); jinak scaffold: service package (Notes ze šablony) + version diagram (`CSOB-ITAN::Version Root Diagram`, ShowDetails=1, Version, Author) + SR (`CSOB-ITAN::Service Realization`) + SR diagram (**auto-kompozit MDG se používá, nezakládá se druhý** — §7e/§7g; jen přejmenování) + Impact View (`MDGDgm=CSOB-ITAN::LD-Behavioral;MDGView=CSOB-ITAN::Realization Impact View;`) + TV 505-1 (zápis jménem přes SetTag, ne `GetAt(0)`) + DTO + Req/Res + vazby (DTO —«refine» Dependency→ SR; Req/Res —Composition→ DTO, `SupplierEnd.Aggregation=2`, client Non-Navigable — diamant u DTO, `DestIsAggregate=2` v readbacku) + place na version/DTO diagram. Vědomá oprava proti VBS: DTO diagram přebírá Notes z DTO šablony (VBS ř. 242 omylem kopíroval SR šablonu). **Šablonové GUIDy + cílový `unsortedPkg` = per-repo `FB_ScaffoldConfig`** (vzor FB_Config; doma fixture v `#FB-TEST`, bankovní hodnoty doplní člověk v bance — v repu jen `<EMR-GUID>` placeholdery). Chybějící šablona = warning, scaffold pokračuje bez Notes. E2E: dávka -35 (1 pkg, 4 diagramy, 4 elementy, 3 vazby, tag505 = GUID operace), -36 (2. běh `found: true`, nic nezaloženo).
 - ⚠ Lekce §6a/3 potvrzena znovu (dávka -32): neznámý sloupec v SQL na `.qea` (`Method_ID` místo `OperationID` v `t_operation`) = modální dialog EA + pumpa visí do odkliknutí.
@@ -218,7 +251,7 @@ Risk-based HITL dle zadání 4b v1.1 (red team GO s podmínkami, dispozice B1–
 
 **`$N` pravidlo (B3):** vlastní prvek = jen `$N` na výsledek CREATE větve Z operace. `$N` na výsledek čtecí op nebo update větve = existující target → `updatedExisting`. Nejistota (matchByName/dedupKey, find_or_create, dopředná reference, nerozhodnutelná větev) → fail-closed ELEVATED. Negativní důkaz: dávka -10 (`$0[0]` z `find_elements_by_name` → `updatedExisting: 1`), pozitivní -09 (`$0` na create větev → `updatedExisting: 0`).
 
-**Fail-closed:** repo bez politiky NEBO neúplná mapa classes NEBO chybějící práh = politika nevalidní → vše ELEVATED s důvodem (W9, dávky -14/-15). Neresolvovatelný target → ELEVATED (T5-4, dávka -11). Překročení `budgetMs` → ELEVATED „metriky nespočítány“ (W5). Payload nad `hashMaxChars` → hash se nepočítá, ELEVATED. Pád gate → ELEVATED, nikdy LOW. **W8**: první zápisová dávka po `E_EXCEPTION` v téže session → ELEVATED (in-memory flag, zaniká s reloadem kódu). MOVE: ověřeno, že update větev `create_or_update_elements` vlastníka nemění → `moveOps` rezervováno = 0 (I4).
+**Fail-closed:** repo bez politiky NEBO neúplná mapa classes NEBO chybějící práh = politika nevalidní → vše ELEVATED s důvodem (W9, dávky -14/-15). Neresolvovatelný target → ELEVATED (T5-4, dávka -11). Překročení `budgetMs` → ELEVATED „metriky nespočítány“ (W5). Payload nad `hashMaxChars` → hash se nepočítá, ELEVATED. Pád gate → ELEVATED, nikdy LOW. **W8**: první zápisová dávka po `E_EXCEPTION` v téže session → ELEVATED (in-memory flag, zaniká s reloadem kódu). MOVE: ověřeno, že update větev `create_or_update_elements` vlastníka nemění → `moveOps` rezervováno = 0 (I4). ⚠ **Dopad na klienta (nález N-2, POC 2026-08-21): přesun existujícího elementu mezi packages bridge NEUMÍ a hlásí ho jako `status: "ok"`, `created: false` — tedy FALEŠNÉ OK bez chybového kódu i bez warningu.** Pole `package` v update větvi je bez účinku (ověřeno dávkami -83/-84/-88: element 11311 zůstal v původní package, cílová zůstala prázdná). Není to chyba, je to hranice protokolu — Automation API cestu na přesun nemá a plánovaně nepřibude. **Pravidlo pro klienta:** přesun neplánuj do dávky; potřebuje-li ho cílový stav (typicky UC založený survey fází mimo svou package), **vykaž ho jako ruční krok v EA browseru** a nevydávej ho za hotový. Kontrolní čtení po zápisu musí ověřovat i `PackageID`, ne jen existenci prvku.
 
 **Vědomé aproximace metrik (shadow, ladí se auditem):** `$N` na existující prvek nezapočítá jeho package (identita až za běhu); matchByName/dedupKey konzervativně +1 `updatedExisting`; endpointy konektorů/zpráv jen do `affectedElements`; `apply_classifier_stereotypes` = 1 write + dotčený diagram; klony = objem až při exekuci (E_QUOTA trvá); scaffold = deklarovaný objem 12 writes (worst case, found-větev nezapisuje). Resolvy jen nad standardními sloupci `t_object`/`t_package`/`t_diagram` (lekce §6a/3), s cache.
 
@@ -321,6 +354,23 @@ ORDER BY t_xrefsystem.Supplier, t_xrefsystem.Type, t_xrefsystem.Client
 
 **(C) Kontext = výběr v browseru.** Nová Č operace `get_selected_context` (`FB_OpSelectedContext`): `GetTreeSelectedItemType`/`GetTreeSelectedObject` (+ `GetTreeSelectedElements` multi-výběr, + `GetCurrentDiagram`) → `context{type: Element|Package|Diagram|Attribute|Operation, guid, id, name, path (tečková), branchGuid+branchId, inWhitelist, whitelistNote}`. Jen čtení vlastností COM objektů — žádná navigace. **Předání KLIENTSKY:** Copilot zavolá `get_selected_context` mini čtecí dávkou a GUIDy vloží do zapisové dávky — dávka zůstává samonosná (system of record; deterministický retry §5a; risk gate a audit sedí na tom, co bylo potvrzeno). Server-side default cíle se záměrně NESTAVÍ (výběr se mezi Copy a exekucí může změnit — TOCTOU). Globální vs. kontextová úloha: rozhoduje AI ze zadání uživatele (žádné heuristiky v executoru); podpora = `scope` na `find_*` (filtr na větev přes `FB_InBranch` — parent řetěz, žádné dialektové SQL) + vzory v copilot-instructions. Whitelist/EA práva beze změny (`inWhitelist` jen varuje předem).
 
+## 6h. Nálezy POC choreografie 2026-08-21 (N-1…N-7) a co z nich plyne pro protokol
+
+POC porovnával dvě choreografie zápisu UC do EMR přes bridge (R1 = jedno vlákno plný cyklus, R2 = dělené vlákno) nad kulisou SportHub; zdroj `IT-ANALYSIS/M365/02-use-case-model/POC-protokol-R1.md` §5/§8.4 (dávky 20260821-60…88). Nálezy mířily hlavně na **kompiláty pro M365 Copilota** (`emr-bridge/EAFB-*.md`, rev. b) — do repa se propisuje to, co je vlastnost protokolu, ne formulace kitu:
+
+| # | nález | dopad | kde v protokolu (v0.11) |
+|---|---|---|---|
+| **N-7** | op-level `warnings` nebyly nikde popsané a **chat ACK je nenesl vůbec** — executor přitom řekl přesně, co je špatně, hned napoprvé | **vysoký**, levně opravitelný; v běhu R1 stály 25 % dávek | **§3a** (nová) + implementace ve `FB_ChatRender` |
+| **N-1** | `join` u větví = **jméno scénáře**, ne číslo kroku; EA neumí návrat na konkrétní krok | **vysoký** — bez opravy je model věcně nesprávný a ACK i počty vypadají v pořádku | §6b, §4 (registr) |
+| **N-2** | přesun elementu mezi packages = **falešné OK** (`moveOps = 0` je záměr, ne chyba) | střední, zákeřný — cílový stav přes bridge nedosažitelný, přesun je ruční krok | §6d |
+| **N-5** | spouštěčem `E_RISK_BLOCKED` nebyla velikost dávky, ale **`matchByName` × `$N`**; doporučení „dělit dávky" se ruší | střední, **opačný závěr** než dřívější lekce | §5a bod 7 |
+| **N-4** | pravidlo „ověř si názvy sloupců" existovalo bez nástroje; selhané SQL = modál + falešná nula | vysoký (v R1 neselhalo jen shodou okolností) | §10 |
+| N-3 | nekonzistence MDG typů v kompilátu; chybí pravidlo priority „vzor v modelu > kompilát" | střední | mimo repo — `EA-Repozitar-Kontext.md` |
+| N-6 | chybí registr požadavků → co dělat s povinnou traceabilitou | nízký v sandboxu, vysoký v bance | mimo repo — skilly |
+| N-8 | tři výše uvedené věci šlo vyřešit **jen čtením `src/` a tohoto protokolu**; reálný Copilot zdroje nemá | kritický pro nasazení | tato sekce + §3a/§6b/§6d/§10 |
+
+**Co z toho plyne pro repo:** protokol je pro klienta bez přístupu ke zdrojům jediný záznam o *tichých* vlastnostech executoru (warning, falešné OK, resolvovatelnost `join`). Nová vlastnost, která může skončit „ok, ale ne celé", musí od teď vzniknout **současně** s (1) warningem v response, (2) propsáním do ACK a (3) řádkem v tomto protokolu. ⚠ **Kity rev. b v `IT-ANALYSIS/emr-bridge/` popisují stav před touto změnou** („Chat ACK warnings zatím NENESE" v `EAFB-Chyby-a-Confirm.md` §Op-level warnings a `EAFB-Pravidla-Agenta.md` §Čtení chat ACK) — po nasazení v0.11 je to **neplatné a je třeba je přepsat na rev. c** (mimo toto repo).
+
 ## 7. Chybové kódy
 
 | Kód | Úroveň | Význam |
@@ -344,6 +394,8 @@ ORDER BY t_xrefsystem.Supplier, t_xrefsystem.Type, t_xrefsystem.Client
 | `E_NOT_FOUND` | op | cíl nenalezen |
 | `E_EXCEPTION` | op/dávka | neočekávaná výjimka |
 | `E_NO_EXECUTOR` | dávka | v modelu chybí FB_Main |
+
+⚠ **Warning není chybový kód.** Operace může skončit `status: "ok"` a přesto nést `warnings[]` — zápis proběhl, ale část záměru se nepropsala (typicky neresolvovaný `join`, chybějící šablona scaffoldu, ignorovaný `confirm`). Warning nemá `code`, nezastaví dávku a **nezobrazí se jako chyba**; od v0.11 ho ale nese první řádek chat ACK. Sémantika a tvar: **§3a**.
 
 ## 8. Bezpečnostní výbava (povinná, ne volitelná)
 
@@ -400,16 +452,29 @@ Nad velkým repozitářem (1,5M prvků) uživatel potřebuje vidět **co a kde**
 - **Složka výměny per-user + default** (`FB_ResolveBaseDir`, 2026-08-20): `FB_Config.baseDir` je nově volitelný — bez položky pro daný repozitář se použije default (složka modelu `\EA-File-Bridge` u `.qea`, jinak `%USERPROFILE%\Documents\EA-File-Bridge\<repo>`); strukturu složek založí sám. Každý si může nastavit svou v `FB_Config`, bez nastavení to funguje. Zapojeno do všech konzumentů baseDir (clipboard, GUI fallback, vrátný, diagram image, linked docs, status).
 - **Rychlá klávesová cesta** (`FB_ClipboardSearch`): clipboard režim lze vyvolat i z vyhledávacího pole EA (Add-in Search „FB_Clipboard", separátor tečka) — bez otevírání menu.
 - **v0.10 (iterace 5, §6g/B):** řádky změn v Output tabu jsou **dvojklikem navigovatelné** na prvek v browseru (reception handler `EA_OnOutputItemDoubleClicked` + ElementID ve `WriteOutput` — u custom tabu EA nativně nenaviguje, korekce K3); Add-in Search **`FB_Changes`** ukáže všechny dotčené prvky dávky jako výsledkovou sadu (dvojklik = nativní navigace přes CLASSGUID); `FB_ShowInBrowser` dál default vypnuto (do závěru spiku `FB_NavProbe`).
+- **v0.11 (nález POC N-7):** chat ACK nese **op-level i dávkové `warnings`** — počet a první warning v prvním řádku, výpis pod ním s rozpočtem a ukazatelem na `res-<id>.json`; bezwarningová dávka beze změny. Warning = „zapsáno, ale část záměru se nepropsala", ne chyba a ne QC nález. Tvar a kontrakt: **§3a**.
 
 ## 10. SQL dialekty
 
 `query` běží v dialektu připojeného repozitáře: lokální `.qea` = SQLite, bankovní repozitář = MS SQL 2022. Executor SQL jen provádí — dialekt hlídá autor dotazu (skilly / copilot-instructions / ea-sql-expert).
+
+**Jak si ověřit názvy sloupců, než dotaz odešleš** (nález N-4, POC 2026-08-21 — pravidlo „ověř si sloupce" existovalo, ale bez nástroje). Neznámý sloupec v EA **nevrátí chybu** — otevře modální dialog, pumpa/vrátný visí do odkliknutí (§6b lekce, `Method_ID` vs `OperationID`) a po zotavení hrozí **falešná nula** (§5a/5).
+
+- **SQLite (`.qea`)** — schéma tabulky bezpečně:
+  `SELECT sql FROM sqlite_master WHERE type='table' AND name='t_objectscenarios';`
+  (`sqlite_master` je vždy přítomná, dotaz nemůže narazit na neznámý sloupec cílové tabulky). Alternativa `PRAGMA table_info(...)` přes `query` **nechodí** — není to SELECT (`E_SQL_READONLY`).
+- **MS SQL (banka)**:
+  `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 't_object' ORDER BY ORDINAL_POSITION;`
+- **`SELECT *` jako první krok** na neznámé tabulce (vzor §6c u `t_objectconstraint`) — levné, bezpečné a rovnou ukáže jména sloupců.
+- **Kvótování rezervovaných slov a jmen s mezerou**: SQLite `"Sloupec"` (dvojité uvozovky) nebo `[Sloupec]`; MS SQL `[Sloupec]`. Řetězcový literál je v obou dialektech `'text'`, apostrof uvnitř se zdvojuje (`''`).
+- **Falešná nula**: `rowCount: 0` znamená vždy jen „dotaz nic nevrátil", **nikdy** „data neexistují" — zvlášť po zotavení z modálu. Kontrolní čtení pak vždy v **čerstvé dávce** (§5a/5); chat ACK to u nulového výsledku říká výslovně.
 
 ## 11. Provoz
 
 - Start: dvojklik `pump.wsf`. Konzole hlásí verzi (`pumpa v0.5 (eafb/0.2, confirm okruh)`), repozitář, počet operací (Code loader) a session baseline — **zkontrolovat pohledem**. Po startu/re-attachi pumpa znovu nabídne dávky čekající v `requests\pending\` (popup; Storno/timeout 300 s = dávka čeká dál).
 - Změna kódu: upravit `src/` → dávka `{"op":"deploy_src","only":["FB_Nazev"]}` (pumpa se sama přenačte — až **po doběhnutí dávky**; nový kód platí od následující dávky, §6a). Bootstrap v EA Scripting jen když pumpa vůbec neběží se starým kódem. **Od v0.10 deploy_src synchronizuje i SIGNATURU existující operace** (lekce K3 iterace 5: dřív se přidaný parametr v hlavičce tiše nepropsal — model držel starý počet parametrů, EA runtime metodu kompiloval bez něj a fíčura tiše degradovala; změny hlásí `paramsSynced` v response; hlavičky bez závorek — EA_ handlery — se nesahají). deploy_src je **JScript-only** (ActiveXObject/Enumerator) — pouštět pumpou, ne clipboard režimem.
 - Kód pro EA runtime (menu, GUI fallback): po `deploy_src` navíc **restart EA** (§1a).
+- **Před každým deployem: `node test/harness.js`** (offline sito, mock COM/EA — syntaxe všech `src/` + funkční testy; aktuálně 150/150 PASS). Harness **nenahrazuje** živý E2E: dual-runtime pasti §1a/4 mock nechytí.
 - Po každé změně: sync `src/` = commit v repu (dělá Miloš, VS Code GUI).
 
 ## 12. Stav modelu (eaexample, po confirm okruhu v0.8)

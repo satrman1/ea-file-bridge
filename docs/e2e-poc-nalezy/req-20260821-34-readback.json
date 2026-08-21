@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-34",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "query",
+      "sql": "SELECT s.Scenario, s.ScenarioType, s.XMLContent FROM t_objectscenarios s INNER JOIN t_object o ON o.Object_ID = s.Object_ID WHERE o.Name = 'FBT N7 UC' ORDER BY s.Scenario" }
+  ]
+}

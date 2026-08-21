@@ -7,10 +7,18 @@
 //    v res-*.json; chat je jen vycuc;
 //  - rowCount 0 se NIKDY neinterpretuje jako "data neexistuji" (lekce T4-3c
 //    falesne OK po odkliku modalu) - jen "dotaz nic nevratil";
-//  - QC tri stavy ODDELENE od zapisu (par. 3.4/W6): ciste | NALEZ | nedobehlo.
+//  - QC tri stavy ODDELENE od zapisu (par. 3.4/W6): ciste | NALEZ | nedobehlo;
+//  - WARNINGS (nalez POC N-7, 2026-08-21): op-level warnings (results[i].warnings)
+//    i davkove (resp.warnings) se propisuji DO PRVNIHO RADKU ACK jako pocet +
+//    prvni warning zkracene, plny vycet zustava v res-<id>.json. Duvod: warning
+//    znamena "zapis probehl, ale CAST ZAMERU se tise nepropsala" (napr. join
+//    neresolvovan) - drive ho chat verze nenesla vubec a agent ho nemel jak
+//    videt. Pocet je v prvni rade prave proto, aby prezil i orez rozpoctem.
+//    Bezwarningova davka ma ACK BEZE ZMENY (zadny prazdny segment).
 var self = this;
 var BUDGET = 1500;
 var QBUDGET = 700;
+var WBUDGET = 500;
 if (resp === null || typeof resp == "undefined") { return "EAFB: response nedostupna."; }
 var st = "" + resp.status;
 var id = "" + (resp.id || "?");
@@ -42,14 +50,45 @@ function qcLine() {
     // skutecne selhani QC behu (SQL apod.) - zapis tim NENI dotcen
     return " | QC neproveden (chyba kontroly: " + clip(qc.reason || "?", 140) + ") - zapis tim NENI dotcen";
 }
-function warnLine() {
-    var w = resp.warnings;
-    if (w && w.length > 0) { return "\nWarning: " + clip(w.join("; "), 200); }
-    return "";
+// sber warningu: davkove (resp.warnings, napr. migrace W6) + op-level
+// (results[i].warnings) se zdrojovou znackou, aby slo warning priradit k operaci
+function collectWarns() {
+    var acc = [];
+    var bw = resp.warnings || [];
+    for (var a = 0; a < bw.length; a++) { acc.push({ src: "davka", text: "" + bw[a] }); }
+    for (var b = 0; b < results.length; b++) {
+        var rb = results[b] || {};
+        var ow = rb.warnings || [];
+        for (var c = 0; c < ow.length; c++) {
+            acc.push({ src: "op[" + b + "] " + (rb.op || "?"), text: "" + ow[c] });
+        }
+    }
+    return acc;
 }
+// segment do PRVNIHO radku ACK - pocet prezije i orez rozpoctem (W10)
+function warnHead(ws) {
+    if (!ws || ws.length === 0) { return ""; }
+    var label = (ws.length == 1) ? "1 WARNING: " : (ws.length + " WARNINGS: ");
+    return " | " + label + clip(ws[0].text, 140);
+}
+// vypis warningu s rozpoctem a ukazatelem na res soubor (W10: zadny tichy cut)
+function warnBlock(ws) {
+    if (!ws || ws.length === 0) { return ""; }
+    var lines = [], used = 0, shown = 0;
+    for (var i = 0; i < ws.length; i++) {
+        var ln = ws[i].src + ": " + clip(ws[i].text, 200);
+        if (used + ln.length > WBUDGET) { break; }
+        lines.push(ln); used += ln.length; shown++;
+    }
+    var s = "\nWarnings (zapis PROBEHL, cast zameru se ale nepropsala - resit OPRAVNOU davkou, ne preposlanim):";
+    for (var j = 0; j < lines.length; j++) { s += "\n- " + lines[j]; }
+    if (shown < ws.length) { s += "\n- (dalsich " + (ws.length - shown) + " - plny vycet v res-" + id + ".json)"; }
+    return s;
+}
+var warns = collectWarns();
 var out = "";
 if (st == "done") {
-    out = "EAFB OK " + id + ": " + okc + "/" + ops + " ops" + qcLine();
+    out = "EAFB OK " + id + ": " + okc + "/" + ops + " ops" + warnHead(warns) + qcLine() + warnBlock(warns);
     // kompaktni vycuc query vysledku (W10: rozpocet + ukazatel, zadny tichy cut)
     for (var j = 0; j < results.length; j++) {
         var rr = results[j] || {};
@@ -72,7 +111,6 @@ if (st == "done") {
         if (buf.length > 0) { out += ": " + buf.join("; "); }
         if (shown < rc) { out += " (zobrazeno prvnich " + shown + " - plna odpoved v res-" + id + ".json)"; }
     }
-    out += warnLine();
 }
 else if (st == "confirm_required") {
     var hp = (resp.confirm && resp.confirm.hashPrefix) ? resp.confirm.hashPrefix : "";
@@ -100,7 +138,7 @@ else if (errIdx >= 0) {
         + " " + clip(errRes.message || "", 300)
         + " - dalsi ops skipped (" + (ops - errIdx - 1) + "), drivejsi zapisy PLATI (rollback neexistuje)."
         + " Oprava dle par. 5a: opravna davka adresujici GUIDy z res souboru, zadne slepe preposlani."
-        + qcLine();
+        + warnHead(warns) + qcLine() + warnBlock(warns);
 }
 else {
     out = "EAFB CHYBA " + id + ": " + code + " " + clip(resp.message || "", 300);

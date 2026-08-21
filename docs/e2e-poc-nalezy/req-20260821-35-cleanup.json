@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-35",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "delete_from_model", "targets": [
+      { "type": "Element", "guid": "FBT N7 UC" }
+    ] }
+  ]
+}

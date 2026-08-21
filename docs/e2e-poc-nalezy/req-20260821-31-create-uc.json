@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-31",
+  "repo": "EAExample.qea",
+  "ops": [
+    { "op": "create_or_update_elements", "elements": [
+      { "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT N7 UC", "type": "UseCase", "notes": "Testovaci UC pro zivy test op-level warnings v chat ACK (nalez POC N-7, 2026-08-21). Po testech smazat davkou -35." }
+    ] }
+  ]
+}
