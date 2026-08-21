@@ -1,0 +1,51 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-A4",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / zivy test (b DUKAZ + c). (1) round-trip presunu UC-95003 s novym vykazovanim (ocekavano children:4, childrenFixed:0 = kaskaduje EA). (2) prevod lokalnich BRU obou UC z ELEMENTU na INTERNAL REQUIREMENTS (U5 rev. 2026-08-21). (3) smazani puvodnich BRU elementu vcetne jejich Usage konektoru. (4) kontrolni cteni.",
+  "ops": [
+    { "op": "move_elements", "package": 1067, "elements": [11311] },
+    { "op": "move_elements", "package": 1070, "elements": [11311] },
+    {
+      "op": "create_or_update_requirements",
+      "element": 11310,
+      "requirements": [
+        { "name": "BRU95002-1 Způsobilost účtu ke zrušení", "status": "Proposed", "priority": "High",
+          "notes": "Rezervaci může zrušit pouze člen, jehož účet není blokovaný. Blokovaný účet rušení rezervací neumožňuje; odblokování a případné zrušení řeší recepce." },
+        { "name": "BRU95002-2 Vypořádání kreditu při stornu", "status": "Proposed", "priority": "High",
+          "notes": "Je-li rezervace zrušena dříve než 24 hodin před začátkem lekce, vrací se členovi plná výše kreditu uhrazeného za rezervaci. Je-li zrušena 24 hodin před začátkem lekce nebo později, kredit propadá a nevrací se." },
+        { "name": "BRU95002-3 Nástup náhradníka z čekací listiny", "status": "Proposed", "priority": "Medium",
+          "notes": "Uvolněná kapacita lekce se nabízí prvnímu členovi v pořadí čekací listiny dané lekce; tento člen je o nabídce upozorněn. Je-li čekací listina prázdná, kapacita zůstává volná k běžné rezervaci." }
+      ]
+    },
+    {
+      "op": "create_or_update_requirements",
+      "element": 11311,
+      "requirements": [
+        { "name": "BRU95003-1 Přípustnost identifikátoru", "status": "Proposed", "priority": "High",
+          "notes": "Identifikátorem člena je členská karta nebo QR kód vydaný systémem. Identifikátor je přípustný, je-li přiřazen existujícímu členovi a nebyl zneplatněn (ztráta, ukončené členství). Nepřípustný identifikátor k odbavení neopravňuje." },
+        { "name": "BRU95003-2 Nárok na vstup", "status": "Proposed", "priority": "High",
+          "notes": "Člen má nárok na vstup, platí-li alespoň jedna z podmínek: má aktivní členství pokrývající okamžik vstupu; má dostatečný kredit na jednorázový vstup; má rezervaci lekce začínající v odbavovacím okně. Vyčerpaný kredit ani ukončené či dosud nezahájené členství nárok nezakládají." },
+        { "name": "BRU95003-3 Vypořádání nároku za vstup", "status": "Proposed", "priority": "Medium",
+          "notes": "Pořadí uplatnění nároku: rezervace lekce, poté aktivní členství, poté kredit. Uplatněná rezervace se označí za využitou; při úhradě kreditem se odečte cena jednorázového vstupu; aktivní členství se vstupem nečerpá." },
+        { "name": "BRU95003-4 Blokovaný účet", "status": "Proposed", "priority": "High",
+          "notes": "Účet blokovaný provozovatelem (dluh, porušení provozního řádu) neopravňuje ke vstupu bez ohledu na členství, kredit i rezervaci. Odblokování řeší recepce." }
+      ]
+    },
+    {
+      "op": "delete_from_model",
+      "targets": [
+        { "type": "Element", "id": 11331 },
+        { "type": "Element", "id": 11332 },
+        { "type": "Element", "id": 11333 },
+        { "type": "Element", "id": 11342 },
+        { "type": "Element", "id": 11343 },
+        { "type": "Element", "id": 11344 },
+        { "type": "Element", "id": 11345 }
+      ]
+    },
+    { "op": "query", "sql": "SELECT Object_ID, Name, Package_ID, ParentID FROM t_object WHERE Object_ID IN (11310,11311) OR ParentID IN (11310,11311) ORDER BY Object_ID" },
+    { "op": "query", "sql": "SELECT Object_ID, Requirement, ReqType, Status, Priority, Notes FROM t_objectrequires WHERE Object_ID IN (11310,11311) ORDER BY Object_ID, ReqID" },
+    { "op": "query", "sql": "SELECT COUNT(*) AS ZbyleUsageKonektory FROM t_connector WHERE Connector_ID IN (4834,4835,4836,4837,4838,4839,4840)" }
+  ]
+}

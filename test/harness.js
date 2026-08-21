@@ -921,6 +921,443 @@ t("FB_XmlRows: entity unescape + vice radku", function () {
     eq(rows[0].A, "x<y");
 });
 
+// ================================================================ ITERACE 6
+// join na krok · move_elements · create_or_update_requirements
+// ---------------------------------------------------------------------------
+// Whitelistovany repo: koren = #FB-TEST GUID z FB_Whitelist, aby FB_CheckWrite
+// prosel (whitelist = cela vetev pod timto package).
+var WL_GUID = "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}";
+function wlRepo(opts) {
+    var repo = mkRepo(opts || {});
+    repo._addPackage({ id: 1054, name: "#FB-TEST", guid: WL_GUID });
+    return repo;
+}
+// Scenar mock: XMLContent se GENERUJE z kroku (jako EA po Steps.AddNew),
+// dokud ho nekdo neprepise (pruchod 3) - pak drzi prepsanou hodnotu.
+function mkScenario(name, type) {
+    var steps = mkColl(function (txt) {
+        return { Name: txt, Uses: "", Results: "", State: "", StepType: 0,
+                 Update: function () { return true; }, GetLastError: function () { return ""; } };
+    });
+    var sc = {
+        Name: name, Type: type, Notes: "", ScenarioGUID: mkGuid(), Steps: steps,
+        _xml: null, _stepGuids: [],
+        Update: function () { return true; }, GetLastError: function () { return ""; }
+    };
+    Object.defineProperty(sc, "XMLContent", {
+        get: function () {
+            if (sc._xml !== null) { return sc._xml; }
+            var out = "<path>";
+            for (var i = 0; i < steps._items.length; i++) {
+                if (!sc._stepGuids[i]) { sc._stepGuids[i] = mkGuid(); }
+                out += '<step name="' + steps._items[i].Name + '" guid="' + sc._stepGuids[i]
+                    + '" level="' + (i + 1) + '" uses="' + steps._items[i].Uses
+                    + '" result="" state="" trigger="0" link=""/>';
+            }
+            return out + "</path>";
+        },
+        set: function (v) { sc._xml = "" + v; }
+    });
+    return sc;
+}
+function mkScEl(repo, id, name, pkgId) {
+    var el = repo._addElement({ id: id, name: name, type: "UseCase", packageID: pkgId });
+    el.Scenarios = mkColl(function (n, ty) { return mkScenario(n, ty); });
+    el.Requirements = mkColl(function (n, ty) {
+        return { Name: n, Type: ty, Notes: "", Status: "", Priority: "", Difficulty: "", Stability: "",
+                 Update: function () { return true; }, GetLastError: function () { return ""; } };
+    });
+    return el;
+}
+// dvouscenarova davka: BE se 3 kroky + jedna vetev pripnuta na krok 1
+function scOp(elRef, joinVal) {
+    var br = { name: "AF-1", type: "Alternate", steps: [{ text: "vetev krok" }],
+               attachTo: { scenario: "BE", step: 1 } };
+    if (typeof joinVal != "undefined") { br.join = joinVal; }
+    return { op: "create_or_update_scenarios", element: elRef, scenarios: [
+        { name: "BE", type: "Basic Path", steps: [{ text: "krok 1" }, { text: "krok 2" }, { text: "krok 3" }] },
+        br
+    ] };
+}
+function beXml(el) { return "" + el.Scenarios.GetAt(0).XMLContent; }
+
+t("scenarios/join: cislo kroku -> do XML jde GUID TOHO KROKU (RE davky -91/-92)", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var res = B.FB_OpScenarios.call(B, repo, scOp("11310", 2), "t-j1");
+    eq(res.status, "ok", "op selhal: " + JSON.stringify(res).substring(0, 300));
+    ok(!res.warnings, "cislo kroku v rozsahu nesmi generovat warning: " + JSON.stringify(res.warnings));
+    var g2 = el.Scenarios.GetAt(0)._stepGuids[1]; // GUID 2. kroku BE
+    ok(g2, "mock nevygeneroval GUID kroku");
+    contains(beXml(el), 'join="' + g2 + '"', "join nenese GUID 2. kroku");
+});
+t("scenarios/join: vynechany join -> join=\"End\" (ne prazdny retezec)", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var res = B.FB_OpScenarios.call(B, repo, scOp("11310"), "t-j2");
+    eq(res.status, "ok");
+    contains(beXml(el), 'join="End"');
+});
+t("scenarios/join: jmeno scenare (vyvraceny nalez N-1) -> warning + End", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var res = B.FB_OpScenarios.call(B, repo, scOp("11310", "BE"), "t-j3");
+    eq(res.status, "ok");
+    ok(res.warnings && res.warnings.length === 1, "ocekavan prave 1 warning: " + JSON.stringify(res.warnings));
+    contains(res.warnings[0], "neni cislo kroku");
+    contains(beXml(el), 'join="End"');
+});
+t("scenarios/join: cislo mimo rozsah kroku hostitele -> warning + End", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var res = B.FB_OpScenarios.call(B, repo, scOp("11310", 99), "t-j4");
+    eq(res.status, "ok");
+    ok(res.warnings && res.warnings.length === 1, "ocekavan warning o rozsahu");
+    contains(res.warnings[0], "mimo rozsah");
+    contains(beXml(el), 'join="End"');
+});
+t("scenarios/join: join bez attachTo -> warning (vetev nikam nevisi)", function () {
+    var repo = wlRepo();
+    mkScEl(repo, 11310, "UC-95002", 1054);
+    var op = scOp("11310", 2);
+    delete op.scenarios[1].attachTo;
+    var res = B.FB_OpScenarios.call(B, repo, op, "t-j5");
+    eq(res.status, "ok");
+    ok(res.warnings && res.warnings.length === 1, "ocekavan warning o chybejicim attachTo");
+    contains(res.warnings[0], "join bez attachTo");
+});
+t("scenarios/join: poradi atributu extension = level, guid, join (jako EA)", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    B.FB_OpScenarios.call(B, repo, scOp("11310", 3), "t-j6");
+    var m = /<extension ([a-z]+)="[^"]*" ([a-z]+)="[^"]*" ([a-z]+)="[^"]*"\/>/.exec(beXml(el));
+    ok(m, "extension nenalezen v XML: " + beXml(el).substring(0, 400));
+    eq(m[1] + "," + m[2] + "," + m[3], "level,guid,join");
+});
+
+// --- move_elements ---------------------------------------------------------
+function mkMoveEl(repo, id, name, pkgId) {
+    var el = repo._addElement({ id: id, name: name, type: "UseCase", packageID: pkgId });
+    el.Elements = mkColl();
+    el.Diagrams = mkColl();
+    return el;
+}
+function addChild(repo, parent, id, name, pkgId) {
+    var ch = mkMoveEl(repo, id, name, pkgId);
+    ch.ParentID = parent.ElementID;
+    parent.Elements._items.push(ch);
+    return ch;
+}
+function addDiagram(el, name, pkgId) {
+    var dg = { Name: name, PackageID: pkgId, Update: function () { return true; }, GetLastError: function () { return ""; } };
+    el.Diagrams._items.push(dg);
+    return dg;
+}
+function moveRepo() {
+    var repo = wlRepo();
+    repo._addPackage({ id: 1067, name: "OTHER ELEMENTS", parentID: 1054 });
+    repo._addPackage({ id: 1069, name: "UC-95002", parentID: 1054 });
+    return repo;
+}
+t("move_elements: presune element, jeho potomky i vlastnene diagramy", function () {
+    var repo = moveRepo();
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var bru = addChild(repo, uc, 11331, "BRU95002-1", 1067);
+    var dg = addDiagram(uc, "UC-95002 FA", 1067);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m1");
+    eq(res.status, "ok", JSON.stringify(res).substring(0, 300));
+    eq(res.moved, 1);
+    eq(uc.PackageID, 1069, "UC se nepresunul");
+    eq(bru.PackageID, 1069, "potomek zustal v puvodnim package");
+    eq(dg.PackageID, 1069, "vlastneny diagram zustal v puvodnim package");
+    eq(res.items[0].children, 1);
+    eq(res.items[0].childrenFixed, 1, "mock EA nekaskaduje -> dorovnal to bridge");
+    eq(res.items[0].diagrams, 1);
+    eq(res.items[0].diagramsFixed, 1);
+    eq(res.items[0].fromPackage, "OTHER ELEMENTS");
+    eq(res.items[0].toPackage, "UC-95002");
+});
+t("move_elements: element uz v cili -> moved:false (idempotence, par. 5a)", function () {
+    var repo = moveRepo();
+    mkMoveEl(repo, 11310, "UC-95002", 1069);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m2");
+    eq(res.status, "ok");
+    eq(res.moved, 0);
+    eq(res.items[0].moved, false);
+});
+t("move_elements: withChildren:false -> potomek zustava (vedomy opt-out)", function () {
+    var repo = moveRepo();
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var bru = addChild(repo, uc, 11331, "BRU95002-1", 1067);
+    var res = B.FB_OpMoveElements.call(B, repo,
+        { op: "move_elements", "package": 1069, elements: [11310], withChildren: false }, "t-m3");
+    eq(res.status, "ok");
+    eq(uc.PackageID, 1069);
+    eq(bru.PackageID, 1067, "s withChildren:false se potomek presouvat nema");
+});
+t("move_elements: neznamy cil -> E_NOT_FOUND a NIC se nepresune (validace pred zapisem)", function () {
+    var repo = moveRepo();
+    var a = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var b2 = mkMoveEl(repo, 11311, "UC-95003", 1067);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", elements: [
+        { element: 11310, "package": 1069 }, { element: 11311, "package": 9999 }
+    ] }, "t-m4");
+    eq(res.status, "error");
+    eq(res.code, "E_NOT_FOUND");
+    eq(a.PackageID, 1067, "prvni prvek se nesmel presunout, kdyz druhy neprosel validaci");
+    eq(b2.PackageID, 1067);
+});
+t("move_elements: cil mimo whitelist -> E_WHITELIST", function () {
+    var repo = moveRepo();
+    repo._addPackage({ id: 2000, name: "MIMO", parentID: 0 });
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 2000, elements: [11310] }, "t-m5");
+    eq(res.status, "error");
+    eq(res.code, "E_WHITELIST");
+    eq(uc.PackageID, 1067);
+});
+t("move_elements: chybejici cilovy package -> E_ARGS", function () {
+    var repo = moveRepo();
+    mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", elements: [11310] }, "t-m6");
+    eq(res.status, "error");
+    eq(res.code, "E_ARGS");
+});
+t("elements: 'package' u UPDATU nepresouva -> warning (konec falesneho OK, N-2)", function () {
+    var repo = moveRepo();
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var res = B.FB_OpElements.call(B, repo, { op: "create_or_update_elements",
+        elements: [{ elementID: 11310, name: "UC-95002 novy nazev", "package": 1069 }] }, "t-e1");
+    eq(res.status, "ok");
+    eq(uc.PackageID, 1067, "update vetev nesmi presouvat");
+    ok(res.warnings && res.warnings.length === 1, "ocekavan warning o neucinnem package: " + JSON.stringify(res.warnings));
+    contains(res.warnings[0], "move_elements");
+});
+t("FB_LogChanges: move_elements radek nese odkud -> kam", function () {
+    var repo = moveRepo();
+    mkMoveEl(repo, 11310, "UC-95002", 1069);
+    B.FB_LogChanges.call(B, repo, { id: "t-m-log", results: [
+        { op: "move_elements", status: "ok", items: [
+            { id: 11310, name: "UC-95002", moved: true, fromPackage: "OTHER ELEMENTS",
+              toPackage: "UC-95002", children: 3, childrenFixed: 0, diagrams: 1, diagramsFixed: 1 }
+        ] }
+    ] });
+    var line = repo._output.filter(function (o) { return o.text.indexOf("presunuto") >= 0; });
+    eq(line.length, 1, "chybi radek presunu v Output tabu");
+    contains(line[0].text, "OTHER ELEMENTS -> UC-95002");
+    contains(line[0].text, "potomku: 3 (dorovnano 0)");
+});
+t("move_elements: EA kaskaduje potomka sama -> children 1, childrenFixed 0 (lekce A1)", function () {
+    var repo = moveRepo();
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var bru = addChild(repo, uc, 11331, "BRU95002-1", 1067);
+    // mock kaskady EA: zmena PackageID rodice prepise i potomka (jako EA 17.1.5)
+    uc.Update = function () { bru.PackageID = uc.PackageID; return true; };
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m7");
+    eq(res.status, "ok");
+    eq(bru.PackageID, 1069);
+    eq(res.items[0].children, 1, "potomek se ma vykazat i kdyz ho presunula EA");
+    eq(res.items[0].childrenFixed, 0, "bridge nemel co dorovnavat");
+});
+
+// --- create_or_update_requirements (internal requirements, U5) --------------
+t("requirements: zapis v poradi davky + default type Functional", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var res = B.FB_OpRequirements.call(B, repo, { op: "create_or_update_requirements", element: "11310",
+        requirements: [
+            { name: "BRU95002-1 Zpusobilost uctu", notes: "Pravidlo 1", status: "Proposed", priority: "High" },
+            { name: "BRU95002-2 Vyporadani kreditu", notes: "Pravidlo 2", type: "Functional" }
+        ] }, "t-r1");
+    eq(res.status, "ok", JSON.stringify(res).substring(0, 300));
+    eq(res.count, 2);
+    eq(res.removed, 0);
+    eq(el.Requirements.Count, 2);
+    eq(el.Requirements.GetAt(0).Name, "BRU95002-1 Zpusobilost uctu");
+    eq(el.Requirements.GetAt(0).Type, "Functional", "chybi default ReqType");
+    eq(el.Requirements.GetAt(0).Priority, "High");
+    eq(el.Requirements.GetAt(1).Notes, "Pravidlo 2");
+});
+t("requirements: deterministicky rebuild V2d - druhy beh smaze a zapise znovu", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var op = { op: "create_or_update_requirements", element: "11310",
+        requirements: [{ name: "BRU95002-1", notes: "v1" }] };
+    B.FB_OpRequirements.call(B, repo, op, "t-r2a");
+    var res = B.FB_OpRequirements.call(B, repo, { op: "create_or_update_requirements", element: "11310",
+        requirements: [{ name: "BRU95002-1", notes: "v2" }] }, "t-r2b");
+    eq(res.removed, 1, "rebuild musi smazat predchozi sadu");
+    eq(el.Requirements.Count, 1, "rebuild nesmi nechat duplicity");
+    eq(el.Requirements.GetAt(0).Notes, "v2");
+});
+t("requirements: chybejici name -> E_ARGS a NIC se nesmaze (validace pred mazanim)", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    B.FB_OpRequirements.call(B, repo, { op: "create_or_update_requirements", element: "11310",
+        requirements: [{ name: "BRU95002-1", notes: "drzi" }] }, "t-r3a");
+    var res = B.FB_OpRequirements.call(B, repo, { op: "create_or_update_requirements", element: "11310",
+        requirements: [{ name: "ok" }, { notes: "bez jmena" }] }, "t-r3b");
+    eq(res.status, "error");
+    eq(res.code, "E_ARGS");
+    eq(el.Requirements.Count, 1, "puvodni sada se nesmela smazat");
+});
+t("requirements: prazdne pole / chybejici element -> E_ARGS", function () {
+    var repo = wlRepo();
+    mkScEl(repo, 11310, "UC-95002", 1054);
+    eq(B.FB_OpRequirements.call(B, repo, { op: "create_or_update_requirements", element: "11310", requirements: [] }, "t-r4").code, "E_ARGS");
+    eq(B.FB_OpRequirements.call(B, repo, { op: "create_or_update_requirements", requirements: [{ name: "x" }] }, "t-r5").code, "E_ARGS");
+});
+
+// --- Risk Gate: nove operace ----------------------------------------------
+function gateRepo() {
+    return mkRepo({ sqlRules: [
+        { re: /FROM t_object WHERE Object_ID = 11310/i,
+          rows: [{ Object_ID: "11310", ea_guid: "{EL-11310}", Package_ID: "1067", Object_Type: "UseCase", Name: "UC-95002" }] },
+        { re: /FROM t_package WHERE Package_ID = 1069/i,
+          rows: [{ Package_ID: "1069", ea_guid: "{PK-1069}", Name: "UC-95002" }] },
+        { re: /FROM t_package WHERE Package_ID = 1067/i,
+          rows: [{ Package_ID: "1067", ea_guid: "{PK-1067}", Name: "OTHER ELEMENTS" }] }
+    ] });
+}
+var REG6 = { "move_elements": { w: true }, "create_or_update_requirements": { w: true },
+             "create_or_update_elements": { w: true } };
+t("RiskGate: move_elements -> moveOps se pocita a davka je ELEVATED", function () {
+    var repo = gateRepo();
+    var polOrig = B.FB_RiskPolicy;
+    B.FB_RiskPolicy = function () {
+        return [{ repo: "EAEXAMPLE.QEA",
+            classes: { move_elements: "ELEVATED", create_or_update_requirements: "ELEVATED", create_or_update_elements: "LOW" },
+            elevate: { deleteTargets: 0, writeOps: 20, updatedExisting: 10, affectedPackages: 1, foreignDiagrams: 0, moveOps: 0 },
+            block: { deleteTargets: 100, writeOps: 500, updatedExisting: 100, affectedPackages: 5 },
+            budgetMs: 8000, hashMaxChars: 2000000 }];
+    };
+    var r = B.FB_RiskGate.call(B, repo, { ops: [
+        { op: "move_elements", "package": 1069, elements: [11310] }
+    ] }, REG6);
+    B.FB_RiskPolicy = polOrig;
+    eq(r.policyValid, true, "politika mela byt validni: " + r.riskReasons.join("; "));
+    eq(r.metrics.moveOps, 1, "moveOps uz neni rezervovana nula");
+    eq(r.riskLevel, "ELEVATED", "presun musi vzdy vyzadovat potvrzeni: " + r.riskReasons.join("; "));
+    eq(r.metrics.updatedExisting, 1, "presouvany prvek je existujici target");
+});
+t("RiskGate: davka bez presunu -> moveOps 0 (regrese)", function () {
+    var repo = gateRepo();
+    var polOrig = B.FB_RiskPolicy;
+    B.FB_RiskPolicy = function () {
+        return [{ repo: "EAEXAMPLE.QEA",
+            classes: { move_elements: "ELEVATED", create_or_update_requirements: "ELEVATED", create_or_update_elements: "LOW" },
+            elevate: { deleteTargets: 0, writeOps: 20, updatedExisting: 10, affectedPackages: 1, foreignDiagrams: 0 },
+            block: { deleteTargets: 100, writeOps: 500, updatedExisting: 100, affectedPackages: 5 },
+            budgetMs: 8000, hashMaxChars: 2000000 }];
+    };
+    var r = B.FB_RiskGate.call(B, repo, { ops: [
+        { op: "create_or_update_elements", elements: [{ elementID: 11310, name: "x" }] }
+    ] }, REG6);
+    B.FB_RiskPolicy = polOrig;
+    eq(r.metrics.moveOps, 0);
+    eq(r.policyValid, true, "chybejici volitelny prah moveOps nesmi znevalidnit politiku");
+});
+t("RiskGate: trida move_elements sama o sobe zvedne LOW davku na ELEVATED", function () {
+    // izolace efektu TRIDY: prahy jsou schvalne tak volne, ze davka jinak
+    // projde jako LOW (bez toho by test prosel i s klasifikaci LOW)
+    var polOrig = B.FB_RiskPolicy;
+    function polWith(klass, withMoveThreshold) {
+        return function () {
+            var el = { deleteTargets: 0, writeOps: 20, updatedExisting: 10, affectedPackages: 9, foreignDiagrams: 9 };
+            if (withMoveThreshold) { el.moveOps = 0; }
+            return [{ repo: "EAEXAMPLE.QEA",
+                classes: { move_elements: klass, create_or_update_requirements: "ELEVATED", create_or_update_elements: "LOW" },
+                elevate: el,
+                block: { deleteTargets: 100, writeOps: 500, updatedExisting: 100, affectedPackages: 5 },
+                budgetMs: 8000, hashMaxChars: 2000000 }];
+        };
+    }
+    var batch = { ops: [{ op: "move_elements", "package": 1069, elements: [11310] }] };
+    B.FB_RiskPolicy = polWith("LOW", false);
+    var low = B.FB_RiskGate.call(B, gateRepo(), batch, REG6);
+    B.FB_RiskPolicy = polWith("ELEVATED", false);
+    var elev = B.FB_RiskGate.call(B, gateRepo(), batch, REG6);
+    B.FB_RiskPolicy = polWith("LOW", true);
+    var thr = B.FB_RiskGate.call(B, gateRepo(), batch, REG6);
+    B.FB_RiskPolicy = polOrig;
+    eq(low.riskLevel, "LOW", "kontrolni vzorek mel projit jako LOW: " + low.riskReasons.join("; "));
+    eq(elev.riskLevel, "ELEVATED", "trida ELEVATED musi davku zvednout sama");
+    eq(thr.riskLevel, "ELEVATED", "prah moveOps musi davku zvednout i pri tride LOW");
+});
+t("RiskGate: OSTRA politika da obema novym operacim ELEVATED", function () {
+    var pol = B.FB_RiskPolicy.call(B);
+    var eaex = null;
+    for (var i = 0; i < pol.length; i++) { if (/EAEXAMPLE/i.test("" + pol[i].repo)) { eaex = pol[i]; } }
+    ok(eaex != null, "eaexample chybi ve FB_RiskPolicy");
+    eq(eaex.classes["move_elements"], "ELEVATED", "presun musi vzdy vyzadovat potvrzeni");
+    eq(eaex.classes["create_or_update_requirements"], "ELEVATED", "rebuild requirements = ELEVATED (vzor constraints)");
+});
+t("RiskGate: souhrn pro dialog nese ZDROJOVOU i cilovou package (odkud -> kam)", function () {
+    var polOrig = B.FB_RiskPolicy;
+    var r = B.FB_RiskGate.call(B, gateRepo(), { ops: [
+        { op: "move_elements", "package": 1069, elements: [11310] }
+    ] }, REG6);
+    B.FB_RiskPolicy = polOrig;
+    var names = (r.summary.packages || []).join(",");
+    contains(names, "OTHER ELEMENTS", "chybi jmeno zdrojove package - clovek nevidi ODKUD se prvek bere");
+    contains(names, "UC-95002");
+});
+t("ConfirmSummary: move davka rekne PRESUNOUT, ne 'upravit'", function () {
+    var out = "" + B.FB_ConfirmSummary.call(B, {
+        status: "confirm_required", id: "t-cs-move",
+        risk: { metrics: { moveOps: 2, updatedExisting: 2, createOps: 0, deleteTargets: 0, writeOps: 2 },
+                summary: { packages: ["OTHER ELEMENTS", "UC-95002"], targets: ["UC-95002"] },
+                riskReasons: ["Operace 'move_elements' je politikou klasifikovana ELEVATED"] },
+        confirm: { hashPrefix: "abc123abc123" }, results: []
+    });
+    contains(out, "PRESUNOUT 2");
+    contains(out, "OTHER ELEMENTS");
+    ok(out.indexOf("Chysta se upravit") < 0, "presun se nesmi tvarit jako obycejna uprava");
+});
+t("move_elements: noop beh NIC nezapise (zadne razitko ai.request)", function () {
+    var repo = moveRepo();
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1069);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m8");
+    eq(res.status, "ok");
+    eq(res.moved, 0);
+    eq(uc.TaggedValues.Count, 0, "noop nesmi sahnout na model ani razitkem (idempotence par. 5a)");
+});
+t("move_elements: potomek mimo whitelist -> warning, bridge ho neprepisuje", function () {
+    var repo = moveRepo();
+    repo._addPackage({ id: 2001, name: "MIMO WHITELIST", parentID: 0 });
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var cizi = addChild(repo, uc, 11399, "Potomek jinde", 2001);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m9");
+    eq(res.status, "ok");
+    eq(uc.PackageID, 1069, "rodic se presunout mel");
+    eq(cizi.PackageID, 2001, "potomek mimo whitelist se nesmi prepsat");
+    ok(res.warnings && res.warnings.length === 1, "chybi warning o potomkovi mimo whitelist: " + JSON.stringify(res.warnings));
+    contains(res.warnings[0], "mimo whitelist");
+});
+t("scenarios: necislena hodnota attachTo.step -> warning, ne TICHA ztrata vetve", function () {
+    var repo = wlRepo();
+    var el = mkScEl(repo, 11310, "UC-95002", 1054);
+    var op = scOp("11310", 2);
+    op.scenarios[1].attachTo.step = "krok 1";
+    var res = B.FB_OpScenarios.call(B, repo, op, "t-j7");
+    eq(res.status, "ok");
+    ok(res.warnings && res.warnings.length === 1, "necislene attachTo.step musi dat warning: " + JSON.stringify(res.warnings));
+    contains(res.warnings[0], "mimo rozsah");
+    ok(beXml(el).indexOf("<extension") < 0, "vetev se nesmi zapsat, kdyz kotva neni platna");
+});
+t("RiskGate: politika pokryva VSECHNY zapisove operace registru FB_Main", function () {
+    var main = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_Main.js"), "utf8");
+    var pol = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_RiskPolicy.js"), "utf8");
+    var active = pol.split(/\r?\n/).filter(function (l) { return l.replace(/^\s+/, "").indexOf("//") !== 0; }).join("\n");
+    var writes = [], m, re = /"([a-z_]+)":\s*\{ fn: "FB_\w+", w: true \}/g;
+    while ((m = re.exec(main)) !== null) { writes.push(m[1]); }
+    var missing = writes.filter(function (w) {
+        return new RegExp('"' + w + '":\\s*"(LOW|ELEVATED|BLOCKED)"').test(active) === false;
+    });
+    ok(writes.length >= 27, "registr ma mit aspon 27 zapisovych operaci, ma " + writes.length);
+    ok(missing.length === 0, "FB_RiskPolicy nepokryva: " + missing.join(", ") + " (fail-closed W9 by shodil vse do ELEVATED)");
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

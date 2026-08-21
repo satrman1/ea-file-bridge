@@ -9,8 +9,19 @@
 // Uloziste: t_objectscenarios, strukturovane kroky = XML v XMLContent:
 // <path><step name guid level uses result state trigger link/></path>;
 // trigger="1" = Actor krok, "0" = System krok; vetev = child kroku
-// <extension guid="{ScenarioGUID vetve}" join="{GUID pokracovani|''}"
-// level="Na"/> (overeno -26: ext guid == ScenarioGUID vetve).
+// <extension level="Na" guid="{ScenarioGUID vetve}" join="{GUID KROKU|End}"/>
+// (overeno -26: ext guid == ScenarioGUID vetve).
+// !! ITERACE 6 - OPRAVA join (reverse engineering davkami -91/-92, dukaz
+// z EA UI): atribut join nese **GUID KROKU**, do ktereho se tok vraci,
+// nebo doslovny retezec "End" (vetev konci). Drivejsi implementace tam
+// psala ScenarioGUID ciloveho scenare - EA takovou hodnotu nerozpozna a
+// v UI (Scenarios -> Entry Points -> sloupec Join) ji zobrazi jako "End".
+// Zaver POC "EA neumi navrat na konkretni krok" je tim VYVRACEN: EA ho
+// umi, bridge ho neumel zapsat. EA pri ulozeni pres UI XMLContent
+// normalizuje: prazdny join -> "End", atributy extension prerovna na
+// poradi level/guid/join, ke krokum doplni useslist="" a na konec <path>
+// blok <context> (cache jmen z uses) - vse kosmetika, ktera se pri
+// deterministickem rebuildu ztrati a EA si ji doplni znovu.
 // !! ZASADNI LEKCE (davky -18/-20/-24/-26): JAKYKOLI Step API zapis mimo
 // prosty AddNew(text,0) - AddNew s typem Actor, vlastnost StepType,
 // Extensions.AddNew, i pozdejsi Step.Update() - krok PREMISTI (reinsert)
@@ -30,8 +41,11 @@
 //                    uses, results, state } ]
 //   attachTo  -> jen vetve: { scenario: <jmeno drive uvedeneho scenare>,
 //                             step: <1-based index kroku> }
-//   join      -> jen vetve: jmeno scenare, kde tok pokracuje (vynechano
-//                = vetev konci)
+//   join      -> jen vetve: CISLO KROKU hostitelskeho scenare (toho z
+//                attachTo.scenario), do ktereho se tok vraci - metodicky
+//                "navrat do kroku M". Vynechano / prazdne / "End" = vetev
+//                konci. Neresolvovatelna hodnota (jmeno scenare, cislo mimo
+//                rozsah, join bez attachTo) = warning + End (viz par. 3a).
 // } ]
 // op.probe     = true -> rozsireny readback (raw t_objectscenarios + XML snapshoty)
 // Vysledek: items = [{guid, name, type, steps}], readback (API + tableRowCount).
@@ -107,34 +121,78 @@ for (var i = 0; i < op.scenarios.length; i++) {
 }
 try { el.Scenarios.Refresh(); } catch (eRf) { }
 // --- pruchod 2: sesbirat vetve (attachTo) - zadne Step API zapisy!
-//     Extension = <extension guid="{ScenarioGUID vetve}" join="{GUID|''}"
-//     level="Na"/> jako child kroku v XMLContent (overeno davkou -26:
-//     ext guid v XML == ScenarioGUID vetve) ---
+//     Extension = <extension level="Na" guid="{ScenarioGUID vetve}"
+//     join="{GUID KROKU|End}"/> jako child kroku v XMLContent (overeno
+//     davkou -26: ext guid v XML == ScenarioGUID vetve; join = GUID kroku
+//     overeno reverse engineeringem -91/-92) ---
 function findMade(nm) {
     for (var k = 0; k < made.length; k++) { if (("" + made[k].def.name) == ("" + nm)) { return made[k]; } }
     return null;
 }
+// GUIDy kroku scenare v poradi 1..N. Ctou se z XMLContent - Step API GUID
+// nenabizi a JAKYKOLI Step zapis by kroky premistil (lekce v hlavicce).
+// Vysledek se cachuje na polozce made[].
+function stepGuids(m) {
+    if (m.stepGuids) { return m.stepGuids; }
+    var out = [];
+    try {
+        var xs = "" + m.sc.XMLContent, pos = 0;
+        while (true) {
+            var s0 = xs.indexOf("<step ", pos);
+            if (s0 < 0) { break; }
+            var g0 = xs.indexOf(" guid=\"", s0);
+            if (g0 < 0) { break; }
+            var g1 = xs.indexOf("\"", g0 + 7);
+            if (g1 < 0) { break; }
+            out.push(xs.substring(g0 + 7, g1));
+            pos = g1;
+        }
+    } catch (eSG) { }
+    m.stepGuids = out;
+    return out;
+}
 for (var x = 0; x < made.length; x++) {
     var mdef = made[x].def;
-    if (!mdef.attachTo) { continue; }
+    if (!mdef.attachTo) {
+        if (typeof mdef.join != "undefined" && mdef.join !== null && ("" + mdef.join) != "") {
+            warns.push("scenarios[" + made[x].idx + "]: join bez attachTo - vetev neni pripnuta na zadny krok, Join nezapsan");
+        }
+        continue;
+    }
     var host = findMade(mdef.attachTo.scenario);
     if (host == null) {
         warns.push("scenarios[" + made[x].idx + "]: attachTo.scenario '" + mdef.attachTo.scenario + "' neni v davce - vetev nepripnuta");
         continue;
     }
     var sIdx = parseInt(mdef.attachTo.step, 10) - 1;
-    if (sIdx < 0 || sIdx >= host.stepCount) {
+    // isNaN guard: bez nej projde necislena hodnota ("krok 2") validaci
+    // (NaN < 0 i NaN >= n je false), ulozi se stepIdx: NaN a v pruchodu 3
+    // se nikdy netrefi - vetev by zmizela TISE, bez warningu
+    if (isNaN(sIdx) || sIdx < 0 || sIdx >= host.stepCount) {
         warns.push("scenarios[" + made[x].idx + "]: attachTo.step " + mdef.attachTo.step + " mimo rozsah - vetev nepripnuta");
         continue;
     }
-    var joinGuid = "";
+    // join = cislo kroku HOSTITELSKEHO scenare -> do XML jde GUID toho kroku;
+    // prazdne / "End" / neresolvovatelne -> "End" (a warning)
+    var joinVal = "End";
     if (typeof mdef.join != "undefined" && mdef.join !== null && ("" + mdef.join) != "") {
-        var jsc = findMade(mdef.join);
-        if (jsc != null) { joinGuid = "" + jsc.sc.ScenarioGUID; }
-        else { warns.push("scenarios[" + made[x].idx + "]: join '" + mdef.join + "' neni v davce - Join nezapsan"); }
+        var jraw = ("" + mdef.join).replace(/^\s+|\s+$/g, "");
+        var hg = stepGuids(host);
+        if (/^end$/i.test(jraw)) {
+            joinVal = "End";
+        } else if (/^[0-9]+$/.test(jraw)) {
+            var jn = parseInt(jraw, 10);
+            if (jn >= 1 && jn <= hg.length) {
+                joinVal = hg[jn - 1];
+            } else {
+                warns.push("scenarios[" + made[x].idx + "]: join '" + jraw + "' je mimo rozsah kroku scenare '" + host.def.name + "' (1.." + hg.length + ") - Join nezapsan (End)");
+            }
+        } else {
+            warns.push("scenarios[" + made[x].idx + "]: join '" + jraw + "' neni cislo kroku - join je CISLO KROKU hostitelskeho scenare '" + host.def.name + "' (1.." + hg.length + ") nebo 'End'; Join nezapsan (End)");
+        }
     }
     if (!host.exts) { host.exts = []; }
-    host.exts.push({ stepIdx: sIdx, guid: "" + made[x].sc.ScenarioGUID, join: joinGuid });
+    host.exts.push({ stepIdx: sIdx, guid: "" + made[x].sc.ScenarioGUID, join: joinVal });
 }
 // --- pruchod 3 (JEDINY dalsi zapis): typy kroku (trigger) + vetve
 //     (<extension>) prepisem XMLContent + Update; po nem uz zadny
@@ -169,7 +227,8 @@ for (var p3 = 0; p3 < made.length; p3++) {
                 var extXml = "";
                 for (var ej = 0; ej < m3.exts.length; ej++) {
                     if (m3.exts[ej].stepIdx != rj3) { continue; }
-                    extXml += '<extension guid="' + m3.exts[ej].guid + '" join="' + m3.exts[ej].join + '" level="' + lvl + letters.charAt(extXml.split("<extension").length - 1) + '"/>';
+                    // poradi atributu jako EA (level, guid, join) - viz hlavicka
+                    extXml += '<extension level="' + lvl + letters.charAt(extXml.split("<extension").length - 1) + '" guid="' + m3.exts[ej].guid + '" join="' + m3.exts[ej].join + '"/>';
                 }
                 if (extXml != "") { tail = ">" + extXml + "</step>"; }
             }

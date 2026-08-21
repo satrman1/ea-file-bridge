@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-A2",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 - oprava vykazovani po lekci z davky A1: EA kaskaduje presun vlastnenych potomku sama, takze children:0 znamenalo 'nebylo co dorovnavat', ne 'potomci zustali vzadu'. Nove dve cisla: children/diagrams = kolik jich s rodicem slo, childrenFixed/diagramsFixed = kolik dorovnal bridge.",
+  "ops": [
+    { "op": "deploy_src", "only": ["FB_OpMoveElements", "FB_LogChanges"] }
+  ]
+}

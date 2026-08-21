@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-99",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / zivy test (b) DUKAZ - round-trip presunu. Davka -97 hlasila moved:false, protoze oba UC uz v cilovych packages byly. Tady se UC-95002 (11310) vcetne 3 BRU potomku presune 1069 -> 1067 a hned zpet 1067 -> 1069: obe operace musi vratit moved:true a children:3, koncovy stav modelu je shodny s vychozim (nulova cista zmena).",
+  "ops": [
+    { "op": "move_elements", "package": 1067, "elements": [11310] },
+    { "op": "move_elements", "package": 1069, "elements": [11310] }
+  ]
+}

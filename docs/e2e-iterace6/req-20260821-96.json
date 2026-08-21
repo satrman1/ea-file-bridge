@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-96",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / zivy test (a) - dukazne cteni po davce -95: mapovani join GUIDu na cisla kroku u UC-95002 i UC-95003.",
+  "ops": [
+    { "op": "query", "sql": "SELECT Object_ID, Scenario, ScenarioType, XMLContent FROM t_objectscenarios WHERE Object_ID = 11310 OR Object_ID = 11311" }
+  ]
+}

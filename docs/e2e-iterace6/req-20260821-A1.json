@@ -1,0 +1,12 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-A1",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 - experiment: kdo stehuje potomky? Davka -99 vratila children:0. Presun UC-95003 (11311) 1070 -> 1067, UPROSTRED davky se precte Package_ID jeho 4 BRU potomku, pak presun zpet 1070. Interpretace: BRU na 1067 + children:3 = stehuje bridge; BRU na 1067 + children:0 = kaskaduje EA sama; BRU na 1070 = potomci se nestehuji vubec.",
+  "ops": [
+    { "op": "move_elements", "package": 1067, "elements": [11311] },
+    { "op": "query", "sql": "SELECT Object_ID, Name, Package_ID, ParentID FROM t_object WHERE ParentID = 11311 ORDER BY Object_ID" },
+    { "op": "move_elements", "package": 1070, "elements": [11311] },
+    { "op": "query", "sql": "SELECT Object_ID, Name, Package_ID, ParentID FROM t_object WHERE Object_ID = 11311 OR ParentID = 11311 ORDER BY Object_ID" }
+  ]
+}

@@ -14,9 +14,16 @@ var del = (typeof m.deleteTargets == "number") ? m.deleteTargets : 0;
 var creat = (typeof m.createOps == "number") ? m.createOps : 0;
 var upd = (typeof m.updatedExisting == "number") ? m.updatedExisting : 0;
 var pkgs = (sm.packages && sm.packages.length) ? sm.packages : [];
+var mov = (typeof m.moveOps == "number") ? m.moveOps : 0;
 var head;
 if (del > 0) {
     head = "Chysta se SMAZAT " + del + " " + (del == 1 ? "prvek" : (del < 5 ? "prvky" : "prvku")) + " z modelu.";
+} else if (mov > 0) {
+    // iterace 6: presun je zasah do STRUKTURY - dialog to musi rict rovnou,
+    // jinak je k nerozeznani od prejmenovani (a cele zduvodneni ELEVATED
+    // u move_elements stoji na tom, ze presun meni, kam prvek patri)
+    head = "Chysta se PRESUNOUT " + mov + " " + (mov == 1 ? "prvek" : (mov < 5 ? "prvky" : "prvku")) + " mezi balicky"
+        + (pkgs.length > 0 ? " (" + pkgs.join(" / ") + ")" : "") + ".";
 } else {
     var partsH = [];
     if (creat > 0) { partsH.push("vytvorit " + creat); }

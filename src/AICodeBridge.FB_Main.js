@@ -5,6 +5,9 @@
 // (FB_OpsAllowed, K4), retezeni GUIDu v davce pres "$N" placeholdery.
 // v0.3 (iterace 2): Diagram Builder. v0.4 (iterace 2b): scenarios, classifier
 // stereotypes, SR scaffold. v0.6: constraints.
+// v0.12 (iterace 6): move_elements (presun elementu mezi packages - konec
+// falesneho OK z nalezu N-2) + create_or_update_requirements (internal
+// requirements = lokalni BRU dle U5). Registr 40 -> 42 operaci.
 // v0.7 (iterace 4b, vypocetni cast): RISK GATE - metriky + klasifikace
 // (FB_RiskGate/FB_RiskPolicy/FB_Sha256).
 // v0.8 (iterace 4b V2 - CONFIRM OKRUH):
@@ -169,6 +172,7 @@ var REG = {
     "export_element_linked_documents":   { fn: "FB_OpLinkedDocExport", w: false },
     "create_element":                    { fn: "FB_OpCreateElement", w: true },
     "create_or_update_elements":         { fn: "FB_OpElements", w: true },
+    "move_elements":                     { fn: "FB_OpMoveElements", w: true },
     "create_or_update_package":          { fn: "FB_OpPackage", w: true },
     "create_or_update_connectors":       { fn: "FB_OpConnectors", w: true },
     "create_or_update_attributes":       { fn: "FB_OpAttributes", w: true },
@@ -192,6 +196,7 @@ var REG = {
     "get_diagram_image":                 { fn: "FB_OpDiagramImage", w: false },
     "create_or_update_scenarios":        { fn: "FB_OpScenarios", w: true },
     "create_or_update_constraints":      { fn: "FB_OpConstraints", w: true },
+    "create_or_update_requirements":     { fn: "FB_OpRequirements", w: true },
     "apply_classifier_stereotypes":      { fn: "FB_OpApplyClassifierStereotypes", w: true },
     "find_or_create_referencing_sr":     { fn: "FB_OpFindOrCreateSR", w: true },
     "deploy_src":                        { fn: "FB_OpDeploySrc", w: true }
@@ -383,7 +388,7 @@ if (writesInBatch > 0) {
 function metricsMatch(a, b) {
     if (a == null || b == null) { return false; }
     var keys = ["writeOps", "createOps", "updatedExisting", "deleteTargets",
-                "affectedElements", "affectedPackages", "affectedDiagrams"];
+                "affectedElements", "affectedPackages", "affectedDiagrams", "moveOps"];
     for (var mi = 0; mi < keys.length; mi++) {
         var av = (typeof a[keys[mi]] == "number") ? a[keys[mi]] : -1;
         var bv = (typeof b[keys[mi]] == "number") ? b[keys[mi]] : -2;

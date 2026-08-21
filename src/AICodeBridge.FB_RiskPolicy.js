@@ -22,7 +22,11 @@
 //             W2a/W2b) eskaluje FB_RiskGate NAD tuto mapu - pravidla jen
 //             eskaluji, nikdy nesnizuji.
 //   elevate   prahy per davka -> ELEVATED (prekroceni = confirm ve V2;
-//             ve vypocetni fazi shadow pole v response/auditu)
+//             ve vypocetni fazi shadow pole v response/auditu).
+//             `moveOps` (iterace 6) je VOLITELNY prah - kdyz chybi,
+//             politika zustava validni (jinak by pridani noveho prahu
+//             fail-closed shodilo kazdou driv nasazenou politiku do
+//             ELEVATED). Trida operace move_elements ELEVATED plati vzdy.
 //   block     prahy per davka -> BLOCKED (E_RISK_BLOCKED, vynucovano hned)
 //   budgetMs  rozpocet vypoctu metrik (W5): prekroceni = fail-closed
 //             ELEVATED "metriky nespocitany"
@@ -66,20 +70,35 @@ return [
           "clone_elements":                  "ELEVATED",
           "create_or_update_scenarios":      "ELEVATED", // V2d rebuild; kandidat na LOW po zacviku
           "create_or_update_constraints":    "ELEVATED", // V2d rebuild; kandidat na LOW po zacviku
+          "create_or_update_requirements":   "ELEVATED", // V2d rebuild (iterace 6); kandidat na LOW po zacviku
+          // move_elements (iterace 6) = ELEVATED VZDY, i pro jediny prvek:
+          //  (1) je to zasah do STRUKTURY modelu, ne do obsahu prvku;
+          //  (2) neni vratny opakovanim davky - puvodni package v davce neni;
+          //  (3) governance visi na package (SA-Status per package, P1) -
+          //      presunem se meni, jaky stav/brana na prvek plati;
+          //  (4) metodika P3 presun mezi pracovnim prostorem a ostrou vetvi
+          //      vyslovne sveruje CLOVEKU ("provadi/potvrzuje clovek");
+          //  (5) dotyka se dvou packages naraz - prah affectedPackages > 1 by
+          //      stejne eskaloval; trida to jen dela explicitnim a nezavislym
+          //      na tom, kolik packages davka jinak potka.
+          "move_elements":                   "ELEVATED",
           // --- dev vyjimka (v PROD sablone BLOCKED) ---
           "deploy_src":                      "ELEVATED"
       },
       elevate: { deleteTargets: 0, writeOps: 20, updatedExisting: 10,
-                 affectedPackages: 1, foreignDiagrams: 0 },
+                 affectedPackages: 1, foreignDiagrams: 0, moveOps: 0 },
       block:   { deleteTargets: 100, writeOps: 500, updatedExisting: 100,
                  affectedPackages: 5 },
       budgetMs: 8000,
       hashMaxChars: 2000000 }
     // Banka (PROD politika - doplni clovek v bance; sablona dle par. 4):
     // { repo: "<TEST-DB>",
-    //   classes: { ...jako vyse..., "deploy_src": "BLOCKED" },
+    //   classes: { ...jako vyse..., "deploy_src": "BLOCKED",
+    //              "move_elements": "ELEVATED" (P2+; do te doby spis
+    //              FB_OpsAllowed deny - presun v ostre vetvi je ukon cloveka),
+    //              "create_or_update_requirements": "ELEVATED" },
     //   elevate: { deleteTargets: 0, writeOps: 20, updatedExisting: 10,
-    //              affectedPackages: 1, foreignDiagrams: 0 },
+    //              affectedPackages: 1, foreignDiagrams: 0, moveOps: 0 },
     //   block:   { deleteTargets: 100, writeOps: 500, updatedExisting: 100,
     //              affectedPackages: 5 },
     //   budgetMs: 8000, hashMaxChars: 2000000 }

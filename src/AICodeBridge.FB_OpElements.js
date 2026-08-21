@@ -2,7 +2,10 @@
 // create_or_update_elements - zrcadlo MCP toolu. Zapis vyhradne Automation API.
 // op.elements = [ {
 //   guid | elementID          -> UPDATE; jinak CREATE
-//   package                   -> cil createu ("{GUID}" | packageID | jmeno)
+//   package                   -> cil CREATE ("{GUID}" | packageID | jmeno).
+//                                U UPDATU element NEPRESOUVA (iterace 6,
+//                                nalez N-2) - vraci warning a odkazuje na
+//                                operaci move_elements.
 //   owningElement             -> alternativa: create POD elementem (napr. BRU pod UC)
 //   name                      -> jmeno (chybejici = "" - nepojmenovane instance/lifeliny)
 //   type                      -> povinne na create; na UPDATE = ZMENA TYPU (bonus K7,
@@ -141,6 +144,18 @@ for (var i = 0; i < op.elements.length; i++) {
         }
     }
     // --- spolecne vlastnosti ---
+    // ITERACE 6 (nalez N-2): `package` u UPDATU element NEPRESOUVA. Drive se
+    // pole tise ignorovalo a odpoved hlasila ok (FALESNE OK bez warningu);
+    // od iterace 6 je z toho viditelny warning (chat ACK ho nese, par. 3a).
+    // Presun ma vyhradne operace move_elements - rozhodnuti Milos 2026-08-21.
+    if (!created && typeof e["package"] != "undefined" && e["package"] !== null && ("" + e["package"]) != "") {
+        var wpk = null;
+        try { wpk = this.FB_ResolvePkg(Repository, e["package"]); } catch (eWp) { wpk = null; }
+        if (wpk == null || wpk.PackageID != el.PackageID) {
+            warns.push("elements[" + i + "]: pole 'package' u existujiciho elementu NEPRESOUVA - element zustava v package id "
+                + el.PackageID + ". Na presun mezi packages pouzij operaci move_elements.");
+        }
+    }
     if (!created && typeof e.name != "undefined" && e.name !== null) { el.Name = "" + e.name; }
     if (typeof e.alias != "undefined") { el.Alias = "" + e.alias; }
     if (e.stereotypes) {

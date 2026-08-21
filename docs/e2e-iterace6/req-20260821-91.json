@@ -1,0 +1,10 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-91",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / RE join - STAV PRED rucnim zasahem Milose v EA UI. Ctecia davka: schema t_objectscenarios (sonda pres sqlite_master - lekce N-4) + kompletni radky scenaru UC-95002 (el. 11310). Diff proti stavu PO bude dukazem formatu join.",
+  "ops": [
+    { "op": "query", "sql": "SELECT name, sql FROM sqlite_master WHERE name = 't_objectscenarios'" },
+    { "op": "query", "sql": "SELECT * FROM t_objectscenarios WHERE Object_ID = 11310" }
+  ]
+}

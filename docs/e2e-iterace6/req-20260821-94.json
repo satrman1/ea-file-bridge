@@ -1,0 +1,18 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-94",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 - deploy kodu: join na krok (FB_OpScenarios), move_elements (nova operace + registr + gate + politika + Output), internal requirements (nova operace), warning u package v update vetvi (FB_OpElements). Registr 40 -> 42 operaci. Ocekava se ELEVATED (deploy_src) -> potvrzeni v popupu pumpy.",
+  "ops": [
+    { "op": "deploy_src", "only": [
+      "FB_OpScenarios",
+      "FB_OpMoveElements",
+      "FB_OpRequirements",
+      "FB_OpElements",
+      "FB_Main",
+      "FB_RiskGate",
+      "FB_RiskPolicy",
+      "FB_LogChanges"
+    ] }
+  ]
+}

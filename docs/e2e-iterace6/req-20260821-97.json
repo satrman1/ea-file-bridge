@@ -1,0 +1,15 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-97",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / zivy test (b) - MOVE_ELEMENTS. Presun UC-95002 (11310) do package 1069 a UC-95003 (11311) do package 1070, vcetne vlastnenych BRU elementu a diagramu (withChildren default true). Uklid dluhu POC: dosud oba UC lezely v OTHER ELEMENTS (1067) a jejich cilove packages byly prazdne.",
+  "ops": [
+    {
+      "op": "move_elements",
+      "elements": [
+        { "element": 11310, "package": 1069 },
+        { "element": 11311, "package": 1070 }
+      ]
+    }
+  ]
+}

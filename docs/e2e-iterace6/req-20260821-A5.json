@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-A5",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 - nasazeni oprav po nezavisle revizi diffu: V1 razitko jen pri skutecne zmene, V2 whitelist i na potomky/diagramy, V4 dialog rekne PRESUNOUT + zdrojova package v souhrnu, V5 isNaN guard u attachTo.step, V6 warning u stropu rekurze. Aby kanon v src\\ a runtime kopie v modelu sedely pred commitem.",
+  "ops": [
+    { "op": "deploy_src", "only": ["FB_OpMoveElements", "FB_OpScenarios", "FB_RiskGate", "FB_ConfirmSummary"] }
+  ]
+}

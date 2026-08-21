@@ -25,9 +25,11 @@
 //  - W9: chybejici/neuplna politika -> vse ELEVATED (validace zde).
 //  - Varianty W2a/W2b/V2d (operations+parameters, elements update se zmenou
 //    type, messages+rebuild) ESKALUJI nad tridu z politiky - nikdy nesnizuji.
-//  - MOVE: overeno 2026-08-19 - update vetev FB_OpElements vlastnika NEMENI
-//    (zadny zapis package na update). moveOps = 0 rezervovano (I4); budouci
-//    move op zachyti fail-closed (neznama operace/vetev).
+//  - MOVE (iterace 6): operace `move_elements` uz existuje - metrika
+//    `moveOps` pocita SKUTECNE presuny (drive rezervovana 0, I4). Trida
+//    v politice = ELEVATED vzdy (zduvodneni ve FB_RiskPolicy); volitelny
+//    prah `elevate.moveOps` je druha pojistka. Update vetev FB_OpElements
+//    vlastnika porad NEMENI - jen o tom nove vraci warning (nalez N-2).
 //
 // VEDOME APROXIMACE METRIK (shadow faze; ladi se auditem):
 //  - $N na existujici prvek: identita znama az za behu -> affectedElements
@@ -186,7 +188,7 @@ function resolveDiagram(ref) {
 }
 
 // --- metriky ---
-var writeOps = 0, createOps = 0, updatedExisting = 0, deleteTargets = 0;
+var writeOps = 0, createOps = 0, updatedExisting = 0, deleteTargets = 0, moveOps = 0;
 var elSet = {}, elCount = 0, pkgSet = {}, pkgCount = 0, dgmSet = {}, dgmCount = 0;
 function addEl(k) { if (elSet[k] != 1) { elSet[k] = 1; elCount++; } }
 function addPkg(k) { if (pkgSet[k] != 1) { pkgSet[k] = 1; pkgCount++; } }
@@ -242,6 +244,7 @@ function classifyDollar(m) {
     }
     if (rname == "create_element" || rname == "clone_package" || rname == "clone_elements"
         || rname == "create_baseline") { return "OWN"; }
+    if (rname == "move_elements") { return "EXISTING"; } // presouva JEN existujici prvky
     // find_or_create_referencing_sr (found vs created), attributes/operations/
     // messages/scenarios/... - vetev nelze pre-exekucne urcit -> fail-closed
     return "UNCERTAIN";
@@ -528,8 +531,31 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
             var pl = lst[j] || {};
             touchElement(pl.element || pl.elementID, "place.elementPlacements[" + j + "]", false, false);
         }
-    } else if (name == "create_or_update_scenarios" || name == "create_or_update_constraints") {
-        lst = (name == "create_or_update_scenarios" ? o.scenarios : o.constraints) || [];
+    } else if (name == "move_elements") {
+        // presun = zapis do ZDROJOVE i CILOVE vetve; oba packages se pocitaji
+        lst = o.elements || [];
+        if (lst.length == 0) { elevate("move_elements bez elements - E_ARGS pri exekuci"); }
+        writeOps += (lst.length > 0 ? lst.length : 1);
+        moveOps += (lst.length > 0 ? lst.length : 1);
+        for (j = 0; j < lst.length; j++) {
+            var mv = lst[j];
+            var mvRef = (mv !== null && typeof mv == "object") ? (mv.element || mv.guid || mv.elementID) : mv;
+            var mvPkg = (mv !== null && typeof mv == "object" && typeof mv["package"] != "undefined"
+                && mv["package"] !== null && ("" + mv["package"]) != "") ? mv["package"] : o["package"];
+            // countUpdate: presun je zmena existujiciho prvku; addPackages:
+            // zapocte ZDROJOVY package prvku
+            var tmv = touchElement(mvRef, "move.elements[" + j + "]", true, true);
+            // ZDROJOVY package i JMENEM - potvrzovaci dialog musi ukazat ODKUD
+            // kam se prvek stehuje (touchElement zna jen jeho id, ne jmeno)
+            if (tmv && tmv.res && tmv.res.pkgId > 0) {
+                touchPackage("" + tmv.res.pkgId, "move.elements[" + j + "].fromPackage", false);
+            }
+            touchPackage(mvPkg, "move.elements[" + j + "].package", false);
+        }
+    } else if (name == "create_or_update_scenarios" || name == "create_or_update_constraints"
+               || name == "create_or_update_requirements") {
+        lst = (name == "create_or_update_scenarios" ? o.scenarios
+              : (name == "create_or_update_constraints" ? o.constraints : o.requirements)) || [];
         writeOps += (lst.length > 0 ? lst.length : 1);
         touchElement(o.element, name + ".element", true, true);
     } else if (name == "apply_classifier_stereotypes") {
@@ -586,6 +612,10 @@ if (polValid) {
     overE(updatedExisting, "updatedExisting");
     overE(pkgCount, "affectedPackages");
     overE(dgmCount, "foreignDiagrams");
+    // moveOps = VOLITELNY prah (iterace 6): chybejici hodnota politiku
+    // neznevaliduje (jinak by novy prah shodil kazdou driv nasazenou
+    // politiku do ELEVATED); trida move_elements ELEVATED plati vzdy
+    if (typeof pol.elevate.moveOps == "number") { overE(moveOps, "moveOps"); }
 }
 
 return {
@@ -597,7 +627,7 @@ return {
         writeOps: writeOps, createOps: createOps, updatedExisting: updatedExisting,
         deleteTargets: deleteTargets, affectedElements: elCount,
         affectedPackages: pkgCount, affectedDiagrams: dgmCount,
-        moveOps: 0, // rezervovano (I4): MOVE operace v registru neexistuje
+        moveOps: moveOps, // iterace 6: skutecne presuny (operace move_elements)
         metricsComplete: !(budgetHit || metricsIncomplete)
     },
     elapsedMs: (new Date().getTime() - t0),

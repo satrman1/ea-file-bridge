@@ -1,0 +1,11 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-93",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 - sonda schematu t_objectrequires pres sqlite_master (lekce N-4: nikdy nehadat nazvy sloupcu) + vzorek existujicich internal requirements v modelu (EAExample ma vlastni obsah).",
+  "ops": [
+    { "op": "query", "sql": "SELECT name, sql FROM sqlite_master WHERE name = 't_objectrequires'" },
+    { "op": "query", "sql": "SELECT * FROM t_objectrequires LIMIT 5" },
+    { "op": "query", "sql": "SELECT COUNT(*) AS PocetRequirements FROM t_objectrequires" }
+  ]
+}

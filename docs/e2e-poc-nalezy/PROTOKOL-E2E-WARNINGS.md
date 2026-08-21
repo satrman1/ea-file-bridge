@@ -1,5 +1,7 @@
 # Živý E2E — op-level warnings v chat ACK (nález POC N-7)
 
+> ⛔ **Revize po iteraci 6 (2026-08-21).** Dávky 4–6 níže stojí na vyvráceném nálezu N-1 („`join` = jméno scénáře"). **`join` je ČÍSLO KROKU hostitelského scénáře**, `"End"`/vynechané = větev končí (viz `PROTOKOL-EAFB.md` §6b/§6i). Scénář testu tím **neztrácí platnost** — jen se posunul obsah: jako „špatná" hodnota, která vyrobí warning, poslouž **jméno scénáře** (dávka 4), jako oprava **číslo kroku** (dávka 5), a readback (dávka 6) má po opravě najít `join="{GUID kroku}"`, po dávce 4 `join="End"`. Dávky v souborech `req-20260821-32/-33/-34` je před spuštěním potřeba v tomto smyslu prohodit.
+
 Stav: **připraveno, živý běh zbývá** (rozhodnutí Miloš 2026-08-21: commit napřed, živý test v samostatném vlákně).
 Offline pokryto: `test/harness.js` **150/150 PASS** (6 nových testů `ChatRender: …`).
 Kontrakt tvaru ACK: `docs/PROTOKOL-EAFB.md` **§3a**.

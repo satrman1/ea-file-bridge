@@ -1,0 +1,140 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-95",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / zivy test (a) - JOIN NA KROK. Deterministicky rebuild kompletnich sad scenaru UC-95002 (11310) a UC-95003 (11311); join = CISLO KROKU hostitelskeho scenare. Ocekavany vysledek v EA UI: Scenarios -> Entry Points sloupec Join ukazuje cisla kroku (9, 10 u 95002; 2 u 95003), ne End.",
+  "ops": [
+    {
+      "op": "create_or_update_scenarios",
+      "element": "11310",
+      "scenarios": [
+        {
+          "name": "BE95002 Zrušení rezervace",
+          "type": "Basic Path",
+          "notes": "Hlavni uspesny scenar zruseni rezervace lekce clenem.",
+          "steps": [
+            { "text": "Člen požaduje přehled svých nadcházejících rezervací.", "kind": "actor" },
+            { "text": "Systém ověří, že účet člena umožňuje rušení rezervací.", "kind": "system", "uses": "BRU95002-1" },
+            { "text": "Systém zobrazí členovi jeho nadcházející rezervace.", "kind": "system" },
+            { "text": "Člen vybere rezervaci ze seznamu a požaduje její zrušení.", "kind": "actor" },
+            { "text": "Systém prezentuje členovi důsledky zrušení vybrané rezervace.", "kind": "system", "uses": "BRU95002-2" },
+            { "text": "Člen zrušení potvrdí.", "kind": "actor" },
+            { "text": "Systém zruší rezervaci a uvolní kapacitu lekce.", "kind": "system" },
+            { "text": "Systém vrátí členovi plný kredit za zrušenou rezervaci.", "kind": "system", "uses": "BRU95002-2" },
+            { "text": "Systém nabídne uvolněnou kapacitu prvnímu náhradníkovi v pořadí a upozorní ho.", "kind": "system", "uses": "BRU95002-3" },
+            { "text": "Systém informuje člena o zrušení rezervace.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "AF95002-1 Zrušení nepotvrzeno",
+          "type": "Alternate",
+          "notes": "Clen zruseni rezervace nepotvrdi.",
+          "attachTo": { "scenario": "BE95002 Zrušení rezervace", "step": 6 },
+          "join": "End",
+          "steps": [
+            { "text": "Člen zrušení nepotvrdí.", "kind": "actor" },
+            { "text": "Systém rezervaci ponechá beze změny.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "AF95002-2 Pozdní storno bez vrácení kreditu",
+          "type": "Alternate",
+          "notes": "Storno po uplynuti lhuty - kredit propada.",
+          "attachTo": { "scenario": "BE95002 Zrušení rezervace", "step": 8 },
+          "join": 9,
+          "steps": [
+            { "text": "Systém zjistí, že rezervace byla zrušena po uplynutí lhůty pro vrácení kreditu.", "kind": "system", "uses": "BRU95002-2" },
+            { "text": "Systém kredit nevrací a informuje o tom člena.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "AF95002-3 Lekce bez náhradníka",
+          "type": "Alternate",
+          "notes": "Cekaci listina lekce je prazdna.",
+          "attachTo": { "scenario": "BE95002 Zrušení rezervace", "step": 9 },
+          "join": 10,
+          "steps": [
+            { "text": "Systém zjistí, že čekací listina lekce je prázdná.", "kind": "system", "uses": "BRU95002-3" },
+            { "text": "Systém ponechá uvolněnou kapacitu k volné rezervaci.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "EF95002-1 Blokovaný účet",
+          "type": "Exception",
+          "notes": "Ucet clena je blokovany - ruseni resi recepce.",
+          "attachTo": { "scenario": "BE95002 Zrušení rezervace", "step": 2 },
+          "join": "End",
+          "steps": [
+            { "text": "Systém zjistí, že účet člena je blokovaný.", "kind": "system", "uses": "BRU95002-1" },
+            { "text": "Systém rušení rezervací neumožní a informuje člena, že situaci řeší recepce.", "kind": "system" }
+          ]
+        }
+      ]
+    },
+    {
+      "op": "create_or_update_scenarios",
+      "element": "11311",
+      "scenarios": [
+        {
+          "name": "BE95003 Odbavení na turniketu",
+          "type": "Basic Path",
+          "notes": "Hlavni uspesny scenar - samoobsluzne odbaveni clena na turniketu.",
+          "steps": [
+            { "text": "Člen předloží na turniketu svůj identifikátor.", "kind": "actor" },
+            { "text": "Systém ověří, že předložený identifikátor je přípustný.", "kind": "system", "uses": "BRU95003-1" },
+            { "text": "Systém ověří, že účet člena není blokovaný.", "kind": "system", "uses": "BRU95003-4" },
+            { "text": "Systém ověří nárok člena na vstup.", "kind": "system", "uses": "BRU95003-2" },
+            { "text": "Systém vypořádá uplatněný nárok.", "kind": "system", "uses": "BRU95003-3" },
+            { "text": "Systém otevře turniket.", "kind": "system" },
+            { "text": "Systém zaeviduje vstup člena do areálu.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "AF95003-1 Ruční odbavení na recepci",
+          "type": "Alternate",
+          "notes": "Clen je odbaven recepcnim; dale pokracuje standardni overeni a vypořádani.",
+          "attachTo": { "scenario": "BE95003 Odbavení na turniketu", "step": 1 },
+          "join": 2,
+          "steps": [
+            { "text": "Člen požádá o odbavení na recepci.", "kind": "actor" },
+            { "text": "Recepční ověří totožnost člena a jeho identifikátor.", "kind": "actor" },
+            { "text": "Recepční požaduje odbavení člena.", "kind": "actor" }
+          ]
+        },
+        {
+          "name": "EF95003-1 Nepřípustný identifikátor",
+          "type": "Exception",
+          "notes": "Predlozeny identifikator neni pripustny.",
+          "attachTo": { "scenario": "BE95003 Odbavení na turniketu", "step": 2 },
+          "join": "End",
+          "steps": [
+            { "text": "Systém zjistí, že předložený identifikátor není přípustný.", "kind": "system", "uses": "BRU95003-1" },
+            { "text": "Systém turniket neotevře a odkáže člena na recepci.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "EF95003-2 Blokovaný účet",
+          "type": "Exception",
+          "notes": "Ucet clena je blokovany.",
+          "attachTo": { "scenario": "BE95003 Odbavení na turniketu", "step": 3 },
+          "join": "End",
+          "steps": [
+            { "text": "Systém zjistí, že účet člena je blokovaný.", "kind": "system", "uses": "BRU95003-4" },
+            { "text": "Systém turniket neotevře a odkáže člena na recepci.", "kind": "system" }
+          ]
+        },
+        {
+          "name": "EF95003-3 Bez nároku na vstup",
+          "type": "Exception",
+          "notes": "Clen nema narok na vstup.",
+          "attachTo": { "scenario": "BE95003 Odbavení na turniketu", "step": 4 },
+          "join": "End",
+          "steps": [
+            { "text": "Systém zjistí, že člen nemá nárok na vstup.", "kind": "system", "uses": "BRU95003-2" },
+            { "text": "Systém turniket neotevře a odkáže člena na recepci.", "kind": "system" }
+          ]
+        }
+      ]
+    }
+  ]
+}

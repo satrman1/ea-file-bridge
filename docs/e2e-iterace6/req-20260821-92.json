@@ -1,0 +1,9 @@
+{
+  "protocol": "eafb/0.2",
+  "id": "20260821-92",
+  "repo": "EAExample.qea",
+  "notes": "ITERACE 6 / RE join - STAV PO rucnim nastaveni Join v EA UI (AF95002-1 -> krok 7, AF95002-3 -> krok 10). Diff proti davce -91 je dukazem formatu.",
+  "ops": [
+    { "op": "query", "sql": "SELECT * FROM t_objectscenarios WHERE Object_ID = 11310" }
+  ]
+}

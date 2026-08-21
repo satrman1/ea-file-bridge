@@ -67,6 +67,20 @@ for (var i = 0; i < results.length; i++) {
             lines.push({ text: "  [" + verb + "]  \"" + (e.name || "?") + "\""
                 + (ein && ein.path ? "  @ " + ein.path : ""), navId: (ein ? ein.navId : 0) });
         }
+    } else if (op == "move_elements") {
+        // iterace 6: presun je zasah do struktury - musi byt v Output videt
+        // odkud kam, vcetne poctu prvku, ktere sly s nim
+        var mts = r.items || [];
+        for (var m = 0; m < mts.length; m++) {
+            var mi2 = mts[m];
+            var min2 = elInfo(mi2.id || mi2.guid);
+            var extra = "";
+            if (mi2.children) { extra += ", potomku: " + mi2.children + " (dorovnano " + (mi2.childrenFixed || 0) + ")"; }
+            if (mi2.diagrams) { extra += ", diagramu: " + mi2.diagrams + " (dorovnano " + (mi2.diagramsFixed || 0) + ")"; }
+            lines.push({ text: "  [" + (mi2.moved ? "presunuto" : "beze zmeny") + "]  \"" + (mi2.name || "?") + "\"  "
+                + (mi2.fromPackage || ("id " + mi2.fromPackageID)) + " -> " + (mi2.toPackage || ("id " + mi2.toPackageID)) + extra
+                + (min2 && min2.path ? "  @ " + min2.path : ""), navId: (min2 ? min2.navId : 0) });
+        }
     } else if (op == "create_or_update_diagram") {
         var dts = r.items || [];
         for (var g = 0; g < dts.length; g++) {
