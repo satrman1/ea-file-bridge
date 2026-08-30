@@ -885,6 +885,305 @@ t("ChatRender: query 0 radku = 'dotaz nic nevratil', ne 'data neexistuji' (T4-3c
     contains(out, "ne 'data neexistuji'");
 });
 
+// =====================================================================
+// --- ITERACE 7 (schrankovy kanal, zadani v1.1 2026-08-30): FB_ChatRender
+// nese IDENTITU vysledku (GUID + jmeno), retry par. 5a proveditelny z ACK.
+// Testy = akceptacni kriteria par. 6 (1-9) + 11' (uplnost proti REG).
+// =====================================================================
+
+t("I7 krit.1: get_selected_context -> ACK nese GUID, jmeno, inWhitelist i plnou path (regrese res-20260821-03)", function () {
+    var out = chat({
+        status: "done", id: "20260821-03", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "get_selected_context", status: "ok", selected: true,
+            context: { type: "Package", guid: "{5A55C1C5-3A34-4a5f-A33C-A6E829A29AAA}", id: 1054,
+                name: "#FB-TEST", path: "Model.Sandbox.#FB-TEST", inWhitelist: true, whitelistNote: "" },
+            selectedElements: [], currentDiagram: null, treeType: 5 }]
+    });
+    contains(out, "{5A55C1C5-3A34-4a5f-A33C-A6E829A29AAA}");
+    contains(out, "#FB-TEST");
+    contains(out, "inWhitelist=true");
+    contains(out, "path=Model.Sandbox.#FB-TEST", "path plnou cestou (par. 4.2/I5)");
+});
+
+t("I7 krit.2a: find_elements_by_name se 3 polozkami -> ACK nese 3 GUIDy", function () {
+    var out = chat({
+        status: "done", id: "t7-f3", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "find_elements_by_name", status: "ok", count: 3, items: [
+            { guid: "{F0000001-0000-0000-0000-000000000001}", id: 1, name: "UC Alfa", type: "UseCase" },
+            { guid: "{F0000002-0000-0000-0000-000000000002}", id: 2, name: "UC Beta", type: "UseCase" },
+            { guid: "{F0000003-0000-0000-0000-000000000003}", id: 3, name: "UC Gama", type: "UseCase" }
+        ] }]
+    });
+    contains(out, "{F0000001-0000-0000-0000-000000000001}");
+    contains(out, "{F0000002-0000-0000-0000-000000000002}");
+    contains(out, "{F0000003-0000-0000-0000-000000000003}");
+    contains(out, "UC Alfa");
+    contains(out, "(UseCase)", "typ na plne urovni detailu");
+});
+
+t("I7 krit.2b: 200 polozek -> prvnich N=items (default 25) + ukazatel, nikdy tichy cut", function () {
+    var items = [];
+    for (var i = 1; i <= 200; i++) {
+        var nn = ("000" + i).slice(-3);
+        items.push({ guid: "{G-" + nn + "}", id: i, name: "E" + nn });
+    }
+    var out = chat({
+        status: "done", id: "t7-f200", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "find_elements_by_name", status: "ok", count: 200, items: items }]
+    });
+    contains(out, "{G-025}", "25. polozka jeste v ACK (default items=25, par. 4.3)");
+    ok(out.indexOf("{G-026}") < 0, "26. polozka uz ne");
+    contains(out, "zobrazeno prvnich 25 z 200", "hlasity orez s poctem");
+    contains(out, "res-t7-f200.json", "ukazatel na res soubor (W10)");
+});
+
+t("I7 krit.3: create_or_update_elements -> oba GUIDy; follow-up davka slozena JEN z ACK je platna", function () {
+    var g1 = "{11111111-2222-3333-4444-555555555555}";
+    var g2 = "{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE}";
+    var out = chat({
+        status: "done", id: "t7-w2", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "create_or_update_elements", status: "ok", count: 2, items: [
+            { guid: g1, id: 11, name: "UC Posli mailovou zpravu", created: true },
+            { guid: g2, id: 12, name: "UC Prijmi zpravu", created: true }
+        ] }]
+    });
+    contains(out, g1); contains(out, g2);
+    // davka VYHRADNE z renderovaneho textu (kriterium 3 - nejsilnejsi test)
+    var found = ("" + out).match(/\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\}/g) || [];
+    eq(found.length, 2, "z ACK jdou vytahnout prave 2 kompletni GUIDy");
+    var batch = JSON.parse(JSON.stringify({
+        protocol: "eafb/0.2", id: "t7-w2-fix", repo: "EAEXAMPLE.QEA",
+        ops: [{ op: "move_elements", elements: [found[0], found[1]], targetPackage: found[0] }]
+    }));
+    eq(batch.ops[0].elements[0], g1, "GUID z ACK == GUID z response");
+    eq(batch.ops[0].elements[1], g2);
+});
+
+t("I7 krit.4: orez podle priority par. 4.4 - GUIDy zustavaji, jmena odpadaji; integrita GUID (W2)", function () {
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", chat: { total: 400 } }]; };
+    var items = [];
+    for (var i = 0; i < 5; i++) {
+        items.push({ guid: "{AB00000" + i + "-1111-2222-3333-44444444444" + i + "}", id: i,
+            name: "Velmi dlouhe jmeno prvku cislo " + i + " ktere se do rozpoctu nevejde" });
+    }
+    var out;
+    try {
+        out = chat({ status: "done", id: "t7-cut", repository: "EAEXAMPLE.QEA",
+            results: [{ op: "create_or_update_elements", status: "ok", count: 5, items: items }] });
+    } finally { B.FB_Config = origCfg; }
+    for (var k = 0; k < 5; k++) { contains(out, "{AB00000" + k, "GUID " + k + " musi prezit orez"); }
+    ok(out.indexOf("Velmi dlouhe jmeno") < 0, "jmena musi odpadnout DRIVE nez GUIDy (par. 4.4)");
+    contains(out, "res-t7-cut.json", "orez vzdy s ukazatelem (W10)");
+    // integrita GUID po orezu (W2): zadny podretezec { bez uzavirajici }
+    var opens = out.split("{").length - 1, closes = out.split("}").length - 1;
+    eq(opens, closes, "pocty { a } musi sedet - zadny neuplny GUID");
+    ok(out.lastIndexOf("{") < out.lastIndexOf("}"), "posledni GUID je uzavreny");
+});
+
+t("I7 krit.4b: FB_Config bez polozky chat -> defaulty v kodu (total 4000, zadny orez pod 1500)", function () {
+    // realny FB_Config (EAEXAMPLE bez sekce chat) - fixture "repo bez polozky"
+    var items = [];
+    for (var i = 0; i < 20; i++) {
+        items.push({ guid: "{DEF0000" + ("0" + i).slice(-2) + "-0000-0000-0000-000000000000}", id: i, name: "Prvek cislo " + i });
+    }
+    var out = chat({ status: "done", id: "t7-def", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "create_or_update_elements", status: "ok", count: 20, items: items }] });
+    ok(out.length > 900, "s defaultem total=4000 se 20 polozek vejde (delka " + out.length + ")");
+    ok(out.indexOf("orez rozpoctem") < 0, "zadny globalni orez na defaultech");
+});
+
+t("I7 krit.5: zakaz obsahu - notes/XMLContent/raw/rtf_b64/png_b64 NIKDY v ACK", function () {
+    var out = chat({
+        status: "done", id: "t7-sec", repository: "EAEXAMPLE.QEA",
+        results: [
+            { op: "get_elements_information", status: "ok", count: 1, items: [
+                { guid: "{E0000001-0000-0000-0000-000000000001}", id: 1, name: "El1", type: "UseCase",
+                  notes: "TAJNE-NOTES", XMLContent: "<x>TAJNE-XML</x>" }] },
+            { op: "get_baselines", status: "ok", count: 1, packageGuid: "{P0000001-0000-0000-0000-000000000001}",
+              items: [{ guid: "{B0000001-0000-0000-0000-000000000001}", version: "1.0", notes: "TAJNE-BNOTES", date: "2026-08-30" }],
+              raw: "<xml>TAJNE-RAW</xml>" },
+            { op: "get_diagrams_information", status: "ok", count: 1, items: [
+                { guid: "{D0000001-0000-0000-0000-000000000001}", name: "SD1", type: "Sequence",
+                  messages: [{ name: "TAJNE-MSG1" }, { name: "TAJNE-MSG2" }] }] },
+            { op: "export_element_linked_documents", status: "ok", count: 1, items: [
+                { file: "responses\\docs\\doc1.rtf", size: 123, rtf_b64: "TAJNE-RTF" }] },
+            { op: "get_diagram_image", status: "ok", count: 1, items: [
+                { file: "responses\\images\\d1.png", png_b64: "TAJNE-PNG" }] }
+        ]
+    });
+    ok(out.indexOf("TAJNE-") < 0, "obsahova pole nesmi do chatu (nalezeno v: " + out.substring(0, 300) + ")");
+    contains(out, "doc1.rtf", "souborovy vystup nese cestu");
+    contains(out, "d1.png");
+    contains(out, "NEPROJDE", "veta, ze obsah schrankou nejde (par. 3)");
+    contains(out, "[zprav: 2]", "zpravy diagramu jen poctem (par. 4.2)");
+});
+
+t("I7 krit.6: ping ACK nese whitelist (GUID+jmeno+plna path) + access; nikdy login/groups/connection/nonce", function () {
+    var out = chat({
+        status: "done", id: "t7-ping", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "ping", status: "ok", echo: "x", eaVersion: "1715",
+            repository: "EAEXAMPLE.QEA", connection: "C:\\Users\\tajnylogin\\models\\EAEXAMPLE.QEA",
+            whitelist: [{ guid: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", name: "#FB-TEST", path: "Model.Sandbox.#FB-TEST" }],
+            access: { securityEnabled: true, login: "TAJNY-LOGIN", access: "write",
+                groups: ["TAJNA-SKUPINA"], reason: "clen write skupiny dle FB_AccessGroups" } }]
+    });
+    contains(out, "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}");
+    contains(out, "#FB-TEST");
+    contains(out, "path=Model.Sandbox.#FB-TEST", "plna cesta whitelist package (par. 4.5/I5)");
+    contains(out, "pristup: write");
+    contains(out, "clen write skupiny", "reason plnym textem");
+    ok(out.indexOf("TAJNY-LOGIN") < 0, "login se nerenderuje (datova minimalizace par. 4.5)");
+    ok(out.indexOf("TAJNA-SKUPINA") < 0, "groups se nerenderuji");
+    ok(out.indexOf("tajnylogin") < 0, "connection se do ACK nedava");
+    ok(out.toLowerCase().indexOf("nonce") < 0, "zadny nonce v ACK");
+});
+
+t("I7 krit.6b: prazdny whitelist = explicitni veta, ne prazdne pole", function () {
+    var out = chat({
+        status: "done", id: "t7-pw0", repository: "JINE.QEA",
+        results: [{ op: "ping", status: "ok", repository: "JINE.QEA", whitelist: [],
+            access: { securityEnabled: false, access: "write", reason: "security vypnuta" } }]
+    });
+    contains(out, "whitelist: PRAZDNY", "prazdny whitelist musi byt explicitne pojmenovan (par. 4.5)");
+});
+
+t("I7: FB_OpPing rozvine whitelist filtrovany na repo; nedohledatelna polozka s poznamkou", function () {
+    delete B._fbAccessCache;
+    var repo = mkRepo();
+    var r = B.FB_OpPing.call(B, repo, { op: "ping", echo: "x" });
+    eq(r.status, "ok");
+    ok(r.whitelist && r.whitelist.length === 1, "radek EAEXAMPLE z FB_Whitelist se ma propsat");
+    contains(r.whitelist[0].guid, "{CCD344F6", "GUID z FB_Whitelist");
+    contains(r.whitelist[0].note || "", "nedohledatelna", "nedohledatelny package = poznamka, ne tiche zahozeni");
+    eq(r.access.access, "write", "security vypnuta -> write (FB_UserAccess)");
+});
+
+t("I7: FB_OpPing dohleda jmeno + plnou cestu whitelist package", function () {
+    delete B._fbAccessCache;
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    repo._addPackage({ id: 2, name: "Sandbox", parentID: 1 });
+    repo._addPackage({ id: 3, name: "#FB-TEST", parentID: 2, guid: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}" });
+    var r = B.FB_OpPing.call(B, repo, { op: "ping" });
+    eq(r.whitelist.length, 1);
+    eq(r.whitelist[0].name, "#FB-TEST");
+    eq(r.whitelist[0].path, "Model.Sandbox.#FB-TEST", "path plnou cestou pres FB_ElementPath");
+});
+
+t("I7 krit.7: E_REPO pojmenuje pripojeny repozitar (basename souborove cesty)", function () {
+    var out = chat({
+        status: "error", id: "20260821-01", code: "E_REPO",
+        message: "Davka je urcena pro repozitar '<NAZEV_REPOZITARE>', pripojeny je jiny. Nic nebylo provedeno.",
+        repository: "C:\\Users\\nejakylogin\\models\\EAEXAMPLE.QEA",
+        results: []
+    });
+    contains(out, "EAFB CHYBA 20260821-01");
+    contains(out, "Pripojeny repozitar: EAEXAMPLE.QEA", "agent se ma opravit sam (par. 4.6)");
+});
+
+t("I7 krit.9: neznama operace -> bezpecny default op+status+shrnuti+ukazatel, nikdy prazdny render", function () {
+    var out = chat({
+        status: "done", id: "t7-unk", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "operace_z_budoucna", status: "ok", count: 7 }]
+    });
+    contains(out, "op[0] operace_z_budoucna: ok", "op + status (B4)");
+    contains(out, "count 7", "ciselne shrnuti");
+    contains(out, "res-t7-unk.json", "ukazatel na res");
+});
+
+t("I7: trida D - diagramova rodina renderuje ciselne shrnuti, nikdy prazdny segment", function () {
+    var out = chat({
+        status: "done", id: "t7-d", repository: "EAEXAMPLE.QEA",
+        results: [
+            { op: "layout_connectors", status: "ok", diagramID: 5, style: "auto", changed: [1, 2, 3] },
+            { op: "open_diagrams", status: "ok", opened: [7], count: 1 },
+            { op: "remove_elements_from_diagram", status: "ok", diagramID: 5, removedElementIDs: [9, 10], count: 2 }
+        ]
+    });
+    contains(out, "op[0] layout_connectors: 3 polozek");
+    contains(out, "op[1] open_diagrams: 1 polozek");
+    contains(out, "op[2] remove_elements_from_diagram: 2 polozek");
+    contains(out, "res-t7-d.json", "trida D vzdy s ukazatelem na res");
+});
+
+t("I7 vyjimka B3: constraints/requirements - element GUID + name+type, rebuild pokyn; jmena prezijou i orez", function () {
+    var origCfg = B.FB_Config;
+    var elGuid = "{E1E1E1E1-0000-0000-0000-000000000001}";
+    var mk = function () {
+        return chat({
+            status: "done", id: "t7-b3", repository: "EAEXAMPLE.QEA",
+            results: [{ op: "create_or_update_constraints", status: "ok", count: 3, removed: 3,
+                guid: elGuid, id: 11129, items: [
+                    { name: "PRE-1 prihlaseny uzivatel", type: "Precondition", created: true },
+                    { name: "PST-1 zprava odeslana", type: "Postcondition", created: true },
+                    { name: "ASU-1 SMTP dostupne", type: "Invariant", created: true }
+                ] }]
+        });
+    };
+    var out = mk();
+    contains(out, elGuid, "identita = element GUID (res.guid)");
+    contains(out, "PRE-1 prihlaseny uzivatel");
+    contains(out, "(Precondition)", "type je soucast identity B3 polozky");
+    contains(out, "rebuild kompletni sady", "retry pokyn dle par. 5a/B3");
+    // orez: jmena B3 polozek JSOU identita - nesmi odpadnout ve prospech niceho
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", chat: { total: 380 } }]; };
+    var out2;
+    try { out2 = mk(); } finally { B.FB_Config = origCfg; }
+    ok(out2.indexOf("PRE-1") >= 0 || out2.indexOf("res-t7-b3.json") >= 0,
+        "B3: bud jmena drzi, nebo je hlasity ukazatel - nikdy tichy cut");
+});
+
+t("I7 krit.12 (offline analog): chyba uprostred davky -> GUIDy drivejsich ok operaci JSOU v ACK", function () {
+    var g1 = "{C1000001-0000-0000-0000-000000000001}";
+    var out = chat({
+        status: "error", id: "t7-err", repository: "EAEXAMPLE.QEA",
+        results: [
+            { op: "create_or_update_elements", status: "ok", count: 1, items: [{ guid: g1, id: 1, name: "UC Hotovy", created: true }] },
+            { op: "create_or_update_connectors", status: "error", code: "E_NOT_FOUND", message: "target neni" },
+            { op: "create_or_update_scenarios", status: "skipped" }
+        ]
+    });
+    contains(out, "EAFB CHYBA t7-err v op[1]");
+    contains(out, g1, "GUID polozky vznikle PRED chybou musi byt v ACK (par. 5a / kriterium 12)");
+    contains(out, "UC Hotovy");
+});
+
+t("I7 krit.11': uplnost projekcni tabulky proti registru REG (W3)", function () {
+    // enumerace REG z FB_Main.js + PROJ z FB_ChatRender.js (zdrojove soubory,
+    // vzor FB_RiskGate.js validace uplnosti classes) - nova operace bez
+    // zaznamu v projekcni tabulce = cerveny harness
+    var mainSrc = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_Main.js"), "utf8");
+    var regM = /var REG = \{([\s\S]*?)\n\};/.exec(mainSrc);
+    ok(regM, "blok REG ve FB_Main.js nalezen");
+    var regOps = [], rex = /"([a-z0-9_]+)":\s*\{\s*fn:/g, m1;
+    while ((m1 = rex.exec(regM[1])) != null) { regOps.push(m1[1]); }
+    ok(regOps.length >= 42, "registr ma mit aspon 42 operaci, nalezeno " + regOps.length);
+    var chatSrc = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_ChatRender.js"), "utf8");
+    var projM = /var PROJ = \{([\s\S]*?)\n\};/.exec(chatSrc);
+    ok(projM, "blok PROJ ve FB_ChatRender.js nalezen");
+    var projOps = {}, pex = /"([a-z0-9_]+)":\s*\{\s*cls:\s*"([ABCD])"/g, m2;
+    var projCount = 0;
+    while ((m2 = pex.exec(projM[1])) != null) { projOps[m2[1]] = m2[2]; projCount++; }
+    var missing = [];
+    for (var ri = 0; ri < regOps.length; ri++) {
+        if (!projOps[regOps[ri]]) { missing.push(regOps[ri]); }
+    }
+    ok(missing.length === 0, "operace registru bez zaznamu v projekcni tabulce (par. 4.2/W3): " + missing.join(", "));
+    // kontrolni soucet trid dle Prilohy A: 27+1+8+6 = 42
+    var byCls = { A: 0, B: 0, C: 0, D: 0 };
+    for (var pk in projOps) { byCls[projOps[pk]]++; }
+    ok(byCls.A >= 27 && byCls.B >= 1 && byCls.C >= 8 && byCls.D >= 6,
+        "rozpad trid nesedi s Prilohou A: A=" + byCls.A + " B=" + byCls.B + " C=" + byCls.C + " D=" + byCls.D);
+});
+
+t("I7: zadny substring cut vysledneho retezce v renderu (W2)", function () {
+    // finalni pojistka drive rezala out.substring(0, BUDGET-90) - po iteraci 7
+    // se render sklada z celych polozek a vysledny retezec se NIKDY nestriha
+    var chatSrc = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_ChatRender.js"), "utf8");
+    ok(!/out\s*=\s*out\.substring\(/.test(chatSrc), "render nesmi strihat vysledny retezec substringem");
+});
+
 // --- regrese jadra: FB_Main ping (legacy textovy kontrakt drzi)
 t("FB_Main: ping davka -> done + echo", function () {
     delete B._fbAccessCache;

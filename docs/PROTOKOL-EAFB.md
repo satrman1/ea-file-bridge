@@ -104,7 +104,32 @@ Reference se rozresolvují rekurzivně v celém objektu opu (i uvnitř polí `ta
 
 Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, created}` u dávkových operací) — kvůli `$N` referencím. **`confirm_required` (v0.8)**: žádný zápis neproběhl, dávka čeká v `pending\`; top-level blok `confirm` s nonce žije **výhradně v `res-*.json`** — do chat verze smí jen `hashPrefix` (§6e pravidla). `rejected` = dávka zamítnuta člověkem (`E_RISK_REJECTED`).
 
-## 3a. Warnings — sémantika a propsání do chat ACK (v0.11, nález POC N-7)
+## 3a. Chat verze ACK — kontrakt (iterace 7) + Warnings (v0.11, nález POC N-7)
+
+### Kontrakt chat verze (iterace 7, zadání v1.1 2026-08-30)
+
+Dřívější stav („datový výcuk jen u `query`, zbytek stavový řádek") byl kořenem nálezu z živého E2E 2026-08-21: agent ve schránkovém kanálu neměl z ACK jak pokračovat a prosil o `res-*.json`. Od iterace 7 platí:
+
+**Čtyři třídy tvarů** (normativní rozpad = Příloha A red team reportu `RedTeam-Zadani-Iterace-7-Schrankovy-Kanal-2026-08.md`; projekční tabulka `PROJ` žije **v kódu** `FB_ChatRender`, úplnost proti registru `REG` hlídá harness — kritérium 11′):
+
+| Třída | Počet | Projekce do ACK |
+|---|---|---|
+| **A** — `count` + `items[]` | 27 | generická větev: identita položek (`guid`, `name`, `type`/`stereotype`, u packages `path` plnou cestou) |
+| **B** — `rows[]` + `rowCount` | 1 | `query` — kompaktní výcuk řádků (beze změny) |
+| **C** — singletony | 8 | vlastní projekce (`ping`, `get_selected_context`, `baseline_diff`, `create_baseline`, `create_element`, `clone_package`, `find_or_create_referencing_sr`, `deploy_src`) |
+| **D** — číselné shrnutí bez `items[]` | 6 | diagramová rodina: `op` + `status` + počet + ukazatel na res — nikdy prázdný segment |
+
+**Projekce = jen identita, nikdy obsah:** do chat verze jde z položky výhradně `guid`, `name`, `type`/`stereotype`, u packages `path` (plnou cestou — jednotně pro whitelist v pingu, projekci packages i `get_selected_context`). **Nikdy** `notes`, `XMLContent`, `raw`, `rtf_b64`, `png_b64`, těla scénářů, atributy ani operace; vnořené `messages[]` jen počtem. Binární/souborové výstupy (`get_diagram_image`, `export_element_linked_documents`) nesou v ACK cestu + explicitní větu, že obsah schránkou neprojde. Neuvedená operace má **bezpečný default**: `op` + `status` + číselné shrnutí + ukazatel na res — nikdy prázdný render u `status: "ok"`.
+
+**Výjimka B3 — `create_or_update_constraints` a `create_or_update_requirements`:** položky GUID nemají a mít nemohou (v datovém modelu EA neexistuje — `t_objectconstraint`, `t_objectrequires`). Identita v ACK = **element GUID (`res.guid`) + `name`+`type` položky**; oprava po chybě = **rebuild kompletní sady na element** (§5a bod 8), ne adresace položky.
+
+**Rozpočty a priorita ořezu:** defaulty žijí v kódu (`total: 4000`, `perOp: 900`, `items: 25`, query 700, warn 500); `FB_Config` sekce `chat` je jen volitelný per-repo přepis (chráněný element, PROTOKOL §8 bod 7). W10 platí beze změny (nikdy tichý cut, vždy ukazatel na `res-<id>.json`) a přibývá **pořadí ústupu**: 1. počet warningů + chybový kód (první řádek), 2. **GUIDy**, 3. jména, 4. typy/cesty/doprovod. Dojde-li rozpočet, zahazují se nejdřív jména a GUIDy zůstávají — agent s GUIDem bez jména pracovat umí, obráceně ne. **Ořez se provádí po hranicích položek — ACK nikdy nenese neúplný GUID (W2);** výsledný řetězec se nestříhá substringem.
+
+**`ping` = úvodní kotva session:** vrací navíc `whitelist[]` (rozvinuté položky připojeného repozitáře: `guid`, `name`, `path` plnou cestou; prázdný whitelist = explicitní věta) a `access{level, securityEnabled, reason}` z `FB_UserAccess`. `login`/`groups` se v chat verzi nerenderují (datová minimalizace, ne bezpečnostní plot — dispozice 2026-08-30), `connection` se do ACK nedává. **`E_REPO`** v chat verzi **pojmenuje připojený repozitář** (basename souborové cesty) — agent se opraví sám bez ztraceného kola.
+
+I3 platí beze změny: chat ACK není nikdy jediný záznam, `res-*.json` zůstává system of record — mění se jen to, kolik z něj agent potřebuje.
+
+### Warnings — sémantika a propsání do chat ACK (v0.11, nález POC N-7)
 
 **Co warning znamená:** operace skončila `status: "ok"`, **zápis proběhl**, ale **část deklarovaného záměru se nepropsala** — a executor přesně ví která. Warning tedy **není** chyba (nemá `code`, nezastaví dávku, nespustí stop-on-error) a **není** ani QC nález (QC je kontrola *po* zápisu, §3.4/W6). Je to *tichá díra mezi zadáním a výsledkem*, kterou nic jiného neohlásí: počty souhlasí, `status` je `ok`, ACK vypadal dřív úplně čistě.
 
@@ -125,13 +150,13 @@ Warnings (zapis PROBEHL, cast zameru se ale nepropsala - resit OPRAVNOU davkou, 
 
 Pravidla tvaru (kontrakt, hlídá harness):
 
-1. **Počet + první warning jsou v PRVNÍM řádku** (`| N WARNING:` / `| N WARNINGS:`) — právě proto, aby přežily deterministický ořez rozpočtem (W10, 1500 znaků). Segment stojí **před** QC segmentem.
+1. **Počet + první warning jsou v PRVNÍM řádku** (`| N WARNING:` / `| N WARNINGS:`) — právě proto, aby přežily deterministický ořez rozpočtem (W10; priorita ořezu viz kontrakt výše, rozpočet `total` default 4000). Segment stojí **před** QC segmentem.
 2. **Bezwarningová dávka má ACK beze změny** — žádný prázdný segment, žádný „0 warnings". Regrese je v harness testu.
 3. Výpis pod prvním řádkem má vlastní rozpočet (500 znaků) a při přetečení končí ukazatelem `(dalsich N - plny vycet v res-<id>.json)` — **nikdy tichý ořez** (W10).
 4. Warningy se vykazují i v **chybové** větvi ACK (`EAFB CHYBA …`) — warning z operace, která doběhla před chybou, nesmí zmizet.
 5. Warning se řeší **opravnou dávkou dle textu warningu** (§5a), nikdy přeposláním téže dávky.
 
-**Pro klienta (Copilot/skill):** ACK je pořád jen výcuc (I3) — u dávek se scénáři, constrainty a zprávami si po zápisu vyžádej `res-<id>.json` a warningy si přečti celé. Nově ale **víš z ACK, že tam nějaké jsou**, a nemusíš to hádat.
+**Pro klienta (Copilot/skill):** ACK od iterace 7 nese identitu výsledků (GUID + jméno) a warningy — **prosba o `res-<id>.json` je výjimka pro doložené případy** (dumpy nad rozpočet, binární výstupy, plný výčet warningů nad rozpočet), ne výchozí postup.
 
 ## 4. Registr operací (42; zrcadlo MCP toolů)
 
@@ -212,6 +237,7 @@ Referenční audit: `docs/AUDIT-B2-IDEMPOTENCE-2026-08.md` (verdikty K1–K4). P
 5. **Vazba na modal hang** (T4-3): po zotavení z visící pumpy odklikem hrozí falešné OK `rowCount: 0` — právě tam vzniknou duplicity nepozorovaně. Retry po každém zotavení proto **výhradně** s `match`/`dedupKey`, nebo přes kontrolní čtení + opravnou dávku dle bodu 2.
 6. Výchozí chování beze změny: create bez opt-in polí je vždy `AddNew` — dávky, které duplicitní jména legitimně chtějí (nepojmenované lifeliny, opakovaná jména v různých kontextech), fungují jako dřív.
 7. ⚠ **`matchByName` × `$N` se sčítají do riskových prahů** (lekce 2026-08-21, dávka 20260821-61, kulisa SportHub): opt-in idempotence je pro Risk Gate **nejistota** — `matchByName`/`dedupKey` konzervativně přičítá `updatedExisting` (§6d) a `$N` reference v takové dávce nejde přiřadit ke create větvi (fail-closed B3), takže cíle počítají jako **existující** prvky a jejich packages jako **cizí**. Scaffold „package + podpackages + obsah" s `matchByName: true` proto spadl na `E_RISK_BLOCKED` (`affectedPackages 6 > 5`), přestože nic v modelu neexistovalo. Praktické pravidlo pro klienty (Copilot, skilly, vrátný): **strukturu zakládej po dávkách s jednou cílovou package** (`affectedPackages > 1` je práh ELEVATED) a GUIDy z předchozí response adresuj přímo; `matchByName` zapínej tam, kde je retry pravděpodobný, ne plošně — když recon prokázal, že cíl neexistuje, je create bez opt-in polí levnější i pro gate. Není to chyba gate (fail-closed je záměr), ale past sestavování dávek. **Protidůkaz k dřívějšímu doporučení „dělit dávky podle velikosti" (nález N-5, POC R1):** táž práce poslaná jako **jedna** dávka o 6 operacích (`writeOps 19`, `createOps 9`, `affectedPackages 2`) **bez** `matchByName` skončila jako ELEVATED a po potvrzení proběhla bez problému. Spouštěčem BLOCKED tedy nebyla velikost, ale kombinace opt-in idempotence a `$N`. Pravidlo zní: **strukturu zakládej po dávkách s jednou cílovou package** (`affectedPackages > 1` je práh ELEVATED, ne BLOCKED) a **`matchByName`/`dedupKey` zapínej jen tam, kde je retry pravděpodobný** — ne plošně a ne jako „pro jistotu". Salámování dávek podle velikosti se tím **ruší** jako doporučení.
+8. **GUIDy pro retry jsou od iterace 7 přímo v chat ACK** (§3a kontrakt) — opravná dávka se ve schránkovém kanálu skládá z GUIDů renderovaných v ACK, bez sahání na `res-*.json`; chybová větev ACK nese i GUIDy položek vzniklých před chybou. **Výjimka B3** (`create_or_update_constraints`, `create_or_update_requirements`): položky GUID nemají — ACK nese element GUID a retry = **rebuild kompletní sady na element GUID** (obě operace jsou deterministický rebuild, dávka vždy nese kompletní sadu).
 
 ## 6. Poznámky z E2E iterace 3
 

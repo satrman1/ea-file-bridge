@@ -16,6 +16,13 @@
 //            B-V3, viz docs/e2e-iterace5/SPIKE-NAV.md).
 //   navProbe: true = ukaze menu polozku "Nav spike (test navigace)"
 //            (iterace 5 B-V3; jen dev repo, do PROD sablon NEpatri).
+//   chat:    VOLITELNE (iterace 7, par. 4.3) - per-repo prepis rozpoctu
+//            chat ACK: { total, perOp, items, query, warn }. DEFAULTY ZIJI
+//            V KODU FB_ChatRender (4000/900/25/700/500) - repozitar bez
+//            polozky jede na defaultech, zadny undefined ani tichy navrat
+//            k zadratovani (W6). FB_Config je chraneny element (PROTOKOL
+//            par. 8 bod 7) -> zvednuti stropu = auditovatelna zmena v
+//            modelu, ne runtime prepinac z chatu.
 // eaexample (dev stanice):
 return [
     { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true }
