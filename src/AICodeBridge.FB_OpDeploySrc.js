@@ -7,6 +7,11 @@
 // Vysledek nese reloadCode: true -> pumpa v0.4+ po teto davce sama prenacte
 // kod z modelu (zadny restart pumpy, zadny klik).
 // op.only = volitelne pole nazvu operaci (jinak vsechny soubory ve srcDir)
+// v0.11 (20260831, E2E T7-00): COM pres FB_ComObj a vypis bez Enumeratoru
+// (vzor FB_ProcessFolder v0.2) - in-model runtime EA (Mozilla JS) nema
+// ActiveXObject ani Enumerator; primy new ActiveXObject padal E_EXCEPTION
+// pri prvnim spusteni deploy_src schrankovym kanalem (drive jel jen pumpou).
+var self = this;
 var cfgs = this.FB_Config();
 var rid = ("" + this.FB_RepoId(Repository)).toUpperCase();
 var cfg = null;
@@ -16,7 +21,7 @@ for (var ci = 0; ci < cfgs.length; ci++) {
 if (cfg == null || !cfg.srcDir) {
     return { op: "deploy_src", status: "error", code: "E_ARGS", message: "FB_Config nema srcDir pro repozitar " + this.FB_RepoId(Repository) + "." };
 }
-var fso = new ActiveXObject("Scripting.FileSystemObject");
+var fso = this.FB_ComObj("Scripting.FileSystemObject");
 if (!fso.FolderExists(cfg.srcDir)) {
     return { op: "deploy_src", status: "error", code: "E_NOT_FOUND", message: "srcDir neexistuje: " + cfg.srcDir };
 }
@@ -31,7 +36,7 @@ if (op && op.only && Object.prototype.toString.call(op.only) == "[object Array]"
     for (var oi = 0; oi < op.only.length; oi++) { only["" + op.only[oi]] = 1; }
 }
 function readUtf8(path) {
-    var st = new ActiveXObject("ADODB.Stream");
+    var st = self.FB_ComObj("ADODB.Stream");
     st.Type = 2; st.Charset = "utf-8"; st.Open();
     st.LoadFromFile(path);
     var s = st.ReadText(-1);
@@ -64,14 +69,42 @@ function headerParams(opName, code) {
     }
     return out;
 }
-var en = new Enumerator(fso.GetFolder(cfg.srcDir).Files);
-for (; !en.atEnd(); en.moveNext()) {
-    var f = en.item();
-    var fm = /^AICodeBridge\.([A-Za-z0-9_]+)\.js$/.exec("" + f.Name);
+// vypis AICodeBridge.*.js bez Enumeratoru (EA runtime ho nema) - vzor
+// FB_ProcessFolder v0.2: JScript vetev zkusi Enumerator (rychlejsi, pumpa),
+// jinak skryty "dir /b" pres WScript.Shell (jmena souboru jsou ASCII)
+function listSrc(dir) {
+    try {
+        var en0 = new Enumerator(fso.GetFolder(dir).Files);
+        var out = [];
+        for (; !en0.atEnd(); en0.moveNext()) {
+            var f0 = en0.item();
+            out.push({ name: "" + f0.Name, path: "" + f0.Path });
+        }
+        return out;
+    } catch (eEnum) { }
+    var sh = self.FB_ComObj("WScript.Shell");
+    var tmp = dir + "\\_fb-deploy-list.tmp";
+    sh.Run('cmd /c dir /b /a-d "' + dir + '\\AICodeBridge.*.js" > "' + tmp + '"', 0, true);
+    var out2 = [];
+    if (fso.FileExists(tmp)) {
+        var tf = fso.OpenTextFile(tmp, 1, false);
+        while (!tf.AtEndOfStream) {
+            var ln = ("" + tf.ReadLine()).replace(/^\s+|\s+$/g, "");
+            if (ln != "") { out2.push({ name: ln, path: dir + "\\" + ln }); }
+        }
+        tf.Close();
+        fso.DeleteFile(tmp);
+    }
+    return out2;
+}
+var srcFiles = listSrc(cfg.srcDir);
+for (var fi = 0; fi < srcFiles.length; fi++) {
+    var f = srcFiles[fi];
+    var fm = /^AICodeBridge\.([A-Za-z0-9_]+)\.js$/.exec("" + f.name);
     if (!fm) { continue; }
     var opName = fm[1];
     if (only != null && only[opName] != 1) { skipped.push(opName); continue; }
-    var code = readUtf8("" + f.Path);
+    var code = readUtf8("" + f.path);
     var meth = have[opName];
     if (!meth) {
         // zalozit operaci; signatura z hlavicky "// AICodeBridge.Nazev(a, b)"
@@ -149,3 +182,4 @@ if (receptions.length > 0) { res.receptions = receptions; }
 if (skipped.length > 0) { res.skipped = skipped; }
 if (warns.length > 0) { res.warnings = warns; }
 return res;
+

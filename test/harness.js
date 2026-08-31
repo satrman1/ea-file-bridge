@@ -268,8 +268,10 @@ var B = L.bridge;
 // pravidlo ActiveXObject: primy vyskyt jen v allowlistu (JScript-only /
 // typeof-guard soubory); vsude jinde VYHRADNE this.FB_ComObj (par. 1a)
 t("pravidlo: ActiveXObject jen v allowlistu", function () {
+    // FB_OpDeploySrc z allowlistu VYRAZEN 20260831 (E2E T7-00: prvni beh
+    // schrankovym kanalem spadl na ActiveXObject v in-model runtime)
     var allow = { "AICodeBridge.FB_ComObj.js": 1, "AICodeBridge.FB_FileBytes.js": 1,
-                  "AICodeBridge.FB_OpDeploySrc.js": 1, "AICodeBridge.FB_ProcessFolder.js": 1 };
+                  "AICodeBridge.FB_ProcessFolder.js": 1 };
     var bad = [];
     L.files.forEach(function (f) {
         if (allow[f]) { return; }
