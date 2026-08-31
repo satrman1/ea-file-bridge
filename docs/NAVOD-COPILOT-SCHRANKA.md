@@ -82,12 +82,10 @@ Než klikneš Ano, přečti si ten souhrn. Je to poslední brzda před nevratnou
 
 ## 6. Kde jsou data, když je ACK nemá
 
-**Dnešní omezení, které je poctivé znát:** chat ACK je **výcuc**, ne úplný záznam. U čtecích dávek nese jen výsledky `query`; GUIDy vzniklých prvků v něm nejsou vůbec. Když je Copilot potřebuje pro navazující dávku, musí si říct o obsah `res` souboru:
+**Od iterace 7 nese chat ACK identitu výsledků sám:** GUIDy + jména položek (u packages plnou cestu) po operacích, výcuk `query`, u pingu whitelist a přístupovou úroveň. Běžná smyčka — recon i navazující zápisové dávky — se tak odbaví **bez otevírání souborů**; Copilot si GUIDy bere přímo z ACK. Soubor otevíráš jen ve výjimkách, které ACK sám ohlásí:
 
-- **`<složka výměny>\responses\res-<id>.json`** — plná odpověď. Cestu ke složce ukazuje **Stav bridge**.
+- **`<složka výměny>\responses\res-<id>.json`** — plná odpověď (system of record). Sáhne se po ní jen když ACK nese **ukazatel** (dump/výčet nad rozpočet) nebo **cestu** k binárnímu výstupu (PNG diagramu, RTF dokumenty — ty schránkou nejdou nikdy). Cestu ke složce ukazuje **Stav bridge**.
 - **Output tab „AI Bridge"** v EA — řádky změn s tečkovou cestou; **dvojklik naviguje** na prvek v Project browseru.
-
-> 🔜 **Chystá se náprava** (iterace 7, zadání `Zadani-EA-File-Bridge-Iterace-7-Schrankovy-Kanal.md`): ACK začne nést GUIDy a jména vzniklých položek i výsledky ostatních čtecích operací, takže smyčka půjde odbavit **bez otevírání souborů**. Do té doby počítej s tím, že po čtecí dávce občas otevřeš `res-*.json` a jeho obsah vložíš Copilotovi.
 
 ---
 
@@ -98,11 +96,11 @@ Než klikneš Ano, přečti si ten souhrn. Je to poslední brzda před nevratnou
 | `Schranka neobsahuje eafb davku` | neklikls Copy, nebo se zkopíroval jiný text | Copy na code blocku a klikni znovu |
 | `Davka <id> uz byla v teto session zpracovana` | dedup — stejná dávka podruhé | nech Copilota změnit `id` |
 | `req-<id>.json uz je ve fronte nebo ceka v pending` | dávka s týmž id čeká na potvrzení | vyřiď ji (Zpracovat davky ze slozky), nebo pošli jiné `id` |
-| `E_REPO` | Copilot poslal špatný/zástupný název repozitáře | řekni mu přesnou hodnotu ze **Stav bridge** |
+| `E_REPO` | Copilot poslal špatný/zástupný název repozitáře | chybový ACK připojený repozitář sám **pojmenuje** — Copilot opraví pole `repo` a pošle dávku znovu; hodnotu vidíš i ve **Stav bridge** |
 | `E_WHITELIST` | cíl je mimo povolenou větev | neobcházej — buď je to omyl v GUIDu, nebo se má whitelist rozšířit (rozhodnutí, ne workaround) |
 | **EA zamrzla a nic se neděje** | SQL dotaz sáhl na neexistující sloupec → EA otevřela modální dialog schovaný za oknem | najdi dialog, odklikni; **pak dej kontrolní dotaz znovu** — první výsledek po odkliknutí může být falešná nula |
 | ACK se nevložil do schránky | zápis do schránky selhal | text je v dialogu — zkopíruj ho ručně; plná odpověď je v `res-<id>.json` |
-| Odpověď je useknutá `(zkraceno …)` | dávka vrátila víc, než se do chatu vejde | otevři `res-<id>.json` — ořez je vždy hlášený, nikdy tichý |
+| Odpověď je useknutá / `(dalsich N …)` | dávka vrátila víc, než rozpočet ACK unese | ořez je **vždy hlášený, nikdy tichý**, a jde po hranicích položek s prioritou **GUIDy > jména** — jména padají první, GUID nikdy neuvidíš neúplný. Copilot obvykle pokračuje rovnou z GUIDů; `res-<id>.json` otevři jen když ACK nese ukazatel a Copilot data z něj opravdu potřebuje |
 
 ---
 
