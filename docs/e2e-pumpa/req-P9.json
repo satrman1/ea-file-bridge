@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P9",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "gui-fallback"
+  }
+ ]
+}

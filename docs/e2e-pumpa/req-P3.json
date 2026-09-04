@@ -1,0 +1,21 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P3",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "get_packages_information",
+   "packages": [
+    "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT p.Package_ID, p.Name, p.ea_guid FROM t_package p WHERE p.Parent_ID = 1054 ORDER BY p.Name"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Object_Type, o.Name, o.ea_guid, o.Package_ID FROM t_object o WHERE o.Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID = 1054) ORDER BY o.Package_ID, o.Name"
+  }
+ ]
+}

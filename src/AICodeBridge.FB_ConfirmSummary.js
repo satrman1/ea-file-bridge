@@ -40,6 +40,13 @@ if (sm.targets && sm.targets.length > 0) {
     L.push((del > 0 ? "Ke smazani: " : "Prvky: ") + sm.targets.join(", "));
 }
 if (pkgs.length > 0) { L.push("Balicky: " + pkgs.join(", ")); }
+// --- PLNA TECKOVA CESTA mazanych / presouvanych cilu (nalez Milose
+// 2026-08-31 "MLA": bez cesty clovek nevi, KDE prvek lezi; vzor = whitelist
+// v pingu, par. 4.5). Plni FB_RiskGate summary.paths (delete + move).
+if (sm.paths && sm.paths.length > 0) {
+    L.push((del > 0 ? "Kde (plna cesta mazaneho): " : "Kde (plna cesta): ") + (sm.paths.length == 1 ? sm.paths[0] : ""));
+    if (sm.paths.length > 1) { for (var pi = 0; pi < sm.paths.length; pi++) { L.push("  - " + sm.paths[pi]); } }
+}
 if (sm.diagrams && sm.diagrams.length > 0) { L.push("Diagramy: " + sm.diagrams.join(", ")); }
 // --- proc se ptam (plainu, prvni konkretni duvod) ---
 if (risk.riskReasons && risk.riskReasons.length > 0) {

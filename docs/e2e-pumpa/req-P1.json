@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P1",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "deploy_src",
+   "only": [
+    "FB_LogChanges",
+    "EA_OnOutputItemDoubleClicked",
+    "FB_RiskGate",
+    "FB_ConfirmSummary",
+    "FB_OpDelete"
+   ]
+  }
+ ]
+}

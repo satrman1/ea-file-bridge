@@ -1,0 +1,98 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P4",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+   "name": "P4 Mail (pumpa)"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC Posli mailovou zpravu (pumpa)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "$1",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "Uzivatel zvoli prijemce a napise text zpravy",
+       "kind": "actor"
+      },
+      {
+       "text": "System overi adresu prijemce",
+       "kind": "system"
+      },
+      {
+       "text": "System zpravu odesle a zobrazi potvrzeni",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "Neplatna adresa",
+     "type": "Exception",
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 2
+     },
+     "steps": [
+      {
+       "text": "System zobrazi chybu neplatne adresy",
+       "kind": "system"
+      },
+      {
+       "text": "Uzivatel adresu opravi",
+       "kind": "actor"
+      }
+     ],
+     "join": 2
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "$1",
+   "constraints": [
+    {
+     "name": "Prijemce ma platnou adresu",
+     "type": "Pre-condition"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$0",
+     "name": "P4 Mail UC (pumpa)",
+     "type": "Use Case"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$4",
+   "elementPlacements": [
+    {
+     "element": "$1",
+     "x": 100,
+     "y": 80,
+     "width": 220,
+     "height": 140
+    }
+   ]
+  }
+ ]
+}

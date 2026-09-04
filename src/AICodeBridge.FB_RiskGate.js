@@ -202,6 +202,23 @@ function pushName(arr, prefix, nm) {
     if (arr.length < 12) { arr.push("" + nm); }
     else if (arr.length == 12) { arr.push("..."); }
 }
+// --- PLNE TECKOVE CESTY mazanych / presouvanych cilu (nalez Milose
+// 2026-08-31, E2E T7-05 "MLA": dialog neukazal, KDE prvek lezi). Stejny
+// vzor jako whitelist v pingu (par. 4.5): FB_ElementPath. Jen pro
+// delete_from_model + move_elements (zasahy do struktury); best-effort,
+// nikdy nespadne - je to popisek pro cloveka. Do summary.paths.
+var tgtPaths = [], pathSeen = {};
+function pushPath(kind, id, nm) {
+    if (!id || id <= 0) { return; }
+    var k = kind + ":" + id;
+    if (pathSeen[k] == 1) { return; }
+    pathSeen[k] = 1;
+    var pth = "";
+    try { pth = "" + self.FB_ElementPath(Repository, kind, id); } catch (ePth) { pth = ""; }
+    if (pth == "" || pth == "?") { pth = "" + nm + " (cesta nedostupna)"; }
+    if (tgtPaths.length < 12) { tgtPaths.push(pth); }
+    else if (tgtPaths.length == 12) { tgtPaths.push("..."); }
+}
 
 // --- klasifikace $N reference (B3): OWN | EXISTING | UNCERTAIN ---
 var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
@@ -303,6 +320,7 @@ function touchPackage(ref, ctx, countUpdate) {
     if (countUpdate) { updatedExisting++; }
     addPkg("p" + res.id);
     pushName(pkgNames, "p", res.name);
+    return { res: res };
 }
 // vraci { own: bool } - cizi (ne-vlastni) diagram jde do foreignDiagrams
 function touchDiagram(ref, ctx) {
@@ -451,8 +469,13 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
             deleteTargets++; writeOps++;
             var dty = ("" + (dt.type || "")).toUpperCase();
             var dref = dt.guid || dt.id;
-            if (dty == "ELEMENT") { touchElement(dref, "delete.targets[" + j + "]", false, true); }
-            else if (dty == "PACKAGE") { touchPackage(dref, "delete.targets[" + j + "]", false); }
+            if (dty == "ELEMENT") {
+                var tde = touchElement(dref, "delete.targets[" + j + "]", false, true);
+                if (tde && tde.res) { pushPath("element", tde.res.id, tde.res.name); }
+            } else if (dty == "PACKAGE") {
+                var tdp = touchPackage(dref, "delete.targets[" + j + "]", false);
+                if (tdp && tdp.res) { pushPath("package", tdp.res.id, tdp.res.name); }
+            }
             else if (dty == "DIAGRAM") { touchDiagram(dref, "delete.targets[" + j + "]"); }
             else if (typeof dref != "undefined" && dref !== null) { guardRaw(dref, "delete.targets[" + j + "]"); }
         }
@@ -545,6 +568,7 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
             // countUpdate: presun je zmena existujiciho prvku; addPackages:
             // zapocte ZDROJOVY package prvku
             var tmv = touchElement(mvRef, "move.elements[" + j + "]", true, true);
+            if (tmv && tmv.res) { pushPath("element", tmv.res.id, tmv.res.name); }
             // ZDROJOVY package i JMENEM - potvrzovaci dialog musi ukazat ODKUD
             // kam se prvek stehuje (touchElement zna jen jeho id, ne jmeno)
             if (tmv && tmv.res && tmv.res.pkgId > 0) {
@@ -622,7 +646,7 @@ return {
     riskLevel: (level == 3 ? "BLOCKED" : (level == 2 ? "ELEVATED" : "LOW")),
     riskReasons: reasons,
     policyValid: polValid,
-    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames },
+    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames, paths: tgtPaths },
     metrics: {
         writeOps: writeOps, createOps: createOps, updatedExisting: updatedExisting,
         deleteTargets: deleteTargets, affectedElements: elCount,

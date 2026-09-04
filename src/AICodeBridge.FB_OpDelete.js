@@ -11,8 +11,20 @@ if (!op || !op.targets || Object.prototype.toString.call(op.targets) != "[object
 }
 var items = [];
 var self = this;
+// Chybova vetev (nalez z ukladu T7-09, 2026-09-01): u vice targets musi byt
+// z response videt CELY obraz - co uz je smazane (items, deleted:true), ktery
+// target selhal (deleted:false + code) a kolik targetu se uz neprovedlo.
+// Bez toho clovek po E_NOT_FOUND uprostred davky nevi, co v modelu zbylo.
 function fail(i, code, message) {
-    return { op: "delete_from_model", status: "error", code: code, message: "targets[" + i + "]: " + message, items: items };
+    var t0 = op.targets[i] || {};
+    items.push({ type: "" + (t0.type || "?"), id: t0.id || 0, guid: t0.guid || "", name: "" + (t0.name || t0.guid || t0.id || "?"),
+                 deleted: false, code: code, index: i });
+    var msg = "targets[" + i + "]: " + message;
+    var doneN = 0;
+    for (var di = 0; di < items.length; di++) { if (items[di].deleted === true) { doneN++; } }
+    msg += " | smazano pred chybou: " + doneN + " z " + op.targets.length
+        + ", neprovedeno: " + (op.targets.length - i - 1) + " (vycet v items)";
+    return { op: "delete_from_model", status: "error", code: code, message: msg, items: items };
 }
 for (var i = 0; i < op.targets.length; i++) {
     var t = op.targets[i];

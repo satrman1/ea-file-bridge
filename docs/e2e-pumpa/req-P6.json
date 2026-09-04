@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P6",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "get_diagram_image",
+   "diagram": 1133
+  }
+ ]
+}

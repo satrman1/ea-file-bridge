@@ -75,10 +75,20 @@ if (dbg) {
 }
 if (navOff) { return; }
 if (tab.replace(/^\s+|\s+$/g, "").toUpperCase() != "AI BRIDGE") { return; }
-if (!id || id <= 0) { return; }
+// T1 (2026-09-04): proklik PER TYP artefaktu. FB_LogChanges pise na konec
+// radku marker "(el:ID)" | "(pkg:ID)" | "(dgm:ID)"; marker ma prednost pred
+// 3. paramem WriteOutput (PackageID/DiagramID nejsou ElementID - jiny
+// ciselny prostor). Radek bez markeru = stavajici chovani (ID = ElementID).
+var kind = "el", target = id;
+var mk = /\((el|pkg|dgm):(\d+)\)\s*$/.exec(line);
+if (mk) { kind = mk[1]; target = parseInt(mk[2], 10); }
+if (!target || target <= 0) { return; }
 try {
-    var el = Repository.GetElementByID(id);
-    if (el) { Repository.ShowInProjectView(el); }
+    var obj = null;
+    if (kind == "pkg") { obj = Repository.GetPackageByID(target); }
+    else if (kind == "dgm") { obj = Repository.GetDiagramByID(target); }
+    else { obj = Repository.GetElementByID(target); }
+    if (obj) { Repository.ShowInProjectView(obj); }
 } catch (eNav) {
-    try { this.Log(Repository, "Navigace na element " + id + " selhala: " + eNav.message); } catch (eO) { }
+    try { this.Log(Repository, "Navigace na " + kind + " " + target + " selhala: " + eNav.message); } catch (eO) { }
 }

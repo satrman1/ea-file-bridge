@@ -197,6 +197,7 @@ function mkRepo(opts) {
         GetElementByGuid: function (g) { return elByGuid[g] || null; },
         GetPackageByID: function (id) { return packages[id] || null; },
         GetPackageByGuid: function (g) { return pkgByGuid[g] || null; },
+        GetDiagramByID: function (id) { return (opts.diagrams && opts.diagrams[id]) || null; },
         CreateOutputTab: function () { },
         EnsureOutputVisible: function () { },
         WriteOutput: function (tab, text, id) { repo._output.push({ tab: tab, text: "" + text, id: id }); },
@@ -320,15 +321,55 @@ t("FB_LogChanges: smazany prvek -> id 0 (neni kam navigovat)", function () {
     eq(del.length, 1, "chybi radek smazano");
     eq(del[0].id, 0, "smazany radek nema mit navigacni id");
 });
-t("FB_LogChanges: package item -> id = Package.Element.ElementID", function () {
+t("FB_LogChanges: package item -> marker (pkg:PackageID), WriteOutput id 0 (T1)", function () {
+    // T1 2026-09-04: Element.ElementID package (10007) proklik NEOZNACIL
+    // (evidence Milose 08-21c) -> radek nese marker s PackageID, 3. param 0
     var repo = mkRepo();
     var pkg = repo._addPackage({ id: 7, name: "NovyPkg", elementID: 10007 });
     var resp = { id: "t-log-3", results: [
         { op: "create_or_update_package", status: "ok", items: [{ id: 7, guid: pkg.PackageGUID, name: "NovyPkg", created: true, kind: "package" }] }
     ] };
     B.FB_LogChanges.call(B, repo, resp);
-    var withId = repo._output.filter(function (o) { return o.id === 10007; });
-    eq(withId.length, 1, "radek package nenese Element.ElementID");
+    var pl = repo._output.filter(function (o) { return o.text.indexOf("package \"NovyPkg\"") >= 0; });
+    eq(pl.length, 1, "chybi radek package");
+    contains(pl[0].text, "(pkg:7)", "radek package nenese marker pkg:PackageID");
+    eq(pl[0].id, 0, "PackageID nesmi jit do 3. paramu WriteOutput (jiny ciselny prostor nez ElementID)");
+    eq(repo._output.filter(function (o) { return o.id === 10007; }).length, 0, "Element.ElementID package uz nema byt navigacni id");
+});
+t("FB_LogChanges: element radek nese marker (el:ID) + stavajici WriteOutput id (T1)", function () {
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    repo._addElement({ id: 42, name: "NovyPrvek", packageID: 1 });
+    B.FB_LogChanges.call(B, repo, { id: "t-log-4", results: [
+        { op: "create_or_update_elements", status: "ok", items: [{ id: 42, name: "NovyPrvek", created: true }] }
+    ] });
+    var l = repo._output.filter(function (o) { return o.id === 42; });
+    eq(l.length, 1);
+    contains(l[0].text, "(el:42)");
+});
+t("FB_LogChanges: scenarios/constraints -> id VLASTNICIHO elementu (T1)", function () {
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    repo._addElement({ id: 11129, name: "FBT UC Scenarios", packageID: 1 });
+    B.FB_LogChanges.call(B, repo, { id: "t-log-5", results: [
+        { op: "create_or_update_scenarios", status: "ok", count: 2, items: [{ guid: "{S1}" }, { guid: "{S2}" }], guid: "{S1}", id: 11129 },
+        { op: "create_or_update_constraints", status: "ok", count: 1, items: [{ name: "PRE" }], guid: "{E}", id: 11129 },
+        { op: "create_or_update_attributes", status: "ok", element: { guid: "{E}", id: 11129 }, count: 1, items: [{ guid: "{A}", id: 5 }] }
+    ] });
+    var owned = repo._output.filter(function (o) { return o.id === 11129; });
+    eq(owned.length, 3, "vsechny tri radky maji nest id vlastnika 11129: " + JSON.stringify(repo._output));
+    contains(owned[0].text, "(el:11129)");
+    contains(owned[0].text, "Model.FBT UC Scenarios", "radek ma nest cestu vlastnika");
+});
+t("FB_LogChanges: diagram radky nesou marker (dgm:DiagramID) (T1)", function () {
+    var repo = mkRepo();
+    B.FB_LogChanges.call(B, repo, { id: "t-log-6", results: [
+        { op: "create_or_update_diagram", status: "ok", items: [{ guid: "{D}", id: 1133, name: "FBT OwnedDiag", created: true }] },
+        { op: "place_elements_on_diagram", status: "ok", diagramID: 1133, guid: "{D}", count: 2, items: [{}, {}] }
+    ] });
+    var dg = repo._output.filter(function (o) { return o.text.indexOf("(dgm:1133)") >= 0; });
+    eq(dg.length, 2, "oba diagramove radky maji nest marker dgm:1133: " + JSON.stringify(repo._output));
+    eq(dg[0].id, 0, "DiagramID nesmi jit do 3. paramu WriteOutput");
 });
 
 // --- FB_Changes (iterace 5, B-V2): Add-in Search - dotcene prvky davky
@@ -667,6 +708,33 @@ t("dblclick handler: cizi tab -> zadna navigace", function () {
         { Name: "ID", Value: 42 }
     ]));
     eq(repo._shown.length, 0);
+});
+t("dblclick handler: marker (pkg:ID) -> GetPackageByID + ShowInProjectView(package) (T1)", function () {
+    var repo = mkRepo();
+    var pkg = repo._addPackage({ id: 1071, name: "T7 Mail", elementID: 11341 });
+    repo._addElement({ id: 1071, name: "CIZI PRVEK SE STEJNYM CISLEM", packageID: 1 });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, "AI Bridge", "  [vytvoreno]  package \"T7 Mail\"  @ Model.#FB-TEST.T7 Mail  (pkg:1071)", 0);
+    eq(repo._shown.length, 1, "melo se navigovat na package");
+    eq(repo._shown[0], pkg, "cil ma byt Package objekt, ne element se stejnym cislem");
+});
+t("dblclick handler: marker (dgm:ID) -> GetDiagramByID + ShowInProjectView(diagram) (T1)", function () {
+    var dg = { DiagramID: 1133, Name: "FBT OwnedDiag" };
+    var repo = mkRepo({ diagrams: { 1133: dg } });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, "AI Bridge", "  [diagram vytvoren]  \"FBT OwnedDiag\"  (dgm:1133)", 0);
+    eq(repo._shown.length, 1, "melo se navigovat na diagram");
+    eq(repo._shown[0], dg);
+});
+t("dblclick handler: marker (el:ID) ma prednost pred 3. paramem; bez markeru plati ID (T1 regrese)", function () {
+    var repo = mkRepo();
+    repo._addPackage({ id: 1, name: "Model" });
+    var a = repo._addElement({ id: 42, name: "A", packageID: 1 });
+    var b = repo._addElement({ id: 43, name: "B", packageID: 1 });
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, "AI Bridge", "  [vytvoreno]  \"B\"  (el:43)", 42);
+    eq(repo._shown[0], b, "marker ma prednost");
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, "AI Bridge", "  [vytvoreno]  \"A\"  @ Model.A", 42);
+    eq(repo._shown[1], a, "radek bez markeru = stavajici chovani (ID = ElementID)");
+    B.EA_OnOutputItemDoubleClicked.call(B, repo, "AI Bridge", "  [smazano]  Element \"X\"", 0);
+    eq(repo._shown.length, 2, "radek bez cile nenaviguje");
 });
 t("FB_Changes: fallback na state soubor lastwrite (EA runtime)", function () {
     var repo = mkRepo({ sqlRules: changesSqlRules("t-ch-4") });
@@ -1659,6 +1727,93 @@ t("RiskGate: politika pokryva VSECHNY zapisove operace registru FB_Main", functi
     ok(missing.length === 0, "FB_RiskPolicy nepokryva: " + missing.join(", ") + " (fail-closed W9 by shodil vse do ELEVATED)");
 });
 
+
+// --- 1b (Z260904-1): plna teckova cesta mazaneho/presouvaneho cile v dialogu
+function pathRepo() {
+    var repo = gateRepo();
+    repo._addPackage({ id: 1, name: "Model", parentID: 0 });
+    repo._addPackage({ id: 1054, name: "#FB-TEST", parentID: 1 });
+    repo._addPackage({ id: 1067, name: "OTHER ELEMENTS", parentID: 1054 });
+    repo._addPackage({ id: 1069, name: "UC-95002", parentID: 1054 });
+    repo._addElement({ id: 11310, name: "UC-95002", packageID: 1067 });
+    return repo;
+}
+var REG_DEL = { "delete_from_model": { w: true }, "move_elements": { w: true }, "create_or_update_elements": { w: true } };
+function polDel() {
+    return [{ repo: "EAEXAMPLE.QEA",
+        classes: { delete_from_model: "ELEVATED", move_elements: "ELEVATED", create_or_update_elements: "LOW" },
+        elevate: { deleteTargets: 0, writeOps: 20, updatedExisting: 10, affectedPackages: 5, foreignDiagrams: 5 },
+        block: { deleteTargets: 100, writeOps: 500, updatedExisting: 100, affectedPackages: 50 },
+        budgetMs: 8000, hashMaxChars: 2000000 }];
+}
+t("RiskGate: delete package -> summary.paths nese PLNOU teckovou cestu (1b)", function () {
+    var polOrig = B.FB_RiskPolicy; B.FB_RiskPolicy = polDel;
+    var r = B.FB_RiskGate.call(B, pathRepo(), { ops: [
+        { op: "delete_from_model", targets: [{ type: "Package", id: 1069 }] }
+    ] }, REG_DEL);
+    B.FB_RiskPolicy = polOrig;
+    eq(r.riskLevel, "ELEVATED");
+    ok(r.summary.paths && r.summary.paths.length === 1, "chybi summary.paths: " + JSON.stringify(r.summary));
+    eq(r.summary.paths[0], "Model.#FB-TEST.UC-95002", "cesta ma byt plna od korene (vzor whitelist v pingu)");
+});
+t("RiskGate: delete element + move -> cesta elementu vc. package retezu (1b)", function () {
+    var polOrig = B.FB_RiskPolicy; B.FB_RiskPolicy = polDel;
+    var r = B.FB_RiskGate.call(B, pathRepo(), { ops: [
+        { op: "delete_from_model", targets: [{ type: "Element", id: 11310 }] }
+    ] }, REG_DEL);
+    var m = B.FB_RiskGate.call(B, pathRepo(), { ops: [
+        { op: "move_elements", "package": 1069, elements: [11310] }
+    ] }, REG_DEL);
+    B.FB_RiskPolicy = polOrig;
+    eq(r.summary.paths[0], "Model.#FB-TEST.OTHER ELEMENTS.UC-95002");
+    eq(m.summary.paths[0], "Model.#FB-TEST.OTHER ELEMENTS.UC-95002", "presun ma ukazat, ODKUD prvek jde, plnou cestou");
+});
+t("RiskGate: davka bez delete/move -> summary.paths prazdne (regrese)", function () {
+    var polOrig = B.FB_RiskPolicy; B.FB_RiskPolicy = polDel;
+    var r = B.FB_RiskGate.call(B, pathRepo(), { ops: [
+        { op: "create_or_update_elements", elements: [{ elementID: 11310, name: "x" }] }
+    ] }, REG_DEL);
+    B.FB_RiskPolicy = polOrig;
+    eq(r.summary.paths.length, 0);
+});
+t("ConfirmSummary: delete dialog ukaze 'Kde (plna cesta mazaneho)' (1b, nalez MLA 31.8.)", function () {
+    var out = "" + B.FB_ConfirmSummary.call(B, {
+        status: "confirm_required", id: "P8",
+        risk: { metrics: { deleteTargets: 1, createOps: 0, updatedExisting: 0, writeOps: 1 },
+                summary: { targets: [], packages: ["T7 Mail"], paths: ["Model.Sandbox.#FB-TEST.T7 Mail"] },
+                riskReasons: ["Operace 'delete_from_model' je politikou klasifikovana ELEVATED"] },
+        confirm: { hashPrefix: "abc123abc123" }, results: []
+    });
+    contains(out, "SMAZAT 1");
+    contains(out, "Kde (plna cesta mazaneho): Model.Sandbox.#FB-TEST.T7 Mail");
+});
+t("ConfirmSummary: vice cest -> odrazky; bez paths beze zmeny (regrese)", function () {
+    var two = "" + B.FB_ConfirmSummary.call(B, { status: "confirm_required", id: "x",
+        risk: { metrics: { deleteTargets: 2, writeOps: 2 }, summary: { targets: ["A", "B"], paths: ["M.A", "M.B"] }, riskReasons: [] }, results: [] });
+    contains(two, "  - M.A"); contains(two, "  - M.B");
+    var none = "" + B.FB_ConfirmSummary.call(B, { status: "confirm_required", id: "y",
+        risk: { metrics: { createOps: 1, writeOps: 1 }, summary: { targets: [], packages: ["P"] }, riskReasons: [] }, results: [] });
+    ok(none.indexOf("Kde (") < 0, "bez paths se radek Kde nesmi objevit");
+});
+
+// --- 1c (Z260904-1): chybova vetev delete s vice targets vyjmenuje i selhany
+t("FB_OpDelete: E_NOT_FOUND uprostred -> items nese smazane i selhany target + pocty (1c)", function () {
+    var repo = wlRepo();
+    var pkg = repo.GetPackageByID(1054);
+    var a = repo._addElement({ id: 501, name: "DEL-A", packageID: 1054 });
+    pkg.Elements._items.push(a);
+    var res = B.FB_OpDelete.call(B, repo, { op: "delete_from_model", targets: [
+        { type: "Element", id: 501 }, { type: "Element", guid: "{00000000-0000-0000-0000-000000000000}" }, { type: "Element", id: 503 }
+    ] }, "t-del-1c");
+    eq(res.status, "error"); eq(res.code, "E_NOT_FOUND");
+    eq(res.items.length, 2, "items = 1 smazany + 1 selhany: " + JSON.stringify(res.items));
+    eq(res.items[0].deleted, true); eq(res.items[0].name, "DEL-A");
+    eq(res.items[1].deleted, false); eq(res.items[1].code, "E_NOT_FOUND"); eq(res.items[1].index, 1);
+    contains(res.items[1].name, "{00000000-0000-0000-0000-000000000000}", "selhany target ma byt identifikovatelny");
+    contains(res.message, "smazano pred chybou: 1 z 3");
+    contains(res.message, "neprovedeno: 1");
+    eq(pkg.Elements.Count, 0, "prvni target se smazat mel");
+});
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

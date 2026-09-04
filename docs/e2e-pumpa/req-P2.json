@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P2",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "pumpa-neutralita"
+  }
+ ]
+}

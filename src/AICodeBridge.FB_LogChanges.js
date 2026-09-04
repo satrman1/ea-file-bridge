@@ -5,12 +5,24 @@
 // repozitarem: uzivatel vidi presne, kam davka sahla. Best-effort (Output je
 // jen popisek) - kazdy radek v try/catch.
 // Iterace 5 (B-V1): radky zmen nesou ElementID (3. param WriteOutput pres
-// Log) -> DVOJKLIK na radek nativne naviguje na prvek v Project browseru
-// (GUI-KATALOG par. 5). Zadne ShowInProjectView z add-inu (past par. 1a/4).
-// Smazane prvky navigacni id nemaji (neni kam skocit); package radky nesou
-// Package.Element.ElementID (nativni navigace funguje i na package).
+// Log) -> DVOJKLIK na radek naviguje na prvek v Project browseru.
+// T1 (2026-09-04, evidence Milose 2026-08-21c vlakno 2): proklik PER TYP
+// artefaktu. Radek nese na konci MARKER cile "(el:ID)" | "(pkg:ID)" |
+// "(dgm:ID)"; handler EA_OnOutputItemDoubleClicked ho parsuje z LineText
+// a dispatchne GetElementByID / GetPackageByID / GetDiagramByID. Duvod:
+//  - package radek nesl Package.Element.ElementID (t_object radek package)
+//    a GetElementByID + ShowInProjectView package NEOZNACIL;
+//  - scenarios/constraints/requirements/attributes/operations logovaly id 0
+//    -> nove nesou id VLASTNICIHO elementu (executor ho v response ma);
+//  - diagram radky (create_or_update_diagram, place_elements_on_diagram)
+//    logovaly id 0 -> nove DiagramID.
+// 3. param WriteOutput (ElementID) se posila JEN u elementu (stavajici
+// chovani zachovano); u package/diagramu je 0 - PackageID/DiagramID zije
+// v jinem ciselnem prostoru a jako ElementID by ukazoval na cizi prvek.
+// Smazane prvky navigacni cil nemaji (neni kam skocit).
 var self = this;
 function L(m, navId) { try { self.Log(Repository, m, navId); } catch (e) { } }
+function mark(kind, id) { return (id && id > 0) ? "  (" + kind + ":" + id + ")" : ""; }
 function elInfo(idOrGuid) {
     try {
         var el = null;
@@ -28,10 +40,19 @@ function pkgInfo(idOrGuid) {
         if (s.charAt(0) == "{") { pkg = Repository.GetPackageByGuid(s); }
         else { pkg = Repository.GetPackageByID(parseInt(s, 10)); }
         if (!pkg) { return null; }
-        var nid = 0;
-        try { nid = pkg.Element ? pkg.Element.ElementID : 0; } catch (eN) { nid = 0; }
-        return { path: self.FB_ElementPath(Repository, "package", pkg), navId: nid };
+        return { path: self.FB_ElementPath(Repository, "package", pkg), pkgId: pkg.PackageID };
     } catch (eP) { return null; }
+}
+// vlastnici element z tvaru response (scenarios/constraints/requirements:
+// res.id; attributes/operations: res.element.id)
+function ownerId(r) {
+    try {
+        if (r.element && typeof r.element.id == "number" && r.element.id > 0) { return r.element.id; }
+        if (typeof r.id == "number" && r.id > 0) { return r.id; }
+        var n = parseInt(r.id, 10);
+        if (!isNaN(n) && n > 0) { return n; }
+    } catch (eO) { }
+    return 0;
 }
 var results = (resp && resp.results) ? resp.results : [];
 var reqId = "" + ((resp && resp.id) || "?");
@@ -55,7 +76,7 @@ for (var i = 0; i < results.length; i++) {
             var pverb = (pe.created === true) ? "vytvoreno"
                 : ((pe.created === false || pe.matchedBy) ? "upraveno" : "zapsano");
             lines.push({ text: "  [" + pverb + "]  package \"" + (pe.name || "?") + "\""
-                + (pin && pin.path ? "  @ " + pin.path : ""), navId: (pin ? pin.navId : 0) });
+                + (pin && pin.path ? "  @ " + pin.path : "") + mark("pkg", pin ? pin.pkgId : 0), navId: 0 });
         }
     } else if (op == "create_or_update_elements" || op == "create_element") {
         var its = r.items || ((r.guid || r.id) ? [r] : []);
@@ -65,7 +86,7 @@ for (var i = 0; i < results.length; i++) {
             var verb = (e.created === true) ? "vytvoreno"
                 : ((e.created === false || e.matchedBy) ? "upraveno" : "zapsano");
             lines.push({ text: "  [" + verb + "]  \"" + (e.name || "?") + "\""
-                + (ein && ein.path ? "  @ " + ein.path : ""), navId: (ein ? ein.navId : 0) });
+                + (ein && ein.path ? "  @ " + ein.path : "") + mark("el", ein ? ein.navId : 0), navId: (ein ? ein.navId : 0) });
         }
     } else if (op == "move_elements") {
         // iterace 6: presun je zasah do struktury - musi byt v Output videt
@@ -79,19 +100,36 @@ for (var i = 0; i < results.length; i++) {
             if (mi2.diagrams) { extra += ", diagramu: " + mi2.diagrams + " (dorovnano " + (mi2.diagramsFixed || 0) + ")"; }
             lines.push({ text: "  [" + (mi2.moved ? "presunuto" : "beze zmeny") + "]  \"" + (mi2.name || "?") + "\"  "
                 + (mi2.fromPackage || ("id " + mi2.fromPackageID)) + " -> " + (mi2.toPackage || ("id " + mi2.toPackageID)) + extra
-                + (min2 && min2.path ? "  @ " + min2.path : ""), navId: (min2 ? min2.navId : 0) });
+                + (min2 && min2.path ? "  @ " + min2.path : "") + mark("el", min2 ? min2.navId : 0), navId: (min2 ? min2.navId : 0) });
         }
     } else if (op == "create_or_update_diagram") {
         var dts = r.items || [];
         for (var g = 0; g < dts.length; g++) {
-            lines.push({ text: "  [diagram " + (dts[g].created === false ? "upraven" : "vytvoren") + "]  \"" + (dts[g].name || "?") + "\"", navId: 0 });
+            var dgId = parseInt(dts[g].id, 10); if (isNaN(dgId)) { dgId = 0; }
+            lines.push({ text: "  [diagram " + (dts[g].created === false ? "upraven" : "vytvoren") + "]  \"" + (dts[g].name || "?") + "\""
+                + mark("dgm", dgId), navId: 0 });
         }
+    } else if (op == "place_elements_on_diagram" || op == "remove_elements_from_diagram"
+               || op == "layout_connectors" || op == "update_diagram_properties" || op == "set_diagram_object_style") {
+        // diagramova rodina: cil prokliku = diagram
+        var dgId2 = parseInt(r.diagramID || r.diagramId || (r.diagram && r.diagram.id) || r.id, 10); if (isNaN(dgId2)) { dgId2 = 0; }
+        var cntD = r.items ? r.items.length : ((typeof r.count == "number") ? r.count : 0);
+        lines.push({ text: "  [" + op + "]  hotovo" + (cntD ? "  (" + cntD + " polozek)" : "") + mark("dgm", dgId2), navId: 0 });
+    } else if (op == "create_or_update_scenarios" || op == "create_or_update_constraints"
+               || op == "create_or_update_requirements" || op == "create_or_update_attributes"
+               || op == "create_or_update_operations") {
+        // polozky ziji UVNITR elementu -> proklik na vlastnici element
+        var oid = ownerId(r);
+        var oin = oid > 0 ? elInfo(oid) : null;
+        var cntO = r.items ? r.items.length : ((typeof r.count == "number") ? r.count : 0);
+        lines.push({ text: "  [" + op + "]  hotovo" + (cntO ? "  (" + cntO + " polozek)" : "")
+            + (oin && oin.path ? "  @ " + oin.path : "") + mark("el", oid), navId: oid });
     } else {
         var cnt = r.items ? r.items.length : ((typeof r.changed == "number") ? r.changed : 0);
         lines.push({ text: "  [" + op + "]  hotovo" + (cnt ? "  (" + cnt + " polozek)" : ""), navId: 0 });
     }
 }
 if (lines.length == 0) { return 0; }
-L("FB " + reqId + " - zmeny v modelu (" + this.FB_RepoId(Repository) + "); dvojklik na radek = skok na prvek v browseru:");
+L("FB " + reqId + " - zmeny v modelu (" + this.FB_RepoId(Repository) + "); dvojklik na radek = skok na prvek/package/diagram v browseru:");
 for (var li = 0; li < lines.length; li++) { L(lines[li].text, lines[li].navId); }
 return lines.length;
