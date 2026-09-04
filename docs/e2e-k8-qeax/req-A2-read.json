@@ -1,0 +1,21 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "A2r",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "k8-a2-neclen"
+  },
+  {
+   "op": "get_packages_information",
+   "packages": [
+    "<GUID-685>"
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid FROM t_package WHERE Parent_ID = 685 ORDER BY Name"
+  }
+ ]
+}

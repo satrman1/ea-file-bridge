@@ -1,0 +1,23 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "A4",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT x.Type, u.UserLogin, u.FirstName || ' ' || u.Surname AS FullName, g.GroupName, x.Client, x.Supplier, o.Name FROM t_xrefsystem x LEFT JOIN t_secuser u ON x.Client = u.UserID LEFT JOIN t_secgroup g ON x.Client = g.GroupID LEFT JOIN t_object o ON x.Supplier = o.ea_guid WHERE x.Type IN ('UserSettings', 'GroupSettings') AND (u.UserLogin IS NOT NULL OR g.GroupName IS NOT NULL) ORDER BY x.Supplier, x.Type, x.Client"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT x.Type, x.Client, x.Supplier, x.Description FROM t_xrefsystem x WHERE x.Type IN ('UserSettings', 'GroupSettings') ORDER BY x.Type, x.Client"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT u.UserLogin, g.GroupName FROM t_secuser u INNER JOIN t_secuser_group ug ON ug.UserID = u.UserID INNER JOIN t_secgroup g ON g.GroupID = ug.GroupID ORDER BY u.UserLogin, g.GroupName"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT * FROM t_seclocks"
+  }
+ ]
+}

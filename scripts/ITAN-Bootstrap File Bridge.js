@@ -4,9 +4,10 @@
 //   1. v OZNACENEM package v Project Browseru zalozi element AICodeBridge
 //      (Class se stereotypem JavascriptAddin), pokud v modelu neexistuje
 //   2. dovytvori chybejici operace vc. parametru (viz SIG nize)
-//   3. naleje kod ze src\ (stejne jako ITAN-Inject)
-// Idempotentni: co existuje, preskoci/jen aktualizuje kod. Existujici
-// operace mimo SIG (napr. EA_ handlery z eaexample) nesaha.
+//   3. naleje kod ze src\ do VSECH operaci, ktere maji soubor (od Z260904-6
+//      uplny disk->model refresh; drive jen SIG)
+// Idempotentni: co existuje, jen dostane kod; chybejici operace se zaklada
+// s parametry z hlavicky souboru (fallback SIG). EA_* receptions NEZAKLADA.
 // POZN: pumpa GUI cast add-inu nepotrebuje - EA_ handlery/receptions se
 // zde NEZAKLADAJI (GUI fallback = az iterace 1, klonem vzoru).
 //
@@ -157,40 +158,71 @@ function main() {
         have["" + el.Methods.GetAt(i).Name] = el.Methods.GetAt(i);
     }
 
-    // 3) operace dle SIG: zaloz chybejici (vc. parametru s Position), naplnit kod
-    var created = 0, coded = 0, noFile = "";
-    for (var j = 0; j < SIG.length; j++) {
-        var name = SIG[j].n;
+    // 3) VSECHNY soubory src\AICodeBridge.*.js (Z260904-6, K8): kod se nalije
+    //    do KAZDE operace, ktera ma soubor - tim je bootstrap uplny disk->model
+    //    refresh (drive jen SIG = 57 operaci; konfiguracni FB_AccessGroups /
+    //    FB_RiskPolicy / FB_QcConfig by po prenosu add-inu zustaly s cizimi
+    //    hodnotami a deploy_src by pak nesel spustit - slepice-vejce).
+    //    Chybejici operace se zaklada s parametry z hlavicky souboru
+    //    "// AICodeBridge.Nazev(a, b)" (fallback = SIG). EA_* handlery se
+    //    NEZAKLADAJI (musi byt receptions se SignalGUID - dela deploy_src);
+    //    existujici EA_* jen dostanou kod.
+    var sigMap = {};
+    for (var sj = 0; sj < SIG.length; sj++) { sigMap[SIG[sj].n] = SIG[sj].p; }
+    var created = 0, coded = 0, skippedEa = "";
+    var folder = fso.GetFolder(SRC_DIR);
+    var files = new Enumerator(folder.Files);
+    var names = [];
+    for (; !files.atEnd(); files.moveNext()) {
+        var fn = "" + files.item().Name;
+        var mm = new RegExp("^" + ADDIN_NAME + "\\.([A-Za-z0-9_]+)\\.js$").exec(fn);
+        if (mm) { names.push(mm[1]); }
+    }
+    names.sort();
+    for (var j = 0; j < names.length; j++) {
+        var name = names[j];
+        var path = SRC_DIR + ADDIN_NAME + "." + name + ".js";
+        var code = readUtf8(path);
         var m = have[name];
         if (!m) {
+            if (name.indexOf("EA_") == 0) {
+                skippedEa = skippedEa + name + " ";
+                Session.Output("--  " + name + " (reception chybi - zalozi deploy_src, ne bootstrap)");
+                continue;
+            }
+            var params = sigMap[name] || null;
+            var hm = /^\/\/\s*AICodeBridge\.([A-Za-z0-9_]+)\s*\(([^)]*)\)/.exec(code.replace(/^\uFEFF/, ""));
+            if (hm && hm[1] == name) {
+                params = [];
+                var raw = hm[2].split(",");
+                for (var ri = 0; ri < raw.length; ri++) {
+                    var pn = raw[ri].replace(/^\s+|\s+$/g, "");
+                    if (pn != "") { params.push(pn); }
+                }
+            }
+            if (params == null) { params = ["Repository"]; }
             m = el.Methods.AddNew(name, "String");
             m.Update();
-            for (var k = 0; k < SIG[j].p.length; k++) {
-                var par = m.Parameters.AddNew(SIG[j].p[k], "String");
+            for (var k = 0; k < params.length; k++) {
+                var par = m.Parameters.AddNew(params[k], "String");
                 par.Position = k;
                 par.Update();
             }
             m.Parameters.Refresh();
+            have[name] = m;
             created++;
         }
-        var path = SRC_DIR + ADDIN_NAME + "." + name + ".js";
-        if (fso.FileExists(path)) {
-            var code = readUtf8(path);
-            m.Code = code;
-            m.Update();
-            coded++;
-            Session.Output("OK  " + name + " (" + code.length + " znaku)");
-        } else {
-            noFile = noFile + name + " ";
-            Session.Output("--  " + name + " (soubor v src nenalezen!)");
-        }
+        m.Code = code;
+        m.Update();
+        coded++;
+        Session.Output("OK  " + name + " (" + code.length + " znaku)");
     }
     el.Methods.Refresh();
 
-    Session.Output("Hotovo: " + created + " operaci zalozeno, " + coded + " nahran kod."
-        + (noFile != "" ? " BEZ SOUBORU: " + noFile : ""));
-    Session.Output("DALSI KROKY: 1) zkontroluj/uprav FB_Whitelist.js (repo + GUID) a pripadne spust znovu,");
-    Session.Output("2) spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.");
+    Session.Output("Hotovo: " + created + " operaci zalozeno, " + coded + " nahran kod (souboru v src: " + names.length + ")."
+        + (skippedEa != "" ? " BEZ RECEPTION (zalozi deploy_src): " + skippedEa : ""));
+    Session.Output("DALSI KROKY: 1) zkontroluj configy v src (FB_Whitelist/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,");
+    Session.Output("2) PLNY restart EA (kod EA runtime) a spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.");
 }
 
 main();

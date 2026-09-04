@@ -1,0 +1,37 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K3",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "k8-k3-recon"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid, Parent_ID FROM t_package WHERE Package_ID IN (685, 686, 377, 380) ORDER BY Package_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Object_Type, Package_ID FROM t_object WHERE Object_ID IN (1966, 1967, 2040, 2055, 2079, 2080, 2081) ORDER BY Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Stereotype, Package_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS cnt FROM t_operation WHERE Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin')"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Name, StyleEx FROM t_operation WHERE Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin') AND Name LIKE 'EA_%' ORDER BY Name"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT GroupID, GroupName FROM t_secgroup ORDER BY GroupName"
+  },
+  {
+   "op": "get_selected_context"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K9",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Package",
+     "guid": "GUID-A1-Z-ACK-A1"
+    },
+    {
+     "type": "Package",
+     "guid": "GUID-A3-Z-ACK-A3a"
+    }
+   ]
+  }
+ ]
+}

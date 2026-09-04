@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K6b",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "k8-po-deployi"
+  }
+ ]
+}

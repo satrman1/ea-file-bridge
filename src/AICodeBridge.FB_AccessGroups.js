@@ -37,6 +37,12 @@
 //
 // eaexample (dev stanice): security vypnuta -> polozka neni potreba;
 // necha se tu priklad pro harness/testy se zapnutou security.
+// QEAX (K8-doma, security ZAPNUTA; Z260904-6): skupinu "EAFB Write" zaklada
+//   Milos rucne v EA (Configure > Security > Users/Groups) v kroku K5 a
+//   prirazuje si sebe; A2 = vyrazeni ze skupiny + PLNY restart EA (cache
+//   FB_UserAccess per session). Placeholder "<QEAX-FILENAME>" nahradi
+//   Z260904-6b (viz FB_Whitelist). Bez teto polozky = fail-closed read.
 return [
-    { repo: "EAEXAMPLE.QEA", writeGroups: ["EAFB Write"] }
+    { repo: "EAEXAMPLE.QEA", writeGroups: ["EAFB Write"] },
+    { repo: "<QEAX-FILENAME>", writeGroups: ["EAFB Write"] }
 ];

@@ -1,0 +1,23 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "A1",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-685>",
+   "name": "K8 A1 (clen skupiny)"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC K8 A1 zapis clenem skupiny",
+     "notes": "Vytvoreno davkou A1 protokolu K8 (QEAX, security zapnuta). Smaze uklid K9."
+    }
+   ]
+  }
+ ]
+}

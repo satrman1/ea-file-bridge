@@ -24,6 +24,13 @@
 //            par. 8 bod 7) -> zvednuti stropu = auditovatelna zmena v
 //            modelu, ne runtime prepinac z chatu.
 // eaexample (dev stanice):
+// QEAX (K8-doma, security model; Z260904-6): "<QEAX-FILENAME>" = zastupna
+//   identita repa (nahradi Z260904-6b hodnotou `repository` z K3 pingu, ve
+//   vsech peti konfiguracnich souborech najednou - viz FB_Whitelist).
+//   baseDir zamerne NENI (default = slozka modelu\EA-File-Bridge, FB_ResolveBaseDir);
+//   pumpa (pump.wsf) cte requests\ vedle sebe bez ohledu na baseDir.
+//   navProbe: false - QEAX neni dev piskoviste, spike menu tam nepatri.
 return [
-    { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true }
+    { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true },
+    { repo: "<QEAX-FILENAME>", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: false }
 ];

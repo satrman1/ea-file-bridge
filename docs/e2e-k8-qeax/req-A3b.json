@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "A3b",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "GUID-A3-Z-ACK-A3a",
+     "type": "UseCase",
+     "name": "UC K8 A3 zapis bez balickovych prav"
+    }
+   ]
+  }
+ ]
+}

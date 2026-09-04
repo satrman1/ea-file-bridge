@@ -1,0 +1,10 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K6",
+ "repo": "<QEAX-FILENAME>",
+ "ops": [
+  {
+   "op": "deploy_src"
+  }
+ ]
+}

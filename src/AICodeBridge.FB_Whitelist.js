@@ -13,6 +13,14 @@
 // zapisovat, dokud se whitelist vedome nepresmeruje = auditovatelny krok.
 // Zmena whitelistu = zmena kodu v modelu = auditovatelna udalost (baseline).
 // eaexample: #FB-TEST (packageID 1054).
+// QEAX (K8-doma, security model; Z260904-6): #FB-TEST = packageID 685.
+//   ZASTUPNE HODNOTY - doplni vyhodnocovaci vlakno Z260904-6b po kroku K3
+//   (ping vraci `repository` = identita repa; query vraci ea_guid 685).
+//   Dokud je repo "<QEAX-FILENAME>", zadny zapis do QEAX neprojde (E_REPO -
+//   fail-secure, kryto harnessem); dokud je pkg "<GUID-685>", zapis konci
+//   E_WHITELIST. Stejny placeholder "<QEAX-FILENAME>" je ve FB_Config,
+//   FB_OpsAllowed, FB_RiskPolicy a FB_AccessGroups - nahradit VSUDE najednou.
 return [
-    { repo: "EAEXAMPLE.QEA", pkg: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}" }
+    { repo: "EAEXAMPLE.QEA", pkg: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}" },
+    { repo: "<QEAX-FILENAME>", pkg: "<GUID-685>" }
 ];

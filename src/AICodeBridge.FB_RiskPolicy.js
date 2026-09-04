@@ -41,9 +41,11 @@
 // VYJIMKA: deploy_src = ELEVATED (ne BLOCKED) - deploy_src je jedina cesta
 // nasazeni kodu na dev stanici a BLOCKED bez override by vyvoj zastavil.
 // V bance deploy_src BLOCKED (+ FB_OpsAllowed deny trva - gate = 2. vrstva).
-return [
-    { repo: "EAEXAMPLE.QEA",
-      classes: {
+// QEAX (K8-doma, security model; Z260904-6): TAZ politika jako eaexample
+// (sdilena mapa DEV_CLASSES + tytez prahy) - testuji se vrstvy 2 a 3
+// autorizace, ne risk gate. Placeholder "<QEAX-FILENAME>" nahradi
+// Z260904-6b (viz FB_Whitelist); repo bez polozky = fail-closed ELEVATED (W9).
+var DEV_CLASSES = {
           // --- LOW (par. 4: bezny pracovni den bez dialogu) ---
           "create_element":                  "LOW",
           "create_or_update_elements":       "LOW",
@@ -84,13 +86,18 @@ return [
           "move_elements":                   "ELEVATED",
           // --- dev vyjimka (v PROD sablone BLOCKED) ---
           "deploy_src":                      "ELEVATED"
-      },
-      elevate: { deleteTargets: 0, writeOps: 20, updatedExisting: 10,
-                 affectedPackages: 1, foreignDiagrams: 0, moveOps: 0 },
-      block:   { deleteTargets: 100, writeOps: 500, updatedExisting: 100,
-                 affectedPackages: 5 },
-      budgetMs: 8000,
-      hashMaxChars: 2000000 }
+};
+var DEV_ELEVATE = { deleteTargets: 0, writeOps: 20, updatedExisting: 10,
+                    affectedPackages: 1, foreignDiagrams: 0, moveOps: 0 };
+var DEV_BLOCK   = { deleteTargets: 100, writeOps: 500, updatedExisting: 100,
+                    affectedPackages: 5 };
+return [
+    { repo: "EAEXAMPLE.QEA",
+      classes: DEV_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK,
+      budgetMs: 8000, hashMaxChars: 2000000 },
+    { repo: "<QEAX-FILENAME>",
+      classes: DEV_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK,
+      budgetMs: 8000, hashMaxChars: 2000000 }
     // Banka (PROD politika - doplni clovek v bance; sablona dle par. 4):
     // { repo: "<TEST-DB>",
     //   classes: { ...jako vyse..., "deploy_src": "BLOCKED",

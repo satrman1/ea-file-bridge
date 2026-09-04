@@ -1814,6 +1814,103 @@ t("FB_OpDelete: E_NOT_FOUND uprostred -> items nese smazane i selhany target + p
     contains(res.message, "neprovedeno: 1");
     eq(pkg.Elements.Count, 0, "prvni target se smazat mel");
 });
+
+// --- K8 QEAX (Z260904-6): configy se zastupnou identitou repa = fail-secure
+var K8_CFG_FILES = ["AICodeBridge.FB_Whitelist.js", "AICodeBridge.FB_Config.js", "AICodeBridge.FB_OpsAllowed.js",
+                    "AICodeBridge.FB_RiskPolicy.js", "AICodeBridge.FB_AccessGroups.js"];
+t("K8: placeholder \"<QEAX-FILENAME>\" je PRAVE JEDNOU v kazdem z 5 configu (find-replace najednou)", function () {
+    K8_CFG_FILES.forEach(function (f) {
+        var code = fs.readFileSync(path.join(SRC, f), "utf8");
+        var active = code.split(/\r?\n/).filter(function (l) { return l.replace(/^\s+/, "").indexOf("//") !== 0; }).join("\n");
+        var n = active.split('"<QEAX-FILENAME>"').length - 1;
+        eq(n, 1, f + ": ocekavan 1 aktivni vyskyt placeholderu, je " + n);
+    });
+    var wl = B.FB_Whitelist.call(B);
+    ok(wl.length === 2 && wl[1].repo === "<QEAX-FILENAME>" && wl[1].pkg === "<GUID-685>", "QEAX polozka whitelistu s placeholdery");
+});
+t("K8: FB_RiskPolicy polozka QEAX ma tytez tridy a prahy jako eaexample", function () {
+    var pol = B.FB_RiskPolicy.call(B);
+    var eaex = null, qeax = null;
+    for (var i = 0; i < pol.length; i++) {
+        if (/EAEXAMPLE/i.test("" + pol[i].repo)) { eaex = pol[i]; }
+        if (pol[i].repo === "<QEAX-FILENAME>") { qeax = pol[i]; }
+    }
+    ok(eaex && qeax, "chybi eaexample nebo QEAX polozka");
+    eq(JSON.stringify(qeax.classes), JSON.stringify(eaex.classes));
+    eq(JSON.stringify(qeax.elevate), JSON.stringify(eaex.elevate));
+    eq(JSON.stringify(qeax.block), JSON.stringify(eaex.block));
+    eq(qeax.classes["deploy_src"], "ELEVATED", "deploy_src v QEAX = ELEVATED (K6 reception sync pumpou)");
+});
+function k8Repo(opts) {
+    // realne configy (ZADNE prepsani FB_*): QEAX identita, ktera placeholderu neodpovida
+    opts = opts || {};
+    var rules = [{ re: /#AI-LOG/i, rows: [] }];
+    if (opts.groups) { rules.push({ re: /t_secgroup/i, rows: opts.groups.map(function (g) { return { GroupName: g }; }) }); }
+    var repo = mkRepo({ connectionString: "C:\\HARNESS\\QEAX-K8-MODEL.QEA",
+        securityEnabled: opts.securityEnabled, login: opts.login, sqlRules: rules });
+    repo._addPackage({ id: 685, name: "#FB-TEST", guid: "{K8-685-GUID}" });
+    return repo;
+}
+t("K8 fail-secure: security ON + clen EAFB Write, ale repo neodpovida placeholderu -> E_ADDIN_ACCESS (nic nezapsano)", function () {
+    delete B._fbAccessCache;
+    var repo = k8Repo({ securityEnabled: true, login: "milos", groups: ["EAFB Write"] });
+    var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "k8-fs-1",
+        ops: [{ op: "create_or_update_package", parent: "{K8-685-GUID}", name: "K8 nesmi vzniknout" }] }));
+    delete B._fbAccessCache;
+    var resp = JSON.parse(out);
+    eq(resp.code, "E_ADDIN_ACCESS", "repo bez polozky FB_AccessGroups = fail-closed read: " + out.substring(0, 200));
+    eq(repo.GetPackageByID(685).Packages.Count, 0, "zadny package nesmel vzniknout");
+});
+t("K8 fail-secure: security OFF + repo neodpovida placeholderu -> zadny zapis (status != done)", function () {
+    delete B._fbAccessCache;
+    var repo = k8Repo({ securityEnabled: false });
+    var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "k8-fs-2",
+        ops: [{ op: "create_or_update_package", parent: "{K8-685-GUID}", name: "K8 nesmi vzniknout" }] }));
+    var resp = JSON.parse(out);
+    ok(resp.status !== "done", "zapis nesmi projet: " + out.substring(0, 200));
+    var oks = (resp.results || []).filter(function (r) { return r.status === "ok"; }).length;
+    eq(oks, 0, "zadna operace ok");
+    eq(repo.GetPackageByID(685).Packages.Count, 0, "zadny package nesmel vzniknout");
+});
+t("K8 fail-secure: cteci davka BEZ pole repo projde i v neznamem repu (K3 recon)", function () {
+    delete B._fbAccessCache;
+    var repo = k8Repo({ securityEnabled: true, login: "milos", groups: [] });
+    var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "k8-fs-3",
+        ops: [{ op: "ping", echo: "k3" }, { op: "query", sql: "SELECT 1 AS x" }] }));
+    delete B._fbAccessCache;
+    var resp = JSON.parse(out);
+    eq(resp.status, "done", "cteni musi projit: " + out.substring(0, 300));
+    contains(resp.repository, "QEAX-K8-MODEL.QEA", "ping vraci identitu repa pro doplneni configu");
+    eq(resp.results[0].whitelist.length, 0, "placeholder whitelist se do ACK nepropisuje");
+    eq(resp.results[0].access.access, "read");
+});
+t("K8 fail-secure: repo doplneno, pkg jeste placeholder -> FB_CheckWrite = E_WHITELIST", function () {
+    var repo = k8Repo({ securityEnabled: false });
+    var origWl = B.FB_Whitelist;
+    B.FB_Whitelist = function () { return [{ repo: "QEAX-K8-MODEL.QEA", pkg: "<GUID-685>" }]; };
+    var chk;
+    try { chk = B.FB_CheckWrite.call(B, repo, repo.GetPackageByID(685)); } finally { B.FB_Whitelist = origWl; }
+    ok(chk != null && chk.code === "E_WHITELIST", "ocekavan E_WHITELIST: " + JSON.stringify(chk));
+});
+
+// --- K8 A3 (Z260904-6): FB_InterpretError - vetev balickovych prav (zastupny vzor)
+t("FB_InterpretError: Group Lock hlaska -> E_PERMISSION (ne E_LOCKED), puvodni text zachovan", function () {
+    var r = B.FB_InterpretError.call(B, "Element 'X' is locked by group 'EAFB Locked'. You are not a member of this group.");
+    ok(r != null, "hlaska musi byt rozpoznana");
+    eq(r.code, "E_PERMISSION");
+    contains(r.message, "EAFB Locked", "puvodni hlaska EA se nesmi ztratit");
+    contains(r.message, "balickova prava");
+});
+t("FB_InterpretError: Require User Lock to Edit bez zamku -> E_PERMISSION", function () {
+    eq(B.FB_InterpretError.call(B, "You must apply a user lock to this element before you can edit it").code, "E_PERMISSION");
+    eq(B.FB_InterpretError.call(B, "Package is locked to group Architects").code, "E_PERMISSION");
+});
+t("FB_InterpretError: zamek jineho uzivatele zustava E_LOCKED; nezname null (regrese)", function () {
+    eq(B.FB_InterpretError.call(B, "Element is locked by user novak").code, "E_LOCKED");
+    eq(B.FB_InterpretError.call(B, "Access denied").code, "E_PERMISSION");
+    eq(B.FB_InterpretError.call(B, "Object reference not set"), null);
+    eq(B.FB_InterpretError.call(B, ""), null);
+});
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");
