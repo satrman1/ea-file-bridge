@@ -261,7 +261,9 @@ Cíl: dostat **přesný text chyby Automation API**, když EA security odmítne 
 
 ---
 
-## Prompt pro vlákno „Z260904-6b vyhodnocení" (zkopíruj celý; spouští se dvakrát — 1. běh po K3, 2. běh po A4)
+## Prompt pro vlákno „Z260904-6b vyhodnocení" — ⚠ PŘEKONÁN 5. 9. 2026, NEPOUŠTĚT
+
+> Nahrazen **jedním živým interaktivním promptem `Z260904-6b K8 QEAX zive`** v `C:\Users\milos\CLAUDE\IT-ANALYSIS\zaprah-vlaken-2026-09-04.md` (sekce Z260904-6b): vlákno vede K0–K9 + A1–A4 souběžně s Milošem, doplnění configů po K3 udělá uprostřed, kanál dávek = pumpa (schránka jen K6b jako doklad menu), dávky s dosazenými hodnotami v `docs\e2e-k8-qeax\ready\`. Důvod: režim ověřený 5. 9. ve vlákně Z260904-1c. Text níže zůstává jen pro dohledatelnost.
 
 ```text
 Z260904-6b vyhodnocení K8 QEAX — název tohoto vlákna (přejmenování ručně).
