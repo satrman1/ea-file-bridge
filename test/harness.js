@@ -1815,6 +1815,21 @@ t("FB_OpDelete: E_NOT_FOUND uprostred -> items nese smazane i selhany target + p
     eq(pkg.Elements.Count, 0, "prvni target se smazat mel");
 });
 
+// --- E2E pumpa P8 (Z260904-1b, 2026-09-05): smazany package v items nese PackageID
+// + jmeno + cestu (zive res-P8 melo {"type":"Package","id":0,"deleted":true})
+t("FB_OpDelete: Package podle GUID -> items nese PackageID, name, path (P8 nalez)", function () {
+    var repo = wlRepo();
+    var parent = repo.GetPackageByID(1054);
+    var sub = repo._addPackage({ id: 1076, name: "P4 Mail (pumpa)", parentID: 1054, guid: "{PKG-P4}" });
+    parent.Packages._items.push(sub);
+    var res = B.FB_OpDelete.call(B, repo, { op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-P4}" }] }, "t-del-p8");
+    eq(res.status, "ok", JSON.stringify(res));
+    eq(res.items[0].id, 1076, "id = PackageID, ne 0 z requestu");
+    eq(res.items[0].name, "P4 Mail (pumpa)");
+    ok(("" + res.items[0].path).indexOf("P4 Mail (pumpa)") >= 0, "path ma koncit jmenem package: " + res.items[0].path);
+    eq(parent.Packages.Count, 0);
+});
+
 // --- K8 QEAX (Z260904-6): configy se zastupnou identitou repa = fail-secure
 var K8_CFG_FILES = ["AICodeBridge.FB_Whitelist.js", "AICodeBridge.FB_Config.js", "AICodeBridge.FB_OpsAllowed.js",
                     "AICodeBridge.FB_RiskPolicy.js", "AICodeBridge.FB_AccessGroups.js"];

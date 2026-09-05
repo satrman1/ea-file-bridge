@@ -66,11 +66,16 @@ try {
         }
     }
 } catch (eCf) { }
+// v6 (E2E pumpa P7, 2026-09-05): debug v5 ukazoval jen prvnich 30 znaku radku,
+// takze u pkg/dgm radku (id=0, nic se neoznacilo) neslo rozhodnout, zda
+// marker "(pkg:ID)" na KONCI radku do handleru vubec dorazil. Nove: delka,
+// hlava i OCAS radku + vysledek dispatchu (marker/kind/target/objekt).
 if (dbg) {
     try {
-        this.Log(Repository, "dblclick debug v5: tab='" + tab + "' id=" + id
+        this.Log(Repository, "dblclick debug v6: tab='" + tab + "' id=" + id
             + " how=[" + u1.how + "," + u2.how + "," + u3.how + "]"
-            + " keys1=[" + u1.keys + "] keys3=[" + u3.keys + "] line='" + line.substring(0, 30) + "'");
+            + " keys1=[" + u1.keys + "] keys3=[" + u3.keys + "] len=" + line.length
+            + " head='" + line.substring(0, 30) + "' tail='" + line.substring(Math.max(0, line.length - 40)) + "'");
     } catch (eL) { }
 }
 if (navOff) { return; }
@@ -82,6 +87,7 @@ if (tab.replace(/^\s+|\s+$/g, "").toUpperCase() != "AI BRIDGE") { return; }
 var kind = "el", target = id;
 var mk = /\((el|pkg|dgm):(\d+)\)\s*$/.exec(line);
 if (mk) { kind = mk[1]; target = parseInt(mk[2], 10); }
+if (dbg) { try { this.Log(Repository, "dblclick nav: marker=" + (mk ? mk[0] : "ZADNY") + " kind=" + kind + " target=" + target); } catch (eL2) { } }
 if (!target || target <= 0) { return; }
 try {
     var obj = null;
@@ -89,6 +95,7 @@ try {
     else if (kind == "dgm") { obj = Repository.GetDiagramByID(target); }
     else { obj = Repository.GetElementByID(target); }
     if (obj) { Repository.ShowInProjectView(obj); }
+    if (dbg) { try { this.Log(Repository, "dblclick nav: " + kind + " " + target + (obj ? " -> ShowInProjectView zavolano" : " -> objekt NENALEZEN")); } catch (eL3) { } }
 } catch (eNav) {
     try { this.Log(Repository, "Navigace na " + kind + " " + target + " selhala: " + eNav.message); } catch (eO) { }
 }

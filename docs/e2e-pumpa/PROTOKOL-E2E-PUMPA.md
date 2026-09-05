@@ -2,6 +2,7 @@
 
 Datum přípravy: 2026-09-04 (vlákno Z260904-1) · Provede: Miloš u EA, pondělí 7. 9. 2026 · Repozitář: `EAExample.qea` (eaexample, EA 17.x) · Kód: commit z tohoto vlákna v `C:\GIT\ea-file-bridge` (harness 211/211).
 Vyhodnocení: ACK a poznámky vkládej do **nového vlákna „Z260904-1b vyhodnocení"** (prompt na konci tohoto souboru).
+**Stav: běh proveden Pá 5. 9. 2026 20:46–21:19 (dřív než plán), tabulky níže vyplnil Miloš; vyhodnocení Z260904-1b → `VYSLEDKY-2026-09-05.md` (P7 ❌ pkg/dgm, P5/P5b neprůkazné — placeholdery nenahrazeny, P8 nález id:0 opraven).**
 
 ## Proč tenhle test
 
@@ -45,10 +46,10 @@ Code loader: <N> operaci nacteno z modelu (elementID 11037).
 
 | Kolonka | Hodnota |
 |---|---|
-| verze pumpy | |
-| repo (cesta) | |
-| počet operací (Code loader) | |
-| session baseline (text) | |
+| verze pumpy | 0.5 |
+| repo (cesta) | C:\Users\milos\Box\03.EAP\MCP-AI\EAExample.qea |
+| počet operací (Code loader) | 105 |
+| session baseline (text) | Session baseline (zaloha pred zapisem) vytvoren nad: Example Model.Model Based Add-Ins.EA Addins.#FB-TEST [FB 2026-09-05 20:46:37] |
 | ✅/❌ | |
 
 ## P1 — deploy_src PUMPOU + plný restart EA
@@ -70,10 +71,10 @@ Nasadí nový kód z tohoto vlákna (5 operací). `deploy_src` je ELEVATED → *
 
 | Kolonka | Hodnota |
 |---|---|
-| popup se ukázal / text hlavičky | |
-| updated / created / paramsSynced | |
-| Code loader po reloadu (N) | |
-| re-attach po restartu EA proběhl sám | |
+| popup se ukázal / text hlavičky | ✅ |
+| updated / created / paramsSynced | ✅ |
+| Code loader po reloadu (N) | 105 |
+| re-attach po restartu EA proběhl sám | ✅ |
 | ✅/❌ | |
 
 ## P2 — ping = kotva session + **test neutrality** (kde je ACK)
@@ -94,10 +95,10 @@ Nasadí nový kód z tohoto vlákna (5 operací). `deploy_src` je ELEVATED → *
 
 | Kolonka | Hodnota |
 |---|---|
-| schránka po dávce (Ctrl+V) | |
-| konzole — objevil se text ACK (EAFB OK…)? | |
-| Output tab — řádek | |
-| whitelist path z res | |
+| schránka po dávce (Ctrl+V) | ✅ |
+| konzole — objevil se text ACK (EAFB OK…)? | 20:57:05  Zpracovavam req-P2.json ...<br/>20:57:07  Hotovo req-P2.json -> res-P2.json |
+| Output tab — řádek | FB P2 -> done: 1 ops (1 ok, 0 chyb) |
+| whitelist path z res | {"protocol":"eafb/0.2","id":"P2","status":"done","results":[{"op":"ping","status":"ok","echo":"pumpa-neutralita","eaVersion":"1715","repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","time":"2026-09-05 20:57:07","whitelist":[{"guid":"{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}","name":"#FB-TEST","path":"Example Model.Model Based Add-Ins.EA Addins.#FB-TEST"}],"access":{"securityEnabled":false,"login":"","access":"write","groups":[],"reason":"EA security je vypnuta - write ficury povoleny (FB_AccessGroups se neuplatnuje)"}}],"repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","audit":{"aiLogGuid":"{6EB9CF87-03D6-4373-A3F7-32CD74097918}"}} |
 | ✅/❌ | |
 
 ## P3 — kontrolní čtení nad `#FB-TEST` (co tam dnes je)
@@ -110,8 +111,8 @@ Nasadí nový kód z tohoto vlákna (5 operací). `deploy_src` je ELEVATED → *
 
 | Kolonka | Hodnota |
 |---|---|
-| podpackages v #FB-TEST (jméno + GUID) | |
-| rozhodnutí: smazat v P8 navíc | |
+| podpackages v #FB-TEST (jméno + GUID) | ✅ |
+| rozhodnutí: smazat v P8 navíc | ne |
 | ✅/❌ | |
 
 ## P4 — řetěz `$N`: package + UC + scénáře + constraint + diagram + umístění
@@ -133,9 +134,9 @@ Ty řádky **nemaž z Output tabu** — jsou vstupem P7. V EA zkontroluj dvojkli
 
 | Kolonka | Hodnota |
 |---|---|
-| GUID-PKG / GUID-UC / GUID-DGM (+ id) | |
-| Output: řádky nesou markery (pkg:/el:/dgm:) | |
-| warnings | |
+| GUID-PKG / GUID-UC / GUID-DGM (+ id) | 11415 |
+| Output: řádky nesou markery (pkg:/el:/dgm:) | ✅ |
+| warnings | ✅ |
 | ✅/❌ | |
 
 ## P5 — chyba uprostřed dávky + oprava z res (vzor T7-03/03b)
@@ -148,8 +149,8 @@ Ty řádky **nemaž z Output tabu** — jsou vstupem P7. V EA zkontroluj dvojkli
 
 | Kolonka | Hodnota |
 |---|---|
-| P5: kód chyby v results[1] / GUID-UC2 z results[0] | |
-| P5b: status / GUID scénáře | |
+| P5: kód chyby v results[1] / GUID-UC2 z results[0] | FB P5 -> error: 2 ops (0 ok, 1 chyb)  risk=ELEVATED writeOps=2 createOps=1 updatedExisting=1 deleteTargets=0 affectedElements=0 affectedPackages=0 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=7 hashMs=0 payloadHash=1181b51445aa889a1ce68550c15e0f9366ea9db84b5bdc605f9da3e4f809dc26 |
+| P5b: status / GUID scénáře | FB P5b -> confirm_required (Operace 'create_or_update_scenarios' je politikou klasifikovana ELEVATED; Neresolvovatelny target 'GUID-UC-Z-RES-P5' (create_or_update_scenarios.element) - fail-closed)<br/>FB P5b -> error: 1 ops (0 ok, 1 chyb)  risk=ELEVATED writeOps=1 createOps=0 updatedExisting=1 deleteTargets=0 affectedElements=0 affectedPackages=0 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=5 hashMs=1 payloadHash=77c26111bc8d05226d687d287c4bb9ac87bab7ba0babba2b4fded44e449e301c  confirmationRequired=true confirmedByUser=true confirmChannel=pumpa confirmedAt=2026-09-05 21:07:58  duvody: Operace 'create_or_update_scenarios' je politikou klasifikovana ELEVATED; Neresolvovatelny target 'GUID-UC-Z-RES-P5' (create_or_update_scenarios.element) - fail-closed |
 | ✅/❌ | |
 
 ## P6 — obrázek diagramu souborem
@@ -169,13 +170,13 @@ V EA otevři okno **System Output → záložka AI Bridge** (pokud není vidět:
 
 | Řádek (dvojklik) | Očekávání | Co se označilo | ✅/❌ |
 |---|---|---|---|
-| `[vytvoreno] package "P4 Mail (pumpa)" … (pkg:…)` | označí se **package** P4 Mail (pumpa) — dřív id 11341-styl nic neoznačil | | |
-| `[vytvoreno] "UC Posli mailovou zpravu (pumpa)" … (el:…)` | označí se UC (stávající chování) | | |
-| `[create_or_update_scenarios] hotovo … (el:…)` | označí se **UC** (vlastník scénářů) — dřív id 0 | | |
-| `[create_or_update_constraints] hotovo … (el:…)` | označí se UC — dřív id 0 | | |
-| `[diagram vytvoren] "P4 Mail UC (pumpa)" (dgm:…)` | označí se **diagram** — dřív id 0 | | |
-| `[place_elements_on_diagram] hotovo … (dgm:…)` | označí se diagram — dřív id 0 | | |
-| `[smazano] …` (až po P8) | nic se nestane (není kam skočit) | | |
+| `[vytvoreno] package "P4 Mail (pumpa)" … (pkg:…)` | označí se **package** P4 Mail (pumpa) — dřív id 11341-styl nic neoznačil | nic<br />dblclick debug v5: tab='AI Bridge' id=0 how=[val,val,val] keys1=[val] keys3=[val] line='  [vytvoreno]  package "P4 Mai' | ❌ |
+| `[vytvoreno] "UC Posli mailovou zpravu (pumpa)" … (el:…)` | označí se UC (stávající chování) | UC | ✅ |
+| `[create_or_update_scenarios] hotovo … (el:…)` | označí se **UC** (vlastník scénářů) — dřív id 0 | UC | **✅** |
+| `[create_or_update_constraints] hotovo … (el:…)` | označí se UC — dřív id 0 | UC | **✅** |
+| `[diagram vytvoren] "P4 Mail UC (pumpa)" (dgm:…)` | označí se **diagram** — dřív id 0 | NIC<br />dblclick debug v5: tab='AI Bridge' id=0 how=[val,val,val] keys1=[val] keys3=[val] line='  [diagram vytvoren]  "P4 Mail' | **❌** |
+| `[place_elements_on_diagram] hotovo … (dgm:…)` | označí se diagram — dřív id 0 | nic<br />dblclick debug v5: tab='AI Bridge' id=0 how=[val,val,val] keys1=[val] keys3=[val] line='  [place_elements_on_diagram] ' | **❌** |
+| `[smazano] …` (až po P8) | nic se nestane (není kam skočit) | | **✅** |
 
 Protože má eaexample v `FB_Config` zapnutý `navProbe: true`, po každém dvojkliku přibude v Output tabu i řádek `dblclick debug v5: tab='AI Bridge' id=… line='…'` — **opiš `id=` a začátek `line=`** aspoň u package a diagram řádku (potvrdí, že marker došel do handleru). Pokud se u package/diagramu nic neoznačí a debug řádek marker (`(pkg:` / `(dgm:`) v `line=` **neobsahuje**, je LineText v EA useknutý na 30 znaků jen v debugu, nebo nedorazil vůbec — zapiš přesně.
 
@@ -188,7 +189,7 @@ Protože má eaexample v `FB_Config` zapnutý `navProbe: true`, po každém dvoj
 - konzole: `CEKA NA POTVRZENI req-P8.json -> requests\pending\` → **popup pumpy**. V popupu (a stejný text na konzoli) musí být:
   ```
   Chysta se SMAZAT 1 prvek z modelu.
-
+  
   Balicky: P4 Mail (pumpa)
   Kde (plna cesta mazaneho): <plná cesta>.#FB-TEST.P4 Mail (pumpa)
   ```
@@ -200,10 +201,10 @@ Protože má eaexample v `FB_Config` zapnutý `navProbe: true`, po každém dvoj
 
 | Kolonka | Hodnota |
 |---|---|
-| popup: text hlavičky | |
-| popup: řádek „Kde (plna cesta mazaneho)" — přesně | |
-| cesta souhlasí s whitelist.path z P2 | |
-| finální status v res / items | |
+| popup: text hlavičky | EA File Bridge - potvrzení davky P8 |
+| popup: řádek „Kde (plna cesta mazaneho)" — přesně | ✅ |
+| cesta souhlasí s whitelist.path z P2 | ✅ |
+| finální status v res / items | {"protocol":"eafb/0.2","id":"P8","status":"done","results":[{"op":"delete_from_model","status":"ok","count":1,"items":[{"type":"Package","id":0,"deleted":true}]}],"repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","risk":{"riskLevel":"ELEVATED","riskReasons":["Operace 'delete_from_model' je politikou klasifikovana ELEVATED","Prah ELEVATED prekrocen: deleteTargets 1 > 0"],"policyValid":true,"summary":{"ops":{"delete_from_model":1},"targets":[],"packages":["P4 Mail (pumpa)"],"diagrams":[],"paths":["Example Model.Model Based Add-Ins.EA Addins.#FB-TEST.P4 Mail (pumpa)"]},"metrics":{"writeOps":1,"createOps":0,"updatedExisting":0,"deleteTargets":1,"affectedElements":0,"affectedPackages":1,"affectedDiagrams":0,"moveOps":0,"metricsComplete":true},"elapsedMs":22,"budgetMs":8000,"hashMaxChars":2000000,"payloadHash":"4fd3a8ba7fcbb4779c5af2742939a8058cebb6e61bcc86cbad08f48cd6758948","hashMs":0,"hashSource":"raw-bytes","confirm":{"required":true,"confirmedByUser":true,"channel":"pumpa","timestamp":"2026-09-05 21:17:15"}},"qc":{"checks":1,"findings":[],"elapsedMs":3,"status":"ciste"},"audit":{"aiLogGuid":"{1E956A46-8D4F-4e96-B647-A3C58D380AFE}"}} |
 | ✅/❌ | |
 
 ## P9 — GUI fallback tou samou dávkou jako P2 (bez pumpy)
@@ -214,9 +215,9 @@ Protože má eaexample v `FB_Config` zapnutý `navProbe: true`, po každém dvoj
 
 | Kolonka | Hodnota |
 |---|---|
-| dialog EA — text | |
-| res-P9 shodné s res-P2 (path whitelistu) | |
-| schránka nedotčená | |
+| dialog EA — text | ✅ |
+| res-P9 shodné s res-P2 (path whitelistu) | {"protocol":"eafb/0.2","id":"P9","status":"done","results":[{"op":"ping","status":"ok","echo":"gui-fallback","eaVersion":"1715","repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","time":"2026-09-05 21:19:23","whitelist":[{"guid":"{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}","name":"#FB-TEST","path":"Example Model.Model Based Add-Ins.EA Addins.#FB-TEST"}],"access":{"securityEnabled":false,"login":"","access":"write","groups":[],"reason":"EA security je vypnuta - write ficury povoleny (FB_AccessGroups se neuplatnuje)"}}],"repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea","audit":{"aiLogGuid":"{53530059-8A7E-4ed6-AD2A-328F3BAA643F}"}} |
+| schránka nedotčená | ✅ |
 | ✅/❌ | |
 
 ---
@@ -225,16 +226,16 @@ Protože má eaexample v `FB_Config` zapnutý `navProbe: true`, po každém dvoj
 
 | Krok | Co ověřuje | ✅/❌ | Poznámka |
 |---|---|---|---|
-| P0 | start pumpy, baseline N operací | | |
-| P1 | deploy_src pumpou + reload + re-attach po restartu EA | | |
-| P2 | ping kotva; **kde je ACK** (neutralita §8/5) | | |
-| P3 | stav #FB-TEST, rozhodnutí o zbytcích | | |
-| P4 | řetěz $N, markery v Output | | |
-| P5/P5b | chyba uprostřed + oprava z res | | |
-| P6 | PNG souborem | | |
-| P7 | prokliky per typ (1a) | | |
-| P8 | plná cesta v ELEVATED dialogu (1b), chybová větev (1c) | | |
-| P9 | GUI fallback = táž dávka, bez pumpy | | |
+| P0 | start pumpy, baseline N operací | ✅ | |
+| P1 | deploy_src pumpou + reload + re-attach po restartu EA | ✅ | |
+| P2 | ping kotva; **kde je ACK** (neutralita §8/5) | ✅ | |
+| P3 | stav #FB-TEST, rozhodnutí o zbytcích | ✅ | |
+| P4 | řetěz $N, markery v Output | ✅ | |
+| P5/P5b | chyba uprostřed + oprava z res | ✅ | |
+| P6 | PNG souborem | ✅ | |
+| P7 | prokliky per typ (1a) | ❌ | |
+| P8 | plná cesta v ELEVATED dialogu (1b), chybová větev (1c) | ✅ | |
+| P9 | GUI fallback = táž dávka, bez pumpy | ✅ | |
 
 ## Známé pasti
 

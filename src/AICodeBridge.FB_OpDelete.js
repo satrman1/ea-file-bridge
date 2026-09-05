@@ -60,13 +60,18 @@ for (var i = 0; i < op.targets.length; i++) {
         var chkP = this.FB_CheckWrite(Repository, pkg);
         if (chkP != null) { return fail(i, chkP.code, chkP.message); }
         if (!pkg.ParentID) { return fail(i, "E_ARGS", "root package nelze mazat"); }
+        // E2E pumpa P8 (2026-09-05): items nesly id z requestu (0 u GUID) a bez
+        // jmena/cesty -> res "id":0, Output '[smazano] Package "" (id 0)'. Jako u
+        // elementu: PackageID + jmeno + cesta zachytit PRED smazanim.
+        var delPkgId = pkg.PackageID, delPkgName = "" + pkg.Name, delPkgPath = "?";
+        try { delPkgPath = this.FB_ElementPath(Repository, "package", pkg); } catch (ePp) { }
         var parent = Repository.GetPackageByID(pkg.ParentID);
         found = false;
         for (j = 0; j < parent.Packages.Count; j++) {
             if (parent.Packages.GetAt(j).PackageID == pkg.PackageID) { parent.Packages.DeleteAt(j, false); parent.Packages.Refresh(); found = true; break; }
         }
         if (!found) { return fail(i, "E_EXCEPTION", "package se nepodarilo najit v kolekci rodice"); }
-        items.push({ type: "Package", id: t.id || 0, deleted: true });
+        items.push({ type: "Package", id: delPkgId, name: delPkgName, path: delPkgPath, deleted: true });
     } else if (typ == "CONNECTOR") {
         var conn = null;
         try {
@@ -107,7 +112,7 @@ for (var i = 0; i < op.targets.length; i++) {
             }
         }
         if (!found) { return fail(i, "E_EXCEPTION", "diagram se nepodarilo najit v kolekci vlastnika"); }
-        items.push({ type: "Diagram", id: dg.DiagramID, deleted: true });
+        items.push({ type: "Diagram", id: dg.DiagramID, name: "" + dg.Name, deleted: true });
     } else if (typ == "ATTRIBUTE" || typ == "OPERATION") {
         // vlastnika najdeme SQL dotazem (jen cteni), mazeme pres kolekci
         var idn = parseInt(t.id, 10);
