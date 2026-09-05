@@ -1,0 +1,27 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P5d",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{7F38D4EA-856D-41f9-B3D2-7884B0D423E4}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "System prijme zpravu a ulozi ji do schranky",
+       "kind": "system"
+      },
+      {
+       "text": "Uzivatel si zpravu zobrazi",
+       "kind": "actor"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

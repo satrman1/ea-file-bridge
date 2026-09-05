@@ -1,0 +1,31 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P5c",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{1ED84D5D-4113-4bcc-9013-B996BB329473}",
+     "type": "UseCase",
+     "name": "UC Prijmi zpravu (pumpa)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{00000000-0000-0000-0000-000000000000}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "steps": [
+      {
+       "text": "x"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "P8d",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Package",
+     "guid": "{324B620B-7F67-47ee-80ED-E8BB26005AE0}"
+    },
+    {
+     "type": "Package",
+     "guid": "{00000000-0000-0000-0000-000000000000}"
+    }
+   ]
+  }
+ ]
+}

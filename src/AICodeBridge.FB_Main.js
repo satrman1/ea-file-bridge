@@ -501,7 +501,17 @@ resp.status = failed ? "error" : "done";
 // QC v ACK (iterace 4 par. 3.4): jen po zapisove davce, ktera neco zapsala.
 // TRI STAVY ODDELENE - selhani QC NENI chyba zapisu (W6), proto try/catch
 // a vysledek vyhradne do resp.qc (chat verze ho rendruje zvlast).
-if (writesInBatch > 0 && okc > 0) {
+// E2E pumpa P8c (2026-09-05): delete_from_model s vice cili muze skoncit
+// error, ale cast cilu UZ je smazana (items deleted:true) - okc je 0 a
+// Output by o smazani mlcel. Castecne mazani = zmena v modelu -> logovat.
+var partialDel = false;
+for (var pdI = 0; pdI < resp.results.length; pdI++) {
+    var pdR = resp.results[pdI];
+    if (pdR && pdR.op == "delete_from_model" && pdR.items) {
+        for (var pdJ = 0; pdJ < pdR.items.length; pdJ++) { if (pdR.items[pdJ].deleted === true) { partialDel = true; } }
+    }
+}
+if (writesInBatch > 0 && (okc > 0 || partialDel)) {
     try { resp.qc = this.FB_QcRun(Repository, req, resp); }
     catch (eQc) { resp.qc = { status: "nedobehlo", reason: "FB_QcRun selhal: " + eQc.message, checks: 0, findings: [] }; }
     // pozorovatelnost (Miloš UX): vypis zmen s teckovou cestou do Output tabu

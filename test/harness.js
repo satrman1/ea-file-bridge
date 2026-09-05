@@ -1830,6 +1830,46 @@ t("FB_OpDelete: Package podle GUID -> items nese PackageID, name, path (P8 nalez
     eq(parent.Packages.Count, 0);
 });
 
+// --- E2E pumpa P8c (Z260904-1c, 2026-09-05): delete s vice cili skoncil error,
+// prvni cil UZ smazany - Output mlcel (FB_Main: okc 0 -> FB_LogChanges se
+// nevolal; FB_LogChanges: status != ok -> continue). Zive res-P8c.json.
+t("FB_LogChanges: delete error s deleted:true v items -> [smazano] + [nesmazano] (P8c nalez)", function () {
+    var repo = mkRepo();
+    B.FB_LogChanges.call(B, repo, { id: "t-log-p8c", results: [
+        { op: "delete_from_model", status: "error", code: "E_NOT_FOUND", items: [
+            { type: "Package", id: 1077, name: "P4 Mail (pumpa)", path: "M.#FB-TEST.P4 Mail (pumpa)", deleted: true },
+            { type: "Package", id: 0, guid: "{0}", name: "{0}", deleted: false, code: "E_NOT_FOUND", index: 1 }
+        ] }
+    ] });
+    var del = repo._output.filter(function (o) { return o.text.indexOf("[smazano]") >= 0; });
+    eq(del.length, 1, "chybi radek smazano: " + JSON.stringify(repo._output));
+    contains(del[0].text, "P4 Mail (pumpa)"); contains(del[0].text, "@ M.#FB-TEST.P4 Mail (pumpa)");
+    var ne = repo._output.filter(function (o) { return o.text.indexOf("[nesmazano]") >= 0; });
+    eq(ne.length, 1, "selhany cil ma mit radek nesmazano");
+    contains(ne[0].text, "E_NOT_FOUND");
+    // error bez items (nic se nesmazalo) -> zadny radek
+    var repo2 = mkRepo();
+    eq(B.FB_LogChanges.call(B, repo2, { id: "t-log-p8c2", results: [{ op: "delete_from_model", status: "error", code: "E_ARGS" }] }), 0);
+});
+t("FB_Main: delete error po castecnem smazani -> FB_LogChanges se vola (Output nemlci) (P8c nalez)", function () {
+    delete B._fbAccessCache;
+    var repo = mainRepoBase({ securityEnabled: false });
+    var oD = B.FB_OpDelete, oG = B.FB_RiskGate;
+    B.FB_OpDelete = function () { return { op: "delete_from_model", status: "error", code: "E_NOT_FOUND", message: "targets[1]", items: [
+        { type: "Package", id: 1077, name: "P4 Mail (pumpa)", path: "M.P4 Mail (pumpa)", deleted: true },
+        { type: "Package", id: 0, name: "{0}", deleted: false, code: "E_NOT_FOUND", index: 1 } ] }; };
+    B.FB_RiskGate = function () { return { riskLevel: "LOW", riskReasons: [], policyValid: true, metrics: {}, summary: {} }; };
+    var out;
+    try {
+        out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "t-p8c", repo: "EAEXAMPLE.QEA",
+            ops: [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{A}" }, { type: "Package", guid: "{0}" }] }] }));
+    } finally { B.FB_OpDelete = oD; B.FB_RiskGate = oG; }
+    var resp = JSON.parse(out);
+    eq(resp.status, "error", out.substring(0, 300));
+    var del = repo._output.filter(function (o) { return o.text.indexOf("[smazano]") >= 0 && o.text.indexOf("P4 Mail (pumpa)") >= 0; });
+    eq(del.length, 1, "Output ma nest smazany package i po error davce: " + JSON.stringify(repo._output));
+});
+
 // --- K8 QEAX (Z260904-6): configy se zastupnou identitou repa = fail-secure
 var K8_CFG_FILES = ["AICodeBridge.FB_Whitelist.js", "AICodeBridge.FB_Config.js", "AICodeBridge.FB_OpsAllowed.js",
                     "AICodeBridge.FB_RiskPolicy.js", "AICodeBridge.FB_AccessGroups.js"];

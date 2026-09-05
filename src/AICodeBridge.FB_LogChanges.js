@@ -59,12 +59,21 @@ var reqId = "" + ((resp && resp.id) || "?");
 var lines = []; // { text, navId }
 for (var i = 0; i < results.length; i++) {
     var r = results[i];
-    if (!r || ("" + r.status) != "ok") { continue; }
+    if (!r) { continue; }
     var op = "" + r.op;
+    // E2E pumpa P8c (2026-09-05): delete_from_model se status error, ale
+    // s uz smazanymi cili (items deleted:true) - ty se musi vypsat, jinak
+    // Output o realne zmene v modelu mlci; selhany cil dostane [nesmazano].
+    if (op == "delete_from_model" && ("" + r.status) != "ok" && !r.items) { continue; }
+    if (op != "delete_from_model" && ("" + r.status) != "ok") { continue; }
     if (op == "delete_from_model") {
         var dit = r.items || [];
         for (var d = 0; d < dit.length; d++) {
             var it = dit[d];
+            if (it.deleted === false) {
+                lines.push({ text: "  [nesmazano]  " + (it.type || "?") + " \"" + (it.name || "") + "\"  (" + (it.code || "chyba") + ")", navId: 0 });
+                continue;
+            }
             lines.push({ text: "  [smazano]  " + (it.type || "?") + " \"" + (it.name || "") + "\""
                 + (it.path ? "  @ " + it.path : ("  (id " + it.id + ")")), navId: 0 });
         }
