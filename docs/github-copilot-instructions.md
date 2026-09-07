@@ -1,6 +1,12 @@
+# ⛔ HISTORIE — kit GHC z `db22a56` nahrazen buildem 2026-09-07 (Z260907b-4)
+
+> `.github/copilot-instructions.md` už **není** kopie tohoto souboru. Od 2026-09-07 je to build výstup `tools/build-vscode.py` (profil `doma`, sada `thin`) ze šablony `IT-ANALYSIS/Skilly/_vscode/copilot-instructions.md` — viz `docs/BUILD-VSCODE.md`. Tento soubor zůstává jen jako historie kitu iterace 7 (chybí v něm pravidla 12b/12c/15); **nepoužívat jako vzor, needitovat**. Opravy instrukcí jdou do kanonu a rebuildu (`tools\build.cmd`).
+
+---
+
 # EA File Bridge — instrukce pro Copilot agenta (DOMÁCÍ dev stanice, eaexample)
 
-> Tento soubor patří do `.github/copilot-instructions.md` ve workspace `C:\GIT\ea-file-bridge`.
+> Tento soubor patřil do `.github/copilot-instructions.md` ve workspace `C:\GIT\ea-file-bridge` (do 2026-09-07).
 > Domácí varianta (eafb/0.2): repo = eaexample, dialekt SQLite, `deploy_src` POVOLEN (dev).
 > Bankovní varianta se odvozuje z `docs/copilot-instructions-eafb.md` (`<TEST-DB>`, MS SQL 2022, deploy_src deny).
 

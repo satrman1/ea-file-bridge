@@ -19,3 +19,6 @@ config/vscode-profile.banka.json
 # Python bytecode (tools/build-vscode.py, test/build-vscode.test.py)
 __pycache__/
 *.pyc
+
+# log opakovaneho buildu z tools/build.cmd (prepisuje se); dukazni log prvniho buildu = docs/e2e-vscode/build-doma.log
+docs/e2e-vscode/build-doma-last.log
