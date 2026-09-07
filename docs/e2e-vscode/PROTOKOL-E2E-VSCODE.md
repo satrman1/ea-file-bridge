@@ -98,8 +98,8 @@ Pro každé kolo: napiš text → počkej, až Copilot dopíše → zkopíruj od
 
 - **Agent má:** podklad G1 v chatu (co vzniklo s GUIDy a plnými cestami, QA verdikt, confidence flags, tier) → HUMAN_DECISION.
 - **Tvoje odpověď:** „`G1 schvaluji, tier dle návrhu. Zapiš Gate Record.`"
-- **Očekáváš:** Artifact do `#GATES` (TV `gate=G1`, datum, rozhodl, výsledek, tier), Output `done`. Agent na závěr shrne: počet dávek (z toho opravných), ELEVATED 1, QA F0/F1, GUID + cesta UC package, ruční kroky.
-- **Zapiš:** id · Output řádek · souhrn agenta (celý do vlákna) · kontext % **konečný**.
+- **Očekáváš:** Artifact do `#GATES` (TV `gate=G1`, datum, rozhodl, výsledek, tier), Output `done`. Package `#GATES` pod `#FB-TEST` **neexistuje** — agent ji založí v téže dávce jako Gate Record (1 nová package = pořád LOW, bez popupu); stejně jako `#QA` v kole 4. Kdyby ji zakládal samostatnou dávkou, je to dávka navíc do limitu — zapiš. Agent na závěr shrne: počet dávek (z toho opravných), ELEVATED 1, QA F0/F1, GUID + cesta UC package, ruční kroky.
+- **Zapiš:** id · Output řádek · `#GATES` založena v téže dávce ✅/❌ · souhrn agenta (celý do vlákna) · kontext % **konečný**.
 
 ## Tabulka výsledků (vyplň průběžně)
 
@@ -143,7 +143,7 @@ Verdikt tenkého řezu: ☐ prošel · ☐ prošel s nálezy · ☐ neprošel �
 |---|---|---|---|---|
 | | | | | |
 
-Známé předem (neopravovat během běhu): číslo UC = `UC-95006`, protože kulisa SportHub (UC-95001…95005) v `#FB-TEST` stále existuje (P3 z 5. 9.) · kontroly 6/6b v QA F1 = W/B záměrně · build WARN u `scenario-phrases.md` = falešný poplach (viz `build-doma.log`).
+Známé předem (neopravovat během běhu): SOS / Core UC pro tenký řez neexistuje — agent v kole 2 vykáže „mantinely nedostupné" jako omezení hranice a pokračuje (kdyby na odkazu na SOS trval, je to nález šablony, ne chyba běhu) · doménové typy do F0–F1 bez logické obrazovky nevstupují (kontrola 6 QA F1 = W/B záměrně; DTO/entity až F2–F3) · package `#QA` (kolo 4) a `#GATES` (kolo 9) pod `#FB-TEST` neexistují, agent je zakládá v téže dávce jako report/record · číslo UC = `UC-95006`, protože kulisa SportHub (UC-95001…95005) v `#FB-TEST` stále existuje (P3 z 5. 9.) · kontroly 6/6b v QA F1 = W/B záměrně · build WARN u `scenario-phrases.md` = falešný poplach (viz `build-doma.log`).
 
 ## Po běhu
 
