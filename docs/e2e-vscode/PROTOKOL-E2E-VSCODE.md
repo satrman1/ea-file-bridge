@@ -48,8 +48,8 @@ Pro každé kolo: napiš text → počkej, až Copilot dopíše → zkopíruj od
 
 - **Napiš:** nic — agent pokračuje sám; když se zastaví, napiš: „`Pokračuj kolem 2: převezmi zadání ze zadani/DBK-hodnot-knihu-brd.md.`"
 - **Agent má:** načíst skill `prevzeti-zadani`, přečíst BRD, vyextrahovat 3 požadavky (`DEMO-91051` hodnocení 1–5★, `-91052` celkové hodnocení v %, `-91053` 1 IP = 1×; s AK a Weight), navrhnout hranici (mimo hranici: vyhledávání/top 50, autoři, administrace, technika IP) a projekt. Smí udělat **jednu čtecí dávku** recon (`find_packages_by_name` DBK / `find_elements_by_name` hodnocení, kniha; ideálně v téže dávce i `query` na nejvyšší obsazené `UC-#####` v `#FB-TEST` pro kolo 6) — počítá se do limitu 10. Skončit **HUMAN_DECISION** v chatu: co schválit.
-- **Očekáváš (recon):** v modelu **existuje pilot `/Business Applications/#PILOT DBK`** (UC-91001…91005 vč. `UC-91002 Hodnoť knihu`, požadavky DBK-01…08) — je **mimo whitelist**, jen ke čtení. Agent to má vykázat jako existující kontext a navrhnout **nový** obsah pod `#FB-TEST` (BRD to říká výslovně); nesmí navrhnout zápis do pilotu ani „jen odkázat na UC-91002 a nic nemodelovat". Pod `#FB-TEST` žádná DBK package není (jsou tam `FBT-*`, `SportHub` s UC-95001…95005, 2× `UC …` z iterace 7). Když recon ukáže něco jiného, zapiš to.
-- **Tvoje odpověď (HUMAN_DECISION):** „`Schvaluji: hranice a požadavky DEMO-91051–91053 dle BRD, mimo hranici dle BRD. Projektovou package nezakládej — package Business Requirements dej přímo pod #FB-TEST (jedna nová package na dávku), UC package později také přímo pod #FB-TEST. Pilot #PILOT DBK je jen reference, nezapisuj do něj.`"
+- **Očekáváš (recon):** v `EAEXAMPLE.QEA` **žádný obsah DBK není** — `find_packages_by_name` / `find_elements_by_name` na DBK, kniha, hodnocení = 0 nálezů (pilot DBK z července žije v jiném repozitáři, EA17_Yoga_QEA2, a do běhu nevstupuje). Agent to má vykázat jako „bez existujícího kontextu" a navrhnout **nový** obsah pod `#FB-TEST`; nesmí si kontext vymyslet. Pod `#FB-TEST` jsou `FBT-*`, `SportHub` s UC-95001…95005 a 2× `UC …` z iterace 7. Když recon ukáže něco jiného, zapiš to.
+- **Tvoje odpověď (HUMAN_DECISION):** „`Schvaluji: hranice a požadavky DEMO-91051–91053 dle BRD, mimo hranici dle BRD. Projektovou package nezakládej — package Business Requirements dej přímo pod #FB-TEST (jedna nová package na dávku), UC package později také přímo pod #FB-TEST.`"
 - **Zapiš:** počet čtecích dávek v kole (0/1) · požadavky rozpoznány 3/3 ✅/❌ · zástupný text v dávce (`<…>`, `TODO`) ✅ nebyl / ❌ byl · kontext %.
 
 ### Kolo 3 — zápis požadavků (1 dávka, LOW)
@@ -69,7 +69,7 @@ Pro každé kolo: napiš text → počkej, až Copilot dopíše → zkopíruj od
 ### Kolo 5 — identifikace a specifikace UC (bez dávky, HUMAN_DECISION)
 
 - **Napiš:** nic; jinak „`Pokračuj kolem 5: identifikace a specifikace UC.`"
-- **Agent má:** načíst `use-case-analyst` + `use-case-model`, **před návrhem přečíst pravidla identifikace a scénářů a v odpovědi uvést kontrolní kód `UC-PRAVIDLA-R4T`** (AK-7 druhá část). Návrh: aktér **Návštěvník** (v `#FB-TEST` neexistuje — založí se; aktéři SportHub Člen/Recepční se nepoužijí), UC **„Hodnoť knihu"** (cíl: návštěvník ohodnotí knihu 1–5★; pokrývá DEMO-91051/52/53), specifikace: PRE (zobrazen detail knihy), PST (hodnocení uloženo, celkové % přepočteno), ASU, BE (základní průchod), AF/EF (druhé hodnocení z téže IP = odmítnutí; neplatná hodnota) s odbočkou na krok BE a návratem, lokální BRU (hodnota 1–5; 1 IP = 1× na knihu; výpočet % z průměru). Skončit HUMAN_DECISION. *(Pro vyhodnocení ve vlákně -5, ne pro agenta: srovnávací vzor je `IT-ANALYSIS/md-mirror/dbk/use-cases/UC-91002.md` z pilotu — mimo workspace.)*
+- **Agent má:** načíst `use-case-analyst` + `use-case-model`, **před návrhem přečíst pravidla identifikace a scénářů a v odpovědi uvést kontrolní kód `UC-PRAVIDLA-R4T`** (AK-7 druhá část). Návrh: aktér **Návštěvník** (v `#FB-TEST` neexistuje — založí se; aktéři SportHub Člen/Recepční se nepoužijí), UC **„Hodnoť knihu"** (cíl: návštěvník ohodnotí knihu 1–5★; pokrývá DEMO-91051/52/53), specifikace: PRE (zobrazen detail knihy), PST (hodnocení uloženo, celkové % přepočteno), ASU, BE (základní průchod), AF/EF (druhé hodnocení z téže IP = odmítnutí; neplatná hodnota) s odbočkou na krok BE a návratem, lokální BRU (hodnota 1–5; 1 IP = 1× na knihu; výpočet % z průměru). Skončit HUMAN_DECISION. *(Pro vyhodnocení ve vlákně -5, ne pro agenta: srovnávací vzor je `IT-ANALYSIS/md-mirror/dbk/use-cases/UC-91002.md` z červencového pilotu v EA17_Yoga_QEA2 — mimo workspace.)*
 - **Kontrola obsahu (ty, 2 minuty):** název UC v rozkazovacím způsobu · kroky BE střídají Návštěvník / Systém · v krocích **není** GUI ani text pravidel (pravidla jsou BRU odkazované z kroků) · AF/EF mají krok, na který se vážou.
 - **Tvoje odpověď:** „`Schvaluji návrh UC Hodnoť knihu beze změn. Pokračuj kolem 6.`" (nebo s úpravou jednou větou — zapiš ji).
 - **Zapiš:** kód `UC-PRAVIDLA-R4T` uveden ✅/❌ · počet BE kroků · AF/EF počet · BRU počet · kontext % (tady bývá nejvyšší — `use-case-analyst` má 36 souborů; screenshot, když > 50 %).
@@ -78,7 +78,7 @@ Pro každé kolo: napiš text → počkej, až Copilot dopíše → zkopíruj od
 
 - **Agent má:** načíst `emr-scaffold` (režim B). Číslo UC = nejvyšší obsazené `UC-#####` v `#FB-TEST` + 1 (z recon kola 2; nemá-li ho, jedna čtecí dávka navíc — zapiš): očekávej **UC-95006** (kulisa SportHub drží 95001…95005; kdyby už nebyla, UC-95001 — zapiš skutečné číslo). Pak **jedna** zápisová dávka `$N`: package `UC-95006 Hodnoť knihu` přímo pod `#FB-TEST` (TV `SA-Status = proposed`) → UseCase s kompozitním diagramem `CSOB-ITAN::FA-Behavioral` → `UCR-95006` (Use Case Realization) → diagram `version_UC-95006 …` → aktér Návštěvník (nový, v téže package) —Association→ UC, UCR —Realization→ UC, umístění na diagram + Boundary.
 - **Očekáváš:** Output `FB <id> -> done: N ops (N ok, 0 chyb)`, **bez popupu** (1 nová package). Agent vypíše GUID package a diagramů a **vykáže ruční krok** „posunout Auto Name Counter".
-- **Když** agent převezme číslo z pilotu (`UC-91002`) nebo si číslo vymyslí bez čtení → napiš: „`Číslo UC urči podle pravidla nejvyšší obsazené UC-##### v #FB-TEST + 1.`" a zapiš jako nález šablony (ne opravnou dávku).
+- **Když** si agent číslo vymyslí bez čtení (např. `UC-91002` z domácího vzoru v kanonu) → napiš: „`Číslo UC urči podle pravidla nejvyšší obsazené UC-##### v #FB-TEST + 1.`" a zapiš jako nález šablony (ne opravnou dávku).
 - **Zapiš:** číslo UC · id (+ čtecí, byla-li) · Output řádek · popup ne ✅ · warnings (agent vypíše) · ruční krok counter vykázán ✅/❌ · kontext %.
 
 ### Kolo 7 — scénáře, constrainty, BRU, traceabilita (1 dávka, **ELEVATED**)
@@ -143,7 +143,7 @@ Verdikt tenkého řezu: ☐ prošel · ☐ prošel s nálezy · ☐ neprošel �
 |---|---|---|---|---|
 | | | | | |
 
-Známé předem (neopravovat během běhu): pilot `#PILOT DBK` je mimo whitelist — pokus agenta zapsat tam skončí `E_WHITELIST` (zapiš jako nález kanonu/šablony; agent má poslat novou dávku pod `#FB-TEST`) · číslo UC = `UC-95006`, protože kulisa SportHub (UC-95001…95005) v `#FB-TEST` stále existuje (P3 z 5. 9.) · kontroly 6/6b v QA F1 = W/B záměrně · build WARN u `scenario-phrases.md` = falešný poplach (viz `build-doma.log`).
+Známé předem (neopravovat během běhu): číslo UC = `UC-95006`, protože kulisa SportHub (UC-95001…95005) v `#FB-TEST` stále existuje (P3 z 5. 9.) · kontroly 6/6b v QA F1 = W/B záměrně · build WARN u `scenario-phrases.md` = falešný poplach (viz `build-doma.log`).
 
 ## Po běhu
 

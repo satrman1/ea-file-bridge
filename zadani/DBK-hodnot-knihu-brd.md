@@ -2,11 +2,11 @@
 
 | Pole | Hodnota |
 |---|---|
-| Projekt | Databáze knih (DBK) — cvičná doména; v EMR existuje pilot `/Business Applications/#PILOT DBK` (UC-91001…91005) **jen pro čtení** — tento tenký řez se modeluje **nově pod `#FB-TEST`** (jediná povolená větev zápisu), do pilotní větve se nezapisuje |
+| Projekt | Databáze knih (DBK) — cvičná doména. V repozitáři `EAEXAMPLE.QEA` žádný obsah DBK není (starší pilot DBK z července žije v jiném repozitáři a do tohoto běhu nevstupuje) — tenký řez se modeluje **nově pod `#FB-TEST`** (jediná povolená větev zápisu) |
 | Zadavatel / Owner | Provozovatel webu DBK (business vlastník) |
 | Origin | dokument „Databáze knih" (`IT-ANALYSIS/podklady/business-sample-book-db.png`), odstavce Základní informace + Doplňující informace 1 |
 | Verze | 1.0 — 2026-09-07 (Z260907b-4, scénář PV-R2 revidován: DBK místo SportHub) |
-| Cílový UC | jeden nový UC pro hodnocení knihy návštěvníkem; **číslo přidělí analytik podle pravidla „nejvyšší obsazené `UC-#####` v cílové větvi + 1"** (nepřebírat čísla z pilotu 91xxx) |
+| Cílový UC | jeden nový UC pro hodnocení knihy návštěvníkem; **číslo přidělí analytik podle pravidla „nejvyšší obsazené `UC-#####` v cílové větvi + 1"** |
 | SOS / Core UC | pro tenký řez **neexistuje** — mantinely neřeš, uveď jako známé omezení v návrhu hranice |
 
 Kontext (ze zadání): Běžný návštěvník webu Databáze knih (www.DBK.cz) se bez jakéhokoli přihlašování dostane do webové aplikace. Na detailu knihy vidí kromě názvu rok vydání, vydavatelství, žánr, jazyk, anotaci, autora (autory) a **celkové hodnocení knihy v procentech** (100 % nejlepší, 0 % nejhorší). Návštěvník má možnost zadat knize **vlastní hodnocení 1 až 5 hvězdiček** (5 nejlepší, 1 nejhorší). Hodnocení z jedné IP adresy je možné jen jednou.
@@ -44,6 +44,6 @@ Glosář: **návštěvník** = nepřihlášený uživatel webu (identifikován j
 
 ## Mimo hranici (neregistrovat jako FR)
 
-- Vyhledávání knih pomocí filtrů, seznam nejlépe hodnocených knih (50), detail autora a seznam autorů — jiné případy užití (v pilotu DBK: UC-91001, UC-91003).
-- Administrace knih a autorů — jiné případy užití (UC-91004, UC-91005).
+- Vyhledávání knih pomocí filtrů, seznam nejlépe hodnocených knih (50), detail autora a seznam autorů — jiné případy užití.
+- Administrace knih a autorů — jiné případy užití.
 - Způsob zjištění IP adresy a ochrana proti obcházení (proxy, VPN) — technické řešení, ne požadavek business zadání.
