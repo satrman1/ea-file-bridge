@@ -1,0 +1,22 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S15",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "clone_package",
+   "package": "GUID-L5000",
+   "name": "FBT-CAL-L5000 klon 1"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L5000",
+   "name": "FBT-CAL-L5000 klon 2"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L5000",
+   "name": "FBT-CAL-L5000 klon 3"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S01",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT name, sql FROM sqlite_master WHERE type = 'table' AND name IN ('t_document', 't_package') ORDER BY name"
+  },
+  {
+   "op": "get_baselines",
+   "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+  }
+ ]
+}

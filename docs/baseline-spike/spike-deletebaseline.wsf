@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<job id="EAFBSpikeDeleteBaseline">
+<script language="VBScript">
+<![CDATA[
+' COM attach na bezici EA - stejny vzor jako pump.wsf (VBScript umi GetObject(, "EA.App"), JScript ne).
+Function AttachEA()
+    On Error Resume Next
+    Set AttachEA = GetObject(, "EA.App")
+    If Err.Number <> 0 Then
+        Err.Clear
+        Set AttachEA = Nothing
+    End If
+End Function
+]]>
+</script>
+<script language="JScript">
+<![CDATA[
+// ============================================================================
+// T6-S SPIKE: existuje Project.DeleteBaseline v EA 17.1.5 a je pouzitelna?
+// (Z260904-2, docs/baseline-spike/PROTOKOL-SPIKE-BASELINE.md, krok K13)
+//
+// RUNTIME = WSH JScript = TENTYZ runtime jako pumpa (pump.wsf). Duvod, proc
+// spike nebezi jako operace bridge: nasazeni docasne operace = deploy_src =
+// zmena src/ a trvaly zaznam v modelu; tento skript nic nenasazuje, nic
+// nemeni v src/ a po skonceni po nem v modelu nezustava nic krome vysledku
+// (smazana nebo nesmazana baseline FBT-SPIKE). COM chyba (neexistujici
+// metoda) je v JScriptu ZACHYTITELNA try/catch - na rozdil od EA runtime
+// (PROTOKOL par. 1a/4), proto se spike na neexistujici metodu dela NEJDRIV tady.
+//
+// Co dela:
+//  1. pripoji se na bezici EA, STOP pokud repozitar neni EAEXAMPLE;
+//  2. vypise baselines package #FB-TEST (GetBaselines), vybere kandidaty
+//     s version zacinajici "FBT-SPIKE" - NIC JINEHO se nikdy nemaze;
+//  3. zepta se na konzoli, kterou FBT-SPIKE baseline smazat (vychozi
+//     "FBT-SPIKE del"), potvrzeni a/n;
+//  4. krok A: typeof pi.DeleteBaseline (existuje clen?)
+//     krok B: pi.DeleteBaseline(guid) - navratova hodnota
+//     krok C: pri false zkusi variantu s GUIDtoXML(guid)
+//     krok D: GetBaselines znovu - je pryc?
+//  5. vysledek vypise + ulozi do vysledky\T6S-pumpa-<cas>.txt vedle skriptu.
+// Start: dvojklik (sam se prehodi do cscript konzole). Pumpa muze bezet
+// (skript se nedotyka requests\), ale NESMI zrovna zpracovavat davku.
+// ============================================================================
+if (WScript.FullName.toLowerCase().indexOf("wscript.exe") >= 0) {
+    var sh0 = new ActiveXObject("WScript.Shell");
+    sh0.Run("cscript //nologo \"" + WScript.ScriptFullName + "\"");
+    WScript.Quit(0);
+}
+var FBTEST = "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"; // #FB-TEST (whitelist eaexample)
+var PREFIX = "FBT-SPIKE";
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+var BASE = fso.GetParentFolderName(WScript.ScriptFullName);
+var lines = [];
+function echo(s) { WScript.Echo(s); lines.push("" + s); }
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+function ts() { var d = new Date(); return "" + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + "-" + pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds()); }
+function save() {
+    try {
+        var dir = BASE + "\\vysledky";
+        if (!fso.FolderExists(dir)) { fso.CreateFolder(dir); }
+        var p = dir + "\\T6S-pumpa-" + ts() + ".txt";
+        var st = new ActiveXObject("ADODB.Stream");
+        st.Type = 2; st.Charset = "utf-8"; st.Open();
+        st.WriteText(lines.join("\r\n") + "\r\n");
+        st.SaveToFile(p, 2); st.Close();
+        WScript.Echo("Vysledek ulozen: " + p);
+    } catch (e) { WScript.Echo("Ulozeni vysledku selhalo: " + e.message); }
+}
+function finish(code) {
+    save();
+    WScript.Echo("");
+    WScript.Echo("Stiskni Enter pro zavreni.");
+    try { WScript.StdIn.ReadLine(); } catch (e) { }
+    WScript.Quit(code);
+}
+function listBaselines(pi) {
+    var xml = "" + pi.GetBaselines(pi.GUIDtoXML(FBTEST), "");
+    var items = [];
+    var re = /<baseline\s+([^>]*)\/?>/gi, m;
+    function attr(s, n) { var am = new RegExp(n + '="([^"]*)"', "i").exec(s); return am ? am[1] : ""; }
+    while ((m = re.exec(xml)) != null) {
+        items.push({ guid: attr(m[1], "guid"), version: attr(m[1], "version"), date: attr(m[1], "date"), notes: attr(m[1], "notes") });
+    }
+    return { items: items, raw: xml };
+}
+function findByGuid(items, g) { for (var i = 0; i < items.length; i++) { if (items[i].guid == g) { return items[i]; } } return null; }
+
+echo("=== T6-S spike: Project.DeleteBaseline z runtime pumpy (WSH JScript) === " + ts());
+var ea = AttachEA();
+if (ea == null) { echo("STOP: bezici EA nenalezena (GetObject EA.App)."); finish(2); }
+var rep = ea.Repository;
+var cs = "";
+try { cs = "" + rep.ConnectionString; } catch (e0) { echo("STOP: EA bez otevreneho projektu (" + e0.message + ")."); finish(2); }
+echo("Pripojeno: " + cs);
+if (cs.toUpperCase().indexOf("EAEXAMPLE") < 0) { echo("STOP: pripojeny repozitar NENI EAExample - spike se pousti jen doma."); finish(3); }
+var pi = rep.GetProjectInterface();
+var pkg = null;
+try { pkg = rep.GetPackageByGuid(FBTEST); } catch (e1) { pkg = null; }
+if (pkg == null) { echo("STOP: package #FB-TEST " + FBTEST + " nenalezen."); finish(3); }
+echo("Package: " + pkg.Name + " (id " + pkg.PackageID + ")");
+
+var before = listBaselines(pi);
+echo("Baselines pred (" + before.items.length + "):");
+var cands = [];
+for (var i = 0; i < before.items.length; i++) {
+    var it = before.items[i];
+    var isC = (it.version.indexOf(PREFIX) == 0);
+    echo("  " + (isC ? "[KANDIDAT] " : "           ") + it.guid + " | version(" + it.version.length + ") = " + (it.version.length > 60 ? it.version.substring(0, 60) + "..." : it.version) + " | date = " + it.date);
+    if (isC) { cands.push(it); }
+}
+echo("Format atributu date (prvni baseline, surove): " + (before.items.length > 0 ? before.items[0].date : "(zadna baseline)"));
+if (cands.length == 0) { echo("STOP: zadna baseline s prefixem " + PREFIX + " - nejdriv davka S07 (create_baseline)."); finish(4); }
+
+WScript.Echo("");
+WScript.Echo("Kterou FBT-SPIKE baseline smazat? Napis cast jmena (Enter = 'FBT-SPIKE del'):");
+var want = "";
+try { want = WScript.StdIn.ReadLine(); } catch (e2) { want = ""; }
+want = ("" + want).replace(/^\s+|\s+$/g, "");
+if (want == "") { want = "FBT-SPIKE del"; }
+var target = null, hits = 0;
+for (var j = 0; j < cands.length; j++) { if (cands[j].version.indexOf(want) == 0) { target = cands[j]; hits++; } }
+if (hits != 1) { echo("STOP: '" + want + "' odpovida " + hits + " kandidatum (musi presne 1)."); finish(4); }
+echo("Cil: " + target.guid + " | " + target.version.substring(0, 40));
+WScript.Echo("Opravdu smazat? (a = ano)");
+var ok = "";
+try { ok = WScript.StdIn.ReadLine(); } catch (e3) { ok = ""; }
+if (("" + ok).replace(/^\s+|\s+$/g, "").toLowerCase() != "a") { echo("Zruseno uzivatelem."); finish(0); }
+
+// --- krok A: existuje clen DeleteBaseline? ---
+var typ = "";
+try { typ = "" + (typeof pi.DeleteBaseline); echo("A) typeof pi.DeleteBaseline = " + typ); }
+catch (eA) { echo("A) VYJIMKA pri pristupu k pi.DeleteBaseline: " + eA.message + " (number " + (eA.number & 0xFFFF) + ")"); }
+
+// --- krok B: volani s plain GUID ---
+var rB = null, excB = null;
+try { rB = pi.DeleteBaseline(target.guid); echo("B) pi.DeleteBaseline(\"" + target.guid + "\") vratil: " + rB + " (typeof " + (typeof rB) + ")"); }
+catch (eB) { excB = eB; echo("B) VYJIMKA: " + eB.message + " (number " + (eB.number & 0xFFFF) + ")"); }
+
+// --- krok C: kdyz B nevratil true, zkusit GUIDtoXML variantu ---
+var rC = null;
+if (excB == null && !rB) {
+    try { rC = pi.DeleteBaseline(pi.GUIDtoXML(target.guid)); echo("C) pi.DeleteBaseline(GUIDtoXML) vratil: " + rC); }
+    catch (eC) { echo("C) VYJIMKA: " + eC.message + " (number " + (eC.number & 0xFFFF) + ")"); }
+}
+
+// --- krok D: kontrolni cteni ---
+var after = listBaselines(pi);
+var still = findByGuid(after.items, target.guid);
+echo("D) GetBaselines po: " + after.items.length + " (pred " + before.items.length + "); cil " + (still == null ? "JE PRYC" : "STALE EXISTUJE"));
+
+// --- verdikt ---
+var verdict = "";
+if (excB != null) {
+    var msg = ("" + excB.message).toLowerCase();
+    var num = (excB.number & 0xFFFF);
+    if (num == 438 || msg.indexOf("does not support") >= 0 || msg.indexOf("nepodporuje") >= 0) {
+        verdict = "STAV 3: API NEEXISTUJE (chyba 438 / object doesn't support) -> par. 6.4: tema 3 degraduje na report + rucni uklid. FBT-SPIKE baselines smaz rucne v Baseline manageru.";
+    } else {
+        verdict = "STAV 2b: API existuje (clen nalezen), ale volani hazi vyjimku -> zapsat presnou hlasku; par. 6.4 degradace, dokud se pricina nevysvetli.";
+    }
+} else if (still == null && (rB || rC)) {
+    verdict = "STAV 1: API EXISTUJE A MAZE (navrat true, GetBaselines ji uz nevraci). Pokracuj K14 (kontrolni cteni t_document) a K15 (EA runtime proxy).";
+} else if (still == null) {
+    verdict = "STAV 1?: baseline je pryc, ale navrat nebyl true (" + rB + "/" + rC + ") -> API maze, navratova hodnota neni spolehliva; zapsat.";
+} else {
+    verdict = "STAV 2: API existuje, vraci " + rB + (rC != null ? "/" + rC : "") + ", baseline STALE EXISTUJE -> par. 6.4 degradace; zapsat, zkusit rucni smazani v Baseline manageru (funguje-li rucne, je to omezeni API, ne zamek).";
+}
+echo("");
+echo("VERDIKT: " + verdict);
+finish(0);
+]]>
+</script>
+</job>

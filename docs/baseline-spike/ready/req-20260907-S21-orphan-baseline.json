@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S21",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_baseline",
+   "package": "{1D8CF437-9895-4d1d-90BD-09C7A3B69477}",
+   "name": "FBT-ORPHAN pred smazanim 2026-09-07",
+   "notes": "Mini-test osirelych baselines: package FBT-ORPHAN se vzapeti smaze (S22)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, d.DocName, d.Version, d.ElementID, d.DocDate, LENGTH(d.BinContent) AS bytes FROM t_document d WHERE d.DocType = 'Baseline' AND d.ElementID = '{1D8CF437-9895-4d1d-90BD-09C7A3B69477}'"
+  }
+ ]
+}

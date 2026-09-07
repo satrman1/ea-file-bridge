@@ -1,0 +1,27 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S02",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT DocType, COUNT(*) AS n FROM t_document GROUP BY DocType ORDER BY n DESC"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT DocID, DocName, DocType, ElementID, ElementType, Author, Version, IsActive, Sequence, DocDate, LENGTH(DocName) AS lenDocName, LENGTH(Version) AS lenVersion FROM t_document WHERE DocType = 'Baseline' ORDER BY ElementID, DocDate"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT p.Package_ID, p.Name AS PackageName, p.ea_guid AS PackageGUID, d.DocID AS BaselineGUID, d.DocName, d.Version, d.DocDate FROM t_document d JOIN t_package p ON p.ea_guid = d.ElementID WHERE d.DocType = 'Baseline' ORDER BY p.Name, d.DocDate"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.ElementID, COUNT(*) AS n FROM t_document d WHERE d.DocType = 'Baseline' GROUP BY d.ElementID ORDER BY n DESC"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, d.ElementID, d.DocName, d.Version, d.DocDate FROM t_document d WHERE d.DocType = 'Baseline' AND d.ElementID NOT IN (SELECT ea_guid FROM t_package)"
+  }
+ ]
+}

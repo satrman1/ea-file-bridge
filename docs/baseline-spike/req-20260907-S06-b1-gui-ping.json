@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S06",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "T6-B1 GUI fallback - FB_ProcessFolder nevola FB_SessionStart"
+  }
+ ]
+}

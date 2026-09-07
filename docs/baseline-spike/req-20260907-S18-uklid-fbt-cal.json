@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S18",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Package",
+     "guid": "GUID-FBT-CAL"
+    }
+   ]
+  }
+ ]
+}

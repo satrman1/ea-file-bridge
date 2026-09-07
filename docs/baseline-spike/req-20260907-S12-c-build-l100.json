@@ -1,0 +1,538 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S12",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+   "name": "FBT-CAL",
+   "notes": "T6-C kalibrace baseline (Z260904-2). Cely strom smaze uklidova davka S18."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$0",
+   "name": "FBT-CAL-L20000"
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "FBT-CAL-L5000"
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$2",
+   "name": "FBT-CAL-L1000"
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$3",
+   "name": "FBT-CAL-L100"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E001"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E002"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E003"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E004"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E005"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E006"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E007"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E008"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E009"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E010"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E011"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E012"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E013"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E014"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E015"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E016"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E017"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E018"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E019"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E020"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E021"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E022"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E023"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E024"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E025"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E026"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E027"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E028"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E029"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E030"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E031"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E032"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E033"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E034"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E035"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E036"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E037"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E038"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E039"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E040"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E041"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E042"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E043"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E044"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E045"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E046"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E047"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E048"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E049"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E050"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E051"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E052"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E053"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E054"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E055"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E056"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E057"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E058"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E059"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E060"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E061"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E062"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E063"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E064"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E065"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E066"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E067"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E068"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E069"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E070"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E071"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E072"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E073"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E074"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E075"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E076"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E077"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E078"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E079"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E080"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E081"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E082"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E083"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E084"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E085"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E086"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E087"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E088"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E089"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E090"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E091"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E092"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E093"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E094"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E095"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E096"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E097"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E098"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E099"
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "FBT-CAL-E100"
+    }
+   ]
+  }
+ ]
+}

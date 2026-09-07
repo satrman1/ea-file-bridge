@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S03",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "get_baselines",
+   "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+  }
+ ]
+}

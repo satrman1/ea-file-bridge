@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S16",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "WITH RECURSIVE sub(root_id, pkg_id) AS (SELECT Package_ID, Package_ID FROM t_package UNION ALL SELECT s.root_id, p.Package_ID FROM t_package p JOIN sub s ON p.Parent_ID = s.pkg_id) SELECT r.Package_ID, r.Name, r.ea_guid, COUNT(DISTINCT s.pkg_id) AS packages, COUNT(o.Object_ID) AS elements FROM t_package r JOIN sub s ON s.root_id = r.Package_ID LEFT JOIN t_object o ON o.Package_ID = s.pkg_id AND o.Object_Type <> 'Package' WHERE r.Name LIKE 'FBT-CAL%' GROUP BY r.Package_ID, r.Name, r.ea_guid ORDER BY elements DESC"
+  }
+ ]
+}

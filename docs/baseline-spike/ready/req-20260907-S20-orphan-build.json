@@ -1,0 +1,20 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S20",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+   "name": "FBT-ORPHAN",
+   "notes": "Mini-test osirelych baselines (Z260904-2b, 7. 9. 2026): package se po baseline smaze davkou S22."
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    { "package": "$0", "type": "Class", "name": "FBT-ORPHAN-E1" },
+    { "package": "$0", "type": "Class", "name": "FBT-ORPHAN-E2" }
+   ]
+  }
+ ]
+}

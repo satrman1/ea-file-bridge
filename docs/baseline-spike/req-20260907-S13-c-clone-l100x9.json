@@ -1,0 +1,52 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S13",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 1"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 2"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 3"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 4"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 5"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 6"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 7"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 8"
+  },
+  {
+   "op": "clone_package",
+   "package": "GUID-L100",
+   "name": "FBT-CAL-L100 klon 9"
+  }
+ ]
+}

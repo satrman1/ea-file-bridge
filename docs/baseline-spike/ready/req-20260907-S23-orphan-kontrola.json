@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S23",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid FROM t_package WHERE ea_guid = '{1D8CF437-9895-4d1d-90BD-09C7A3B69477}' OR Name LIKE 'FBT-ORPHAN%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, d.ElementID, d.DocName, d.Version, d.DocDate, LENGTH(d.BinContent) AS bytes FROM t_document d WHERE d.DocType = 'Baseline' AND d.ElementID NOT IN (SELECT ea_guid FROM t_package)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, d.DocName, d.Version, d.DocDate FROM t_document d WHERE d.DocType = 'Baseline' AND d.ElementID = '{1D8CF437-9895-4d1d-90BD-09C7A3B69477}'"
+  }
+ ]
+}

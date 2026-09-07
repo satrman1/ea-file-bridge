@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S17",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, p.Name AS PackageName, d.DocName, d.Version, d.DocDate, LENGTH(d.BinContent) AS bytes, LENGTH(d.BinContent) / 1048576.0 AS mb FROM t_document d JOIN t_package p ON p.ea_guid = d.ElementID WHERE d.DocType = 'Baseline' AND p.Name LIKE 'FBT-CAL%' ORDER BY d.DocDate"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n, SUM(LENGTH(BinContent)) / 1048576.0 AS mb_total FROM t_document WHERE DocType = 'Baseline'"
+  }
+ ]
+}

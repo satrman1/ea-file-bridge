@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S19",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid FROM t_package WHERE Name LIKE 'FBT-CAL%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, d.ElementID, d.DocName, d.Version, d.DocDate, LENGTH(d.BinContent) AS bytes FROM t_document d WHERE d.DocType = 'Baseline' AND d.ElementID NOT IN (SELECT ea_guid FROM t_package)"
+  },
+  {
+   "op": "get_baselines",
+   "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+  }
+ ]
+}

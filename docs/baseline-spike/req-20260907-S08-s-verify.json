@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-S08",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "get_baselines",
+   "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT DocID, DocName, Version, DocDate, LENGTH(DocName) AS lenDocName, LENGTH(Version) AS lenVersion, LENGTH(BinContent) AS bytes FROM t_document WHERE DocType = 'Baseline' AND ElementID = '{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}' ORDER BY DocDate"
+  }
+ ]
+}

@@ -1,0 +1,57 @@
+﻿=== T6-S spike: Project.DeleteBaseline z runtime pumpy (WSH JScript) === 20260907-113249
+Pripojeno: C:\Users\milos\Box\03.EAP\MCP-AI\EAExample.qea
+Package: #FB-TEST (id 1054)
+Baselines pred (46):
+             {C49B0436-5362-4416-AD53-BE160820B77D} | version(22) = FB 2026-08-13 18:21:41 | date = 
+             {A07F5949-1058-45b3-93C5-3CDDF6836C13} | version(22) = FB 2026-08-13 18:27:28 | date = 
+             {57FF3769-0B7C-4e79-A653-C03D2243720F} | version(22) = FB 2026-08-13 18:35:34 | date = 
+             {72FECE97-C28B-403e-8D3F-D10104DC2B3E} | version(22) = FB 2026-08-14 13:00:50 | date = 
+             {263C761B-D40F-4fc2-8E16-41C84F1FA499} | version(22) = FB 2026-08-14 23:36:54 | date = 
+             {41CE18BF-4BD8-41a7-9C3B-80755A7F21D7} | version(22) = FB 2026-08-16 14:31:47 | date = 
+             {B1081A62-5C54-4fa8-94B8-56338AA075E4} | version(22) = FB 2026-08-16 14:35:34 | date = 
+             {9EF5EB92-BC9E-4312-B03B-0A2EF2542B74} | version(22) = FB 2026-08-16 22:44:22 | date = 
+             {EA1C1D26-8740-409b-A9A3-A3734959A57C} | version(22) = FB 2026-08-16 22:54:09 | date = 
+             {771187F2-D16B-4b2f-B70F-FD018AC50055} | version(22) = FB 2026-08-16 23:21:11 | date = 
+             {7507C941-3AC1-4cda-808F-13DA8E106DDE} | version(22) = FB 2026-08-17 15:15:40 | date = 
+             {D76AD579-1280-44c1-8281-229FEBC730AE} | version(22) = FB 2026-08-17 16:55:46 | date = 
+             {CF104B11-A155-4aae-8626-0FF7ED8A6C5D} | version(22) = FB 2026-08-18 23:18:09 | date = 
+             {F38D4F24-D974-422e-ABD2-FB1DA2B6B248} | version(22) = FB 2026-08-19 11:33:52 | date = 
+             {F1C71EB0-C646-4844-8A46-76AF0DA134A7} | version(22) = FB 2026-08-19 14:03:18 | date = 
+             {18AEE41E-EBF7-4f10-AA24-0158F7C2451D} | version(22) = FB 2026-08-19 14:37:39 | date = 
+             {67542432-CFE0-479c-AA39-95BE68CBAF87} | version(22) = FB 2026-08-19 14:53:43 | date = 
+             {E0D5D98D-BA66-48d5-9044-B35E376E51C9} | version(22) = FB 2026-08-19 16:42:26 | date = 
+             {D9637E84-E670-466c-A87B-744F47597666} | version(22) = FB 2026-08-19 21:40:36 | date = 
+             {EA7014A7-FDAD-4651-BA80-1F3B110DCD9F} | version(22) = FB 2026-08-20 14:31:20 | date = 
+             {FC4DB7E3-C181-4e66-B428-643290B0714F} | version(22) = FB 2026-08-20 14:38:18 | date = 
+             {C1C8F958-04D1-46a1-9D5F-AA3D53359BDE} | version(22) = FB 2026-08-20 15:23:06 | date = 
+             {1748C69A-B107-4b48-A6E1-C505CBAA41EE} | version(22) = FB 2026-08-20 15:48:51 | date = 
+             {50484599-9DC8-48ca-8292-2E8116439512} | version(22) = FB 2026-08-20 17:00:30 | date = 
+             {55E26C0C-9E84-42b1-8FFA-7F3F30C964E6} | version(22) = FB 2026-08-20 17:36:33 | date = 
+             {73D9567D-98BC-4857-BD1C-1C92816EB80B} | version(22) = FB 2026-08-20 18:08:30 | date = 
+             {801815E5-694E-43a2-8C4E-D40A79DE5F2C} | version(22) = FB 2026-08-20 21:04:59 | date = 
+             {EF4B86BD-A0BA-4f0f-9314-E8C534E51F65} | version(22) = FB 2026-08-20 22:28:39 | date = 
+             {954BFF20-794D-4930-AE56-FCFBCF75452E} | version(22) = FB 2026-08-20 22:44:19 | date = 
+             {ABE30A35-8B3D-4693-A9FB-125AD56312DE} | version(22) = FB 2026-08-20 23:11:01 | date = 
+             {F9B1EA1E-F1D8-4e29-BE53-5437D46AC889} | version(22) = FB 2026-08-20 23:20:21 | date = 
+             {D6E2D554-53B1-4b41-8A5D-00475F19B8F5} | version(22) = FB 2026-08-20 23:25:02 | date = 
+             {E88272C4-8C07-44e3-B0F0-8ABBADB25CB8} | version(22) = FB 2026-08-20 23:30:04 | date = 
+             {0066A80D-7734-4240-AF0D-35131F8D8E0E} | version(22) = FB 2026-08-21 11:28:49 | date = 
+             {50560BAC-C401-46f2-8755-5059E3AE5182} | version(22) = FB 2026-08-21 12:05:57 | date = 
+             {A098C590-2CB4-4294-A6C2-4D028C96B2F5} | version(22) = FB 2026-08-21 20:16:41 | date = 
+             {3CBA40E4-A792-4ebc-8A91-2D7690F94FF5} | version(22) = FB 2026-09-05 20:46:37 | date = 
+             {EDC3507F-C592-449d-BAC2-4B54326013F5} | version(22) = FB 2026-09-05 22:32:58 | date = 
+             {10F5476B-763C-4e9d-9075-3A3427A3CE5B} | version(22) = FB 2026-09-05 22:42:23 | date = 
+             {4C6710E7-6D5C-4029-BA9B-1D9BA0D3EE96} | version(22) = FB 2026-09-07 10:50:15 | date = 
+             {CA1A86D8-90FD-4cb7-929F-0E6B5EA3A54C} | version(22) = FB 2026-09-07 10:58:46 | date = 
+             {F47D824D-259A-4b8c-9A65-BC61E923CE4E} | version(29) = Pojistka pred T6-S 2026-09-07 | date = 
+             {698E9F74-FF99-430c-BC2D-D719462B6EB7} | version(22) = FB 2026-09-07 11:29:37 | date = 
+  [KANDIDAT] {32798739-CE47-42f4-86CE-FBC3278680C5} | version(24) = FBT-SPIKE del 2026-09-07 | date = 
+  [KANDIDAT] {8F98501B-9B14-4acd-B7C1-93B3E50C2ECA} | version(255) = FBT-SPIKE len255 1122222222223333333333444444444455555555556... | date = 
+  [KANDIDAT] {D5E61FBB-16FB-4e33-A8FB-336D89D03BCB} | version(300) = FBT-SPIKE len300 1122222222223333333333444444444455555555556... | date = 
+Format atributu date (prvni baseline, surove): 
+Cil: {32798739-CE47-42f4-86CE-FBC3278680C5} | FBT-SPIKE del 2026-09-07
+A) typeof pi.DeleteBaseline = unknown
+B) pi.DeleteBaseline("{32798739-CE47-42f4-86CE-FBC3278680C5}") vratil: true (typeof boolean)
+D) GetBaselines po: 45 (pred 46); cil JE PRYC
+
+VERDIKT: STAV 1: API EXISTUJE A MAZE (navrat true, GetBaselines ji uz nevraci). Pokracuj K14 (kontrolni cteni t_document) a K15 (EA runtime proxy).
