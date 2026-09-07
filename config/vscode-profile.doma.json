@@ -1,0 +1,36 @@
+{
+  "_comment": "Profil doma pro tools/build-vscode.py — demo hodnoty eaexample (veřejné, už jsou v src/). Commituje se. Žádný klíč mdg (PV-R6 ii). sweepAllow = výslovně zdůvodněné neškodné nálezy sweepu B1 (T6): rule = na který regex se výjimka vztahuje, scope match = celý nález, scope line = celý řádek.",
+  "repo": "EAEXAMPLE.QEA",
+  "whitelist": [
+    {
+      "name": "#FB-TEST",
+      "guid": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+    }
+  ],
+  "dialekt": "sqlite",
+  "denyOps": [],
+  "contextNotes": [
+    "Domácí prostředí: eaexample (SQLite), transport pumpa pump.wsf, bez EA security."
+  ],
+  "sweepWords": [],
+  "sweepAllow": [
+    {
+      "rule": "jira",
+      "pattern": "(UC|BRU|LS|WF|IF|SA|SH|K[0-9]+|RETEST|C[0-9]|UTF|BRU[0-9]+|LS[0-9]+|PRE|PST|ASU|AF|EF|BE)-[0-9]+|[A-Z]+X{3,}-[0-9]+",
+      "scope": "match",
+      "reason": "kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID"
+    },
+    {
+      "rule": "url",
+      "pattern": "https://github\\.com/<org.*",
+      "scope": "match",
+      "reason": "syntetický příklad URL s placeholderem <org> (ir-format, emr-zapis-pravidla) — ne reálná adresa"
+    },
+    {
+      "rule": "token",
+      "pattern": "(?i)^(?!.*(token|passw|secret|api[_-]?key|bearer|authorization)\\w*\\s*[:=\"']).*$",
+      "scope": "line",
+      "reason": "slovo password/token v próze bez přiřazení hodnoty (UC příklady Cockburn, DDL EA [Password]) — ne credential"
+    }
+  ]
+}

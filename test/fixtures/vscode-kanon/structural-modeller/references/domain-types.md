@@ -1,0 +1,3 @@
+# Doménové typy
+
+dtAmount, dtFlag.

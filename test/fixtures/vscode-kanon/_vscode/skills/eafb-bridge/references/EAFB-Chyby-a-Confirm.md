@@ -1,0 +1,3 @@
+# Chyby
+
+ELEVATED = člověk klikne.

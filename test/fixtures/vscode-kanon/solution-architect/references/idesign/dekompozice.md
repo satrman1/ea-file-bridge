@@ -1,0 +1,3 @@
+# Dekompozice
+
+Volatility trumps all.

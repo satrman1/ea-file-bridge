@@ -1,0 +1,44 @@
+{
+  "_comment": "VZOR profilu banka pro tools/build-vscode.py. V korporátním repu zkopíruj na config/vscode-profile.banka.json (je v .gitignore — přes kurýr nikdy nejde) a doplň hodnoty: repo = název DB (NAVOD-NASAZENI-BANKA §6, FB_RepoId/DB_NAME), whitelist = testovací package(s) EMR_TEST. Žádný klíč mdg (PV-R6 ii). sweepWords = interní slovník (T6: config/zakazana-slova.txt) — názvy DB, serverů, space/project keys; nálezy se v profilu banka jen reportují.",
+  "repo": "<TEST-DB>",
+  "whitelist": [
+    {
+      "name": "<WHITELIST>",
+      "guid": "{00000000-0000-0000-0000-000000000000}"
+    }
+  ],
+  "dialekt": "mssql",
+  "denyOps": [
+    "deploy_src",
+    "delete_from_model",
+    "clone_package"
+  ],
+  "contextNotes": [
+    "Bankovní prostředí: MS SQL 2022 (INFORMATION_SCHEMA, [Constraint], +), EA security zapnutá, deny operace = ruční krok člověka (delete-request).",
+    "Kontext repa: EA-Repozitar-Kontext-banka.md v korporátním repu (mimo kurýr)."
+  ],
+  "sweepWords": [
+    "<TEST-DB>",
+    "<PROD-DB>"
+  ],
+  "sweepAllow": [
+    {
+      "rule": "jira",
+      "pattern": "(UC|BRU|LS|WF|IF|SA|SH|K[0-9]+|RETEST|C[0-9]|UTF|BRU[0-9]+|LS[0-9]+|PRE|PST|ASU|AF|EF|BE)-[0-9]+|[A-Z]+X{3,}-[0-9]+",
+      "scope": "match",
+      "reason": "kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID"
+    },
+    {
+      "rule": "url",
+      "pattern": "https://github\\.com/<org.*",
+      "scope": "match",
+      "reason": "syntetický příklad URL s placeholderem <org> — ne reálná adresa"
+    },
+    {
+      "rule": "token",
+      "pattern": "(?i)^(?!.*(token|passw|secret|api[_-]?key|bearer|authorization)\\w*\\s*[:=\"']).*$",
+      "scope": "line",
+      "reason": "slovo password/token v próze bez přiřazení hodnoty — ne credential"
+    }
+  ]
+}

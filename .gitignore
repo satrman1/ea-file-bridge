@@ -11,3 +11,11 @@ state-*.txt
 
 # pracovni poznamky (lokalni; plati doma i v bance)
 tmp-*.md
+
+# ostry bankovni profil buildu .github/ (tools/build-vscode.py) - jen v korporatnim repu,
+# pres kuryr nikdy; vzor = config/vscode-profile.banka.example.json
+config/vscode-profile.banka.json
+
+# Python bytecode (tools/build-vscode.py, test/build-vscode.test.py)
+__pycache__/
+*.pyc
