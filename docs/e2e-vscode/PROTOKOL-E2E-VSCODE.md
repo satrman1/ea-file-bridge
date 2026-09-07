@@ -1,6 +1,6 @@
 # E2E ve VS Code — klikací protokol tenkého řezu F0 → F1 na DBK „Hodnoť knihu" (Z260907b-5)
 
-*v1.0 — 2026-09-07 (Z260907b-4). Prostředí: VS Code + GitHub Copilot Pro+ (agent `sa-analytik`, model Claude Opus 5), EA s `EAExample.qea`, transport pumpa. Zadání: `IT-ANALYSIS/Zadani-Portace-VSCode-v2.md` kap. 5.2 (kola), kap. 9 (AK-6, AK-7, AK-8); scénář PV-R2 revidován 7. 9. večer: místo SportHub/UC-95004 **Databáze knih (DBK), UC „Hodnoť knihu"** z `zadani/DBK-hodnot-knihu-brd.md` (podklad `IT-ANALYSIS/podklady/business-sample-book-db.png`). Rituál, který agent provádí: `.github/skills/e2e-f0-f1/SKILL.md`. Build, který se testuje: `docs/e2e-vscode/build-doma.log`.*
+*v1.1 — 2026-09-07 (Z260907b-4; **VYPLNĚN po živém běhu Po 7. 9. 16:20–18:45, Z260907b-5** — výsledky níže). Původně v1.0: Prostředí: VS Code + GitHub Copilot Pro+ (agent `sa-analytik`, model Claude Opus 5), EA s `EAExample.qea`, transport pumpa. Zadání: `IT-ANALYSIS/Zadani-Portace-VSCode-v2.md` kap. 5.2 (kola), kap. 9 (AK-6, AK-7, AK-8); scénář PV-R2 revidován 7. 9. večer: místo SportHub/UC-95004 **Databáze knih (DBK), UC „Hodnoť knihu"** z `zadani/DBK-hodnot-knihu-brd.md` (podklad `IT-ANALYSIS/podklady/business-sample-book-db.png`). Rituál, který agent provádí: `.github/skills/e2e-f0-f1/SKILL.md`. Build, který se testuje: `docs/e2e-vscode/build-doma.log`.*
 
 ## Jak protokol používat
 
@@ -26,7 +26,7 @@ Co znamená status v Output tabu: `done` = provedeno · `confirm_required` / kon
 | # | Udělej | Má být vidět | Zapiš |
 |---|---|---|---|
 | 0.1 | Otevři EA s `EAExample.qea`. | Project Browser, package `#FB-TEST` v `Example Model / Model Based Add-Ins / EA Addins`. | — |
-| 0.2 | Dvojklik na `C:\GIT\ea-file-bridge\pump.wsf`. | Okno konzole pumpy: `=== EA File Bridge pumpa v0.5 …`, `Pripojeno na EA: …`, `Code loader: N operaci nacteno`, řádek session baseline nad `#FB-TEST`. Kdyby hlásila starou dávku v `pending\`, dej v popupu **Ne**. | N operací: ____ |
+| 0.2 | Dvojklik na `C:\GIT\ea-file-bridge\pump.wsf`. **Před tím zavři každé starší okno pumpy — smí běžet jen jedna** (dvě pumpy provedou tutéž dávku dvakrát, N5). | Okno konzole pumpy: `=== EA File Bridge pumpa v0.5 …`, `Pripojeno na EA: …`, `Code loader: N operaci nacteno`, řádek session baseline nad `#FB-TEST`. Kdyby hlásila starou dávku v `pending\`, dej v popupu **Ne**. | N operací: ____ |
 | 0.3 | Otevři VS Code na složce `C:\GIT\ea-file-bridge` (jen tato složka, ne multi-root). Source Control panel: žádné změny, poslední commit = `chore(zadani): scénář tenkého řezu → DBK Hodnoť knihu (PV-R2 rev.) + protokol E2E`. | Ve stromu: `.github\skills\` (8 složek), `.github\agents\sa-analytik.agent.md`, `zadani\DBK-hodnot-knihu-brd.md` (jediný soubor v `zadani\`). | commit hash (z panelu Source Control → historie): ____ |
 | 0.4 | Otevři Copilot Chat, přepni na režim **Agent**, v rozbalovacím seznamu agentů vyber **`sa-analytik`**, model **Claude Opus 5**. | V hlavičce chatu je vidět `sa-analytik` a `Claude Opus 5`. Když `sa-analytik` v seznamu není: Nastavení → hledej `chat.agentFilesLocations` (má obsahovat `.github/agents`) a `chat.useAgentSkills` (zapnuto) — zapiš, co bylo jinak. | agent ✅/❌ · model ✅/❌ |
 | 0.5 | Nový chat (ikona +), nic nepiš. Zapiš stav ukazatele kontextu **před prvním dotazem**. | Ukazatel u vstupního pole (procenta nebo kolečko; hover ukáže číslo). | kontext start: ____ % |
@@ -105,47 +105,62 @@ Pro každé kolo: napiš text → počkej, až Copilot dopíše → zkopíruj od
 
 | Kolo | Co | Dávka id | Output řádek (ACK) | Popup / klik | Opravná | Allow dialog | Kontext % | Poznámka |
 |---|---|---|---|---|---|---|---|---|
-| 0 | příprava | — | — | — | — | — | | N operací = |
-| 1 | ping | | | — | — | | | kód SA-KIT-VSC-Q9M ✅/❌ |
-| 2 | převzetí zadání (recon?) | | | — | — | | | 3/3 požadavky |
-| 3 | Business Requirements + 3 Req | | | ne | | | | |
-| 4a | QA F0 čtení | | | — | | | | |
-| 4b | QA F0 report | | | — | | | | verdikt |
-| 5 | návrh UC (bez dávky) | — | — | — | — | | | kód UC-PRAVIDLA-R4T ✅/❌ |
-| 6 | kostra UC | | | ne | | | | UC-______ · ruční: counter |
-| 7 | scénáře + BRU + trace | | | **Ano** ___:___ | | | | warnings = |
-| 7x | opravná (je-li) | | | | ✅ | | | |
-| 8a | QA F1 čtení | | | — | | | | |
-| 8b | QA F1 report | | | — | | | | W/B = 6/6b? |
-| 9 | Gate Record G1 | | | — | | | | |
-| **Σ** | | **dávek =** | | **ELEVATED =** | **opravných =** | **Allow =** | **max % =** | |
+| 0 | příprava | — | — | — | — | — | 0 | N operací = 105 (pumpa); **byla otevřená i druhá pumpa z dopoledne** (zjištěno až v kole 6) |
+| 1 | ping | 20260907-E1 | `done: 1 ops (1 ok)` (Output řádek smazán, doloženo `res-…E1.json`) | — | — | 0 | 3 | kód SA-KIT-VSC-Q9M ✅ v první větě |
+| 2 | převzetí zadání (recon 0) | — | — | — | — | 0 | 3 | 3/3 požadavky ✅, recon vynechán (dotazy přibalil do kola 4) — dobře; UC pojmenoval „Ohodnotit knihu" (infinitiv, v kole 5 sám opravil); zeptal se na `AI-User` |
+| 3 | Business Requirements + 3 Req | 20260907-E2 | `done: 2 ops (2 ok)` risk=**ELEVATED** | **Ano** (nemělo být) | — | 1 (obsah dialogu nezjištěn — doplní Miloš) | 3 | ELEVATED kvůli `matchByName: true` na nové package (N1), ne kvůli `$N` |
+| 4a | QA F0 čtení | 20260907-E3 | `done: 5 ops (5 ok)` | — | — | 0 | 3 | res 11 kB v jednom řádku — Copilot dočetl jen část, dotazy zopakoval v E4 (N4) |
+| 4b | QA F0 report (+ recon UC counter, aktéři, MDG) | 20260907-E4 | `done: 6 ops (6 ok)` risk=**ELEVATED** confirmedAt 16:31:30 | **Ano** (nemělo být) | — | 0 | 3 | verdikt **pass s W** (B=0, W=2, I=1); `#QA` v téže dávce ✅; ELEVATED opět `matchByName` (N1); MDG dotaz chybný → falešné „bez MDG" (N3) |
+| 5 | návrh UC (bez dávky) | — | — | — | — | 0 | 5 | kód UC-PRAVIDLA-R4T ✅ · BE 8 kroků · AF 2 (AF-2 na pokyn vypuštěn) / EF 2 · BRU 3 · název „Hodnoť knihu" (opraven na pokyn z „Ohodnoť") |
+| 6 | kostra UC | 20260907-E5 | `done: 8 ops (8 ok)` risk=**LOW** | ne ✅ | — | 0 | 9 | UC-95006 ✅ · counter vykázán ✅ · warnings 0 · **provedeno 2× (dvě pumpy → duplicitní package 1082, N5)** · typování fallback UML+stereotyp místo `CSOB-ITAN::` (N3) |
+| 7 | scénáře + BRU + trace | 20260907-E6 | `done: 4 ops (4 ok)` risk=ELEVATED writeOps=14 | **Ano** 18:20:59 | — | 0 | 9 | popup: „Chysta se vytvorit 3 a upravit 3 prvku … Operace 'create_or_update_scenarios' je politikou klasifikovana ELEVATED (+ 2 dalsi duvody)"; warnings = 0; join AF→3, EF-2→3, EF-1→End správně |
+| X1 | **úklid prostředí** (mimo rozpočet): delete duplicitní package 1082 | 20260907-X1-duplikat | `done: 1 ops (1 ok)` risk=ELEVATED | **Ano** | — | 0 | — | dávku připravilo vlákno -5 (`ready/`), Miloš zkopíroval; druhá pumpa zavřena |
+| 8a | QA F1 čtení | 20260907-E7 | `done: 8 ops (8 ok)` | — | — | 0 | 12 | op 1 `SELECT … Type FROM t_objectconstraint` = neexistující sloupec → **modální dialog EA** + `ok, rowCount 0` (falešná nula, N2) |
+| 8a' | QA F1 dočtení | 20260907-E8 | `done: 4 ops (4 ok)` | — | ✅ (čtecí) | 0 | 12 | `SELECT *` — constrainty 4/4 ✓ |
+| 8b | QA F1 report | 20260907-E9 | `done: 2 ops (2 ok)` risk=LOW | — | — | 0 | 12 | verdikt **pass s W**; **B = jen 6/6b** ✅; W navíc: 6c aktér v UC package (dle protokolu), typování bez MDG (N3), 1c umístění pod #FB-TEST (dle protokolu) |
+| 9 | Gate Record G1 | 20260907-EA | `done: 2 ops (2 ok)` risk=LOW | — | — | 0 | 13 | `#GATES` v téže dávce ✅ · GR `{3CD8A76C-…}` · souhrn agenta úplný (dávky, ELEVATED, QA, GUIDy, ruční kroky) |
+| **Σ** | | **dávek = 10** (E1–E9, EA) + 1 úklid prostředí mimo rozpočet | | **ELEVATED = 3** (E2, E4, E6) | **opravných = 1** (E8, čtecí) | **Allow = 1** (kolo 3–4) | **max % = 13** | |
+
+Souhrn agenta na konci (doslova zkráceno): 10 dávek, 1 opravná (E8), ELEVATED 3 (E2/E4 `matchByName`, E6 politika scénářů), kódy SA-KIT-VSC-Q9M + UC-PRAVIDLA-R4T, QA F0 pass s W (B=0), QA F1 pass s W (B=2 = 6/6b), výstup `#FB-TEST/UC-95006 Hodnoť knihu` {65D45022-4B79-4aae-AE12-5DD704040BD1} (UseCase {BD9BCAB1-1CF3-4e99-9B84-77EC0009075A}, UCR, aktér Návštěvník, boundary, detail + version diagram, 4 scénáře, 4 constrainty, 3 BRU, 3 Realization na DEMO-91051/52/53), `Business Requirements` {655F0D69-…}, `#QA` {DA02D755-…} (3 Artifacty), `#GATES` {5663EE51-…} (GR-G1); ruční kroky: counter 95007, přesun z #FB-TEST, aktér do ACTORS, zaokrouhlení % (BRU95006-3). Agent sám správně pojmenoval kandidáty do kanonu: `matchByName` → ELEVATED, `ConstraintType`, falešná nula.
 
 ## Vyhodnocení AK-6 / AK-7 / AK-8 (vyplní vlákno Z260907b-5 po běhu)
 
 | AK | Kritérium | Limit | Naměřeno | ✅/❌ |
 |---|---|---|---|---|
-| AK-6a | dávek celkem | ≤ 10 | | |
-| AK-6b | opravných dávek | ≤ 2 | | |
-| AK-6c | ELEVATED potvrzení | právě 1 (kolo 7) | | |
-| AK-6d | QA F0 | pass | | |
-| AK-6e | QA F1 | pass s W, jediné B/W = 6/6b | | |
-| AK-6f | Gate Record G1 zapsán | ano | | |
-| AK-6g | Allow / Continue dialogy | 0 | | |
-| AK-7a | kód `SA-KIT-VSC-Q9M` v první odpovědi | ano | | |
-| AK-7b | kód `UC-PRAVIDLA-R4T` v kole 5 | ano | | |
-| AK-8 | ukazatel kontextu, maximum přes všechna kola (bez `/compact`) | ≤ 60 % | | |
+| AK-6a | dávek celkem | ≤ 10 | 10 (+1 úklid prostředí mimo rozpočet agenta) | ✅ |
+| AK-6b | opravných dávek | ≤ 2 | 1 (E8, čtecí dočtení po falešné nule) | ✅ |
+| AK-6c | ELEVATED potvrzení | právě 1 (kolo 7) | 3 (E2, E4 kvůli `matchByName`; E6 = to očekávané) | ❌ — příčina = mezera kitu (N1), po opravě kanonu by běh dal 1 |
+| AK-6d | QA F0 | pass | pass s varováními (B=0, W=2: umístění pod #FB-TEST, razítka ověřena až v E4) | ✅ |
+| AK-6e | QA F1 | pass s W, jediné B/W = 6/6b | pass s W; **B = jen 6/6b** ✅; W navíc 3 (6c aktér, typování bez MDG, 1c umístění) | ✅ s výhradou (W navíc: 2× důsledek zadání protokolu, 1× N3) |
+| AK-6f | Gate Record G1 zapsán | ano | ano — `#GATES` založena v téže dávce, TV gate/datum/rozhodl/vysledek/tier | ✅ |
+| AK-6g | Allow / Continue dialogy | 0 | 1 (kolo 3–4; na co se ptal, Miloš nezaznamenal) | ❌ (neurčeno) |
+| AK-7a | kód `SA-KIT-VSC-Q9M` v první odpovědi | ano | ano, první řádek odpovědi | ✅ |
+| AK-7b | kód `UC-PRAVIDLA-R4T` v kole 5 | ano | ano (pozn.: agent kód nejdřív hledal grepem „kontroln|kód", teprve pak četl pravidla — důkaz načtení je slabší, než AK předpokládá; obsah návrhu ale pravidla respektoval) | ✅ |
+| AK-8 | ukazatel kontextu, maximum přes všechna kola (bez `/compact`) | ≤ 60 % | **13 %** (969/7000; kolo 5 = 5 %, kolo 6–7 = 9 %, kolo 8 = 12 %) | ✅ |
 
-Verdikt tenkého řezu: ☐ prošel · ☐ prošel s nálezy · ☐ neprošel — důvod: ______
+Verdikt tenkého řezu: ☐ prošel · ☒ **prošel s nálezy** · ☐ neprošel — důvod: obsahově F0→F1 kompletní a správné (UC, scénáře s join, constrainty, BRU, traceabilita, QA F0/F1, G1) v 10 dávkách a 13 % kontextu; neprošly AK-6c (3× ELEVATED — mezera kitu u `matchByName`, opraveno v kanonu) a AK-6g (1 Allow dialog nezdokumentovaný); prostředí přidalo duplicitní provedení E5 (dvě pumpy).
 
 ## Nálezy (klasifikace: šablona `_vscode/` · kanon `Skilly/<skill>` · bridge `src/` · prostředí)
 
 | # | Kolo | Co se stalo (1–2 věty) | Klasifikace | Oprava (kam) |
 |---|---|---|---|---|
-| | | | | |
+| N1 | 3, 4 | Agent dal na nově zakládanou package `matchByName: true` („idempotence bez reconu"). Risk Gate klasifikuje `$N` na package s `matchByName` jako „nejistý původ" (fail-closed B3) a novou package počítá jako cizí → ELEVATED 2×. Agentova diagnóza („každý `$N` je ELEVATED") byla špatně; po větě z vlákna -5 šla E5 bez `matchByName` jako LOW. Pravidlo bylo jen v `emr-zapis.instructions.md` (applyTo `requests/**`), které agent při skládání zjevně neměl v kontextu. | šablona `_vscode/` | ✅ `eafb-bridge/SKILL.md` (nové pravidlo), `copilot-instructions.md` bod 7, `e2e-f0-f1/SKILL.md` kola 3/4/6 |
+| N2 | 8a | Dotaz `SELECT … Type AS ConstraintType FROM t_objectconstraint` — sloupec se jmenuje `ConstraintType`. EA otevřelo modální dialog „SQL API Open FAILED: no such column: Type" (Miloš musel odkliknout), bridge vrátil `ok, rowCount: 0`. Stálo 1 dávku (E8). | šablona + **bridge** | ✅ `eafb-bridge/SKILL.md` (sloupce QA tabulek, falešná nula), `e2e-f0-f1` kolo 8; **bridge (po 22. 9.)**: `query` má chybu SQL detekovat a vracet `error`/`E_SQL`, ne `ok`; zvážit `Repository.SuppressEADialogs` kolem `SQLQuery` |
+| N3 | 4b, 6 | Agent „ověřil", že repozitář nemá MDG, dotazem `Object_Type LIKE '%::%'` / `Diagram_Type LIKE '%::%'` — tam MDG nikdy není (StyleEx `MDGDgm=`, t_xref). V tomtéž `#FB-TEST` přitom SportHub UC-95001 má diagram `CSOB-ITAN::FA-Behavioral`. Výsledek: UC package typována fallbackem (UseCase + Collaboration «Use Case Realization», diagram Use Case / Class místo FA-Behavioral / Version Root Diagram) a QA F1 W navíc. | šablona + kanon | ✅ `eafb-bridge/SKILL.md` (MDG detekce, vzor z existující package), `e2e-f0-f1` kolo 4/6 |
+| N4 | 4a | `res-…E3.json` (11 kB, jeden řádek) Copilot nedokázal přečíst celý („výstup spadl za limit čitelnosti") a dotazy zopakoval v E4 — bez ztráty dávky, ale dvojí čtení. Copilotův file search navíc `responses/` nevidí (gitignore → „No matches found"), soubor otevře jen přímo cestou. | prostředí + bridge | ✅ `eafb-bridge/SKILL.md` (číst celý soubor, opakovat kompaktně); **bridge (po 22. 9.)**: pumpa může res zapisovat odsazený (pretty-print) — čitelnější pro nástroje IDE; search.exclude pro `responses/` je věc nastavení VS Code, ne kitu |
+| N5 | 6 | **Dvě běžící pumpy** (dopolední z baseline spike + odpolední) vzaly `req-…E5.json` obě → package `UC-95006` vznikla 2× (1082 a 1083, ids prokládané 18:19:14–18:19:31), `res-E5.json` přepsán druhým během; Copilot pracoval s GUIDy z prvního (1083). Úklid: dávka `X1-duplikat` z vlákna -5 (ELEVATED, Ano), druhá pumpa zavřena. E6 už jela jednou. | **prostředí** (+ bridge kandidát) | protokol kolo 0.2 doplněn („jen jedno okno pumpy"); **bridge (po 22. 9.)**: `pump.wsf` — zámek jediné instance (lock soubor / mutex), případně atomický přesun req do `processing/` před zpracováním |
+| N6 | 3–4 | Vyskočil 1 Allow/Continue dialog, Miloš potvrdil, obsah nezaznamenán → AK-6g nelze vyhodnotit. | prostředí / obsluha | příště: text dialogu do vlákna před kliknutím (protokol „Jak protokol používat" bod 4 to říká) |
+| N7 | 2 | Agent se zeptal na hodnotu razítka `AI-User` (login z pingu prázdný, security vypnutá) — správně, ale protokol s tím nepočítal. | šablona | ✅ `e2e-f0-f1` kolo 2 (otázka v HUMAN_DECISION) |
+| N8 | 2, 5 | UC nejdřív „Ohodnotit knihu" (infinitiv, kolo 2 před čtením pravidel), v kole 5 „Ohodnoť knihu", na pokyn „Hodnoť knihu". Kontrolní kód R4T agent našel grepem a teprve pak četl pravidla. | pozorování | bez opravy; AK-7 měří přítomnost kódu, ne hloubku čtení — pro banku zvážit kód uvnitř věty pravidla, ne v hlavičce |
+| N9 | 8b | QA F1 W „aktér v UC package místo ACTORS" a „umístění pod #FB-TEST místo /Projects" jsou důsledek zadání protokolu (jediná whitelist větev, aktér nový v téže package) — agent je správně zdůvodnil. | pozorování | bez opravy |
 
 Známé předem (neopravovat během běhu): SOS / Core UC pro tenký řez neexistuje — agent v kole 2 vykáže „mantinely nedostupné" jako omezení hranice a pokračuje (kdyby na odkazu na SOS trval, je to nález šablony, ne chyba běhu) · doménové typy do F0–F1 bez logické obrazovky nevstupují (kontrola 6 QA F1 = W/B záměrně; DTO/entity až F2–F3) · package `#QA` (kolo 4) a `#GATES` (kolo 9) pod `#FB-TEST` neexistují, agent je zakládá v téže dávce jako report/record · číslo UC = `UC-95006`, protože kulisa SportHub (UC-95001…95005) v `#FB-TEST` stále existuje (P3 z 5. 9.) · kontroly 6/6b v QA F1 = W/B záměrně · build WARN u `scenario-phrases.md` = falešný poplach (viz `build-doma.log`).
 
-## Po běhu
+## Po běhu (stav 7. 9. večer)
+
+Hotovo vláknem Z260907b-5: protokol vyplněn, kanon opraven (N1–N3, N7 → `Skilly/_vscode/`), rebuild doma thin (`docs/e2e-vscode/build-doma-2.log`, 60 souborů, sweep 0, verify OK, harness 223/223), commit lokálně. Zbývá Miloš: rozhodnout úklid `#FB-TEST` (dávka `docs/e2e-vscode/ready/req-20260907-X2-uklid.json` = delete `UC-95006 Hodnoť knihu` + `Business Requirements` + `#QA` + `#GATES`, ELEVATED — nebo nechat jako referenci), Pá 11. 9. tag `v0.13` + push, po 22. 9. bridge kandidáti N2/N4/N5.
+
+### Původní pokyny
 
 1. Do vlákna Z260907b-5 vlož vyplněnou tabulku výsledků (nebo ji vlákno vyplní z tvých průběžných vstupů) — vlákno doplní AK tabulku, nálezy, opraví kanon, spustí `tools\build.cmd` (dvojklik; okno se na konci zastaví, čekej „OK – build i verify prosly") a commitne.
 2. Úklid `#FB-TEST`: vlákno ti připraví dávku delete package `UC-95006 Hodnoť knihu` + `Business Requirements` (ELEVATED, klikneš Ano), nebo obsah necháš jako referenci — rozhodneš jednou větou.

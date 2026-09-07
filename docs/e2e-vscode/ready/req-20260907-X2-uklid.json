@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-X2-uklid",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    { "type": "Package", "guid": "{65D45022-4B79-4aae-AE12-5DD704040BD1}" },
+    { "type": "Package", "guid": "{655F0D69-494D-4a11-907F-06449F3C9A57}" },
+    { "type": "Package", "guid": "{DA02D755-9FAB-4126-8FD9-D14EB541AAF0}" },
+    { "type": "Package", "guid": "{5663EE51-89FA-4382-9EF5-528E0392020E}" }
+   ]
+  }
+ ]
+}

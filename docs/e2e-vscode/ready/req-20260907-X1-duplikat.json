@@ -1,0 +1,13 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260907-X1-duplikat",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    { "type": "Package", "guid": "{E153CC60-404C-418e-99EA-3DDA6C64197F}" }
+   ]
+  }
+ ]
+}

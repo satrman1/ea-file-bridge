@@ -4,7 +4,7 @@
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-09-07 + sha1 a035d9b4ec74b1de1ee48af632abf1c593975616 |
+| Verze kanonu | 2026-09-07 + sha1 f750215b41eb6c40f366442e2b7ec8d487006e13 |
 | Profil | doma |
 | Sada | thin |
 | Skillů | 8 (kanon 5 + generované 3) |
@@ -27,13 +27,13 @@
 | Soubor | sha256 |
 |---|---|
 | agents/sa-analytik.agent.md | a0521cefbd29d41a31b571af23dcf354f222ab562c94c2194b89f1638172ca97 |
-| copilot-instructions.md | e025471397c8c20ea06ba47b0c0d2be4d4796ef610e10e0fa2d64dbe6c44e40c |
+| copilot-instructions.md | 1f700be857a5203cc438a1cde89ee98d1c5d92e5549a2f41984fd78277ce0c49 |
 | instructions/emr-zapis.instructions.md | 1125ccab156f3d75bdf92d3da2d3012e35fa01274620bc22fdb923a05aeef0a7 |
 | instructions/mermaid.instructions.md | f0f3219b9bd6c0f2dd9c5697e8c35a77361a629fc98e2290f22262bab99edca8 |
-| skills/e2e-f0-f1/SKILL.md | dc549dfea6b1c0810f4293fe3b812735c18312d0c7b85d20230fe4a82d60a817 |
+| skills/e2e-f0-f1/SKILL.md | 9d0d9f61aaec07c458699353aeef38049562c8dfad83d47777a7ab1fcf7692b7 |
 | skills/e2e-f0-f1/references/UC-Pravidla-Identifikace.md | f2fca2f543401c9e1acdccc2b2f542e4705b4fa5b3bed5f6819bee78e66cbea3 |
 | skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md | f2b3e6764264dc33899169d499a026d5065d32e7739185bbfb71c5c7a2c6e951 |
-| skills/eafb-bridge/SKILL.md | b0ac6a978ffdfbd324abfb8370bad23c129a608f654f2c72cec244a7fb852ba4 |
+| skills/eafb-bridge/SKILL.md | 0ba156ea55f2cd93ded8203f7d09c4763512c66aa873826c9f4f2094bc7e5919 |
 | skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | b4d13cf2602b7e506f2c3b4bd8d88dfefd3cf97e2030722c50386ee320ef8dd1 |
 | skills/eafb-bridge/references/EAFB-Operace-Registr.md | b2b1aba85d643eaeec70b94e07c43bf6148d7aa85dfa4f33a78e0fc7efed7534 |
 | skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | 417976433a02a391b67c9698ae630ca43eeafeb16671800d6fa4cee1ac662ee8 |
