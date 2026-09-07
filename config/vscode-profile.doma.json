@@ -21,6 +21,12 @@
       "reason": "kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID"
     },
     {
+      "rule": "jira",
+      "pattern": "DEMO-[0-9]+",
+      "scope": "match",
+      "reason": "syntetický příklad Jira klíče DEMO-nnnnn v kanonu (prevzeti-zadani) — ne reálný projekt"
+    },
+    {
       "rule": "url",
       "pattern": "https://github\\.com/<org.*",
       "scope": "match",
