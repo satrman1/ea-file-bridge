@@ -1,6 +1,8 @@
 # runtime data pumpy - obsahuji data z EA repozitare, do gitu nepatri
 requests/
 responses/
+# zamek jedine instance pumpy (v0.13, pump.wsf) - requests/ ho kryje, explicitne pro jistotu
+.pump.lock
 
 # perzistentni stav bridge (FB_StateFile v baseDir) - stanice-zavisly runtime,
 # ne kanon: id posledni zapisove davky, citac spiku, W8 flag

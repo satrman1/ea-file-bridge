@@ -37,6 +37,9 @@ End Function
 //  - Po startu se cekajici davky v pending\ znovu nabidnou (bezstavovost:
 //    potvrzeni prezije restart pumpy i EA).
 //  - rejected\ nove i pro E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky).
+// v0.13 (lekce E2E VS Code 2026-09-07, N5): jedina instance - zamek
+//    requests\.pump.lock drzeny po dobu behu; druhy start vypise
+//    "Pumpa uz bezi" a skonci (exit 2). Viz komentar u zamku nize.
 //
 // Start: dvojklik (sam se prehodi do cscript konzole).
 // Konec: zavrit okno konzole (nebo Ctrl+C).
@@ -275,6 +278,32 @@ function eaAlive(ea) {
 
 // ============================ hlavni smycka =================================
 ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ); ensureDir(DIR_PEND);
+
+// --- v0.13: JEDINA INSTANCE PUMPY (nalez N5, E2E VS Code 2026-09-07: dve
+// bezici pumpy vzaly tutez davku a package vznikla 2x). Zamek = soubor
+// requests\.pump.lock otevreny pro zapis a DRZENY po celou dobu behu.
+// Semantika, o kterou se opirame (Win32 sdileni souboru): FSO.OpenTextFile
+// ForWriting otevira soubor s GENERIC_WRITE a BEZ FILE_SHARE_WRITE - dokud
+// nas handle zije, druhy pokus o otevreni pro zapis konci chybou
+// "Permission denied" (err 70). Handle je objekt jadra vazany na proces:
+// pri KAZDEM konci procesu (Ctrl+C, zavreni okna, pad cscriptu) ho jadro
+// zavre a sdileni se uvolni - osirely soubor .pump.lock po tvrdem padu
+// tedy dalsi start NEBLOKUJE (jen se prepise). Pad EA neni pad pumpy
+// (re-attach smycka bezi dal, zamek se drzi). Promenna lockFile musi
+// zustat globalni - kdyby ji JScript uvolnil, TextStream by se zavrel
+// a zamek by zmizel. Rucni Close neni potreba (konec = konec procesu).
+// Zive overeni: docs\e2e-vscode\OVERENI-S-OPRAVY-2026-09-08.md (V2).
+var LOCK_PATH = DIR_REQ + "\\.pump.lock";
+var lockFile = null;
+try {
+    lockFile = fso.OpenTextFile(LOCK_PATH, 2, true); // 2 = ForWriting, true = create
+    lockFile.Write("pumpa start=" + ts() + " id=" + Math.floor(Math.random() * 1e9) + "\r\n");
+} catch (eLock) {
+    echo("Pumpa uz bezi (zamek requests\\.pump.lock) - zavri toto okno.");
+    WScript.Sleep(8000);
+    WScript.Quit(2);
+}
+
 echo("=== EA File Bridge pumpa v0.5 (eafb/0.2, confirm okruh) ===");
 echo("Slozka requestu: " + DIR_REQ + " (pending\\ = davky cekajici na potvrzeni)");
 

@@ -1966,6 +1966,112 @@ t("FB_InterpretError: zamek jineho uzivatele zustava E_LOCKED; nezname null (reg
     eq(B.FB_InterpretError.call(B, "Object reference not set"), null);
     eq(B.FB_InterpretError.call(B, ""), null);
 });
+// =====================================================================
+// --- v0.13 S-opravy (Z260908-1, lekce E2E VS Code 2026-09-07: N2, N4)
+// =====================================================================
+// N2: chybny SQL -> E_SQL (ne falesna nula), SuppressEADialogs kolem SQLQuery
+function supRepo(sqlImpl) {
+    var repo = mkRepo();
+    repo._supLog = [];
+    var supVal = false;
+    Object.defineProperty(repo, "SuppressEADialogs", {
+        get: function () { return supVal; },
+        set: function (v) { supVal = v; repo._supLog.push(v); }
+    });
+    repo.SQLQuery = function (sql) { repo._supDuringQuery = supVal; return sqlImpl(sql); };
+    return repo;
+}
+t("N2 E_SQL: EA vrati chybovy text bez Dataset_0 -> status error, code E_SQL, hlaska EA v message", function () {
+    var repo = supRepo(function () { return "SQL API Open FAILED: no such column: Type"; });
+    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT Type FROM t_objectconstraint LIMIT 1" });
+    eq(r.status, "error"); eq(r.code, "E_SQL");
+    contains(r.message, "no such column: Type", "prvni radek chyby EA musi byt v message");
+    ok(typeof r.rowCount == "undefined", "E_SQL nesmi nest rowCount");
+});
+t("N2 E_SQL: prazdny retezec i <EADATA/> bez Dataset_0 = E_SQL s vychozi hlaskou", function () {
+    var r1 = B.FB_OpQuery.call(B, supRepo(function () { return ""; }), { sql: "SELECT x FROM neexistuje" });
+    eq(r1.code, "E_SQL"); contains(r1.message, "dotaz selhal");
+    var r2 = B.FB_OpQuery.call(B, supRepo(function () { return '<?xml version="1.0"?><EADATA version="1.0" exporter="Enterprise Architect"></EADATA>'; }), { sql: "SELECT x FROM neexistuje" });
+    eq(r2.code, "E_SQL"); contains(r2.message, "dotaz selhal");
+});
+t("N2 E_SQL: vyjimka ze SQLQuery -> E_SQL s textem vyjimky", function () {
+    var r = B.FB_OpQuery.call(B, supRepo(function () { throw new Error("mock: SQLQuery vyhodil"); }), { sql: "SELECT 1" });
+    eq(r.code, "E_SQL"); contains(r.message, "SQLQuery vyhodil");
+});
+t("N2 legitimni prazdny SELECT: <Dataset_0> s prazdnym <Data/> = ok / rowCount 0 (ne E_SQL)", function () {
+    var r = B.FB_OpQuery.call(B, supRepo(function () { return '<?xml version="1.0"?><EADATA version="1.0" exporter="Enterprise Architect"><Dataset_0><Data/></Dataset_0></EADATA>'; }), { sql: "SELECT Name FROM t_object WHERE 1=0" });
+    eq(r.status, "ok"); eq(r.rowCount, 0); eq(r.rows.length, 0);
+    var rB = B.FB_OpQuery.call(B, mkRepo(), { sql: "SELECT Name FROM t_object WHERE 1=0" });
+    eq(rB.status, "ok", "mock xmlRows([]) = legitimni nula"); eq(rB.rowCount, 0);
+});
+t("N2 normalni dotaz: n radku = ok / rowCount n; hodnota 'error' v datech NENI chyba", function () {
+    var repo = mkRepo({ sqlRules: [{ re: /t_object/, rows: [{ Name: "ErrorHandler" }, { Name: "Open FAILED test" }] }] });
+    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_object" });
+    eq(r.status, "ok"); eq(r.rowCount, 2); eq(r.rows[0].Name, "ErrorHandler");
+});
+t("N2 SuppressEADialogs: true behem SQLQuery, po dotazu vracena puvodni hodnota (i pri chybe)", function () {
+    var repo = supRepo(function () { return xmlRows([{ x: 1 }]); });
+    B.FB_OpQuery.call(B, repo, { sql: "SELECT 1 AS x" });
+    eq(repo._supDuringQuery, true, "behem dotazu musi byt SuppressEADialogs = true");
+    eq(repo.SuppressEADialogs, false, "po dotazu puvodni hodnota");
+    eq(repo._supLog.join(","), "true,false");
+    var repoE = supRepo(function () { throw new Error("x"); });
+    B.FB_OpQuery.call(B, repoE, { sql: "SELECT 1" });
+    eq(repoE.SuppressEADialogs, false, "finally vraci hodnotu i po vyjimce");
+});
+t("N2 SuppressEADialogs chybi v runtime (prirazeni hazi) -> dotaz jede dal bez ni", function () {
+    var repo = mkRepo({ sqlRules: [{ re: /./, rows: [{ x: 1 }] }] });
+    Object.defineProperty(repo, "SuppressEADialogs", {
+        get: function () { throw new Error("mock: property neexistuje"); },
+        set: function () { throw new Error("mock: property neexistuje"); }
+    });
+    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT 1 AS x" });
+    eq(r.status, "ok"); eq(r.rowCount, 1);
+});
+t("N2 E_SQL pres FB_Main: davka konci error, results[0].code = E_SQL", function () {
+    var repo = supRepo(function () { return "SQL API Open FAILED: no such column: Type"; });
+    var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "n2-main",
+        ops: [{ op: "query", sql: "SELECT Type FROM t_objectconstraint LIMIT 1" }] }));
+    var resp = JSON.parse(out);
+    eq(resp.status, "error"); eq(resp.results[0].code, "E_SQL");
+});
+t("SuppressEADialogs: pravidlo - vyskyt jen ve FB_OpQuery (jinde SQLQuery bez obalu = vedome, interni dotazy)", function () {
+    var where = [];
+    L.files.forEach(function (f) {
+        if (/SuppressEADialogs/.test(fs.readFileSync(path.join(SRC, f), "utf8"))) { where.push(f); }
+    });
+    eq(where.join(","), "AICodeBridge.FB_OpQuery.js");
+});
+
+// N4: odsazeny res (FB_JsonStringify indent), obsahove beze zmeny
+t("N4 FB_JsonStringify(v, 1): odradkovani + 1 mezera na uroven, bez mezery za dvojteckou, prazdne [] a {}", function () {
+    var v = { a: 1, b: [1, "x"], c: {}, d: [], e: { f: null, g: true } };
+    var s = B.FB_JsonStringify.call(B, v, 1);
+    eq(s, '{\n "a":1,\n "b":[\n  1,\n  "x"\n ],\n "c":{},\n "d":[],\n "e":{\n  "f":null,\n  "g":true\n }\n}');
+});
+t("N4 FB_JsonStringify: indent 0 / nevyplneno = dosavadni kompaktni tvar; parse obou tvaru = stejny objekt", function () {
+    var v = { a: "x\ny", b: [1, { c: "\"q\"" }], d: 2.5 };
+    var compact = B.FB_JsonStringify.call(B, v);
+    eq(compact, B.FB_JsonStringify.call(B, v, 0));
+    ok(compact.indexOf("\n") < 0, "kompaktni tvar bez odradkovani");
+    eq(JSON.stringify(JSON.parse(compact)), JSON.stringify(JSON.parse(B.FB_JsonStringify.call(B, v, 1))));
+    eq(JSON.stringify(JSON.parse(B.FB_JsonStringify.call(B, v, 2))), JSON.stringify(v));
+});
+t("N4 FB_Main: res je odsazeny, parsovatelny FB_JsonParse i JSON.parse, textove kotvy pumpy ('\"status\":\"…\"') zustavaji", function () {
+    var repo = mkRepo();
+    var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "n4-main",
+        ops: [{ op: "ping", echo: "n4" }] }));
+    ok(out.indexOf("\n") > 0, "res musi byt odsazeny (viceradkovy)");
+    ok(/^\{\n "protocol":"eafb\/0\.2",\n "id":"n4-main"/.test(out), "1 mezera na uroven, bez mezery za dvojteckou: " + out.substring(0, 60));
+    var a = JSON.parse(out);
+    var b = B.FB_JsonParse.call(B, out);
+    eq(JSON.stringify(a), JSON.stringify(b), "FB_JsonParse musi dat totez co JSON.parse");
+    eq(a.status, "done");
+    ok(out.indexOf("\"status\":\"done\"") >= 0, "kotva '\"status\":\"done\"' bez mezery (pumpa/FB_ConfirmPending hledaji doslovne)");
+    var outE = B.FB_Main.call(B, repo, "{nevalidni json");
+    ok(outE.indexOf("\"code\":\"E_PARSE\"") >= 0, "kotva '\"code\":\"E_PARSE\"' musi v odsazenem res prezit");
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

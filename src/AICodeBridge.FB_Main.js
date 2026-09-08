@@ -31,6 +31,11 @@
 //    cestou ELEVATED (trida klonu v politice), E_QUOTA se uz nevydava.
 //  - Audit par. 8: confirmationRequired, confirmedByUser + timestamp,
 //    confirmChannel (pres risk.confirm -> FB_RiskNote/FB_RiskAuditTags).
+// v0.13 (E2E VS Code 2026-09-07, nalez N4): response se serializuje ODSAZENA
+//    (FB_JsonStringify(resp, 1) - jedna mezera na uroven, bez mezery za
+//    dvojteckou), aby res-*.json precetl Copilot Read cely; obsah beze zmeny.
+//    payloadHash se pocita ze SUROVYCH bajtu req souboru (vyse), z res textu
+//    se nic nepocita - odsazeni nema na nonce/hash mechaniku vliv.
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var self = this;
 function pad2m(x) { return (x < 10 ? "0" : "") + x; }
@@ -54,7 +59,7 @@ if (inTrim.charAt(0) == "{") {
     if (!okPath) {
         resp.code = "E_PARSE";
         resp.message = "Vstup neni validni JSON ani cesta k existujicimu souboru.";
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
     reqPath = inTrim;
     try {
@@ -90,7 +95,7 @@ if (inTrim.charAt(0) == "{") {
     } catch (eRaw) {
         resp.code = "E_PARSE";
         resp.message = "Req soubor nejde precist: " + eRaw.message;
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
 }
 var req = null;
@@ -99,7 +104,7 @@ try {
 } catch (e) {
     resp.code = "E_PARSE";
     resp.message = "Request neni validni JSON.";
-    return this.FB_JsonStringify(resp);
+    return this.FB_JsonStringify(resp, 1);
 }
 var reqId = "" + ((req && req.id) || ("noid-" + (new Date()).getTime()));
 resp.id = reqId;
@@ -112,13 +117,13 @@ if (req.repo) {
     if (cs.indexOf(("" + req.repo).toUpperCase()) < 0) {
         resp.code = "E_REPO";
         resp.message = "Davka je urcena pro repozitar '" + req.repo + "', pripojeny je jiny. Nic nebylo provedeno.";
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
 }
 if (!req.ops || Object.prototype.toString.call(req.ops) != "[object Array]" || req.ops.length == 0) {
     resp.code = "E_PARSE";
     resp.message = "Request nema neprazdne pole ops.";
-    return this.FB_JsonStringify(resp);
+    return this.FB_JsonStringify(resp, 1);
 }
 // --- B1 (par. 6.2): potvrzovaci parametry NEJSOU prijatelne z obsahu davky
 // ZADNEHO kanalu - vcetne souboru polozeneho primo do requests\. Vynucuje
@@ -130,7 +135,7 @@ for (fi = 0; fi < FORBID_TOP.length; fi++) {
         resp.code = "E_RISK_CONFIRM";
         resp.message = "Request obsahuje potvrzovaci pole '" + FORBID_TOP[fi] + "' na urovni davky - potvrzeni neni prijatelne z obsahu davky zadneho kanalu (par. 6.2, B1). Davka odmitnuta, nic nebylo provedeno. Potvrzeni probiha vyhradne lokalnim ukonem (dialog/konzole).";
         this.Log(Repository, "FB " + reqId + " -> E_RISK_CONFIRM (podvrzene potvrzovaci pole '" + FORBID_TOP[fi] + "' v obsahu davky)");
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
 }
 for (fi = 0; fi < req.ops.length; fi++) {
@@ -139,7 +144,7 @@ for (fi = 0; fi < req.ops.length; fi++) {
         resp.code = "E_RISK_CONFIRM";
         resp.message = "ops[" + fi + "] obsahuje potvrzovaci pole (nonce/payloadHash) - potvrzeni neni prijatelne z obsahu davky (par. 6.2, B1). Davka odmitnuta, nic nebylo provedeno.";
         this.Log(Repository, "FB " + reqId + " -> E_RISK_CONFIRM (potvrzovaci pole v ops[" + fi + "])");
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
 }
 // --- W6 (par. 6.4): migrace E_QUOTA - op-level confirm: true ztraci ucinek.
@@ -287,7 +292,7 @@ if (writesInBatch > 0) {
             resp.audit = { aiLogGuid: agA };
         } catch (e3a) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3a.message }; }
         this.Log(Repository, "FB " + reqId + " -> E_ADDIN_ACCESS (" + (acc ? acc.login : "?") + ": " + (acc ? acc.reason : "?") + ")");
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
 }
 // confirm kontext (nastavuje VYHRADNE FB_ConfirmPending po overeni nonce
@@ -363,7 +368,7 @@ if (writesInBatch > 0) {
             resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3b.message };
         }
         this.Log(Repository, "FB " + reqId + " -> E_RISK_BLOCKED (" + risk.riskReasons.join("; ") + ")");
-        return this.FB_JsonStringify(resp);
+        return this.FB_JsonStringify(resp, 1);
     }
     // --- ELEVATED: vynucene potvrzeni (V2 - konec shadow rezimu) ---
     if (risk.riskLevel == "ELEVATED") {
@@ -411,7 +416,7 @@ function emitConfirmRequired() {
             note: "Textove volani FB_Main nema req soubor - potvrzeni neni mozne. Poloz davku jako soubor do requests\\ (kontrakt I5)." };
         resp.message = "Risk Gate: ELEVATED - davka vyzaduje lidske potvrzeni, ktere textovy kanal neumoznuje. Nic nebylo provedeno.";
         self.Log(Repository, "FB " + reqId + " -> confirm_required (textovy kanal, bez nonce - nic neprovedeno)");
-        return self.FB_JsonStringify(resp);
+        return self.FB_JsonStringify(resp, 1);
     }
     if (!risk.payloadHash) {
         // bez hashe nejde potvrdit (integrita CR par. 7) - soubor NESMI zustat
@@ -422,7 +427,7 @@ function emitConfirmRequired() {
         resp.message = "Risk Gate: ELEVATED, ale payloadHash nespocitan (nad hashMaxChars / chyba) - potvrzeni neni mozne. Nic nebylo provedeno; davku zmensi a posli znovu. Duvody: " + risk.riskReasons.join("; ");
         resp.results = [];
         self.Log(Repository, "FB " + reqId + " -> E_RISK_CONFIRM (ELEVATED bez hashe - nelze potvrdit)");
-        return self.FB_JsonStringify(resp);
+        return self.FB_JsonStringify(resp, 1);
     } else {
         var nonce = "" + self.FB_Nonce(risk.payloadHash + "|" + reqId + "|" + resp.repository);
         var pendDir = "";
@@ -439,7 +444,7 @@ function emitConfirmRequired() {
                     resp.code = "E_RISK_CONFIRM";
                     resp.message = "V requests\\pending\\ uz ceka davka tehoz jmena (" + fsoP.GetFileName(reqPath) + ") - nejdriv ji potvrd/zamitni, pak posli novou s jinym id.";
                     resp.results = [];
-                    return self.FB_JsonStringify(resp);
+                    return self.FB_JsonStringify(resp, 1);
                 }
                 fsoP.MoveFile(reqPath, tgt);
                 resp.confirm = { pendingPath: tgt };
@@ -451,7 +456,7 @@ function emitConfirmRequired() {
             resp.code = "E_RISK_CONFIRM";
             resp.message = "Presun davky do requests\\pending\\ selhal: " + eMv.message;
             resp.results = [];
-            return self.FB_JsonStringify(resp);
+            return self.FB_JsonStringify(resp, 1);
         }
         resp.confirm.nonce = nonce;
         resp.confirm.payloadHash = "" + risk.payloadHash;
@@ -460,7 +465,7 @@ function emitConfirmRequired() {
     }
     resp.message = "Risk Gate: ELEVATED - davka ceka na lidske potvrzeni v requests\\pending\\. Zadny zapis neprobehl. Duvody: " + risk.riskReasons.join("; ");
     self.Log(Repository, "FB " + reqId + " -> confirm_required (" + risk.riskReasons.join("; ") + ")");
-    return self.FB_JsonStringify(resp);
+    return self.FB_JsonStringify(resp, 1);
 }
 // --- provedeni davky (stop-on-error) ---
 var okc = 0, errc = 0, failed = false;
@@ -542,4 +547,4 @@ try {
     else if (writesInBatch > 0) { this._fbPrevExc = false; try { this.FB_StateFile(Repository, "w8", null); } catch (eW8b) { } }
 } catch (eW8) { }
 this.Log(Repository, "FB " + reqId + " -> " + summary);
-return this.FB_JsonStringify(resp);
+return this.FB_JsonStringify(resp, 1);

@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20260908-V3",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT ConstraintType FROM t_objectconstraint LIMIT 1"
+  }
+ ]
+}
