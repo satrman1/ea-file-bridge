@@ -1,5 +1,16 @@
 # Ověření S-oprav bridge v0.13 — 8. 9. 2026 (Z260908-1)
 
+## Výsledek živého běhu 8. 9. ~14:45 (Miloš, eaexample, EA 17.1.5 build 1715)
+
+| Krok | Výsledek | Doklad |
+|---|---|---|
+| 1 — V2 zámek | ✅ druhé okno „Pumpa uz bezi", zavřelo se samo; `.pump.lock` = `pumpa start=20260908-144355 id=721565306` (soubor zůstává i po zavření druhé pumpy — záměr, zámek drží handle první pumpy) | obrazovka + soubor |
+| 2 — V0 deploy | ✅ `updated` FB_JsonStringify, FB_Main, FB_OpQuery; `paramsSynced FB_JsonStringify: (v) -> (v, indent)`; res V0 kompaktní (starý FB_Main) | `res-20260908-V0.json` |
+| 3 — V1 chybný SQL | **⚠ půl na půl**: res `status error`, `E_SQL`, message = výchozí „dotaz selhal (…)" (EA chybový text nevrací — `SQLQuery` dalo prázdno/bez `<Dataset_0>`), res odsazený ✅ — **ale dialog „SQL API Open FAILED with error: no such column: Type" se OBJEVIL** (`SuppressEADialogs` ho nekryje nebo v runtime chybí) | `res-20260908-V1.json` + screenshot dialogu |
+| 4 — V3 správný SQL | ✅ `ok`, `rowCount 1` (`ConstraintType: Assumption`), bez dialogu | `res-20260908-V3.json` |
+
+**Závěr:** falešná nula je pryč (hlavní část N2), zámek i odsazení fungují. Dialog zůstává → pumpa při chybném SQL dál čeká na klik. **Dohra V0b + V1b** (níže): `FB_OpQuery` nově vrací v `E_SQL` pole `suppressDialogs` = `on (readback=…, before=…)` (vlastnost přijala `true`, dialog přesto nekryje → bridge nemá páku, zůstává pravidlo kitu „ověř sloupce") nebo `unavailable: <chyba>` (vlastnost v EA 17.1.5 chybí → hledat jinou). Postup: zkopíruj `ready\req-20260908-V0b.json` (deploy jen FB_OpQuery, popup Ano) → pak `ready\req-20260908-V1b.json` → dialog zase odklikni; res přečte vlákno.
+
 Tři opravy z nálezů živého E2E ve VS Code 7. 9. (`PROTOKOL-E2E-VSCODE.md`, N2 / N4 / N5): `E_SQL` místo falešné nuly, zámek jediné pumpy, odsazený res. Harness 235/235 (bylo 223). Živě zbývá ~5 minut u **eaexample** (pumpa, ne VS Code). Dávky leží v `docs\e2e-vscode\ready\`, kopírují se do `requests\`. Res soubory nečti — vyhodnotí je vlákno **Z260908-2** (nebo Z260908-1, když ještě běží); sem patří jen to, co je vidět na obrazovce.
 
 Pořadí je závazné: zámek žije v `pump.wsf` (soubor na disku → nový kód až po **restartu pumpy**), kdežto V0 nasazuje kód do modelu (pumpa se přenačte sama).

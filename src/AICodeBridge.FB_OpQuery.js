@@ -6,7 +6,9 @@
 // dialog "SQL API Open FAILED", ktery musel clovek odkliknout. Nove:
 //  - kolem SQLQuery se nastavi Repository.SuppressEADialogs = true (EA 16+;
 //    kdyz vlastnost v runtime chybi, prirazeni tise selze) a po dotazu se
-//    vrati puvodni hodnota (try/finally),
+//    vrati puvodni hodnota (try/finally). ZIVE 2026-09-08 (V1, EA 17.1.5
+//    build 1715): dialog "SQL API Open FAILED" se PRESTO objevil - obal ho
+//    nekryje; pole suppressDialogs v E_SQL vysledku rika proc (viz sqlErr),
 //  - vysledek bez <Dataset_0> (prazdny retezec, EA chybovy text, <EADATA/>
 //    bez datasetu) = E_SQL s prvnim radkem hlasky EA; vyjimka z SQLQuery = E_SQL.
 //  Legitimni prazdny SELECT vraci <EADATA><Dataset_0><Data/>...</EADATA>
@@ -34,15 +36,21 @@ function sqlErr(detail) {
         }
     }
     if (msg == "") { msg = "dotaz selhal (neexistujici sloupec/tabulka?)"; }
-    return { op: "query", status: "error", code: "E_SQL", message: msg, sql: sql.substring(0, 500) };
+    // suppressDialogs = diagnostika (zive 2026-09-08 V1: dialog "SQL API Open
+    // FAILED" se OBJEVIL i s obalem) - rozlisuje "on" (vlastnost prijala true,
+    // ale dialog nekryje) od "unavailable: <chyba>" (vlastnost v runtime chybi)
+    return { op: "query", status: "error", code: "E_SQL", message: msg, sql: sql.substring(0, 500), suppressDialogs: supState };
 }
 var xml = "";
-var supOld = null, supSet = false;
+var supOld = null, supSet = false, supState = "not-set";
 try {
-    // SuppressEADialogs: zadny modalni dialog EA behem dotazu (EA 16+).
+    // SuppressEADialogs: pokus potlacit modalni dialog EA behem dotazu (EA 16+).
     // Chybi-li vlastnost (starsi EA / mock), prirazeni spadne do catch a jede se bez ni.
-    try { supOld = Repository.SuppressEADialogs; Repository.SuppressEADialogs = true; supSet = true; }
-    catch (eSup) { supSet = false; }
+    try {
+        supOld = Repository.SuppressEADialogs; Repository.SuppressEADialogs = true; supSet = true;
+        supState = "on (readback=" + Repository.SuppressEADialogs + ", before=" + supOld + ")";
+    }
+    catch (eSup) { supSet = false; supState = "unavailable: " + (eSup && eSup.message ? eSup.message : eSup); }
     try { xml = "" + Repository.SQLQuery(sql); }
     catch (eQ) { return sqlErr(eQ && eQ.message ? eQ.message : ""); }
 } finally {
