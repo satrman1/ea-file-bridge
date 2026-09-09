@@ -351,45 +351,6 @@ Vyplněná tabulka je nahoře v bloku **VÝSLEDKY 2026-09-07** (šablona odstran
 
 ---
 
-## Prompt pro nové vlákno „Z260904-2b vyhodnocení" — ⚠ PŘEKONÁN 5. 9. 2026, NEPOUŠTĚT
+## Vlákno k tomuto protokolu
 
-> Nahrazen **živým interaktivním promptem `Z260904-2b baseline spike zive`** v `C:\Users\milos\CLAUDE\IT-ANALYSIS\zaprah-vlaken-2026-09-04.md` (sekce Z260904-2b): vlákno běží souběžně s Milošem u EA, čte `responses\` samo, dosazuje GUIDy do dávek v `docs\baseline-spike\ready\` a Miloš jen kopíruje soubory a vkládá, co je na obrazovce. Důvod: režim ověřený 5. 9. ve vlákně Z260904-1c (žádná chyba obsluhy). Text níže zůstává jen pro dohledatelnost.
-
-```text
-Z260904-2b vyhodnocení baseline prerekvizit — název tohoto vlákna; pokud se
-nepropsal automaticky, přejmenování udělá Miloš.
-Dávka: C:\Users\milos\CLAUDE\IT-ANALYSIS\zaprah-vlaken-2026-09-04.md (Z260904-2)
-Úkol: vyhodnotit živý běh protokolu C:\GIT\ea-file-bridge\docs\baseline-spike\
-PROTOKOL-SPIKE-BASELINE.md (kroky K0–K27) a zapsat výsledky prerekvizit
-T6-W4 / T6-B1 / T6-S / T6-C do zadání Baseline politiky. Sám do EA nezapisuj,
-MCP Enterprise Architect nepoužívej.
-Kontext: Paměť ANO (ea-file-bridge). Vstupy: protokol + res-20260907-S01…S19
-v C:\GIT\ea-file-bridge\responses\, docs\baseline-spike\vysledky\T6S-pumpa-*.txt,
-gk-ping-b1*.json, a hodnoty/✅❌, které vložím níže do chatu.
-0. Prescan: přečti protokol, všechny res-20260907-S*.json a soubor vysledky;
-   IT-ANALYSIS\Zadani-EA-File-Bridge-Baseline-Politika.md §4.3, §4.5, §6.1,
-   §6.3, §6.4, §8/6, §9 (T6-S/W4/B1/C), §11 bod 4.
-1. Za každou prerekvizitu napiš verdikt s důkazem (soubor + hodnota):
-   W4 (jde jedním SELECT? sloupce version/package GUID/date; osiřelé
-   baselines), B1 (C0/C1/C2 → je oprava FB_Process prerekvizita?), T6-S
-   (STAV 1/2/3 z pumpy, výsledek EA runtime, formát date, limit version doma
-   + poznámka k bance), T6-C (tabulka, subtreeMax, maxBaselineElements —
-   shadow).
-2. Propiš do IT-ANALYSIS\Zadani-EA-File-Bridge-Baseline-Politika.md jako
-   v1.2: §11 bod 4 → ✅ s výsledky; §6.4 (téma 3 stavitelné / degradace);
-   §6.1 (formát date, limit version, formát jména potvrzen/upraven); §6.3
-   (kandidátní množina = SELECT nad t_document, nebo fallback; osiřelé
-   baselines); §4.3/§5 (shadow hodnoty subtreeMax, maxBaselineElements);
-   §8/6 (oprava FB_Process — prerekvizita ano/ne); changelog v1.1 → v1.2.
-3. Do PROTOKOL-EAFB.md NEZASAHUJ (to udělá stavební vlákno); do
-   docs\baseline-spike\PROTOKOL-SPIKE-BASELINE.md doplň nahoře blok
-   „VÝSLEDKY 2026-09-07" (tabulka souhrnu vyplněná).
-4. Ověření: každý verdikt cituje res soubor / řádek; git status v repu =
-   jen docs\baseline-spike (src, test beze změny); zadání v1.2 má changelog.
-5. Shrň v chatu: 4 verdikty jednou větou, co z toho blokuje stavbu (§11
-   bod 5), co zbývá ručně (Miloš: bankovní kroky sql-banka.md B1–B4,
-   rozhodnutí subtreeMax, dočištění K27).
-Výstup: zadání v1.2 + doplněný protokol. Necommituj. Po doběhnutí: řádek
-Z260904-2b do tabulky Zápřahy v IT-ANALYSIS\_MOC.md, korekce paměti
-ea-file-bridge (výsledky T6-S/B1 jsou lekce runtime).
-```
+Živý běh proběhl 7. 9. 2026 ve vlákně **`Z260904-2b baseline spike zive`** (prompt v `C:\Users\milos\CLAUDE\IT-ANALYSIS\zaprah-vlaken-2026-09-04.md`, sekce Z260904-2b); výsledky jsou v bloku VÝSLEDKY nahoře. Starší prompt „Z260904-2b vyhodnocení", který tu býval, byl překonán 5. 9. 2026 a 9. 9. 2026 odstraněn (dohledatelný v git historii do commitu `23a225b`).
