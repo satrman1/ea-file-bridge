@@ -7,9 +7,14 @@
 //   3. naleje kod ze src\ do VSECH operaci, ktere maji soubor (od Z260904-6
 //      uplny disk->model refresh; drive jen SIG)
 // Idempotentni: co existuje, jen dostane kod; chybejici operace se zaklada
-// s parametry z hlavicky souboru (fallback SIG). EA_* receptions NEZAKLADA.
-// POZN: pumpa GUI cast add-inu nepotrebuje - EA_ handlery/receptions se
-// zde NEZAKLADAJI (GUI fallback = az iterace 1, klonem vzoru).
+// s parametry z hlavicky souboru (fallback SIG).
+//   4. (od 2026-09-09, nalez N-K8-1 ziveho K8 QEAX) RECEPTIONS: EA_* handlery
+//      se zakladaji / opravuji jako RECEPTION na LOKALNI Signal tehoz jmena
+//      (StyleEx 'Reception=1;SignalGUID={...};', lookup podle JMENA v cilovem
+//      modelu = stejna logika jako deploy_src). Add-in preneseny Copy/Paste
+//      nese CIZI SignalGUID -> EA ho nenacte (Manage Add-Ins pada na Disabled,
+//      menu mlci) - v bance je deploy_src deny, proto to dela bootstrap.
+//      Signal, ktery v modelu neni -> handler se preskoci (vypis).
 //
 // PRED SPUSTENIM:
 //   - v Project Browseru OZNAC package, kam ma element patrit (jen pri
@@ -164,12 +169,28 @@ function main() {
     //    FB_RiskPolicy / FB_QcConfig by po prenosu add-inu zustaly s cizimi
     //    hodnotami a deploy_src by pak nesel spustit - slepice-vejce).
     //    Chybejici operace se zaklada s parametry z hlavicky souboru
-    //    "// AICodeBridge.Nazev(a, b)" (fallback = SIG). EA_* handlery se
-    //    NEZAKLADAJI (musi byt receptions se SignalGUID - dela deploy_src);
-    //    existujici EA_* jen dostanou kod.
+    //    "// AICodeBridge.Nazev(a, b)" (fallback = SIG). EA_* handlery =
+    //    RECEPTIONS na lokalni Signal (viz hlavicka bod 4): chybejici se
+    //    zalozi jen kdyz Signal existuje, existujici dostanou kod + oprava
+    //    cizi SignalGUID.
     var sigMap = {};
     for (var sj = 0; sj < SIG.length; sj++) { sigMap[SIG[sj].n] = SIG[sj].p; }
-    var created = 0, coded = 0, skippedEa = "";
+    var created = 0, coded = 0, skippedEa = "", recFixed = 0, recNew = 0;
+    // signatury EA_ handleru bez zavorek v hlavicce (stejne jako harness KNOWN_ARGS)
+    var EA_ARGS = {
+        EA_Connect: ["Repository"],
+        EA_Disconnect: [],
+        EA_GetMenuItems: ["Repository", "MenuLocation", "MenuName"],
+        EA_MenuClick: ["Repository", "MenuLocation", "ItemName"],
+        EA_GetMenuState: ["Repository", "MenuLocation", "MenuName", "ItemName", "IsEnabled", "IsChecked"],
+        EA_OnOutputItemDoubleClicked: ["Repository", "TabName", "LineText", "ID"],
+        EA_OnOutputItemClicked: ["Repository", "TabName", "LineText", "ID"]
+    };
+    function signalGuidFor(opName) {
+        var sx = "" + Repository.SQLQuery("SELECT ea_guid FROM t_object WHERE Object_Type = 'Signal' AND Name = '" + opName.replace(/'/g, "''") + "'");
+        var sm = /<ea_guid>([^<]+)<\/ea_guid>/i.exec(sx);
+        return sm ? sm[1] : "";
+    }
     var folder = fso.GetFolder(SRC_DIR);
     var files = new Enumerator(folder.Files);
     var names = [];
@@ -184,13 +205,15 @@ function main() {
         var path = SRC_DIR + ADDIN_NAME + "." + name + ".js";
         var code = readUtf8(path);
         var m = have[name];
+        var isEa = (name.indexOf("EA_") == 0);
+        var sg = isEa ? signalGuidFor(name) : "";
         if (!m) {
-            if (name.indexOf("EA_") == 0) {
+            if (isEa && sg == "") {
                 skippedEa = skippedEa + name + " ";
-                Session.Output("--  " + name + " (reception chybi - zalozi deploy_src, ne bootstrap)");
+                Session.Output("--  " + name + " (Signal tehoz jmena v modelu neni - reception nelze zalozit; zkontroluj Broadcast Types)");
                 continue;
             }
-            var params = sigMap[name] || null;
+            var params = (isEa ? EA_ARGS[name] : sigMap[name]) || null;
             var hm = /^\/\/\s*AICodeBridge\.([A-Za-z0-9_]+)\s*\(([^)]*)\)/.exec(code.replace(/^\uFEFF/, ""));
             if (hm && hm[1] == name) {
                 params = [];
@@ -211,6 +234,14 @@ function main() {
             m.Parameters.Refresh();
             have[name] = m;
             created++;
+            if (isEa) { m.StyleEx = "Reception=1;SignalGUID=" + sg + ";"; recNew++; }
+        } else if (isEa && sg != "") {
+            var haveStyle = "" + m.StyleEx;
+            if (haveStyle.toUpperCase().indexOf(("SignalGUID=" + sg + ";").toUpperCase()) < 0) {
+                m.StyleEx = "Reception=1;SignalGUID=" + sg + ";";
+                recFixed++;
+                Session.Output("RX  " + name + " -> reception prepnuta na lokalni Signal " + sg + (haveStyle.indexOf("Reception=1") < 0 ? " (doplneno)" : " (byl cizi GUID - preneseny add-in)"));
+            }
         }
         m.Code = code;
         m.Update();
@@ -220,7 +251,8 @@ function main() {
     el.Methods.Refresh();
 
     Session.Output("Hotovo: " + created + " operaci zalozeno, " + coded + " nahran kod (souboru v src: " + names.length + ")."
-        + (skippedEa != "" ? " BEZ RECEPTION (zalozi deploy_src): " + skippedEa : ""));
+        + " Receptions: " + recNew + " zalozeno, " + recFixed + " prepnuto na lokalni Signal."
+        + (skippedEa != "" ? " BEZ RECEPTION (Signal chybi): " + skippedEa : ""));
     Session.Output("DALSI KROKY: 1) zkontroluj configy v src (FB_Whitelist/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,");
     Session.Output("2) PLNY restart EA (kod EA runtime) a spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.");
 }

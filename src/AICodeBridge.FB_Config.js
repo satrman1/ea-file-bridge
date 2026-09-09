@@ -16,6 +16,9 @@
 //            B-V3, viz docs/e2e-iterace5/SPIKE-NAV.md).
 //   navProbe: true = ukaze menu polozku "Nav spike (test navigace)"
 //            (iterace 5 B-V3; jen dev repo, do PROD sablon NEpatri).
+//   auditPkg: VOLITELNE (od 2026-09-09, nalez N-K8-3): GUID package pro audit
+//            davek (FB_Audit). Bez polozky fallback jmenem '#AI-LOG' (prvni
+//            dle Package_ID + WARN pri vice). V bance nastavit VZDY.
 //   chat:    VOLITELNE (iterace 7, par. 4.3) - per-repo prepis rozpoctu
 //            chat ACK: { total, perOp, items, query, warn }. DEFAULTY ZIJI
 //            V KODU FB_ChatRender (4000/900/25/700/500) - repozitar bez
@@ -30,7 +33,9 @@
 //   baseDir zamerne NENI (default = slozka modelu\EA-File-Bridge, FB_ResolveBaseDir);
 //   pumpa (pump.wsf) cte requests\ vedle sebe bez ohledu na baseDir.
 //   navProbe: false - QEAX neni dev piskoviste, spike menu tam nepatri.
+//   auditPkg = #AI-LOG 686 pod Test Data (res-K3.json); model ma #AI-LOG 3x.
 return [
     { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true },
-    { repo: "EA17_Yoga_QEA2.qeax", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: false }
+    { repo: "EA17_Yoga_QEA2.qeax", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: false,
+      auditPkg: "{AEEBE2C0-AD55-4912-903D-07CD047C7244}" }
 ];

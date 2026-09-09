@@ -515,6 +515,71 @@ t("FB_Main: zapisova davka + access read -> E_ADDIN_ACCESS, nic neprovedeno", fu
     eq(resp.results.length, 1);
     eq(resp.results[0].status, "skipped");
 });
+t("FB_Main E_ADDIN_ACCESS: hlaska pro omezeneho uzivatele bez zdvojeneho 'cteci operace funguji' (K8 A2w 2026-09-09)", function () {
+    delete B._fbAccessCache;
+    var repo = mainRepoBase({ securityEnabled: true, login: "novak" });
+    var orig = B.FB_AccessGroups;
+    B.FB_AccessGroups = function () { return [{ repo: "EAEXAMPLE.QEA", writeGroups: ["@FX_AI_Write"] }]; };
+    var out = B.FB_Main.call(B, repo, JSON.stringify({
+        protocol: "eafb/0.2", id: "t-acc-msg", repo: "EAEXAMPLE.QEA",
+        ops: [{ op: "create_or_update_package", parent: "{X}", name: "Pkg" }]
+    }));
+    B.FB_AccessGroups = orig;
+    delete B._fbAccessCache;
+    var msg = ("" + JSON.parse(out).message).toLowerCase();
+    eq(msg.split("cteci operace funguji").length - 1, 1, "veta 'cteci operace funguji' prave jednou: " + msg);
+    contains(msg, "spravce ea");
+});
+// --- FB_Audit: cil auditu (N-K8-3, zive K8 QEAX 2026-09-09: 3x #AI-LOG -> vsech 18 auditu v cizi package)
+function auditRepo(rows, cfgGuid) {
+    var repo = mkRepo({ sqlRules: [{ re: /#AI-LOG/i, rows: rows }] });
+    var orig = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", auditPkg: cfgGuid }]; };
+    repo._restore = function () { B.FB_Config = orig; };
+    return repo;
+}
+t("FB_Audit: FB_Config.auditPkg -> audit jde do package s timto GUID (jmeno se nekontroluje)", function () {
+    var repo = auditRepo([{ Package_ID: "1", ea_guid: "{JINA}" }], "{AUDIT-CFG}");
+    var jina = repo._addPackage({ id: 1, name: "#AI-LOG", guid: "{JINA}" });
+    var cil = repo._addPackage({ id: 2, name: "Muj audit", guid: "{AUDIT-CFG}" });
+    var g;
+    try { g = B.FB_Audit.call(B, repo, "t-au-1", "done: 1 ops", "{}"); } finally { repo._restore(); }
+    ok(g != "", "audit musi vzniknout");
+    eq(cil.Elements.Count, 1, "artefakt v package z configu");
+    eq(jina.Elements.Count, 0, "do package jmenem #AI-LOG nic");
+});
+t("FB_Audit: auditPkg nastaven, ale GUID v modelu neni -> WARN a zadny fallback jmenem", function () {
+    var repo = auditRepo([{ Package_ID: "1", ea_guid: "{JINA}" }], "{CHYBI}");
+    var jina = repo._addPackage({ id: 1, name: "#AI-LOG", guid: "{JINA}" });
+    var g;
+    try { g = B.FB_Audit.call(B, repo, "t-au-2", "done", "{}"); } finally { repo._restore(); }
+    eq(g, "");
+    eq(jina.Elements.Count, 0, "fallback jmenem nesmi nastat, kdyz je auditPkg nastaven");
+    ok(repo._output.some(function (o) { return /auditPkg/.test(o.text); }), "WARN musi jmenovat auditPkg");
+});
+t("FB_Audit: bez auditPkg + vice package #AI-LOG -> prvni dle Package_ID + WARN s poctem", function () {
+    var repo = auditRepo([{ Package_ID: "356", ea_guid: "{A356}" }, { Package_ID: "686", ea_guid: "{A686}" }], "");
+    var p356 = repo._addPackage({ id: 356, name: "#AI-LOG", guid: "{A356}" });
+    var p686 = repo._addPackage({ id: 686, name: "#AI-LOG", guid: "{A686}" });
+    var g;
+    try { g = B.FB_Audit.call(B, repo, "t-au-3", "done", "{}"); } finally { repo._restore(); }
+    ok(g != "");
+    eq(p356.Elements.Count, 1); eq(p686.Elements.Count, 0);
+    ok(repo._output.some(function (o) { return /2x package #AI-LOG/.test(o.text); }), "WARN o vice package");
+});
+t("FB_Audit: bez auditPkg + jedina #AI-LOG -> audit bez WARN (eaexample beze zmeny chovani)", function () {
+    var repo = auditRepo([{ Package_ID: "9", ea_guid: "{A9}" }], "");
+    var p9 = repo._addPackage({ id: 9, name: "#AI-LOG", guid: "{A9}" });
+    try { B.FB_Audit.call(B, repo, "t-au-4", "done", "{}"); } finally { repo._restore(); }
+    eq(p9.Elements.Count, 1);
+    ok(!repo._output.some(function (o) { return /WARN/.test(o.text); }), "zadny WARN");
+});
+t("K8: FB_Config QEAX ma auditPkg = GUID #AI-LOG 686", function () {
+    var cfg = B.FB_Config.call(B);
+    var q = null;
+    for (var i = 0; i < cfg.length; i++) { if (cfg[i].repo === "EA17_Yoga_QEA2.qeax") { q = cfg[i]; } }
+    ok(q && q.auditPkg === "{AEEBE2C0-AD55-4912-903D-07CD047C7244}", "auditPkg QEAX");
+});
 t("FB_Main: cteci davka + access read -> probehne (ping ok)", function () {
     delete B._fbAccessCache;
     var repo = mainRepoBase({ securityEnabled: true, login: "novak" });
@@ -1974,6 +2039,17 @@ t("K8 zive: SQL clenstvi vrati vysledek BEZ Dataset_0 (EA bez vyjimky) -> fail-c
     eq(a.access, "read");
     contains(a.reason, "dataset", "duvod musi rict, ze selhal dotaz");
     ok(a.reason.indexOf("neni clenem") < 0, "nesmi tvrdit, ze uzivatel neni clenem");
+});
+// --- N-K8-1 (2026-09-09): bootstrap zaklada/opravuje receptions EA_* handleru na lokalni Signal
+t("ITAN-Bootstrap: EA_* handlery = receptions na lokalni Signal (StyleEx), stara veta 'zalozi deploy_src' pryc", function () {
+    var code = fs.readFileSync(path.join(__dirname, "..", "scripts", "ITAN-Bootstrap File Bridge.js"), "utf8");
+    ok(code.indexOf('"Reception=1;SignalGUID=" + sg + ";"') >= 0, "bootstrap musi nastavovat StyleEx reception");
+    ok(/Object_Type = 'Signal' AND Name =/.test(code), "lookup Signalu podle jmena v cilovem modelu");
+    eq(code.indexOf("zalozi deploy_src, ne bootstrap"), -1, "EA_* uz se nepreskakuji");
+    ["EA_Connect", "EA_GetMenuItems", "EA_MenuClick", "EA_OnOutputItemDoubleClicked"].forEach(function (n) {
+        ok(code.indexOf(n + ":") >= 0, "signatura " + n + " v EA_ARGS");
+    });
+    new Function("Repository", "Session", "ActiveXObject", "Enumerator", code.replace(/^\s*main\(\);\s*$/m, ""));
 });
 // --- K8 A3 (Z260904-6): FB_InterpretError - vetev balickovych prav (zastupny vzor)
 t("FB_InterpretError: Group Lock hlaska -> E_PERMISSION (ne E_LOCKED), puvodni text zachovan", function () {

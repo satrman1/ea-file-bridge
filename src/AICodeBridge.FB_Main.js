@@ -282,7 +282,7 @@ if (writesInBatch > 0) {
         resp.code = "E_ADDIN_ACCESS";
         resp.message = "Zapisove ficury bridge nejsou pro uzivatele '" + (acc ? acc.login : "?")
             + "' povolene (EA security skupiny, FB_AccessGroups): " + (acc ? acc.reason : "?")
-            + " Cteci operace funguji; o zarazeni do write skupiny pozadej spravce EA. Nic nebylo provedeno.";
+            + " O zarazeni do write skupiny pozadej spravce EA. Nic nebylo provedeno.";
         for (var ai2 = 0; ai2 < req.ops.length; ai2++) {
             resp.results.push({ op: "" + (req.ops[ai2] && req.ops[ai2].op ? req.ops[ai2].op : "?"), status: "skipped" });
         }
