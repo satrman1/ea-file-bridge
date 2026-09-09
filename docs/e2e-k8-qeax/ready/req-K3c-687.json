@@ -1,0 +1,26 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K3c",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid, Parent_ID FROM t_package WHERE Package_ID IN (380, 687) OR Parent_ID IN (360, 687) ORDER BY Package_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Name, COUNT(*) AS cnt FROM t_object WHERE Object_Type = 'Signal' GROUP BY Name HAVING COUNT(*) > 1 ORDER BY Name"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Object_Type, Package_ID FROM t_object WHERE Package_ID IN (380, 687) ORDER BY Package_ID, Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Object_Type, Package_ID FROM t_object WHERE ea_guid IN ('{47BFD707-2CA4-4198-8749-43EB1F105FF5}', '{B77B978A-A18B-469d-B954-83ABFE09CE39}', '{CC89F083-A6A4-4ea6-9A05-8E587527F031}')"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid, Parent_ID FROM t_package WHERE Name = '#AI-LOG' ORDER BY Package_ID"
+  }
+ ]
+}

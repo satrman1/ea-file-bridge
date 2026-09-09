@@ -1,6 +1,8 @@
 # K8 — bridge v QEAX modelu se zapnutou EA security: klikací protokol (A1–A4)
 
 Datum přípravy: 2026-09-04 (vlákno Z260904-6) · Provede: Miloš u EA, **Čt–Pá 10.–11. 9. 2026** · Model: QEAX (security ZAPNUTA; název souboru doplň níže) · Kód: commit tohoto vlákna v `C:\GIT\ea-file-bridge` (harness 220/220) · Nahrazuje nikdy nespuštěný zápřah `IT-ANALYSIS\zaprah-vlaken-2026-08-21.md`.
+
+> **PROVEDENO ŽIVĚ St 9. 9. 2026 11:00–15:35** (vlákno `Z260904-6b K8 QEAX zive`, souběžně s Milošem u EA). HEAD před během `bfc4f0f` (harness 235/235), po běhu commity `8d7b22c` + feat(k8) (harness 238/238). Model `EA17_Yoga_QEA2.qeax`. **Vyplněné tabulky níže = stav k 9. 9.; plný zápis, nálezy N-K8-1…8 a doporučení pro banku: `VYSLEDKY-2026-09-09.md`.** Odchylky od protokolu: K1 proběhl pastem celé package (kopie podbalíčků smazány ručně), K2 bootstrap vynechán (nahradil K4), K6 dvakrát (nález `t_secusergroup`), doplňkové dávky K3b/K3c/K3d/K10 v `ready\`.
 Vyhodnocení: ACK a poznámky vkládej do **nového vlákna „Z260904-6b vyhodnocení"** (prompt na konci souboru). To vlákno se spouští **DVAKRÁT**: poprvé po K3 (doplní identitu repa + GUID do configů a commitne — bez toho nejde dál), podruhé po A4 (vzor hlášky A3, §6g živě, commit).
 
 ## Co se tady ověřuje a proč
@@ -43,10 +45,10 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| název souboru QEAX | |
-| režim security / login | |
-| záloha vytvořena | |
-| 685/686 existují | |
+| název souboru QEAX | `EA17_Yoga_QEA2.qeax` (identita repa = název souboru; plná cesta v `res-K3.json`) |
+| režim security / login | standardní / `admin` |
+| záloha vytvořena | ano (`-BEFORE-K8.qeax`) |
+| 685/686 existují | ano, pod Test Data (377); AICodeBridge v modelu nebyl (MCP recon) ✅ |
 
 ## K1 — přenos add-inu z eaexample do QEAX
 
@@ -58,8 +60,8 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| paste proběhl / počet operací | |
-| ✅/❌ | |
+| paste proběhl / počet operací | ano — ale pastnuta CELÁ package `EA Addins` z eaexample (nová 687, původní 380 smazána) vč. kopií #AI-LOG/#FB-TEST/#AI-CODE (688/689/710, ručně smazány) a vendor ExtendedPropertiesAddin; 105 operací (`res-K3.json` cnt) |
+| ✅/❌ | ✅ s odchylkou |
 
 ## K2 — ITAN-Bootstrap (kód z disku, placeholdery) + Manage Add-Ins + plný restart
 
@@ -80,10 +82,10 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| bootstrap: X zalozeno / Y nahran kod | |
-| Manage Add-Ins: co dialog nabízí (screenshot uložen) | |
-| menu AI Bridge po restartu: vidět / mlčí | |
-| ✅/❌ | |
+| bootstrap: X zalozeno / Y nahran kod | vynecháno (Miloš — paste nese plný kód; bootstrap až K4) |
+| Manage Add-Ins: co dialog nabízí (screenshot uložen) | sloupce Available Add-Ins / **Groups** / Status / Load on Startup; AICodeBridge → Groups `@F002_Write`, Status **Optional** (`manage-addins-security.png`); před K6 dialog padal na Disabled (N-K8-1) |
+| menu AI Bridge po restartu: vidět / mlčí | mlčí (cizí SignalGUID) — po K6 vidět |
+| ✅/❌ | ⚠ (bootstrap vynechán; add-in do K6 nenačten) |
 
 ## K3 — první čtecí dávka BEZ pole `repo` (recon) → ACK do vlákna 6b
 
@@ -94,7 +96,7 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 | Co | Kde v res | Poznámka |
 |---|---|---|
 | **identita repa** | `"repository": "…"` (kořen res) | u .qeax = cesta k souboru; 6b z ní vezme název souboru jako `repo` do configů |
-| `access` | `results[0].access` | čekáme `securityEnabled: true`, `login` = ty, `access: "read"`, `reason` „repozitar nema polozku ve FB_AccessGroups" (placeholder nesedí) — **správně, fail-closed**; `groups[]` = tvé skupiny (SQL nad `t_secuser_group` prošel ⇒ jména tabulek na SQLite potvrzena) |
+| `access` | `results[0].access` | čekáme `securityEnabled: true`, `login` = ty, `access: "read"`, `reason` „repozitar nema polozku ve FB_AccessGroups" (placeholder nesedí) — **správně, fail-closed**; `groups[]` = tvé skupiny (SQL nad `t_secusergroup` prošel ⇒ jména tabulek na SQLite potvrzena; **9. 9.: vazební tabulka je `t_secusergroup` — do opravy vracel dotaz falešně `[]`**) |
 | `whitelist` | `results[0].whitelist` | čekáme `[]` |
 | **GUID 685 / 686** | `results[1].rows` | `ea_guid` řádku `#FB-TEST` → do `FB_Whitelist`; `#AI-LOG` jen kontrola |
 | GUIDy signálů | `results[2].rows` | 1966 `EA_Connect`, 1967 `EA_OnOutputItemDoubleClicked`, 2079 `EA_MenuClick`, 2080 `EA_GetMenuItems` … — porovnání s eaexample `{5F05064B-…}` řekne, proč menu mlčelo |
@@ -108,12 +110,12 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| kanál (schránka/pumpa) · Code loader N | |
-| repository (identita) | |
-| access: login / access / reason / groups | |
-| GUID #FB-TEST (685) / #AI-LOG (686) | |
-| cnt operací · receptions cizí/lokální | |
-| ✅/❌ | |
+| kanál (schránka/pumpa) · Code loader N | pumpa · Code loader neopsán (konzole) — cnt z res = 105 |
+| repository (identita) | plná cesta k `EA17_Yoga_QEA2.qeax` (ConnectionString) → do configů název souboru |
+| access: login / access / reason / groups | admin / read / „repozitar nema polozku ve FB_AccessGroups - fail-closed read“ / `[]` (FALEŠNĚ prázdné — N-K8-2) |
+| GUID #FB-TEST (685) / #AI-LOG (686) | `{78F3F9CB-68B9-4e31-9287-AC38F59BFF17}` / `{AEEBE2C0-AD55-4912-903D-07CD047C7244}` |
+| cnt operací · receptions cizí/lokální | 105 · 4 receptions, všechny CIZÍ (EA_Connect, EA_GetMenuItems, EA_MenuClick, EA_OnOutputItemDoubleClicked); lokální signály 1966/1967/2079/2080 existují (`res-K3.json` results[2], `res-K3b-xref.json` results[4]) |
+| ✅/❌ | ✅ |
 
 ## K4 — bootstrap podruhé (skutečné configy) + plný restart
 
@@ -123,8 +125,8 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| Hotovo řádek | |
-| ✅/❌ | |
+| Hotovo řádek | `Hotovo: 0 operaci zalozeno, 105 nahran kod (souboru v src: 105).` (2× — podruhé po opravě FB_UserAccess) |
+| ✅/❌ | ✅ |
 
 ## K5 — security: skupina „EAFB Write" + sebe do ní + plný restart
 
@@ -135,8 +137,8 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| skupiny založeny (Write / Locked) · jsi v Write | |
-| ✅/❌ | |
+| skupiny založeny (Write / Locked) · jsi v Write | ano / ano · ano (`res-A4.json` results[2]) |
+| ✅/❌ | ✅ |
 
 ## K6 — `deploy_src` PUMPOU (receptions → lokální signály) + plný restart
 
@@ -151,10 +153,10 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| popup / updated / created / receptions | |
-| menu AI Bridge po restartu vidět | |
-| K6b: access · reason · whitelist path | |
-| ✅/❌ | |
+| popup / updated / created / receptions | 1. běh: dialog EA „no such table: t_secuser_group“ → odmítnuto (N-K8-2, opraveno + bootstrap + restart pumpy); 2. běh: popup Ano / updated 105 / created [] / receptions 4× „prepnuto z ciziho GUID - preneseny add-in“ (`res-K6-deploy.json`) |
+| menu AI Bridge po restartu vidět | ano |
+| K6b: access · reason · whitelist path | write · „clen write skupiny dle FB_AccessGroups“ · `Groups.Model Addins.Addin Install Package.Test Data.#FB-TEST` |
+| ✅/❌ | ✅ (po opravě) |
 
 ## A1 — člen skupiny: LOW zápis do #FB-TEST + Output proklik
 
@@ -164,10 +166,10 @@ Do tabulek zapisuj ✅/❌ + co bylo jinak. Když něco selže, **neopravuj nasl
 
 | Kolonka | Hodnota |
 |---|---|
-| status / GUID-A1 / GUID UC | |
-| proklik UC · proklik package | |
-| audit v #AI-LOG | |
-| ✅/❌ | |
+| status / GUID-A1 / GUID UC | done 2/2, LOW bez popupu / `{06ADB271-4859-4f4f-9BE8-007ADABBADAA}` (711) / `{3A7BF07C-A5F5-498b-BBBA-23999FA9CDF6}` (3770) |
+| proklik UC · proklik package | označí UC · označí package ✅ |
+| audit v #AI-LOG | artefakt `FB A1` vznikl — ale v `/Groups/#AI-LOG` (356), ne v 686 (N-K8-3, `res-K10-audit.json`) |
+| ✅/❌ | ✅ |
 
 ## K7 — vyřadit se ze skupiny + plný restart (příprava A2)
 
@@ -182,9 +184,9 @@ Security → Manage Users → tvůj login → odeber `EAFB Write` → **PLNÝ re
 
 | Kolonka | Hodnota |
 |---|---|
-| A2w: kód / hláška doslova / package nevznikl | |
-| A2r: status / access.reason / podpackages | |
-| ✅/❌ | |
+| A2w: kód / hláška doslova / package nevznikl | `E_ADDIN_ACCESS` / viz VYSLEDKY (hláška doslova) / nevznikl ✅ |
+| A2r: status / access.reason / podpackages | done 3/3 / read, „uzivatel neni clenem zadne write skupiny dle FB_AccessGroups (EAFB Write) - cteci operace funguji“, groups = 5 skutečných skupin / jen 711 |
+| ✅/❌ | ✅ |
 
 ## A3 — zápis do package bez balíčkových práv → syrová EA hláška
 
@@ -201,10 +203,10 @@ Cíl: dostat **přesný text chyby Automation API**, když EA security odmítne 
 
 | Kolonka | Hodnota |
 |---|---|
-| GUID-A3 · varianta zámku (group lock / require user lock / nedostupné) | |
-| A3b: kód z ACK · **syrová hláška doslova** | |
-| UC vznikl? (nečekané) | |
-| ✅/❌ | |
+| GUID-A3 · varianta zámku (group lock / require user lock / nedostupné) | `{FEA8A14C-5D89-46bc-83B4-C68162C46C79}` (712) · Group Lock na `EAFB Locked` (admin se musel dočasně přidat do skupiny, N-K8-6) |
+| A3b: kód z ACK · **syrová hláška doslova** | `E_PERMISSION` (obecná větev — zástupný vzor netrefil, opraveno) · `Cannot create new UseCase.  The parent package is locked by Project Security.` |
+| UC vznikl? (nečekané) | ne — zámek přes API platí |
+| ✅/❌ | ✅ |
 
 ## A4 — t_xrefsystem: UserSettings / GroupSettings (aktivace add-inu)
 
@@ -220,10 +222,10 @@ Cíl: dostat **přesný text chyby Automation API**, když EA security odmítne 
 
 | Kolonka | Hodnota |
 |---|---|
-| UserSettings řádek (login, Supplier=AICodeBridge) | |
-| GroupSettings řádek (pokud) | |
-| členství · t_seclocks | |
-| ✅/❌ | |
+| UserSettings řádek (login, Supplier=AICodeBridge) | ano (admin → `{8DCBE61C-CDB8-710D-9371-7A2D97B073FC}`); + osiřelý UserSettings na GUID smazaného add-inu |
+| GroupSettings řádek (pokud) | **ano**: `@F002_Write` → AICodeBridge (A4b netřeba) |
+| členství · t_seclocks | admin ∈ EAFB Write (+ 5 skupin @F00x), Locked prázdná · 1 řádek = group lock A3 (UserID, GroupID, EntityType=Element, EntityID=GUID package, Timestamp); po odemčení K10 → E_SQL (N-K8-4) |
+| ✅/❌ | ✅ |
 
 ## K9 — úklid (volitelné, ELEVATED)
 
@@ -235,19 +237,19 @@ Cíl: dostat **přesný text chyby Automation API**, když EA security odmítne 
 
 | Krok | Co ověřuje | ✅/❌ | Poznámka |
 |---|---|---|---|
-| K0 | příprava, režim security, záloha | | |
-| K1 | přenos add-inu Copy/Paste mezi modely | | |
-| K2 | bootstrap (105 souborů), Manage Add-Ins v security modelu (screenshot), menu po restartu | | |
-| K3 | recon bez `repo`: identita, GUIDy, tabulky t_sec* na SQLite, fail-closed read | | |
-| K4 | bootstrap podruhé se skutečnými configy | | |
-| K5 | skupiny EAFB Write / EAFB Locked | | |
-| K6 | deploy_src pumpou: vrstva 2 pustí člena; receptions přepnuty; menu | | |
-| A1 | člen: LOW zápis + proklik + audit | | |
-| K7 | vyřazení + restart | | |
-| A2 | nečlen: E_ADDIN_ACCESS, čtení projde | | |
-| A3 | balíčková práva: syrová hláška | | |
-| A4 | t_xrefsystem UserSettings/GroupSettings | | |
-| K9 | úklid | | |
+| K0 | příprava, režim security, záloha | ✅ | standardní režim, admin |
+| K1 | přenos add-inu Copy/Paste mezi modely | ✅ ⚠ | pastnuta celá package (kopie podbalíčků smazány ručně) |
+| K2 | bootstrap (105 souborů), Manage Add-Ins v security modelu (screenshot), menu po restartu | ⚠ | bootstrap až K4; add-in Disabled do opravy receptions (N-K8-1); screenshot ano |
+| K3 | recon bez `repo`: identita, GUIDy, tabulky t_sec* na SQLite, fail-closed read | ✅ | + K3b/K3c/K3d doplňky; `groups: []` falešné (N-K8-2) |
+| K4 | bootstrap podruhé se skutečnými configy | ✅ | 0 založeno / 105 kód |
+| K5 | skupiny EAFB Write / EAFB Locked | ✅ | |
+| K6 | deploy_src pumpou: vrstva 2 pustí člena; receptions přepnuty; menu | ❌→✅ | t_secuser_group → t_secusergroup (oprava kódu), pak 105 updated + 4 receptions přepnuty; K6b schránkou ✅ |
+| A1 | člen: LOW zápis + proklik + audit | ✅ | audit v jiné #AI-LOG (N-K8-3) |
+| K7 | vyřazení + restart | ✅ | restart EA i pumpy |
+| A2 | nečlen: E_ADDIN_ACCESS, čtení projde | ✅ | hláška doslova ve VYSLEDKY |
+| A3 | balíčková práva: syrová hláška | ✅ | `…locked by Project Security.` → přesný vzor v FB_InterpretError |
+| A4 | t_xrefsystem UserSettings/GroupSettings | ✅ | obojí doloženo |
+| K9 | úklid | ✅ | + K10 audit/zámky (N-K8-3, N-K8-4) |
 
 ## Známé pasti
 

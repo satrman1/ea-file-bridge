@@ -7,8 +7,9 @@
 // interpretuje na jasnou hlasku (tim se odlisi i read-only uzivatel u
 // zapisove davky - dostane E_PERMISSION misto kryptickeho selhani).
 // Vraci { code, message } kdyz chybu pozna, jinak null (-> zustane E_EXCEPTION).
-// !! PRESNY text EA hlasky pri odepreni zapisu je nutne OVERIT NAZIVO v bance
-// s OMEZENYM uzivatelem - do te doby keyword match; puvodni hlaska se VZDY
+// Presny text EA hlasky pri Group Lock OVEREN ZIVE 2026-09-09 (K8 QEAX, vetev
+// nize). Hlaska pri chybejicich @F002_Write package permissions v bance zatim
+// NE (doma neni MS SQL) - do te doby keyword match; puvodni hlaska se VZDY
 // zachova (za ": Puvodni hlaska EA: ...") - nic se neztrati, jen se doplni
 // citelny nadpis. Pri prvni realne hlasce z banky sem doplnit presny vzor.
 var m = ("" + (rawMsg || "")).toLowerCase();
@@ -18,11 +19,15 @@ if (m == "") { return null; }
 // zamku. Semanticky je to PRAVO (E_PERMISSION), ne prechodny zamek jineho
 // uzivatele (E_LOCKED) - proto tato vetev bezi PRED vetvi zamku, ktera by
 // slovo "locked" chytla driv.
-// !! ZASTUPNY VZOR: klicova slova odhadnuta z terminologie EA UI (Group Lock,
-// User Lock, Require User Lock to Edit). PRESNOU syrovou hlasku z Automation
-// API doda zivy krok A3 (docs/e2e-k8-qeax/PROTOKOL-K8.md) a vyhodnocovaci
-// vlakno Z260904-6b ji sem doplni jako prvni alternativu regexu + test.
-if (/locked (by|to|for) (the |a )?group|group[ -]?lock|(apply|obtain|require[sd]?|need[s]?|must have|without) (a |an |the )?(user |group )?lock|user lock (is )?required|not locked (by|for) (you|editing)|lock (it|the (element|package)) (first|before)/.test(m)) {
+// PRESNY VZOR (zive A3, 2026-09-09, QEAX EA 17.1.5 .qeax, package s Group
+// Lock na skupinu, jejimz clenem uzivatel neni; Element.Update() v
+// create_or_update_elements; docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md):
+//   "Cannot create new UseCase.  The parent package is locked by Project Security."
+// (dve mezery za teckou; "UseCase" = typ prvku). Prvni alternativa regexu =
+// "locked by project security". Ostatni alternativy zustavaji jako zastupne
+// (Require User Lock to Edit doma neovereno - rezim QEAX je standardni;
+// slovnik EA UI: Group Lock, User Lock, Require User Lock to Edit).
+if (/locked by project security|locked (by|to|for) (the |a )?group|group[ -]?lock|(apply|obtain|require[sd]?|need[s]?|must have|without) (a |an |the )?(user |group )?lock|user lock (is )?required|not locked (by|for) (you|editing)|lock (it|the (element|package)) (first|before)/.test(m)) {
     return { code: "E_PERMISSION",
         message: "Nemas balickova prava k cili zapisu - EA security (package zamcena na skupinu / rezim Require User Lock to Edit), plati i pres API. "
             + "Toto NENI chyba bridge: poproste spravce EA o clenstvi ve skupine s pravem k danemu balicku (nebo si prvek zamkni, pokud rezim vyzaduje uzivatelsky zamek), "

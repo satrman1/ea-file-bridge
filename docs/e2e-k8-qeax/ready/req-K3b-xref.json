@@ -1,0 +1,26 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K3b",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT name FROM sqlite_master WHERE type = 'table' AND (name LIKE 't_sec%' OR name = 't_xrefsystem') ORDER BY name"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT * FROM t_xrefsystem ORDER BY Type, Client"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT UserID, UserLogin, FirstName, Surname FROM t_secuser ORDER BY UserLogin"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Stereotype, Package_ID FROM t_object WHERE Object_Type = 'JavascriptAddin' OR Stereotype = 'JavascriptAddin' ORDER BY Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Name AS addin, op.Name AS reception, op.StyleEx, s.Object_ID AS local_signal_id, s.Name AS local_signal FROM t_operation op INNER JOIN t_object o ON o.Object_ID = op.Object_ID LEFT JOIN t_object s ON s.Object_Type = 'Signal' AND op.StyleEx LIKE '%' || s.ea_guid || '%' WHERE o.Stereotype = 'JavascriptAddin' AND op.StyleEx LIKE 'Reception%' ORDER BY o.Name, op.Name"
+  }
+ ]
+}

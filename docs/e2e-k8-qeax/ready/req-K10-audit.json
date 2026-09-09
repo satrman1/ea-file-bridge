@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K10",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Name, o.Package_ID, p.Name AS PackageName, o.CreatedDate FROM t_object o INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE o.Object_Type = 'Artifact' AND o.Name LIKE 'FB %' AND o.CreatedDate >= '2026-09-09' ORDER BY o.Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT * FROM t_seclocks"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (685, 687) ORDER BY Package_ID"
+  }
+ ]
+}

@@ -1955,6 +1955,26 @@ t("K8 fail-secure: repo doplneno, pkg jeste placeholder -> FB_CheckWrite = E_WHI
     ok(chk != null && chk.code === "E_WHITELIST", "ocekavan E_WHITELIST: " + JSON.stringify(chk));
 });
 
+// --- K8 ZIVE 2026-09-09 (Z260904-6b, K6): jmena security tabulek + chybny SQL bez vyjimky
+t("K8 zive: FB_UserAccess se pta na t_secusergroup (bez podtrzitka), nikdy na t_secuser_group", function () {
+    var code = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_UserAccess.js"), "utf8");
+    var active = code.split(/\r?\n/).filter(function (l) { return l.replace(/^\s+/, "").indexOf("//") !== 0; }).join("\n");
+    ok(active.indexOf("t_secusergroup") >= 0, "SQL musi jmenovat t_secusergroup");
+    eq(active.indexOf("t_secuser_group"), -1, "chybny nazev t_secuser_group nesmi byt v aktivnim kodu");
+    var a4 = fs.readFileSync(path.join(__dirname, "..", "docs", "e2e-k8-qeax", "req-A4.json"), "utf8");
+    eq(a4.indexOf("t_secuser_group"), -1, "req-A4.json: chybny nazev tabulky");
+});
+t("K8 zive: SQL clenstvi vrati vysledek BEZ Dataset_0 (EA bez vyjimky) -> fail-closed read s duvodem 'SQL', ne 'neni clenem'", function () {
+    delete B._fbAccessCache;
+    var repo = mkRepo({ securityEnabled: true, login: "milos",
+        sqlRules: [{ re: /t_secusergroup/i, rows: [] }] });
+    repo.SQLQuery = function (sql) { return "SQL API Open FAILED with error: no such table: t_secusergroup"; };
+    var a = B.FB_UserAccess.call(B, repo);
+    delete B._fbAccessCache;
+    eq(a.access, "read");
+    contains(a.reason, "dataset", "duvod musi rict, ze selhal dotaz");
+    ok(a.reason.indexOf("neni clenem") < 0, "nesmi tvrdit, ze uzivatel neni clenem");
+});
 // --- K8 A3 (Z260904-6): FB_InterpretError - vetev balickovych prav (zastupny vzor)
 t("FB_InterpretError: Group Lock hlaska -> E_PERMISSION (ne E_LOCKED), puvodni text zachovan", function () {
     var r = B.FB_InterpretError.call(B, "Element 'X' is locked by group 'EAFB Locked'. You are not a member of this group.");
@@ -1962,6 +1982,15 @@ t("FB_InterpretError: Group Lock hlaska -> E_PERMISSION (ne E_LOCKED), puvodni t
     eq(r.code, "E_PERMISSION");
     contains(r.message, "EAFB Locked", "puvodni hlaska EA se nesmi ztratit");
     contains(r.message, "balickova prava");
+});
+t("FB_InterpretError: PRESNA hlaska EA z ziveho A3 (Group Lock, 2026-09-09) -> E_PERMISSION vetev balickovych prav", function () {
+    var raw = "Cannot create new UseCase.  The parent package is locked by Project Security.";
+    var r = B.FB_InterpretError.call(B, raw);
+    ok(r != null, "hlaska musi byt rozpoznana");
+    eq(r.code, "E_PERMISSION");
+    contains(r.message, "balickova prava", "musi chytit vetev balickovych prav (skupinovy zamek), ne obecnou");
+    contains(r.message, raw, "puvodni hlaska EA doslova zachovana");
+    eq(B.FB_InterpretError.call(B, "Cannot create new Package.  The parent package is locked by Project Security.").code, "E_PERMISSION");
 });
 t("FB_InterpretError: Require User Lock to Edit bez zamku -> E_PERMISSION", function () {
     eq(B.FB_InterpretError.call(B, "You must apply a user lock to this element before you can edit it").code, "E_PERMISSION");

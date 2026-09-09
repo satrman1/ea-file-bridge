@@ -1,0 +1,20 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K9",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Package",
+     "guid": "{06ADB271-4859-4f4f-9BE8-007ADABBADAA}"
+    },
+    {
+     "type": "Package",
+     "guid": "{FEA8A14C-5D89-46bc-83B4-C68162C46C79}"
+    }
+   ]
+  }
+ ]
+}

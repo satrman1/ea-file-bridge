@@ -80,4 +80,4 @@ Na eaexample je security vypnutá → gate se neuplatní; logiku kryje harness. 
 | K5 kontext (3 případy) | ✅ | -02 element FBT IT5 UX (path+branch+`inWhitelist:true`), -21 AICodeBridge (`inWhitelist:false`+note), -22 kořen (`type:Package`); `currentDiagram` se vrací vždy |
 | K6 scope | ✅ | -03: bez scope count 1, se scope #FB-TEST count 0 + `scope` blok s cestou |
 | K7 spike | ✅ uzavřen | kroky 1–2 OK (krok 1 sbalí strom), **b1 potvrzen prokllikem** (ShowInProjectView z user-gesture bez pádu); kroky 4–5 + fáze D se nestaví — viz SPIKE-NAV.md |
-| K8 security živě | ⏳ | nejdřív DOMA v QEAX (zápřah `zaprah-vlaken-2026-08-21.md`; #FB-TEST 685 + #AI-LOG 686 už založeny přes MCP), pak banka s kurýrem |
+| K8 security živě | ✅ ⚠ | **DOMA v QEAX PROVEDENO 2026-09-09** (`docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`, PROTOKOL-K8 vyplněn): A1–A4 ✅; ⚠ = dva nálezy s opravou kódu (`t_secusergroup`, přesný vzor hlášky Group Lock) a kandidáti před bankou (audit do první `#AI-LOG`, receptions po bootstrapu); banka s kurýrem Po 14. 9. |

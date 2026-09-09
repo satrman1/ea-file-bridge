@@ -1,0 +1,26 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "K3d",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Package_ID FROM t_object WHERE Object_Type = 'Signal' ORDER BY Name, Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Object_Type, Package_ID FROM t_object WHERE Package_ID IN (687, 688, 689, 710) ORDER BY Package_ID, Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ea_guid, Object_Type, Package_ID FROM t_object WHERE ea_guid IN ('{47BFD707-2CA4-4198-8749-43EB1F105FF5}', '{B77B978A-A18B-469d-B954-83ABFE09CE39}', '{CC89F083-A6A4-4ea6-9A05-8E587527F031}', '{F26A349C-B1B2-43f5-8B4D-70EFFB228B04}')"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid, Parent_ID FROM t_package WHERE Name IN ('#AI-LOG', '#FB-TEST', '#AI-CODE', 'EA Addins') ORDER BY Name, Package_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (688, 689, 710) ORDER BY Package_ID"
+  }
+ ]
+}
