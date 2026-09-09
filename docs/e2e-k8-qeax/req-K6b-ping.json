@@ -1,7 +1,7 @@
 {
  "protocol": "eafb/0.2",
  "id": "K6b",
- "repo": "<QEAX-FILENAME>",
+ "repo": "EA17_Yoga_QEA2.qeax",
  "ops": [
   {
    "op": "ping",

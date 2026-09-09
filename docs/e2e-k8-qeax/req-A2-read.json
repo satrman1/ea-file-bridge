@@ -1,7 +1,7 @@
 {
  "protocol": "eafb/0.2",
  "id": "A2r",
- "repo": "<QEAX-FILENAME>",
+ "repo": "EA17_Yoga_QEA2.qeax",
  "ops": [
   {
    "op": "ping",
@@ -10,7 +10,7 @@
   {
    "op": "get_packages_information",
    "packages": [
-    "<GUID-685>"
+    "{78F3F9CB-68B9-4e31-9287-AC38F59BFF17}"
    ]
   },
   {

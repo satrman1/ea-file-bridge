@@ -40,9 +40,9 @@
 // QEAX (K8-doma, security ZAPNUTA; Z260904-6): skupinu "EAFB Write" zaklada
 //   Milos rucne v EA (Configure > Security > Users/Groups) v kroku K5 a
 //   prirazuje si sebe; A2 = vyrazeni ze skupiny + PLNY restart EA (cache
-//   FB_UserAccess per session). Placeholder "<QEAX-FILENAME>" nahradi
-//   Z260904-6b (viz FB_Whitelist). Bez teto polozky = fail-closed read.
+//   FB_UserAccess per session). Identita doplnena 6b 2026-09-09 (viz
+//   FB_Whitelist). Bez teto polozky = fail-closed read.
 return [
     { repo: "EAEXAMPLE.QEA", writeGroups: ["EAFB Write"] },
-    { repo: "<QEAX-FILENAME>", writeGroups: ["EAFB Write"] }
+    { repo: "EA17_Yoga_QEA2.qeax", writeGroups: ["EAFB Write"] }
 ];

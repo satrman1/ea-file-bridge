@@ -1,7 +1,7 @@
 {
  "protocol": "eafb/0.2",
  "id": "K9",
- "repo": "<QEAX-FILENAME>",
+ "repo": "EA17_Yoga_QEA2.qeax",
  "ops": [
   {
    "op": "delete_from_model",

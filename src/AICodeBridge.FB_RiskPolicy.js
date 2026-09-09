@@ -43,8 +43,8 @@
 // V bance deploy_src BLOCKED (+ FB_OpsAllowed deny trva - gate = 2. vrstva).
 // QEAX (K8-doma, security model; Z260904-6): TAZ politika jako eaexample
 // (sdilena mapa DEV_CLASSES + tytez prahy) - testuji se vrstvy 2 a 3
-// autorizace, ne risk gate. Placeholder "<QEAX-FILENAME>" nahradi
-// Z260904-6b (viz FB_Whitelist); repo bez polozky = fail-closed ELEVATED (W9).
+// autorizace, ne risk gate. Identita doplnena 6b 2026-09-09 (viz
+// FB_Whitelist); repo bez polozky = fail-closed ELEVATED (W9).
 var DEV_CLASSES = {
           // --- LOW (par. 4: bezny pracovni den bez dialogu) ---
           "create_element":                  "LOW",
@@ -95,7 +95,7 @@ return [
     { repo: "EAEXAMPLE.QEA",
       classes: DEV_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK,
       budgetMs: 8000, hashMaxChars: 2000000 },
-    { repo: "<QEAX-FILENAME>",
+    { repo: "EA17_Yoga_QEA2.qeax",
       classes: DEV_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK,
       budgetMs: 8000, hashMaxChars: 2000000 }
     // Banka (PROD politika - doplni clovek v bance; sablona dle par. 4):

@@ -1,11 +1,11 @@
 {
  "protocol": "eafb/0.2",
  "id": "A3a",
- "repo": "<QEAX-FILENAME>",
+ "repo": "EA17_Yoga_QEA2.qeax",
  "ops": [
   {
    "op": "create_or_update_package",
-   "parent": "<GUID-685>",
+   "parent": "{78F3F9CB-68B9-4e31-9287-AC38F59BFF17}",
    "name": "K8 A3 zamceny (skupina EAFB Locked)"
   }
  ]

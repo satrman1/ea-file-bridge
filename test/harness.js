@@ -1873,22 +1873,29 @@ t("FB_Main: delete error po castecnem smazani -> FB_LogChanges se vola (Output n
 // --- K8 QEAX (Z260904-6): configy se zastupnou identitou repa = fail-secure
 var K8_CFG_FILES = ["AICodeBridge.FB_Whitelist.js", "AICodeBridge.FB_Config.js", "AICodeBridge.FB_OpsAllowed.js",
                     "AICodeBridge.FB_RiskPolicy.js", "AICodeBridge.FB_AccessGroups.js"];
-t("K8: placeholder \"<QEAX-FILENAME>\" je PRAVE JEDNOU v kazdem z 5 configu (find-replace najednou)", function () {
+// 6b 2026-09-09 (zivy K3): identita QEAX = nazev souboru .qeax, GUID #FB-TEST
+// z res-K3.json. Placeholder uz nesmi byt nikde (ani v komentari by nevadil,
+// ale v aktivnim kodu = fail-secure past: zadny zapis do QEAX).
+var K8_REPO_ID = "EA17_Yoga_QEA2.qeax";
+var K8_PKG_GUID = "{78F3F9CB-68B9-4e31-9287-AC38F59BFF17}";
+t("K8: skutecna identita QEAX je PRAVE JEDNOU a placeholder 0x v kazdem z 5 configu", function () {
     K8_CFG_FILES.forEach(function (f) {
         var code = fs.readFileSync(path.join(SRC, f), "utf8");
         var active = code.split(/\r?\n/).filter(function (l) { return l.replace(/^\s+/, "").indexOf("//") !== 0; }).join("\n");
-        var n = active.split('"<QEAX-FILENAME>"').length - 1;
-        eq(n, 1, f + ": ocekavan 1 aktivni vyskyt placeholderu, je " + n);
+        var n = active.split('"' + K8_REPO_ID + '"').length - 1;
+        eq(n, 1, f + ": ocekavan 1 aktivni vyskyt identity QEAX, je " + n);
+        eq(active.indexOf("<QEAX-FILENAME>"), -1, f + ": placeholder <QEAX-FILENAME> uz v aktivnim kodu nesmi byt");
+        eq(active.indexOf("<GUID-685>"), -1, f + ": placeholder <GUID-685> uz v aktivnim kodu nesmi byt");
     });
     var wl = B.FB_Whitelist.call(B);
-    ok(wl.length === 2 && wl[1].repo === "<QEAX-FILENAME>" && wl[1].pkg === "<GUID-685>", "QEAX polozka whitelistu s placeholdery");
+    ok(wl.length === 2 && wl[1].repo === K8_REPO_ID && wl[1].pkg === K8_PKG_GUID, "QEAX polozka whitelistu se skutecnou identitou a GUID #FB-TEST");
 });
 t("K8: FB_RiskPolicy polozka QEAX ma tytez tridy a prahy jako eaexample", function () {
     var pol = B.FB_RiskPolicy.call(B);
     var eaex = null, qeax = null;
     for (var i = 0; i < pol.length; i++) {
         if (/EAEXAMPLE/i.test("" + pol[i].repo)) { eaex = pol[i]; }
-        if (pol[i].repo === "<QEAX-FILENAME>") { qeax = pol[i]; }
+        if (pol[i].repo === K8_REPO_ID) { qeax = pol[i]; }
     }
     ok(eaex && qeax, "chybi eaexample nebo QEAX polozka");
     eq(JSON.stringify(qeax.classes), JSON.stringify(eaex.classes));
@@ -1897,7 +1904,7 @@ t("K8: FB_RiskPolicy polozka QEAX ma tytez tridy a prahy jako eaexample", functi
     eq(qeax.classes["deploy_src"], "ELEVATED", "deploy_src v QEAX = ELEVATED (K6 reception sync pumpou)");
 });
 function k8Repo(opts) {
-    // realne configy (ZADNE prepsani FB_*): QEAX identita, ktera placeholderu neodpovida
+    // realne configy (ZADNE prepsani FB_*): identita, ktera QEAX polozce neodpovida (cizi model)
     opts = opts || {};
     var rules = [{ re: /#AI-LOG/i, rows: [] }];
     if (opts.groups) { rules.push({ re: /t_secgroup/i, rows: opts.groups.map(function (g) { return { GroupName: g }; }) }); }
@@ -1906,7 +1913,7 @@ function k8Repo(opts) {
     repo._addPackage({ id: 685, name: "#FB-TEST", guid: "{K8-685-GUID}" });
     return repo;
 }
-t("K8 fail-secure: security ON + clen EAFB Write, ale repo neodpovida placeholderu -> E_ADDIN_ACCESS (nic nezapsano)", function () {
+t("K8 fail-secure: security ON + clen EAFB Write, ale repo neodpovida zadne polozce -> E_ADDIN_ACCESS (nic nezapsano)", function () {
     delete B._fbAccessCache;
     var repo = k8Repo({ securityEnabled: true, login: "milos", groups: ["EAFB Write"] });
     var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "k8-fs-1",
@@ -1916,7 +1923,7 @@ t("K8 fail-secure: security ON + clen EAFB Write, ale repo neodpovida placeholde
     eq(resp.code, "E_ADDIN_ACCESS", "repo bez polozky FB_AccessGroups = fail-closed read: " + out.substring(0, 200));
     eq(repo.GetPackageByID(685).Packages.Count, 0, "zadny package nesmel vzniknout");
 });
-t("K8 fail-secure: security OFF + repo neodpovida placeholderu -> zadny zapis (status != done)", function () {
+t("K8 fail-secure: security OFF + repo neodpovida zadne polozce -> zadny zapis (status != done)", function () {
     delete B._fbAccessCache;
     var repo = k8Repo({ securityEnabled: false });
     var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "k8-fs-2",

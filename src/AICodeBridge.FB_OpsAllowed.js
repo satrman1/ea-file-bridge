@@ -24,9 +24,9 @@
 // QEAX (K8-doma, security model; Z260904-6) - vse povolene: testuje se
 //   VRSTVA 2 (clenstvi v EA skupine -> E_ADDIN_ACCESS) a VRSTVA 3 (balickova
 //   prava EA -> FB_InterpretError), ne whitelist operaci. deploy_src je
-//   potreba pro K6 (prepnuti receptions na lokalni SignalGUID). Placeholder
-//   "<QEAX-FILENAME>" nahradi Z260904-6b (viz FB_Whitelist).
+//   potreba pro K6 (prepnuti receptions na lokalni SignalGUID). Identita
+//   doplnena 6b 2026-09-09 (viz FB_Whitelist).
 return [
     { repo: "EAEXAMPLE.QEA", allow: ["*"], deny: [] },
-    { repo: "<QEAX-FILENAME>", allow: ["*"], deny: [] }
+    { repo: "EA17_Yoga_QEA2.qeax", allow: ["*"], deny: [] }
 ];
