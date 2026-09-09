@@ -2093,6 +2093,13 @@ function supRepo(sqlImpl) {
     repo.SQLQuery = function (sql) { repo._supDuringQuery = supVal; return sqlImpl(sql); };
     return repo;
 }
+t("N-K8-4 (9. 9.): E_SQL nese raw = zacatek odpovedi EA (diagnostika prazdny SELECT * vs. chyba)", function () {
+    var repo = supRepo(function () { return "<?xml version=\"1.0\"?><EADATA version=\"1.0\" exporter=\"Enterprise Architect\"></EADATA>"; });
+    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT * FROM t_seclocks" });
+    eq(r.code, "E_SQL");
+    contains(r.raw, "<EADATA", "raw musi nest zacatek odpovedi vcetne tagu");
+    ok(r.raw.length <= 300);
+});
 t("N2 E_SQL: EA vrati chybovy text bez Dataset_0 -> status error, code E_SQL, hlaska EA v message", function () {
     var repo = supRepo(function () { return "SQL API Open FAILED: no such column: Type"; });
     var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT Type FROM t_objectconstraint LIMIT 1" });

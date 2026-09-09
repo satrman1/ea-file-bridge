@@ -14,6 +14,13 @@
 //  Legitimni prazdny SELECT vraci <EADATA><Dataset_0><Data/>...</EADATA>
 //  -> zustava ok/rowCount 0. Rozliseni "<EADATA> bez Dataset_0 = chyba"
 //  potvrzuje ziva davka 20260908-V1 (docs/e2e-vscode/OVERENI-S-OPRAVY-2026-09-08.md).
+//  !! OTEVRENO 2026-09-09 (K8 K10, N-K8-4): `SELECT * FROM t_seclocks` nad
+//  PRAZDNOU tabulkou skoncil E_SQL BEZ dialogu EA (tyz dotaz s 1 radkem
+//  prosel) - hypoteza: u SELECT * bez radku EA nezna sloupce a Dataset_0
+//  nevyrobi -> falesne pozitivni E_SQL. Proto E_SQL od 9. 9. nese `raw`
+//  (prvnich 300 znaku odpovedi EA, tagy zachovany) = diagnostika pro
+//  rozliseni obou pripadu pri pristim vyskytu; do te doby pravidlo pro kit:
+//  nad tabulkou, ktera muze byt prazdna, sloupce VYJMENOVAT, ne SELECT *.
 var sql = "";
 if (op && op.sql_b64) { sql = this.B64Decode(op.sql_b64); }
 else if (op && op.sql) { sql = "" + op.sql; }
@@ -25,6 +32,7 @@ if (head.substring(0, 6) != "SELECT" && head.substring(0, 4) != "WITH") {
     return { op: "query", status: "error", code: "E_SQL_READONLY", message: "Povoleny jen SELECT/WITH dotazy (read-only)." };
 }
 function sqlErr(detail) {
+    var rawText = (detail == null ? "" : detail);
     var msg = "";
     if (detail) {
         // prvni neprazdny radek textu bez XML tagu (hlaska EA, napr. "SQL API Open FAILED: no such column: Type")
@@ -39,7 +47,8 @@ function sqlErr(detail) {
     // suppressDialogs = diagnostika (zive 2026-09-08 V1: dialog "SQL API Open
     // FAILED" se OBJEVIL i s obalem) - rozlisuje "on" (vlastnost prijala true,
     // ale dialog nekryje) od "unavailable: <chyba>" (vlastnost v runtime chybi)
-    return { op: "query", status: "error", code: "E_SQL", message: msg, sql: sql.substring(0, 500), suppressDialogs: supState };
+    return { op: "query", status: "error", code: "E_SQL", message: msg, sql: sql.substring(0, 500), suppressDialogs: supState,
+        raw: ("" + rawText).substring(0, 300) };
 }
 var xml = "";
 var supOld = null, supSet = false, supState = "not-set";
