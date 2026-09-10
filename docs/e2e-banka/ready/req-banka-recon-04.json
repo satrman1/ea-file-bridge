@@ -1,0 +1,10 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-recon-04",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "ping", "echo": "banka-recon-04" },
+  { "op": "query", "sql": "SELECT g.GroupName FROM t_secgroup g INNER JOIN t_secusergroup ug ON ug.GroupID = g.GroupID INNER JOIN t_secuser u ON u.UserID = ug.UserID WHERE u.UserLogin = '<LOGIN>' ORDER BY g.GroupName" },
+  { "op": "query", "sql": "SELECT TOP 5 u.UserLogin FROM t_secuser u INNER JOIN t_secusergroup ug ON ug.UserID = u.UserID INNER JOIN t_secgroup g ON g.GroupID = ug.GroupID WHERE g.GroupName = '<WRITE-GROUP>' ORDER BY u.UserLogin" }
+ ]
+}

@@ -1,0 +1,14 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-recon-03",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "ping", "echo": "banka-recon-03" },
+  { "op": "query", "sql": "SELECT Package_ID FROM t_package WHERE Package_ID = -1" },
+  { "op": "query", "sql": "SELECT t_xrefsystem.Type, t_secgroup.GroupName, t_object.Name FROM ((t_xrefsystem LEFT JOIN t_secuser ON t_xrefsystem.Client = t_secuser.UserID) LEFT JOIN t_secgroup ON t_xrefsystem.Client = t_secgroup.GroupID) LEFT JOIN t_object ON t_xrefsystem.Supplier = t_object.ea_guid WHERE t_xrefsystem.Type IN ('UserSettings', 'GroupSettings') AND t_object.Name = 'AICodeBridge' ORDER BY t_xrefsystem.Type" },
+  { "op": "query", "sql": "SELECT g.GroupName FROM t_secgroup g INNER JOIN t_secusergroup ug ON ug.GroupID = g.GroupID INNER JOIN t_secuser u ON u.UserID = ug.UserID WHERE u.UserLogin = '<LOGIN>' ORDER BY g.GroupName" },
+  { "op": "query", "sql": "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 't_document' ORDER BY ORDINAL_POSITION" },
+  { "op": "query", "sql": "SELECT COUNT(*) AS cnt FROM t_seclocks" },
+  { "op": "query", "sql": "SELECT TOP 1 EntityType FROM t_seclocks" }
+ ]
+}

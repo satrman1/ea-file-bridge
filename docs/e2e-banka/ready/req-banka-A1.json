@@ -1,0 +1,23 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-A1",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-SANDBOX>",
+   "name": "POC banka A1 (clen write skupiny)"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC POC banka A1 zapis clenem skupiny",
+     "notes": "Vytvoreno davkou banka-A1 (POC EA File Bridge, EMR_TEST, security zapnuta). Uklid rucne po POC."
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-ping-05",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "ping", "echo": "po-restartu-clenstvi" }
+ ]
+}

@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-recon-01",
+ "ops": [
+  { "op": "ping", "echo": "banka-recon" },
+  { "op": "query", "sql": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 't_sec%' OR TABLE_NAME = 't_xrefsystem' ORDER BY TABLE_NAME" },
+  { "op": "query", "sql": "SELECT Object_ID, Name, ea_guid, Stereotype, Package_ID FROM t_object WHERE Name = 'AICodeBridge' ORDER BY Object_ID" },
+  { "op": "query", "sql": "SELECT COUNT(*) AS cnt FROM t_operation WHERE Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin')" },
+  { "op": "query", "sql": "SELECT Name, StyleEx FROM t_operation WHERE Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin') AND Name LIKE 'EA%' ORDER BY Name" },
+  { "op": "query", "sql": "SELECT Package_ID, Name, ea_guid, Parent_ID FROM t_package WHERE Name = '#AI-LOG' ORDER BY Package_ID" },
+  { "op": "query", "sql": "SELECT Package_ID, Name, ea_guid, Parent_ID FROM t_package WHERE ea_guid = '<GUID-SANDBOX-ZE-ZALOHY>'" },
+  { "op": "query", "sql": "SELECT t_xrefsystem.Type, t_secuser.UserLogin, t_secgroup.GroupName, t_object.Name FROM ((t_xrefsystem LEFT JOIN t_secuser ON t_xrefsystem.Client = t_secuser.UserID) LEFT JOIN t_secgroup ON t_xrefsystem.Client = t_secgroup.GroupID) LEFT JOIN t_object ON t_xrefsystem.Supplier = t_object.ea_guid WHERE t_xrefsystem.Type IN ('UserSettings', 'GroupSettings') AND t_object.Name = 'AICodeBridge' ORDER BY t_xrefsystem.Type" },
+  { "op": "query", "sql": "SELECT g.GroupName FROM t_secgroup g INNER JOIN t_secusergroup ug ON ug.GroupID = g.GroupID INNER JOIN t_secuser u ON u.UserID = ug.UserID WHERE u.UserLogin = '<LOGIN>' ORDER BY g.GroupName" },
+  { "op": "query", "sql": "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 't_document' ORDER BY ORDINAL_POSITION" },
+  { "op": "query", "sql": "SELECT COUNT(*) AS cnt FROM t_seclocks" },
+  { "op": "query", "sql": "SELECT UserID, GroupID, EntityType, EntityID, Timestamp FROM t_seclocks" },
+  { "op": "query", "sql": "SELECT * FROM t_seclocks" }
+ ]
+}
