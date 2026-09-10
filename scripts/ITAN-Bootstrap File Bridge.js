@@ -15,6 +15,11 @@
 //      nese CIZI SignalGUID -> EA ho nenacte (Manage Add-Ins pada na Disabled,
 //      menu mlci) - v bance je deploy_src deny, proto to dela bootstrap.
 //      Signal, ktery v modelu neni -> handler se preskoci (vypis).
+//   5. (od 2026-09-10, nalez zive v bance) PARAMETRY receptions EA_* se
+//      kontroluji proti EA_ARGS (Sparx broadcast signatury) a pri neshode
+//      se prestavi - EA preda argumenty POZICNE, chybejici parametr posune
+//      vsechny dalsi (EA_MenuClick bez MenuName -> ItemName = nazev podmenu,
+//      Output "Unhandled menu item: -AI Bridge"). Idempotentni jako vse ostatni.
 //
 // PRED SPUSTENIM:
 //   - v Project Browseru OZNAC package, kam ma element patrit (jen pri
@@ -175,17 +180,35 @@ function main() {
     //    cizi SignalGUID.
     var sigMap = {};
     for (var sj = 0; sj < SIG.length; sj++) { sigMap[SIG[sj].n] = SIG[sj].p; }
-    var created = 0, coded = 0, skippedEa = "", recFixed = 0, recNew = 0;
+    var created = 0, coded = 0, skippedEa = "", recFixed = 0, recNew = 0, parFixed = 0;
     // signatury EA_ handleru bez zavorek v hlavicce (stejne jako harness KNOWN_ARGS)
     var EA_ARGS = {
         EA_Connect: ["Repository"],
         EA_Disconnect: [],
         EA_GetMenuItems: ["Repository", "MenuLocation", "MenuName"],
-        EA_MenuClick: ["Repository", "MenuLocation", "ItemName"],
+        EA_MenuClick: ["Repository", "MenuLocation", "MenuName", "ItemName"],
         EA_GetMenuState: ["Repository", "MenuLocation", "MenuName", "ItemName", "IsEnabled", "IsChecked"],
         EA_OnOutputItemDoubleClicked: ["Repository", "TabName", "LineText", "ID"],
         EA_OnOutputItemClicked: ["Repository", "TabName", "LineText", "ID"]
     };
+    // bod 5 hlavicky: parametry reception = presne EA_ARGS (jmeno + poradi)
+    function syncEaParams(meth, opName) {
+        var wantP = EA_ARGS[opName];
+        if (!wantP) { return false; }
+        var haveP = [];
+        for (var hp = 0; hp < meth.Parameters.Count; hp++) { haveP.push("" + meth.Parameters.GetAt(hp).Name); }
+        if (haveP.join(",") == wantP.join(",")) { return false; }
+        for (var dp = meth.Parameters.Count - 1; dp >= 0; dp--) { meth.Parameters.DeleteAt(dp, false); }
+        meth.Parameters.Refresh();
+        for (var np = 0; np < wantP.length; np++) {
+            var par2 = meth.Parameters.AddNew(wantP[np], "String");
+            par2.Position = np;
+            par2.Update();
+        }
+        meth.Parameters.Refresh();
+        Session.Output("PX  " + opName + " -> parametry reception opraveny: (" + haveP.join(", ") + ") -> (" + wantP.join(", ") + ")");
+        return true;
+    }
     function signalGuidFor(opName) {
         var sx = "" + Repository.SQLQuery("SELECT ea_guid FROM t_object WHERE Object_Type = 'Signal' AND Name = '" + opName.replace(/'/g, "''") + "'");
         var sm = /<ea_guid>([^<]+)<\/ea_guid>/i.exec(sx);
@@ -236,6 +259,7 @@ function main() {
             created++;
             if (isEa) { m.StyleEx = "Reception=1;SignalGUID=" + sg + ";"; recNew++; }
         } else if (isEa && sg != "") {
+            if (syncEaParams(m, name)) { parFixed++; }
             var haveStyle = "" + m.StyleEx;
             if (haveStyle.toUpperCase().indexOf(("SignalGUID=" + sg + ";").toUpperCase()) < 0) {
                 m.StyleEx = "Reception=1;SignalGUID=" + sg + ";";
@@ -251,7 +275,7 @@ function main() {
     el.Methods.Refresh();
 
     Session.Output("Hotovo: " + created + " operaci zalozeno, " + coded + " nahran kod (souboru v src: " + names.length + ")."
-        + " Receptions: " + recNew + " zalozeno, " + recFixed + " prepnuto na lokalni Signal."
+        + " Receptions: " + recNew + " zalozeno, " + recFixed + " prepnuto na lokalni Signal, " + parFixed + " parametry opraveny."
         + (skippedEa != "" ? " BEZ RECEPTION (Signal chybi): " + skippedEa : ""));
     Session.Output("DALSI KROKY: 1) zkontroluj configy v src (FB_Whitelist/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,");
     Session.Output("2) PLNY restart EA (kod EA runtime) a spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.");

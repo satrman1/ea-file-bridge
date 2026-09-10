@@ -234,7 +234,7 @@ function mkRepo(opts) {
 var KNOWN_ARGS = {
     EA_Connect: ["Repository"],
     EA_GetMenuItems: ["Repository", "MenuLocation", "MenuName"],
-    EA_MenuClick: ["Repository", "MenuLocation", "ItemName"],
+    EA_MenuClick: ["Repository", "MenuLocation", "MenuName", "ItemName"],
     EA_GetMenuState: ["Repository", "MenuLocation", "MenuName", "ItemName", "IsEnabled", "IsChecked"]
 };
 function loadBridge() {
@@ -2050,6 +2050,20 @@ t("ITAN-Bootstrap: EA_* handlery = receptions na lokalni Signal (StyleEx), stara
         ok(code.indexOf(n + ":") >= 0, "signatura " + n + " v EA_ARGS");
     });
     new Function("Repository", "Session", "ActiveXObject", "Enumerator", code.replace(/^\s*main\(\);\s*$/m, ""));
+});
+// --- BANKA 2026-09-10 (Z260908-5): bootstrap zalozil EA_MenuClick bez MenuName -> ItemName = "-AI Bridge"
+t("ITAN-Bootstrap: EA_ARGS = Sparx broadcast signatury (EA_MenuClick ma MenuName), parametry existujicich receptions se synchronizuji", function () {
+    var code = fs.readFileSync(path.join(__dirname, "..", "scripts", "ITAN-Bootstrap File Bridge.js"), "utf8");
+    var m = /EA_MenuClick:\s*\[([^\]]*)\]/.exec(code);
+    ok(m != null, "EA_ARGS.EA_MenuClick musi existovat");
+    var args = m[1].split(",").map(function (a) { return a.replace(/[\s"]/g, ""); });
+    eq(args.join(","), "Repository,MenuLocation,MenuName,ItemName", "Sparx: EA_MenuClick(Repository, MenuLocation, MenuName, ItemName)");
+    var g = /EA_GetMenuItems:\s*\[([^\]]*)\]/.exec(code);
+    eq(g[1].split(",").map(function (a) { return a.replace(/[\s"]/g, ""); }).join(","), "Repository,MenuLocation,MenuName");
+    ok(code.indexOf("syncEaParams(m, name)") >= 0, "existujici reception musi projit sync parametru (pozicni predani argumentu EA)");
+    ok(code.indexOf("Parameters.DeleteAt(dp, false)") >= 0, "sync = prestaveni parametru, ne jen pridani");
+    ok(code.indexOf("parametry opraveny") >= 0, "souhrn hlasi pocet opravenych signatur");
+    eq(KNOWN_ARGS.EA_MenuClick.join(","), "Repository,MenuLocation,MenuName,ItemName", "harness KNOWN_ARGS = tataz signatura");
 });
 // --- K8 A3 (Z260904-6): FB_InterpretError - vetev balickovych prav (zastupny vzor)
 t("FB_InterpretError: Group Lock hlaska -> E_PERMISSION (ne E_LOCKED), puvodni text zachovan", function () {
