@@ -2107,12 +2107,18 @@ function supRepo(sqlImpl) {
     repo.SQLQuery = function (sql) { repo._supDuringQuery = supVal; return sqlImpl(sql); };
     return repo;
 }
-t("N-K8-4 (9. 9.): E_SQL nese raw = zacatek odpovedi EA (diagnostika prazdny SELECT * vs. chyba)", function () {
-    var repo = supRepo(function () { return "<?xml version=\"1.0\"?><EADATA version=\"1.0\" exporter=\"Enterprise Architect\"></EADATA>"; });
-    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT * FROM t_seclocks" });
-    eq(r.code, "E_SQL");
-    contains(r.raw, "<EADATA", "raw musi nest zacatek odpovedi vcetne tagu");
+t("N-K8-4 ROZHODNUTO (banka 2026-09-10): obalka <EADATA> bez Dataset_0 = ok / rowCount 0 + warning + raw (ne E_SQL)", function () {
+    // presny tvar odpovedi EA 17.1.6 na MS SQL 2022 pro 0 radku (recon-01 op 7, vyjmenovane sloupce)
+    var bankRaw = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\" ?>\r\n<EADATA version=\"1.0\" exporter=\"Enterprise Architect\">\r\n</EADATA>";
+    var r = B.FB_OpQuery.call(B, supRepo(function () { return bankRaw; }), { sql: "SELECT Package_ID, Name FROM t_package WHERE ea_guid = '{nic}'" });
+    eq(r.status, "ok"); eq(r.rowCount, 0); eq(r.rows.length, 0);
+    ok(typeof r.code == "undefined", "zadny chybovy kod");
+    ok(r.warnings && r.warnings.length == 1, "warning o nerozlisitelnosti 0 radku vs. chybny dotaz");
+    contains(r.warnings[0], "SQL API Open FAILED", "warning musi rict, jak se pozna chybny dotaz");
+    contains(r.raw, "<EADATA", "raw nese zacatek odpovedi (diagnostika)");
     ok(r.raw.length <= 300);
+    var r2 = B.FB_OpQuery.call(B, supRepo(function () { return "<?xml version=\"1.0\"?><EADATA version=\"1.0\" exporter=\"Enterprise Architect\"></EADATA>"; }), { sql: "SELECT * FROM t_seclocks" });
+    eq(r2.status, "ok", "SQLite K10 tvar = totez"); eq(r2.rowCount, 0);
 });
 t("N2 E_SQL: EA vrati chybovy text bez Dataset_0 -> status error, code E_SQL, hlaska EA v message", function () {
     var repo = supRepo(function () { return "SQL API Open FAILED: no such column: Type"; });
@@ -2121,11 +2127,19 @@ t("N2 E_SQL: EA vrati chybovy text bez Dataset_0 -> status error, code E_SQL, hl
     contains(r.message, "no such column: Type", "prvni radek chyby EA musi byt v message");
     ok(typeof r.rowCount == "undefined", "E_SQL nesmi nest rowCount");
 });
-t("N2 E_SQL: prazdny retezec i <EADATA/> bez Dataset_0 = E_SQL s vychozi hlaskou", function () {
+t("N2 E_SQL: prazdny retezec / bily text = E_SQL s vychozi hlaskou; ne-XML text = E_SQL s hlaskou EA (obalka bez datasetu uz NENI chyba)", function () {
     var r1 = B.FB_OpQuery.call(B, supRepo(function () { return ""; }), { sql: "SELECT x FROM neexistuje" });
     eq(r1.code, "E_SQL"); contains(r1.message, "dotaz selhal");
-    var r2 = B.FB_OpQuery.call(B, supRepo(function () { return '<?xml version="1.0"?><EADATA version="1.0" exporter="Enterprise Architect"></EADATA>'; }), { sql: "SELECT x FROM neexistuje" });
-    eq(r2.code, "E_SQL"); contains(r2.message, "dotaz selhal");
+    var r1b = B.FB_OpQuery.call(B, supRepo(function () { return "  \r\n "; }), { sql: "SELECT x FROM neexistuje" });
+    eq(r1b.code, "E_SQL");
+    var r3 = B.FB_OpQuery.call(B, supRepo(function () { return "SQL API Open FAILED with error: no such table: t_x"; }), { sql: "SELECT x FROM t_x" });
+    eq(r3.code, "E_SQL"); contains(r3.message, "no such table");
+});
+// --- FB_UserAccess: stejne pravidlo (banka 2026-09-10) - obalka bez datasetu = 0 skupin, ne "SQL selhal"
+t("FB_UserAccess: obalka <EADATA> bez Dataset_0 = uzivatel bez skupin (neni clenem), prazdny retezec = SQL selhal", function () {
+    var src = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_UserAccess.js"), "utf8");
+    ok(/<EADATA\[\\s>\\\/\]/.test(src) || src.indexOf("<EADATA[") >= 0, "FB_UserAccess musi rozlisovat obalku bez datasetu od prazdneho retezce");
+    ok(src.indexOf("groups = [];") >= 0, "obalka bez datasetu -> prazdne clenstvi");
 });
 t("N2 E_SQL: vyjimka ze SQLQuery -> E_SQL s textem vyjimky", function () {
     var r = B.FB_OpQuery.call(B, supRepo(function () { throw new Error("mock: SQLQuery vyhodil"); }), { sql: "SELECT 1" });

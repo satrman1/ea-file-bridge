@@ -21,6 +21,16 @@
 //  (prvnich 300 znaku odpovedi EA, tagy zachovany) = diagnostika pro
 //  rozliseni obou pripadu pri pristim vyskytu; do te doby pravidlo pro kit:
 //  nad tabulkou, ktera muze byt prazdna, sloupce VYJMENOVAT, ne SELECT *.
+//  !! ROZHODNUTO 2026-09-10 (zive BANKA, MS SQL 2022, recon-01 op 7, raw):
+//  prazdny vysledek = `<?xml ...?><EADATA version="1.0" exporter="Enterprise
+//  Architect"></EADATA>` - obalka BEZ Dataset_0, i s VYJMENOVANYMI sloupci
+//  (ne jen SELECT *). Detekce z 8. 9. tedy kazde legitimni 0 radku hlasila
+//  E_SQL a shodila zbytek davky (recon, ktery nic nenajde = cely beh stoji).
+//  Nove pravidlo: obalka <EADATA> bez datasetu = ok / rowCount 0 + warning
+//  (EA takto muze vratit i CHYBNY dotaz - ten pozna clovek podle dialogu
+//  "SQL API Open FAILED"; bridge ho z odpovedi rozlisit neumi); E_SQL jen
+//  pro vyjimku, prazdny retezec nebo ne-XML text. Tvar odpovedi EA na
+//  chybny dotaz zatim v `raw` nezachycen - kdyz se objevi, doplnit sem.
 var sql = "";
 if (op && op.sql_b64) { sql = this.B64Decode(op.sql_b64); }
 else if (op && op.sql) { sql = "" + op.sql; }
@@ -65,7 +75,16 @@ try {
 } finally {
     if (supSet) { try { Repository.SuppressEADialogs = supOld; } catch (eRes) { } }
 }
-if (xml.replace(/\s/g, "") == "" || xml.indexOf("<Dataset_0") < 0) {
+if (xml.replace(/\s/g, "") == "") { return sqlErr(xml); }
+if (xml.indexOf("<Dataset_0") < 0) {
+    if (/<EADATA[\s>\/]/i.test(xml)) {
+        // obalka bez datasetu = 0 radku (zive banka 2026-09-10 + K8 K10) - NE chyba
+        return { op: "query", status: "ok", rowCount: 0, rows: [],
+            warnings: ["0 radku: EA vratilo obalku <EADATA> bez datasetu. Stejne muze vypadat i CHYBNY dotaz"
+                + " (neexistujici sloupec/tabulka) - ten se pozna podle dialogu 'SQL API Open FAILED' v EA."
+                + " Nez z nuly vyvodis zaver, over nazvy sloupcu (INFORMATION_SCHEMA / sqlite_master)."],
+            raw: xml.substring(0, 300) };
+    }
     return sqlErr(xml);
 }
 var rows = this.FB_XmlRows(xml);

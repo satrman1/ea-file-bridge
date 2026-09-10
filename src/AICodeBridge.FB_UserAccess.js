@@ -64,10 +64,15 @@ if (cfg == null) {
             + " INNER JOIN t_secuser u ON u.UserID = ug.UserID"
             + " WHERE u.UserLogin = '" + ("" + login).replace(/'/g, "''") + "'");
         // EA pri chybnem SQL NEvyhodi vyjimku - vrati vysledek bez <Dataset_0>
-        // (lekce E_SQL 2026-09-08 + zive K6 2026-09-09). Bez datasetu je to
-        // selhani dotazu, ne "zadne clenstvi" - duvod musi rict pravdu.
-        if (xml.indexOf("<Dataset_0") < 0) {
+        // (lekce E_SQL 2026-09-08 + zive K6 2026-09-09). ALE zive banka
+        // 2026-09-10 (MS SQL): i legitimni 0 radku = obalka <EADATA> bez
+        // datasetu (viz FB_OpQuery). Proto: prazdny retezec / ne-XML = SQL
+        // selhal (duvod musi rict pravdu); obalka bez datasetu = uzivatel
+        // v zadne skupine (clenstvi prazdne, ne selhani).
+        if (xml.replace(/\s/g, "") == "" || (xml.indexOf("<Dataset_0") < 0 && !/<EADATA[\s>\/]/i.test(xml))) {
             sqlFail = "EA nevratila dataset (neexistujici tabulka/sloupec? viz dialog EA)";
+        } else if (xml.indexOf("<Dataset_0") < 0) {
+            groups = [];
         } else {
             var rows = this.FB_XmlRows(xml);
             for (var ri = 0; ri < rows.length; ri++) {
