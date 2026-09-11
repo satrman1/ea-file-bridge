@@ -4,12 +4,13 @@
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-09-11 + sha1 6acf62355569c09e871a0b7f810adff2f0ae6b9b |
+| Verze kanonu | 2026-09-11 + sha1 8c8c80d46107da200771bdcca27fee529634b789 |
 | Profil | doma |
 | Sada | full |
-| Skillů | 24 (kanon 21 + generované 3) |
-| Souborů | 104 |
-| build-vscode.py | 1.0 |
+| Terminál | off |
+| Skillů | 22 (kanon 19 + generované 3) |
+| Souborů | 102 |
+| build-vscode.py | 1.1 |
 
 ## Skilly
 
@@ -23,9 +24,7 @@
 - katalog-komponent
 - logicka-obrazovka
 - logicky-datovy-model
-- mapovani-rozhrani
 - prevzeti-zadani
-- re-interface
 - realizace-sluzby
 - realizace-uc
 - sar-architektura-zapis
@@ -38,11 +37,16 @@
 - use-case-model
 - verzovani-release
 
+## Vynechané skilly (vyžadují terminál — N-P8; terminal: off)
+
+- mapovani-rozhrani
+- re-interface
+
 ## Soubory
 
 | Soubor | sha256 |
 |---|---|
-| agents/sa-analytik.agent.md | a0521cefbd29d41a31b571af23dcf354f222ab562c94c2194b89f1638172ca97 |
+| agents/sa-analytik.agent.md | 71d5aeb4545b02ec50e700951b18e6f8a0de00fc857adfb2e615cd2caa451ab3 |
 | copilot-instructions.md | 2211ead25b6708ec638e96745a29049cfe0b2c1c9de15475a8ecf87e366aae0d |
 | instructions/emr-zapis.instructions.md | 1125ccab156f3d75bdf92d3da2d3012e35fa01274620bc22fdb923a05aeef0a7 |
 | instructions/mermaid.instructions.md | f0f3219b9bd6c0f2dd9c5697e8c35a77361a629fc98e2290f22262bab99edca8 |
@@ -78,9 +82,7 @@
 | skills/katalog-komponent/SKILL.md | 5ac423065c342ab8fe3eb4dcad00c43918e7f00481210365cee7b60389612349 |
 | skills/logicka-obrazovka/SKILL.md | 1f4895913fcbc1329bdcfe6712ad51f6811d9d7150997b7a067a76ea61f60728 |
 | skills/logicky-datovy-model/SKILL.md | d418fcdf0bde58597bf9b2c0024066be4138c15e88438bbd9b493c9f54c96f76 |
-| skills/mapovani-rozhrani/SKILL.md | 05f278a672a245acf8ed838ce7708991d43bc833af22e7470563e7a201700596 |
 | skills/prevzeti-zadani/SKILL.md | 2f9a90eb17250b08904f3a81c48b18f2a3752f418b5765f8a6e0580301ff10f1 |
-| skills/re-interface/SKILL.md | c8a4e6d947bddfb28f05c22ba514fd013bc0aa9c85d2c61f6fdba398f51c9e46 |
 | skills/realizace-sluzby/SKILL.md | a2f68d23c02ef03973d824ba1ea1399c9b06bfd35ab0799adb7bff2e7a59e1e5 |
 | skills/realizace-uc/SKILL.md | 5d0c34e6b36546c38c409ade98f03507a9e658b8accca2535d8fbf7bb4ae00f9 |
 | skills/sar-architektura-zapis/SKILL.md | 8b02795fd6022074572e93deb94851d7082c147933ef98b0a3752cf7fff59a6f |
