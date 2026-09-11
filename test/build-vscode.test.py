@@ -4,7 +4,8 @@
 Testy tools/build-vscode.py nad fixture test/fixtures/vscode-kanon/ (unittest, stdlib).
 
 Spuštění:  python test/build-vscode.test.py        (nebo  python -m unittest test.build-vscode.test)
-Fixture = minimální syntetický kanon (22 skillů, _shared 7, _vscode šablony s placeholdery).
+Fixture = minimální syntetický kanon (22 skillů, _shared 7, _vscode šablony s placeholdery)
++ test/fixtures/re-fixtures/tools/ (stub skripty pro variantu s terminálem, Z260911-3).
 Negativní testy pracují nad kopií fixture v temp složce — fixture se nemění.
 Syntax držena kompatibilní s Python 3.6.
 """
@@ -123,9 +124,12 @@ class PositiveBuilds(Base):
         rc, log, out = self.build(skill_set="full")
         self.assertEqual(rc, 0, log)
         dirs = self.skill_dirs(out)
-        self.assertEqual(len(dirs), 24, dirs)
+        # 24 - 2 terminálové skilly (re-interface, mapovani-rozhrani; terminal: off)
+        self.assertEqual(len(dirs), 22, dirs)
         self.assertIn("ea-addin-developer", dirs)
         self.assertNotIn("sa-orchestrator", dirs)
+        self.assertNotIn("re-interface", dirs)
+        self.assertNotIn("mapovani-rozhrani", dirs)
         # CRLF zdroj → LF výstup
         sql = (out / "skills" / "ea-sql-expert" / "references" / "EASchema.sql").read_bytes()
         self.assertNotIn(b"\r", sql)
@@ -136,8 +140,9 @@ class PositiveBuilds(Base):
         rc, log, out = self.build(profile="banka", skill_set="full")
         self.assertEqual(rc, 0, log)
         dirs = self.skill_dirs(out)
-        self.assertEqual(len(dirs), 23, dirs)
+        self.assertEqual(len(dirs), 21, dirs)
         self.assertNotIn("ea-addin-developer", dirs)
+        self.assertNotIn("re-interface", dirs)
         ci = read(out / "copilot-instructions.md")
         self.assertIn("mssql", ci)
         self.assertIn("deploy_src, delete_from_model, clone_package", ci)
@@ -186,6 +191,125 @@ class PositiveBuilds(Base):
         text = read(out / "skills" / "emr-konvence" / "SKILL.md")
         self.assertIn("name: emr-konvence", text)
         self.assertIn("(references/emr-zapis-pravidla.md)", text)
+
+
+class Terminal(Base):
+    """Varianta s terminálem (PV-R8 ii, N-P8; docs/BUILD-VSCODE.md sekce Terminál)."""
+
+    def test_terminal_off_default(self):
+        rc, log, out = self.build(skill_set="full")
+        self.assertEqual(rc, 0, log)
+        self.assertIn("terminál: off (profil)", log)
+        self.assertIn("vynechán re-interface (vyžaduje terminál", log)
+        self.assertIn("vynechán mapovani-rozhrani (vyžaduje terminál", log)
+        ci = read(out / "copilot-instructions.md")
+        self.assertIn("**Nepoužívej terminál.**", ci)
+        self.assertNotIn("Terminál jen pro skripty", ci)
+        ag = read(out / "agents" / "sa-analytik.agent.md")
+        self.assertIn("tools: ['search', 'edit']", ag)
+        self.assertNotIn("execute", ag)
+        self.assertIn("**Nepoužívej terminál.**", ag)
+        man = read(out / "skills-manifest.md")
+        self.assertIn("| Terminál | off |", man)
+        self.assertIn("## Vynechané skilly (vyžadují terminál", man)
+        self.assertIn("- re-interface\n", man)
+        self.assertFalse((out / "skills" / "re-interface").exists())
+
+    def test_terminal_on_cli_full_doma(self):
+        rc, log, out = self.build(skill_set="full", extra=("--terminal", "on"))
+        self.assertEqual(rc, 0, log)
+        self.assertIn("terminál: on (--terminal)", log)
+        dirs = self.skill_dirs(out)
+        self.assertEqual(len(dirs), 24, dirs)
+        self.assertIn("re-interface", dirs)
+        self.assertIn("mapovani-rozhrani", dirs)
+        # skripty vendorované do scripts/ + odkaz v SKILL.md přepsán na kopii
+        sc = out / "skills" / "re-interface" / "scripts"
+        self.assertEqual(sorted(p.name for p in sc.iterdir()),
+                         ["emr-ir-check.py", "ir-extract.py"])
+        ri = read(out / "skills" / "re-interface" / "SKILL.md")
+        self.assertIn("[ir-extract.py](scripts/ir-extract.py)", ri)
+        self.assertIn("[emr-ir-check.py](scripts/emr-ir-check.py)", ri)
+        self.assertNotIn("re-fixtures/tools/", ri)
+        self.assertIn("scripts/: scripts/emr-ir-check.py, scripts/ir-extract.py", log)
+        # agent: nástroj terminálu doplněn do tools, pravidlo přepnuto
+        ag = read(out / "agents" / "sa-analytik.agent.md")
+        self.assertIn("tools: ['search', 'edit', 'execute/runInTerminal', "
+                      "'execute/getTerminalOutput']", ag)
+        self.assertIn("Terminál jen pro skripty skillů", ag)
+        self.assertIn("tools += execute/runInTerminal, execute/getTerminalOutput", log)
+        ci = read(out / "copilot-instructions.md")
+        self.assertIn("Terminál jen pro skripty skillů", ci)
+        self.assertIn("Nikdy `git`, `pip`", ci)
+        self.assertNotIn("**Nepoužívej terminál.**", ci)
+        self.assertNotIn("{{", ci)
+        # mapovani-rozhrani nemá skript → WARN, build projde
+        self.assertIn("[WARN] skill mapovani-rozhrani: terminál zapnut, ale skill nenese "
+                      "žádný skript", log)
+        man = read(out / "skills-manifest.md")
+        self.assertIn("| Terminál | on |", man)
+        self.assertIn("- re-interface (scripts/: emr-ir-check.py, ir-extract.py)", man)
+        self.assertNotIn("Vynechané skilly", man)
+        # verify čte Terminál z manifestu
+        rc, vlog = run("--out", out, "--profile", "doma", "--config-dir", self.cfg, "--verify")
+        self.assertEqual(rc, 0, vlog)
+        self.assertIn("terminál on", vlog)
+
+    def test_terminal_on_profile_key_thin(self):
+        p = self.cfg / "vscode-profile.doma.json"
+        d = json.loads(read(p))
+        d["terminal"] = True
+        write(p, json.dumps(d))
+        rc, log, out = self.build()
+        self.assertEqual(rc, 0, log)
+        self.assertIn("terminál: on (profil)", log)
+        self.assertEqual(len(self.skill_dirs(out)), 8)   # thin nemá terminálové skilly
+        self.assertIn("'execute/runInTerminal'", read(out / "agents" / "sa-analytik.agent.md"))
+        self.assertIn("Terminál jen pro skripty", read(out / "copilot-instructions.md"))
+        # --terminal off přebije profil
+        rc, log, out = self.build(extra=("--terminal", "off"), out=self.tmp / "off")
+        self.assertEqual(rc, 0, log)
+        self.assertIn("terminál: off (--terminal)", log)
+        self.assertNotIn("execute", read(out / "agents" / "sa-analytik.agent.md"))
+
+    def test_terminal_on_banka_full(self):
+        rc, log, out = self.build(profile="banka", skill_set="full",
+                                  extra=("--terminal", "on"))
+        self.assertEqual(rc, 0, log)
+        dirs = self.skill_dirs(out)
+        self.assertEqual(len(dirs), 23, dirs)
+        self.assertIn("re-interface", dirs)
+        self.assertNotIn("ea-addin-developer", dirs)
+
+    def test_terminal_on_without_scripts_warns(self):
+        kanon = self.kanon_copy()   # kopie kanonu bez ../re-fixtures → skripty chybí
+        rc, log, out = self.build(skill_set="full", kanon=kanon, extra=("--terminal", "on"))
+        self.assertEqual(rc, 0, log)
+        self.assertIn("[WARN] skill re-interface: skript ir-extract.py nenalezen", log)
+        self.assertIn("[WARN] skill re-interface: terminál zapnut, ale skill nenese žádný "
+                      "skript", log)
+        self.assertFalse((out / "skills" / "re-interface" / "scripts").exists())
+        ri = read(out / "skills" / "re-interface" / "SKILL.md")
+        self.assertIn("`re-fixtures/tools/ir-extract.py`", ri)   # bez kopie zůstává text
+
+    def test_terminal_profile_key_not_bool(self):
+        p = self.cfg / "vscode-profile.doma.json"
+        d = json.loads(read(p))
+        d["terminal"] = "ano"
+        write(p, json.dumps(d))
+        rc, log, _ = self.build()
+        self.assertEqual(rc, 1)
+        self.assertIn("'terminal' musí být true/false", log)
+
+    def test_terminal_off_template_with_execute_fails(self):
+        kanon = self.kanon_copy()
+        p = kanon / "_vscode" / "agents" / "sa-analytik.agent.md"
+        write(p, read(p).replace("tools: ['search', 'edit']",
+                                 "tools: ['search', 'edit', 'execute/runInTerminal']"))
+        rc, log, out = self.build(kanon=kanon, out=self.tmp / "neg-term")
+        self.assertEqual(rc, 1)
+        self.assertIn("šablona nese nástroj terminálu", log)
+        self.assertFalse((self.tmp / "neg-term").exists())
 
 
 class NegativeBuilds(Base):

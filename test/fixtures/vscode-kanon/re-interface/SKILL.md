@@ -8,3 +8,5 @@ license: Complete terms in LICENSE.txt
 
 Syntetický postup skillu pro testy buildu.
 
+2. Strukturu extrahuje skript `re-fixtures/tools/ir-extract.py` (`--repo --repo-map --ref --out`); klasifikaci `re-fixtures/tools/emr-ir-check.py`.
+

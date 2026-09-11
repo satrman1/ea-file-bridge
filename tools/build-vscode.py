@@ -9,8 +9,11 @@ kap. 9 AK-1…AK-5, odchylka PV-R6 (ii): profil `kuryr` neexistuje, název MDG p
 se nenahrazuje. Kontrakt placeholderů: zaprah-vlaken-2026-09-07b.md (hlavička dávky).
 
 Použití (doma):
-    python tools/build-vscode.py --kanon <cesta Skilly> --profile doma --set thin
+    python tools/build-vscode.py --kanon <cesta Skilly> --profile doma --set full
     python tools/build-vscode.py --profile doma --verify
+
+Varianta s terminálem (PV-R8 ii, N-P8; docs/BUILD-VSCODE.md sekce „Terminál"):
+    python tools/build-vscode.py --kanon <cesta Skilly> --profile doma --set full --terminal on --out .github-term
 
 Použití (banka, korporátní repo s config/vscode-profile.banka.json):
     python tools/build-vscode.py --kanon <cesta kanonu> --profile banka --set thin
@@ -35,7 +38,7 @@ import shutil
 import sys
 from pathlib import Path
 
-BUILD_VERSION = "1.0"
+BUILD_VERSION = "1.1"
 
 # ---------------------------------------------------------------------------
 # Konstanty — sady skillů (Zadani-Portace-VSCode-v2.md kap. 5.1 + AK-1)
@@ -81,6 +84,37 @@ SET_FULL = [
 DOMA_ONLY_SKILLS = {"ea-addin-developer"}          # PV-R7
 AGENT_BODY_SKILLS = {"sa-orchestrator"}            # kap. 5.1 — tělo agenta, ne skill
 
+# Varianta s terminálem (PV-R8 ii, nález N-P8): skilly, jejichž postup spouští
+# skripty (Python), jdou do sady JEN při terminal: true — i v sadě full. Bez
+# terminálu by agent postup nemohl dodržet (krok „pusť ir-extract.py").
+TERMINAL_SKILLS = ["re-interface", "mapovani-rozhrani"]
+# Skripty vendorované do skills/<skill>/scripts/ při terminal: true.
+# Zdroj = složka relativně k RODIČI kanonu (IT-ANALYSIS/), protože skripty žijí
+# mimo Skilly/ (re-fixtures/tools/). Chybí-li zdroj nebo je seznam prázdný →
+# [WARN] „skill nenese žádný skript" (build projde — N-P8 zůstává otevřený).
+TERMINAL_SCRIPTS = {
+    "re-interface": ("re-fixtures/tools", ["ir-extract.py", "emr-ir-check.py"]),
+    "mapovani-rozhrani": (None, []),               # generátor Excelu z YAML zatím není
+}
+# Nástroje terminálu ve frontmatteru custom agenta (VS Code docs „Copilot features"
+# ms.date 2026-09-09, fetch 2026-09-11): tool set `execute` = runInTerminal,
+# getTerminalOutput, createAndRunTask, runNotebookCell, testFailure. Bereme jen
+# běh příkazu + čtení výstupu, ne celý set (žádné tasks / notebooky).
+TERMINAL_TOOLS = ["execute/runInTerminal", "execute/getTerminalOutput"]
+AGENT_TOOLS_RE = re.compile(r"^(tools:\s*\[)(.*)(\]\s*)$", re.M)
+
+# {{TERMINAL_RULES}} — text pravidla 11 kitu (v Zadani-Portace-VSCode-v2 „pravidlo 14").
+# OFF = doslovné znění kanonu před Z260911-3 (výchozí build se nemění).
+TERMINAL_RULES_OFF = ("**Nepoužívej terminál.** Vše přes soubory workspace (`requests/`, "
+                      "`responses/`, `zadani/`). Žádné skripty, žádné příkazy.")
+TERMINAL_RULES_ON = (
+    "**Terminál jen pro skripty skillů** `re-interface` a `mapovani-rozhrani` "
+    "(`scripts/` uvnitř skillu, spouštěné z kořene workspace: "
+    "`python .github/skills/<skill>/scripts/<skript>.py …`). Nikdy `git`, `pip`, "
+    "síť (`curl`, `wget`, …), instalace, nic mimo workspace. **Každý příkaz ukaž v chatu "
+    "před spuštěním** a počkej na potvrzení; výstup skriptu použij v dalším kroku "
+    "skillu, do chatu ho neopisuj celý.")
+
 # Skilly generované ze šablon `_vscode/skills/<name>/` (kontrakt dávky Z260907b).
 GENERATED_SKILLS = ["emr-konvence", "eafb-bridge", "e2e-f0-f1"]
 SHARED_TARGET_SKILL = "emr-konvence"               # `_shared/` → skills/emr-konvence/references/
@@ -102,7 +136,8 @@ TEMPLATE_REQUIRED = [
 # `skills/emr-konvence/SKILL.md` — pokud chybí, build ji vygeneruje (kap. 4.4 bod 2)
 # a do logu napíše „šablona chybí".
 
-PLACEHOLDERS = ["REPO", "WHITELIST", "DIALEKT", "DENY_OPS", "CONTEXT_NOTES"]
+PLACEHOLDERS = ["REPO", "WHITELIST", "DIALEKT", "DENY_OPS", "CONTEXT_NOTES",
+                "TERMINAL_RULES"]
 PLACEHOLDER_RE = re.compile(r"\{\{\s*([A-Z_]+)\s*\}\}")
 COPILOT_MAX_BYTES = 8192                            # kap. 4.1 / AK-1
 
@@ -243,12 +278,16 @@ def load_profile(config_dir, profile_name):
     prof.setdefault("contextNotes", [])
     prof.setdefault("sweepAllow", [])
     prof.setdefault("sweepWords", [])
+    prof.setdefault("terminal", False)
+    if not isinstance(prof["terminal"], bool):
+        raise SystemExit("[FAIL] profil %s: klíč 'terminal' musí být true/false (je %r)"
+                         % (path.name, prof["terminal"]))
     prof["_name"] = profile_name
     prof["_path"] = str(path)
     return prof
 
 
-def substitutions(prof):
+def substitutions(prof, terminal=False):
     wl = []
     for w in prof["whitelist"]:
         name = w.get("name", "").strip()
@@ -262,7 +301,23 @@ def substitutions(prof):
         "DIALEKT": prof["dialekt"],
         "DENY_OPS": ", ".join(deny) if deny else "žádné",
         "CONTEXT_NOTES": "\n".join("- %s" % n for n in notes) if notes else "(žádné)",
+        "TERMINAL_RULES": TERMINAL_RULES_ON if terminal else TERMINAL_RULES_OFF,
     }
+
+
+def add_agent_tools(text, tools):
+    """Do frontmatteru agenta (`tools: [...]`) doplní chybějící nástroje. Vrátí
+    (nový text, přidané názvy) nebo (text, None), když řádek `tools:` chybí."""
+    m = AGENT_TOOLS_RE.search(text)
+    if not m:
+        return text, None
+    present = [t.strip().strip("'\"") for t in m.group(2).split(",") if t.strip()]
+    added = [t for t in tools if t not in present]
+    if not added:
+        return text, []
+    items = ["'%s'" % t for t in present + added]
+    new_line = "%s%s%s" % (m.group(1), ", ".join(items), m.group(3))
+    return text[:m.start()] + new_line + text[m.end():], added
 
 
 def link_text_for(path):
@@ -283,13 +338,20 @@ def md_link(text, target):
 
 class Build(object):
 
-    def __init__(self, kanon, templates, out, profile, skill_set, dry_run):
+    def __init__(self, kanon, templates, out, profile, skill_set, dry_run,
+                 terminal=None):
         self.kanon = Path(kanon)
         self.templates = Path(templates)
         self.out_dir = Path(out)
         self.prof = profile
         self.set_name = skill_set
         self.dry_run = dry_run
+        # terminál: přepínač CLI (--terminal on/off) má přednost před profilem
+        self.terminal_source = "profil" if terminal is None else "--terminal"
+        self.terminal = bool(profile.get("terminal", False)) if terminal is None \
+            else bool(terminal)
+        self.skipped_terminal = []   # skilly vynechané kvůli terminal: false
+        self.vendored_scripts = {}   # skill → [skripty ve scripts/]
         self.files = {}          # rel (posix, relativně k .github/) → bytes
         self.errors = []
         self.warnings = []
@@ -322,8 +384,35 @@ class Build(object):
             if s in DOMA_ONLY_SKILLS and self.prof["_name"] != "doma":
                 self.log("  vynechán %s (jen profil doma, PV-R7)" % s)
                 continue
+            if s in TERMINAL_SKILLS and not self.terminal:
+                self.log("  vynechán %s (vyžaduje terminál — N-P8; terminal: off)" % s)
+                self.skipped_terminal.append(s)
+                continue
             out.append(s)
         return out
+
+    def terminal_scripts_for(self, name):
+        """Při terminal: true vrátí {scripts/<x>.py: bytes} pro skill; WARN, když
+        skill žádný skript nenese (zdroj chybí nebo není definován)."""
+        if not self.terminal or name not in TERMINAL_SCRIPTS:
+            return {}
+        src_rel, names = TERMINAL_SCRIPTS[name]
+        found = {}
+        if src_rel and names:
+            src_dir = self.kanon.parent / src_rel
+            for fname in names:
+                p = src_dir / fname
+                if p.is_file():
+                    found["scripts/" + fname] = p.read_bytes()
+                else:
+                    self.warn("skill %s: skript %s nenalezen (%s)" % (name, fname, p))
+        if not found:
+            self.warn("skill %s: terminál zapnut, ale skill nenese žádný skript "
+                      "(scripts/ prázdné — N-P8 otevřený, agent bude Python psát ad hoc)"
+                      % name)
+        else:
+            self.vendored_scripts[name] = sorted(k[len("scripts/"):] for k in found)
+        return found
 
     def read_tree(self, root):
         """Vrátí {posix rel: bytes} pro všechny soubory pod root (seřazeno)."""
@@ -361,6 +450,10 @@ class Build(object):
             return ("link", path)
 
         base = posixpath.basename(path)
+        # skript vendorovaný do scripts/ (terminal: true) — kanon ho odkazuje
+        # původní cestou (re-fixtures/tools/x.py) → link na kopii ve skillu
+        if ("scripts/" + base) in tree_files:
+            return ("link", posixpath.relpath("scripts/" + base, file_dir or "."))
         # _shared/<x> nebo ../_shared/<x> (ze skillu) — sdílené reference
         m_shared = re.match(r"^(?:\.\./)*_shared/([^/]+)$", path)
         if m_shared:
@@ -504,9 +597,11 @@ class Build(object):
             if not src.is_dir():
                 self.err("skill %s: složka v kanonu neexistuje (%s)" % (name, src))
                 continue
-            self.vendor_skill(name, src)
-            self.log("  kanon  skills/%s (%d souborů)" % (
-                name, sum(1 for k in self.files if k.startswith("skills/%s/" % name))))
+            scripts = self.terminal_scripts_for(name)
+            self.vendor_skill(name, src, extra_files=scripts or None)
+            self.log("  kanon  skills/%s (%d souborů%s)" % (
+                name, sum(1 for k in self.files if k.startswith("skills/%s/" % name)),
+                "; scripts/: " + ", ".join(sorted(scripts)) if scripts else ""))
 
     # -- šablony ------------------------------------------------------------
     def substitute(self, rel, text, subs):
@@ -545,6 +640,8 @@ class Build(object):
                 for p in sorted(d.glob(pattern)):
                     text = self.substitute(sub + "/" + p.name,
                                            normalize_text(p.read_bytes()), subs)
+                    if sub == "agents":
+                        text = self.agent_terminal_tools(p.name, text)
                     self.put("%s/%s" % (sub, p.name), text.encode("utf-8"))
                     self.log("  šablona %s/%s" % (sub, p.name))
         # generované skilly
@@ -581,6 +678,25 @@ class Build(object):
                               extra_files=tree)
             self.log("  šablona skills/%s (%d souborů)" % (
                 gname, sum(1 for k in self.files if k.startswith("skills/%s/" % gname))))
+
+    def agent_terminal_tools(self, fname, text):
+        """terminal: true → do `tools:` agenta doplní TERMINAL_TOOLS; terminal: false →
+        šablona nesmí nástroj terminálu nést (kit pravidlo 11 / AK-6 „žádný Allow")."""
+        has_exec = any(("'%s'" % t) in text or ('"%s"' % t) in text
+                       for t in TERMINAL_TOOLS + ["execute"])
+        if not self.terminal:
+            if has_exec:
+                self.err("agents/%s: šablona nese nástroj terminálu (execute*), ale "
+                         "terminal: off — nástroj patří do buildu, ne do šablony" % fname)
+            return text
+        new_text, added = add_agent_tools(text, TERMINAL_TOOLS)
+        if added is None:
+            self.err("agents/%s: chybí řádek `tools: [...]` ve frontmatteru — nelze "
+                     "doplnit nástroj terminálu" % fname)
+            return text
+        self.log("  agent %s: tools += %s" % (fname, ", ".join(added) if added
+                                             else "(už obsahuje)"))
+        return new_text
 
     def generated_konvence_skill(self, shared_files):
         lines = [
@@ -795,6 +911,7 @@ class Build(object):
             "| Verze kanonu | %s + sha1 %s |" % (build_date, kver),
             "| Profil | %s |" % self.prof["_name"],
             "| Sada | %s |" % self.set_name,
+            "| Terminál | %s |" % ("on" if self.terminal else "off"),
             "| Skillů | %d (kanon %d + generované %d) |" % (len(skills), len(skills) - n_gen,
                                                             n_gen),
             "| Souborů | %d |" % len(self.files),
@@ -804,7 +921,15 @@ class Build(object):
             "",
         ]
         for s in skills:
-            lines.append("- %s" % s)
+            extra = ""
+            if s in self.vendored_scripts:
+                extra = " (scripts/: %s)" % ", ".join(self.vendored_scripts[s])
+            lines.append("- %s%s" % (s, extra))
+        if self.skipped_terminal:
+            lines += ["", "## Vynechané skilly (vyžadují terminál — N-P8; terminal: off)",
+                      ""]
+            for s in self.skipped_terminal:
+                lines.append("- %s" % s)
         lines += ["", "## Soubory", "", "| Soubor | sha256 |", "|---|---|"]
         for rel in sorted(self.files.keys()):
             lines.append("| %s | %s |" % (rel, sha256_bytes(self.files[rel])))
@@ -835,13 +960,15 @@ class Build(object):
                                        if self.dry_run else ""))
         self.log("  profil:   %s (%s)" % (self.prof["_name"], self.prof["_path"]))
         self.log("  sada:     %s" % self.set_name)
+        self.log("  terminál: %s (%s)" % ("on" if self.terminal else "off",
+                                         self.terminal_source))
         if not self.kanon.is_dir():
             self.err("kanon neexistuje: %s" % self.kanon)
             return self.finish(None, build_date)
         self.kanon_skill_names = {p.name for p in self.kanon.iterdir()
                                   if p.is_dir() and (p / "SKILL.md").is_file()}
 
-        subs = substitutions(self.prof)
+        subs = substitutions(self.prof, self.terminal)
         self.log("")
         self.log("Substituce placeholderů:")
         for k in PLACEHOLDERS:
@@ -931,7 +1058,8 @@ def parse_manifest(text):
     for m in re.finditer(r"^\| (\S.*?) \| ([0-9a-f]{64}) \|$", text, re.M):
         files[m.group(1)] = m.group(2)
     meta = {}
-    for m in re.finditer(r"^\| (Profil|Sada|Skillů|Souborů) \| (.+?) \|$", text, re.M):
+    for m in re.finditer(r"^\| (Profil|Sada|Terminál|Skillů|Souborů) \| (.+?) \|$", text,
+                         re.M):
         meta[m.group(1)] = m.group(2)
     return meta, files
 
@@ -945,9 +1073,9 @@ def verify(out_dir, profile, report):
         report.append("  [FAIL] chybí %s" % MANIFEST_NAME)
         return 1
     meta, files = parse_manifest(mpath.read_text(encoding="utf-8"))
-    report.append("  manifest: profil %s, sada %s, skillů %s, souborů %s"
-                  % (meta.get("Profil"), meta.get("Sada"), meta.get("Skillů"),
-                     meta.get("Souborů")))
+    report.append("  manifest: profil %s, sada %s, terminál %s, skillů %s, souborů %s"
+                  % (meta.get("Profil"), meta.get("Sada"), meta.get("Terminál", "off"),
+                     meta.get("Skillů"), meta.get("Souborů")))
     missing = changed = 0
     for rel in sorted(files):
         p = out_dir / rel
@@ -1016,6 +1144,11 @@ def main(argv=None):
     ap.add_argument("--templates", help="složka šablon (default <kanon>/_vscode)")
     ap.add_argument("--profile", required=True, choices=["doma", "banka"])
     ap.add_argument("--set", dest="skill_set", default="thin", choices=["thin", "full"])
+    ap.add_argument("--terminal", choices=["on", "off"],
+                    help="varianta s terminálem (PV-R8 ii): přebije klíč 'terminal' profilu; "
+                         "on = agent dostane execute/runInTerminal, pravidlo 11 kitu ve "
+                         "variantě „jen skripty skillů\", skilly re-interface/mapovani-rozhrani "
+                         "v sadě + jejich scripts/")
     ap.add_argument("--config-dir", default=str(repo / "config"),
                     help="složka s vscode-profile.<profil>.json (default <repo>/config)")
     ap.add_argument("--verify", action="store_true",
@@ -1032,7 +1165,9 @@ def main(argv=None):
         if not args.kanon:
             ap.error("--kanon je povinný pro build")
         templates = args.templates or str(Path(args.kanon) / "_vscode")
-        b = Build(args.kanon, templates, args.out, profile, args.skill_set, args.dry_run)
+        terminal = None if args.terminal is None else (args.terminal == "on")
+        b = Build(args.kanon, templates, args.out, profile, args.skill_set, args.dry_run,
+                  terminal=terminal)
         rc = b.run()
         report = b.report
     text = "\n".join(report) + "\n"

@@ -5,4 +5,6 @@ Repo: {{REPO}}. Whitelist: {{WHITELIST}}. Dialekt SQL: {{DIALEKT}}. Deny: {{DENY
 Kontext:
 {{CONTEXT_NOTES}}
 
+Pravidlo 11: {{TERMINAL_RULES}}
+
 Kontrolní kód: CIA7X. Detail operací: skill eafb-bridge.
