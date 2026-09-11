@@ -17,7 +17,7 @@ license: Complete terms in LICENSE.txt
 
 ## Kroky
 1. Načti kontrolní sadu z `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) a vzory z `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele).
-2. Strukturální kontroly přes EA MCP: `get_packages_information`, `get_elements_information`, `get_connectors_information`, `get_diagrams_information` — úplnost packages, konektory, tagged values, klasifikátory lifelinů, message↔operace. **Výskyt elementu na diagramech** (kontroly 6b, 9d) zjisti čtecí dávkou `query` — samostatná bridge operace pro hledání elementu na diagramech **neexistuje** (nález K11 auditu MCP→bridge, registr operací `EAFB-Operace-Registr.md` (skill `eafb-bridge`, references/EAFB-Operace-Registr.md)):
+2. Strukturální kontroly přes operace ea-file-bridge: `get_packages_information`, `get_elements_information`, `get_connectors_information`, `get_diagrams_information` — úplnost packages, konektory, tagged values, klasifikátory lifelinů, message↔operace. **Výskyt elementu na diagramech** (kontroly 6b, 9d) zjisti čtecí dávkou `query` — samostatná bridge operace pro hledání elementu na diagramech **neexistuje** (nález K11 auditu MCP→bridge, registr operací `EAFB-Operace-Registr.md` (skill `eafb-bridge`, references/EAFB-Operace-Registr.md)):
 
 ```sql
 SELECT dob.Object_ID, dob.Diagram_ID, dgm.Name, dgm.Package_ID

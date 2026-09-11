@@ -30,7 +30,7 @@ Operace = pole `ops` v dávce. **Čtecí** jsou povoleny vždy, **zápisové** p
 - `find_or_create_referencing_sr` (`operation`, `packageName` dle konvence `<Operace>_ARELYYMM`) — najde nebo založí Service Realizaci; `found:true` = existuje, nic se nezaložilo.
 - `create_baseline` (`package`, `name`), `delete_from_model` (`targets[{type Package|Diagram|Element|Connector|Attribute|Operation|Parameter, id|guid}]`), `delete_taggedvalue_from_model`, `clone_package`, `clone_elements`, `import_element_linked_documents`.
 
-**Nepoužívej:** `deploy_src` (vývojová operace, v bance zakázaná). Neexistuje `apply_baseline` (obnovu dělá člověk v EA) ani `find_element_in_diagrams` (použij `query`).
+**Nepoužívej:** `deploy_src` (vývojová operace, v bance zakázaná). Neexistuje `apply_baseline` (obnovu dělá člověk v EA) ani operace pro hledání elementu na diagramech (K11 — použij `query` nad `t_diagramobjects` JOIN `t_diagram`).
 
 ## Řetězení `$N` v dávce
 

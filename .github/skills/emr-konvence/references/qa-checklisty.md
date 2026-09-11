@@ -77,6 +77,8 @@ Nad EMR běží kontinuální produkční QA (reporty QC101–QC405): nález = J
 
 ## Průřezové SQL kontroly (ea-sql-expert, kdykoliv)
 
+**Pravidlo pro každé QA SQL přes `query` (lekce z banky 2026-09-10, N-B-3):** každý `SELECT` má omezení — `TOP N` (MS SQL) / `LIMIT N` (SQLite) podle dialektu repozitáře, nebo selektivní `WHERE` (Package_ID, Object_ID, GUID, jméno); velké tabulky (`t_seclocks`, `t_object`, `t_connector`, `t_diagramobjects`, `t_xref`, `t_attribute`, `t_operation`) **nikdy bez omezení** — neomezený výpis nechá EA sestavovat XML minuty a pumpa „visí“. Kontroly typu „existuje/kolik“ piš přes `COUNT(*)` scoped na dotčené packages, ne výpisem řádků. Řády velkých tabulek = kontext repozitáře (`EA-Repozitar-Kontext.md`, v bance `EA-Repozitar-Kontext-banka.md`). Prázdný výsledek (`ok`, `rowCount: 0`, případně warning „EA nerozlišuje 0 řádků od chybného dotazu“) **není chyba** a nález z něj vyvozuj jen po ověření sloupců; `E_SQL` = chybný dotaz → oprav a pošli znovu.
+
 Orphan elementy (bez diagramu a konektorů) v dotčených packages; elementy bez stereotypu tam, kde MDG typ povinný; duplicitní názvy UC/SR v BA; **duplicitní `UC-#####` číslo napříč BA** (B — riziko AI max+1 × UI counter, ✅ U1b §3 pravidel; ověř i vykázaný posun counteru ve výstupu skillu); konektory na smazané elementy; #TODO-IN/OUT neprázdné déle než release cyklus (W).
 
 ## Mapování checklist ↔ produkční QC (2026-07-03)

@@ -29,7 +29,7 @@ Vstup: UC číslo+název, aktéři, cílový modul.
 1. Ověř, že struktura BA/Module existuje a UC číslo není obsazené. Číslování: counter se přes AI kanál (bridge/Automation API) **neaplikuje** (✅ U1b 2026-07-07) — dohledej nejvyšší obsazené `UC-#####` (query dávka), přiděl max+1 a ve výstupu vykaž „posunout Auto Name Counter na <N+1>" jako HITL krok (§3 pravidel; duplicity hlídá QA).
 2. Package `UC-##### Název` pod (Module). V něm:
    - UseCase `UC-##### Název` + kompozitní diagram `CSOB-ITAN::FA-Behavioral` (owning ElementID = UC),
-   - `UCR-##### Název` — type **`CSOB-ITAN::Use Case Realization`** (MDG typ jako `type`, ne stereotyp — §7c pravidel); auto-kompozit `UML Behavioral::Sequence` **ponech a používej přímo** (✅ 2026-07-12 — §7d/§7h; revalidovat přes bridge; verzní výhrada „na MCP < 2.8.4 smazat a založit plain `Sequence`" platí jen doma),
+   - `UCR-##### Název` — type **`CSOB-ITAN::Use Case Realization`** (MDG typ jako `type`, ne stereotyp — §7c pravidel); auto-kompozit `UML Behavioral::Sequence` **ponech a používej přímo** (✅ 2026-07-12 — §7d/§7h; revalidovat přes bridge),
    - diagram `version_UC-##### Název` typu `CSOB-ITAN::Version Root Diagram` v rootu package — **zakládej rovnou NAPLNĚNÝ**: root elementy package na něj umísti hned při scaffoldu (`place_elements_on_diagram`; ✅ N-K3-3 — prázdný version diagram = vrácení G1; EA-Repozitar-Kontext §9).
 3. Konektory: Aktér (z ACTORS) —Association→ UC; UCR —Realization→ UC; vše s `direction: FromSourceToTarget` (✅ N-K3-1, §5 pravidel). Umísti na FA-Behavioral diagram + **System/Module Boundary** (typ Boundary, název dle BA/modulu) obepínající vše kromě aktéra a požadavků (§7f pravidel).
 4. LS nezakládej zde — řeší `logicka-obrazovka` (patří ale do rootu UC package).
@@ -52,8 +52,8 @@ Vstup: operace z katalogu komponent, cílová komponenta. **Katalog-first princi
 > Pro lidský (ne-AI) tok existuje ekvivalentní skript `Scripts/ITAN-Find or Create Referencing Service Realization.vbs` — výstupy musí být identické.
 
 ## Auto-kompozity MDG elementů (závazné, §7g pravidel — z kola 2; revize 2026-08-16)
-- Auto-kompozity **NEMAZAT, jen přejmenovat/použít**; chování revalidovat přes bridge. (Verzní výhrady MCP 2.8.x níže platí jen pro domácí MCP.)
-- **UCR/SR**: auto-kompozit `UML Behavioral::Sequence` se **používá přímo** (✅ ověřeno 2026-07-12; jen domácí MCP < 2.8.4: smazat a založit plain `Sequence` se jménem elementu, owningElementID).
+- Auto-kompozity **NEMAZAT, jen přejmenovat/použít**; chování revalidovat přes bridge.
+- **UCR/SR**: auto-kompozit `UML Behavioral::Sequence` se **používá přímo** (✅ ověřeno 2026-07-12).
 - **LS**: auto-kompozit vzniká rovnou jako **`CSOB-ITAN::FA-Structural Detail`** (jen se jménem „Class") — **NEMAZAT, jen přejmenovat a použít** (✅ N-K3-9). **DTO**: auto-kompozit vzniká rovnou jako **`UML Structural::Class`** — **NEMAZAT, jen přejmenovat a použít** (✅ ověřeno kolo 4, 2026-07-14, §7g pravidel).
 - **505-1**: zapisuj `ids` strukturou dle §7h pravidel (type `Operation` + operationID) — placeholder `#FIX-GUID:` je zrušený (✅ 2026-07-07).
 

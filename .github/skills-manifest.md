@@ -1,53 +1,112 @@
 # skills-manifest — build výstup tools/build-vscode.py
 
-> vendored from IT-ANALYSIS/Skilly @ 2026-09-08 — needitovat ručně (lekce → kanon → rebuild; docs/BUILD-VSCODE.md)
+> vendored from IT-ANALYSIS/Skilly @ 2026-09-11 — needitovat ručně (lekce → kanon → rebuild; docs/BUILD-VSCODE.md)
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-09-08 + sha1 8590cdd9209c0c38473340b15a8406116a0adc4b |
+| Verze kanonu | 2026-09-11 + sha1 6acf62355569c09e871a0b7f810adff2f0ae6b9b |
 | Profil | doma |
-| Sada | thin |
-| Skillů | 8 (kanon 5 + generované 3) |
-| Souborů | 59 |
+| Sada | full |
+| Skillů | 24 (kanon 21 + generované 3) |
+| Souborů | 104 |
 | build-vscode.py | 1.0 |
 
 ## Skilly
 
 - e2e-f0-f1
+- ea-addin-developer
+- ea-sql-expert
 - eafb-bridge
 - emr-konvence
 - emr-qa
 - emr-scaffold
+- katalog-komponent
+- logicka-obrazovka
+- logicky-datovy-model
+- mapovani-rozhrani
 - prevzeti-zadani
+- re-interface
+- realizace-sluzby
+- realizace-uc
+- sar-architektura-zapis
+- sar-prevzeti-zadani
+- sar-validace-call-chains
+- sar-volatilita-dekompozice
+- solution-architect
+- structural-modeller
 - use-case-analyst
 - use-case-model
+- verzovani-release
 
 ## Soubory
 
 | Soubor | sha256 |
 |---|---|
 | agents/sa-analytik.agent.md | a0521cefbd29d41a31b571af23dcf354f222ab562c94c2194b89f1638172ca97 |
-| copilot-instructions.md | ee597ce337de43f2552dc665c84afcd0b3f6b6c8d14b28aa179c6663a93d9a15 |
+| copilot-instructions.md | 2211ead25b6708ec638e96745a29049cfe0b2c1c9de15475a8ecf87e366aae0d |
 | instructions/emr-zapis.instructions.md | 1125ccab156f3d75bdf92d3da2d3012e35fa01274620bc22fdb923a05aeef0a7 |
 | instructions/mermaid.instructions.md | f0f3219b9bd6c0f2dd9c5697e8c35a77361a629fc98e2290f22262bab99edca8 |
 | skills/e2e-f0-f1/SKILL.md | b1796ef848ed9ab2d866cf59a0f16c91de61ef9ef9d35ed0fdc31ab97dc5d881 |
 | skills/e2e-f0-f1/references/UC-Pravidla-Identifikace.md | f2fca2f543401c9e1acdccc2b2f542e4705b4fa5b3bed5f6819bee78e66cbea3 |
 | skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md | f2b3e6764264dc33899169d499a026d5065d32e7739185bbfb71c5c7a2c6e951 |
-| skills/eafb-bridge/SKILL.md | 078849027c769ad0335b2ebe78187fff8ba8c861a9f16205f69f7c583c6822f9 |
-| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | b4d13cf2602b7e506f2c3b4bd8d88dfefd3cf97e2030722c50386ee320ef8dd1 |
-| skills/eafb-bridge/references/EAFB-Operace-Registr.md | b2b1aba85d643eaeec70b94e07c43bf6148d7aa85dfa4f33a78e0fc7efed7534 |
-| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | 908bf87559a6a5bd2817559b049e275b87f98efe7965f840580c260c1149c685 |
+| skills/ea-addin-developer/SKILL.md | e6c9edd933e02b5a821c1feda5413447701cc5830456975f892504339f499ba7 |
+| skills/ea-addin-developer/references/addin-conventions.md | 3e54562585087ba302b1275409cd82c2ca866735395baf441d3c5ef3ee1c2bdd |
+| skills/ea-addin-developer/references/bridge-workflow.md | 9ff1b4a073ffa2f7b135f5e250e9e4e154f6b90b403238c9acb314089bd59dcd |
+| skills/ea-addin-developer/references/gui-catalog.md | f05a64d7ca5bda6eb2433d46dd8eefeec64db25270451f031997fafe87039602 |
+| skills/ea-addin-developer/references/vendor-samples.md | 6e146a20bd4cc7a7fc1b8a0ad502cce88670d3731040a6515f4583c3ae9556c6 |
+| skills/ea-sql-expert/SKILL.md | d71040dca0f79845e25067b6e1f1f045ffe4533574e1c9f1f6d18082431ed6cf |
+| skills/ea-sql-expert/references/EASchema_1558_SQLServer.sql | cdd53dfe0b2596802a4cd984ee454ed954ba9fa04bdbe95ec0c63415228c5009 |
+| skills/ea-sql-expert/references/ea-sql-rules.md | 27827cf6c0ef49c1eb9d63b68aef9e805a276233a0bc0637d9a2b19bb40814cc |
+| skills/ea-sql-expert/references/ea-sql-snippets.md | 5df16868bf24d6b481fa64b489a985faef52b7a49a65fc1b7cf391c50ed0681a |
+| skills/ea-sql-expert/references/emr-specific-views-and-tables.md | c792fa1538b076ea4ed3e797eb5fd2ebcec5179f51d22d28e7e417c5f02ebde0 |
+| skills/ea-sql-expert/references/mermaid-rules.md | 66b1d0be2b464015d63a95524a8db888390dee8d1f148d53f360399a91bf176d |
+| skills/ea-sql-expert/references/sql-format-rules.md | e00ac0ce9a97ad459908f7d1efd0e2fae0913947e47a7af2f882937dd659ff3c |
+| skills/eafb-bridge/SKILL.md | ede3f02eb745cd8a2017d03c028c8ea93f56ce376da749f1f58d69046f618341 |
+| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | b82c1e3b59e5babd411cf9e424fd191c5ff647c2de9b7e2cbfcb7ecef3fe8cc7 |
+| skills/eafb-bridge/references/EAFB-Operace-Registr.md | 248210ff3f626383594fd011a8901d04aadbfa4b4ab9f8e2dc5ab7094427942a |
+| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | 0530ca1677e06eb5672d75cfbb0005a843a62f119c88c0ed945844894e23e83c |
 | skills/emr-konvence/SKILL.md | 38d57317cb3e09a2526f602016bd9160f8d02eece23b69f1a13aa07d93461280 |
 | skills/emr-konvence/references/emr-bridge-protokol.md | 71a391f61f7e4c01b1f126b6109b88243423d20cb2b22493c3022fbbfa4e342a |
 | skills/emr-konvence/references/emr-zapis-pravidla.md | 06b9633c779115dceb12c5102bd06fbc31cc804d0b599623c1d60fd8bdc5d1fc |
 | skills/emr-konvence/references/hitl-brany.md | 8b40b0248f9298e39e95f6b69bae6d3aa811faca60d797246df59c23d140c07c |
 | skills/emr-konvence/references/ir-format.md | 95293df0162ccbbf9b8a0d5aba51ae60c698c49eab79215a070a6d330b13193f |
-| skills/emr-konvence/references/qa-checklisty.md | 746e414859fdc436c2dba0e708731366c3fbd7b4bf287f2149851201a11ae5c1 |
+| skills/emr-konvence/references/qa-checklisty.md | 5dc6e7e972bb63927840476cfff05b5508ad0dc2685a4ee66bc004e12848d14f |
 | skills/emr-konvence/references/qc-verzovani.sql | ed03933752967007ed35fc6c7594a7274686108f11bfd591981e4a412acc3057 |
 | skills/emr-konvence/references/sar-pravidla.md | 923be140763871f2f149a0bbabae5cd086dcf556c133f3281cfad48556cfc143 |
-| skills/emr-qa/SKILL.md | 2e7ce5c4c226d64aee47461fe045ac6dd80b5f4abf8158a8b902c74fe6de2114 |
-| skills/emr-scaffold/SKILL.md | 48f52a28fed7ea702729fd0afebb62a04da90eddb78c9b9e76f2050284a4ff97 |
-| skills/prevzeti-zadani/SKILL.md | 8c51495c26288241592f49eed3296395dcd621cc5abab6958d38ecf7d7874301 |
+| skills/emr-qa/SKILL.md | 3591b5d5b2301b45e6c2638c0668c02614995185eb9cf007f2238eca79b08d44 |
+| skills/emr-scaffold/SKILL.md | c584ae28e764f2b0c2d17b313ecdb94a6b60cf351697d5d6987358eb4c4cd444 |
+| skills/katalog-komponent/SKILL.md | 5ac423065c342ab8fe3eb4dcad00c43918e7f00481210365cee7b60389612349 |
+| skills/logicka-obrazovka/SKILL.md | 1f4895913fcbc1329bdcfe6712ad51f6811d9d7150997b7a067a76ea61f60728 |
+| skills/logicky-datovy-model/SKILL.md | d418fcdf0bde58597bf9b2c0024066be4138c15e88438bbd9b493c9f54c96f76 |
+| skills/mapovani-rozhrani/SKILL.md | 05f278a672a245acf8ed838ce7708991d43bc833af22e7470563e7a201700596 |
+| skills/prevzeti-zadani/SKILL.md | 2f9a90eb17250b08904f3a81c48b18f2a3752f418b5765f8a6e0580301ff10f1 |
+| skills/re-interface/SKILL.md | c8a4e6d947bddfb28f05c22ba514fd013bc0aa9c85d2c61f6fdba398f51c9e46 |
+| skills/realizace-sluzby/SKILL.md | a2f68d23c02ef03973d824ba1ea1399c9b06bfd35ab0799adb7bff2e7a59e1e5 |
+| skills/realizace-uc/SKILL.md | 5d0c34e6b36546c38c409ade98f03507a9e658b8accca2535d8fbf7bb4ae00f9 |
+| skills/sar-architektura-zapis/SKILL.md | 8b02795fd6022074572e93deb94851d7082c147933ef98b0a3752cf7fff59a6f |
+| skills/sar-prevzeti-zadani/SKILL.md | fab3aa2dc35b8ac16f1a5ef6444b36de84b07804a30b4dc6f88568dbe84ab3a6 |
+| skills/sar-validace-call-chains/SKILL.md | 55318294c1ded7ae1dd7d794e42fae6dff1516449570e9b65161da5a4b2c43b7 |
+| skills/sar-volatilita-dekompozice/SKILL.md | 0f7f75847b359fe21995b8cb356129db25d7ff2851511713235d927d99cc20bf |
+| skills/solution-architect/SKILL.md | 46fd74409c01fa7ece3f0b751e5e7cc05bc696d9cfe5fcacf8be17342ea3e8cd |
+| skills/solution-architect/references/idesign/banka-kontext.md | d13ed2fcc334a187bad58f79c07f5c10a7afda5f1da7e788d145c00c175d0c7a |
+| skills/solution-architect/references/idesign/checklisty.md | bd1473480816b64fa17e8aae6758a0b84be349583bc4053567944522bf2e687e |
+| skills/solution-architect/references/idesign/dekompozice-volatilita.md | 2b6d598263b84e15ae05b9f254cbac527c33d004a47c97418de3e5bebd617ca7 |
+| skills/solution-architect/references/idesign/design-smells.md | 673e028549b0cfe49ef789e5c8e138198fb867275ddd570dc4b2c2315657e5c3 |
+| skills/solution-architect/references/idesign/index.md | ccc19c0b39d3c98ea14ab9c7f8dbb66e837c3ba77a2c7302cb228f3cc50b0d66 |
+| skills/solution-architect/references/idesign/interview-stakeholderu.md | 56bbb6b78527f5c86d8f6380c8acc2191014778c9fb92bf628c5b99243222c6f |
+| skills/solution-architect/references/idesign/kontrakty-facety-dto.md | 1113b6658da48e0c8163fa2bc6dce7eada2d4f870cfbabc7ecb2837497252b6b |
+| skills/solution-architect/references/idesign/messaging.md | 78d1b0429a44245eb314263a975a7e3fa5b019f29c31ef8d58ceebe46dc0df23 |
+| skills/solution-architect/references/idesign/pravidla-interakce.md | 61fc124ee78d1d0a1f134e64edf3d9cfe9effa7103b67714e726d9ed8d2b5b1e |
+| skills/solution-architect/references/idesign/project-design.md | 61ce5cbd7c40f4b65a27be4c310f7193b103a2acfece93a07e077d9d252fa6ab |
+| skills/solution-architect/references/idesign/soa-anti-patterny.md | d44b8d3644456c790ba6b237bb765f629b214b17291f8fa4c29d63476c96c14f |
+| skills/solution-architect/references/idesign/taxonomie-komponent.md | cf837b2c8853e575cc3d80e5fc883e86754f84673d1e1bc0bed9efc73bb9ae3b |
+| skills/solution-architect/references/idesign/validace-call-chains.md | bc6876e1f531f5dd3fc8dc5b88e5da91e71990be2ad70c950c4b367534099f3e |
+| skills/solution-architect/references/idesign/vize-cile-mise.md | 6a442bb2e10e82f547db8d12caf50be028e70ea4018f0845480806e7267114dc |
+| skills/structural-modeller/SKILL.md | 0eecf79d40aa9c67dafcd0b40e16b14176f362d35983ca741b2cee254d2a1617 |
+| skills/structural-modeller/references/attribute-naming-conventions.md | 47881a817454175979ac602d6db989cf349b0fb424c0b302c4882ae2684e957f |
+| skills/structural-modeller/references/domain-types.md | 37a9c646a36502342ffb0cdfcf2223b347a70a6b63e21f4e7b0be0fd18ea6fd2 |
+| skills/structural-modeller/references/mermaid-rules.md | 66b1d0be2b464015d63a95524a8db888390dee8d1f148d53f360399a91bf176d |
+| skills/structural-modeller/references/operation-name-rules.md | 0a1b1f92674724df665317e50a5f77b3860a7efb39534f0e679cb7e434ca98f7 |
 | skills/use-case-analyst/SKILL.md | 027a8bbba213d35a6cc2b9cdfce33a40a4caebdc9d592579b88a785d47f8695d |
 | skills/use-case-analyst/references/common-mistakes.md | 77a3f9420ae84e1523e2715cc8f90e4e52acc9d32b9697934ee3663b4067890e |
 | skills/use-case-analyst/references/mermaid-rules.md | 66b1d0be2b464015d63a95524a8db888390dee8d1f148d53f360399a91bf176d |
@@ -84,4 +143,6 @@
 | skills/use-case-analyst/references/uc-patterns/pattern-orthogonal-views.md | f1221ee2a76db9d63ff87b43f93345cd11494f413e77a592ee738c62ff5e31cb |
 | skills/use-case-analyst/references/uc-patterns/pattern-use-case-sequence.md | 29b021d713ef0796cdf9682ff789eb65f42f47e17756834459d2dc861aaea38f |
 | skills/use-case-analyst/references/use-case-rules.md | c5ec0ecc41ae14238663f2c08eddbeb75c4eb4be6496fd0f53257d7efac0ed61 |
-| skills/use-case-model/SKILL.md | 9f41a95a1b93a5f500de1daf508c57d5676cc46effffbd66d0fcd1749e4b3675 |
+| skills/use-case-model/SKILL.md | 208696f98d8e3ce46a9270289f6dd532ae3e99f0942e598445a2fb9148b731a7 |
+| skills/verzovani-release/SKILL.md | 61801187ce83ed7f4d0f17e200c698a66dd77d4c9d7ddae4c8b3b98ec5c2261b |
+| skills/verzovani-release/references/qc-verzovani.sql | ed03933752967007ed35fc6c7594a7274686108f11bfd591981e4a412acc3057 |

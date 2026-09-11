@@ -30,5 +30,5 @@ license: Complete terms in LICENSE.txt
 ## Kontrola výstupu
 Každý požadavek pokryt UC; scénář čistý (pravidla jen odkazem); UC package úplný; survey aktuální. K dávce přilož **shrnutí producenta s confidence flags** dle `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) (WP4, ✅ 2026-07-17). Pak `emr-qa` (sada F1) → podklad pro G1 dle `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md).
 
-## EA MCP
-`create_or_update_elements, create_or_update_connectors, create_or_update_diagram, place_elements_on_diagram, find_elements_by_name` + bridge `create_or_update_scenarios` (scénáře — U2 rev. 2026-08-17; domácí MCP scénáře neumí, doma je zapisuje bridge/ruční krok)
+## Operace ea-file-bridge
+`create_or_update_elements, create_or_update_connectors, create_or_update_diagram, place_elements_on_diagram, find_elements_by_name` + `create_or_update_scenarios`, `create_or_update_constraints`, `create_or_update_requirements` (scénáře, constrainty, lokální BRU — U2 rev. 2026-08-17; Risk Gate ELEVATED, B3)

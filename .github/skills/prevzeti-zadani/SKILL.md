@@ -27,5 +27,5 @@ license: Complete terms in LICENSE.txt
 ## Kontrola výstupu
 Hranice jednoznačná; žádný požadavek nezůstal nezařazený; existující artefakty EMR zohledněny. K dávce přilož **shrnutí producenta s confidence flags** dle `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) (WP4, ✅ 2026-07-17). Pak `emr-qa` (sada F0) → G0 dle `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md).
 
-## EA MCP
+## Operace ea-file-bridge
 `find_packages_by_name, find_elements_by_name, get_elements_information, create_or_update_elements`

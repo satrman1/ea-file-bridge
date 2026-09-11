@@ -30,6 +30,7 @@ Zápisové dávky prochází deterministickým **Risk Gate**. Podle rizika:
 | `E_LOCKED` | Cílový prvek/balíček je zamčený (EA locking) — počkat na uvolnění zámku. |
 | `E_UNKNOWN_OP`, `E_ARGS` | Neznámá operace / chybí povinné argumenty. Oprav dávku. |
 | `E_SQL_READONLY` | Jiný dotaz než SELECT/WITH. |
+| `E_SQL` | Dotaz v EA selhal (neexistující sloupec/tabulka, syntaxe) — `message` = hláška EA (může chybět), `sql` = dotaz, `raw` = začátek odpovědi EA. Oprav dotaz (ověř sloupce), pošli znovu; EA k tomu otevřela modální dialog, který člověk odklikne. **Prázdný výsledek NENÍ `E_SQL`** — od v0.14 je to `ok`/`rowCount: 0` + warning. |
 | `E_NOT_FOUND` | Cíl nenalezen — ověř GUID/jméno zpětným čtením. |
 | `E_EXCEPTION`, `E_NO_EXECUTOR` | Neočekávaná chyba / bridge neběží. Ohlas uživateli. |
 
