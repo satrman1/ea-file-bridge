@@ -100,6 +100,10 @@ Klíč `mdg` je zakázaný (PV-R6 ii). `sweepAllow` = položky `{rule, pattern, 
 
 Sweep běží nad celým výstupem v obou profilech. **Doma: neošetřený nález = build FAIL** (výstup se commituje do kurýrního repa — pojistka proti úniku z kanonu, ne kvůli MDG). **Banka: jen report** (hodnoty jsou vlastní hodnoty banky v korporátním repu). Nález doma se řeší buď opravou kanonu (syntetický příklad), nebo položkou `sweepAllow` s důvodem — nikdy editací `.github/`.
 
+## Workspace analytika
+
+Kit pro **workspace repo metodiky** (`C:\GIT\ai-transfer`) nestaví build přímo — volá ho `tools/refresh-workspace.py` s `--out <workspace>\.github` a přidává vendorovanou pumpu + `PUMP-VERSION` + skeleton. Postup, rozhodnutí a klikací test: `docs/WORKSPACE-METODIKY.md`.
+
 ## Co se commituje
 
 - `tools/build-vscode.py`, `test/build-vscode.test.py`, `test/fixtures/vscode-kanon/`, `config/vscode-profile.doma.json`, `config/vscode-profile.banka.example.json`, tento návod.

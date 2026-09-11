@@ -1,0 +1,28 @@
+refresh-workspace.py 1.0 — 2026-09-11 (verify)
+  bridge:    /sessions/rcw-01mifnyrddcy3hxbjsvjvedy/mnt/ea-file-bridge
+  workspace: /sessions/rcw-01mifnyrddcy3hxbjsvjvedy/mnt/ai-transfer
+
+Verify .github/ (tools/build-vscode.py --verify):
+  | verify — /sessions/rcw-01mifnyrddcy3hxbjsvjvedy/mnt/ai-transfer/.github
+  |   manifest: profil doma, sada full, terminál off, skillů 22 (kanon 19 + generované 3), souborů 102
+  |   sha256: 102 souborů OK, 0 chybí, 0 změněno, 0 mimo manifest
+  |   skillů: 22
+  |   sweep povoleno   2× — GUID whitelistu profilu
+  |   sweep povoleno 105× — kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID
+  |   sweep povoleno  13× — slovo password/token v próze bez přiřazení hodnoty (UC příklady Cockburn, DDL EA [Password]) — ne credential
+  |   sweep povoleno   1× — syntetický příklad Jira klíče DEMO-nnnnn v kanonu (prevzeti-zadani) — ne reálný projekt
+  |   sweep povoleno   2× — syntetický příklad URL s placeholderem <org> (ir-format, emr-zapis-pravidla) — ne reálná adresa
+  |   sweep NEOŠETŘENÉ: 0
+  | [OK] verify prošel
+
+Kontrola pumpy (PUMP-VERSION):
+  workspace: pumpa v0.5, sha256 5e37af2050ef…, PUMP-VERSION říká v0.5 / commit 914f921 (refresh 2026-09-11)
+  aktuální: pumpa ve workspace = pumpa v bridge (v0.5)
+
+Kontrola skeletonu:
+  ok: requests/
+  ok: responses/
+  ok: zadani/
+  ok: .gitignore má spravovaný blok
+
+[OK] verify prošel (.github/ dle manifestu, pumpa aktuální, skeleton)

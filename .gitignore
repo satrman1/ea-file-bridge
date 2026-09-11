@@ -24,6 +24,8 @@ __pycache__/
 
 # log opakovaneho buildu z tools/build.cmd (prepisuje se); dukazni log prvniho buildu = docs/e2e-vscode/build-doma.log
 docs/e2e-vscode/build-doma-last.log
+# log opakovaneho refreshe workspace z tools/refresh-workspace.cmd (prepisuje se); dukazni log = docs/e2e-vscode/refresh-workspace-doma.log
+docs/e2e-vscode/refresh-workspace-last.log
 
 # varianta s terminalem (Z260911-3, docs/BUILD-VSCODE.md sekce Terminal): build --terminal on
 # jde do .github-term/, nikdy do .github/ (repo zustava bez terminalu); zadani/re-fixtures/ =

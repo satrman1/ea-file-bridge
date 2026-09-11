@@ -7,7 +7,7 @@ AI driver ──► requests\req-*.json ──► pumpa (pump.wsf, WSH) ──�
 AI driver ◄── responses\res-*.json ◄──────────────────────────────────┘
 ```
 
-**Tento repozitář = kanon.** Vyvíjí se doma (eaexample), klon se synchronizuje do banky. Složky `requests\` a `responses\` vznikají za běhu a do gitu nepatří (.gitignore) — obsahují data z repozitáře EA.
+**Tento repozitář = produkt pro správce bridge** (kód, pumpa, nástroje, testy, docs). Vyvíjí se doma (eaexample), klon se synchronizuje do banky. **Analytik pracuje v jiném repu** — workspace metodiky `ai-transfer` (`docs/WORKSPACE-METODIKY.md`), kam se kit i pumpa dostávají nástrojem `tools/refresh-workspace.py`. Složky `requests\` a `responses\` vznikají za běhu a do gitu nepatří (.gitignore) — obsahují data z repozitáře EA.
 
 ## Obsah
 
@@ -18,7 +18,8 @@ AI driver ◄── responses\res-*.json ◄────────────
 | `scripts/` | ITAN-Inject (nalití `src/` do existujících operací) + ITAN-Bootstrap (založení elementu/operací, idempotentní) — EA Scripting, **JScript**; cestu ke `src/` si najdou samy, jinak se zeptají dialogem |
 | `krok0/` | smoke testy prostředí (WSH, COM attach, XMLHTTP, free Copilot) + návod |
 | `docs/` | protokol eafb/0.1, návod domácí generálky, šablony copilot-instructions (domácí/bankovní) |
-| `.github/copilot-instructions.md` | instrukce pro Copilot agenta — vytvořit ručně kopií z `docs/github-copilot-instructions.md` (doma), resp. bankovní varianty |
+| `.github/` | kit pro Copilot (agent `sa-analytik`, Agent Skills, instrukce) — **výstup buildu** `tools/build-vscode.py` z kanonu skillů (`docs/BUILD-VSCODE.md`), needitovat ručně |
+| `tools/refresh-workspace.py` + `.cmd` | naplní **workspace repo metodiky** (`C:\GIT\ai-transfer`) — build `.github/`, vendorovaná kopie `pump.wsf` + `PUMP-VERSION`, skeleton (`docs/WORKSPACE-METODIKY.md`) |
 
 ## Rychlý start (doma)
 
