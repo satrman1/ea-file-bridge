@@ -1,0 +1,165 @@
+build-vscode.py 1.0 — 2026-09-11
+  kanon:    C:\Users\milos\CLAUDE\IT-ANALYSIS\Skilly
+  šablony:  C:\Users\milos\CLAUDE\IT-ANALYSIS\Skilly\_vscode
+  výstup:   C:\GIT\ea-file-bridge\.github  (DRY-RUN — nic se nezapisuje)
+  profil:   doma (C:\GIT\ea-file-bridge\config\vscode-profile.doma.json)
+  sada:     full
+
+Substituce placeholderů:
+  {{REPO}} → EAEXAMPLE.QEA
+  {{WHITELIST}} → #FB-TEST {CCD344F6-9EAA-44eb-BAA4-4952E48526B7}
+  {{DIALEKT}} → sqlite
+  {{DENY_OPS}} → žádné
+  {{CONTEXT_NOTES}} → - Domácí prostředí: eaexample (SQLite), transport pumpa pump.wsf, bez EA security.
+
+Skilly:
+  kanon  skills/prevzeti-zadani (1 souborů)
+  kanon  skills/emr-scaffold (1 souborů)
+  kanon  skills/use-case-model (1 souborů)
+  kanon  skills/use-case-analyst (36 souborů)
+  kanon  skills/emr-qa (1 souborů)
+  kanon  skills/logicka-obrazovka (1 souborů)
+  kanon  skills/realizace-uc (1 souborů)
+  kanon  skills/katalog-komponent (1 souborů)
+  kanon  skills/realizace-sluzby (1 souborů)
+  kanon  skills/logicky-datovy-model (1 souborů)
+  kanon  skills/mapovani-rozhrani (1 souborů)
+  kanon  skills/verzovani-release (2 souborů)
+  kanon  skills/re-interface (1 souborů)
+  kanon  skills/sar-prevzeti-zadani (1 souborů)
+  kanon  skills/sar-volatilita-dekompozice (1 souborů)
+  kanon  skills/sar-architektura-zapis (1 souborů)
+  kanon  skills/sar-validace-call-chains (1 souborů)
+  kanon  skills/structural-modeller (5 souborů)
+  kanon  skills/ea-sql-expert (7 souborů)
+  kanon  skills/solution-architect (15 souborů)
+  kanon  skills/ea-addin-developer (5 souborů)
+  šablona copilot-instructions.md (6031 B, limit 8192)
+  šablona agents/sa-analytik.agent.md
+  šablona instructions/emr-zapis.instructions.md
+  šablona instructions/mermaid.instructions.md
+  šablona skills/emr-konvence (8 souborů)
+  šablona skills/eafb-bridge (4 souborů)
+  šablona skills/e2e-f0-f1 (3 souborů)
+
+Přepisy odkazů (mimo strom skillu → kopie / ukazatel / „mimo workspace“): 103
+| Soubor | Původně | Nově | Typ |
+|---|---|---|---|
+| skills/prevzeti-zadani/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/prevzeti-zadani/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/prevzeti-zadani/SKILL.md | ../../../BRQS/JIRA pole - Requirement.md | `JIRA pole - Requirement.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/prevzeti-zadani/SKILL.md | ../../../BRQS/BRQ AI - Implementace.md | `BRQ AI - Implementace.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/prevzeti-zadani/SKILL.md | ../../../BRQS/BRQ Management.md | `BRQ Management.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/prevzeti-zadani/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/prevzeti-zadani/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/emr-scaffold/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-scaffold/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/emr-scaffold/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/use-case-model/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/use-case-model/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/use-case-model/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/use-case-model/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/use-case-model/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/use-case-analyst/references/scenario-rules.md | ../../../podklady/error-handling.md | `error-handling.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
+| skills/emr-qa/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-qa/SKILL.md | ../../emr-bridge/EAFB-Operace-Registr.md | `EAFB-Operace-Registr.md` (skill `eafb-bridge`, references/EAFB-Operace-Registr.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/logicka-obrazovka/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/logicka-obrazovka/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/logicka-obrazovka/SKILL.md | ../../podklady/ls-rules.png | `ls-rules.png` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/logicka-obrazovka/SKILL.md | ../structural-modeller/references/attribute-naming-conventions.md | `references/attribute-naming-conventions.md` (skill `structural-modeller`) | backtick |
+| skills/logicka-obrazovka/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/logicka-obrazovka/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/logicka-obrazovka/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/realizace-uc/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/realizace-uc/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/realizace-uc/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/realizace-uc/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/katalog-komponent/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/katalog-komponent/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/katalog-komponent/SKILL.md | _shared/sar-pravidla.md | `sar-pravidla.md` (skill `emr-konvence`, references/sar-pravidla.md) | backtick |
+| skills/katalog-komponent/SKILL.md | ../structural-modeller/references/operation-name-rules.md | `references/operation-name-rules.md` (skill `structural-modeller`) | backtick |
+| skills/katalog-komponent/SKILL.md | _shared/ir-format.md | `ir-format.md` (skill `emr-konvence`, references/ir-format.md) | backtick |
+| skills/katalog-komponent/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/realizace-sluzby/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/realizace-sluzby/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/realizace-sluzby/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/realizace-sluzby/SKILL.md | _shared/ir-format.md | `ir-format.md` (skill `emr-konvence`, references/ir-format.md) | backtick |
+| skills/logicky-datovy-model/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/logicky-datovy-model/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/logicky-datovy-model/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/logicky-datovy-model/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/logicky-datovy-model/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/mapovani-rozhrani/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/mapovani-rozhrani/SKILL.md | ../../INTERFACES/current-implementation.md | `current-implementation.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/mapovani-rozhrani/SKILL.md | ../../INTERFACES/ANALYZA Rozhrani a mapovani v EA s LLM.md | `ANALYZA Rozhrani a mapovani v EA s LLM.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/mapovani-rozhrani/SKILL.md | ../../INTERFACES/Feedback-Interfaces-Integrace.md | `Feedback-Interfaces-Integrace.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/mapovani-rozhrani/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/verzovani-release/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/verzovani-release/SKILL.md | ../../_archiv/Feedback-Verzovani-Mechanismus.md | `Feedback-Verzovani-Mechanismus.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/verzovani-release/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/verzovani-release/SKILL.md | ../../Verzovani-Kritika-a-Redesign.md | `Verzovani-Kritika-a-Redesign.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/verzovani-release/SKILL.md | ../../_archiv/emr-versionining-oficial.png | `emr-versionining-oficial.png` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/verzovani-release/references/qc-verzovani.sql | _shared/qc-verzovani.sql | kopie do references/ | kopie |
+| skills/verzovani-release/SKILL.md | ../../_archiv/emr-versionining-alternative_*.png | `emr-versionining-alternative_*.png` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/verzovani-release/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/verzovani-release/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/verzovani-release/SKILL.md | _shared/hitl-brany.md | `hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md) | backtick |
+| skills/verzovani-release/SKILL.md | ../../Verzovani-Kritika-a-Redesign.md | `Verzovani-Kritika-a-Redesign.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/verzovani-release/references/qc-verzovani.sql | ../../Verzovani-Kritika-a-Redesign.md | Verzovani-Kritika-a-Redesign.md (mimo workspace) | zbytkové ../../ |
+| skills/re-interface/SKILL.md | _shared/ir-format.md | `ir-format.md` (skill `emr-konvence`, references/ir-format.md) | backtick |
+| skills/re-interface/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/re-interface/SKILL.md | _shared/ir-format.md | `ir-format.md` (skill `emr-konvence`, references/ir-format.md) | backtick |
+| skills/re-interface/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/re-interface/SKILL.md | _shared/ir-format.md | `ir-format.md` (skill `emr-konvence`, references/ir-format.md) | backtick |
+| skills/sar-prevzeti-zadani/SKILL.md | _shared/sar-pravidla.md | `sar-pravidla.md` (skill `emr-konvence`, references/sar-pravidla.md) | backtick |
+| skills/sar-prevzeti-zadani/SKILL.md | ../solution-architect/references/idesign/validace-call-chains.md | `references/idesign/validace-call-chains.md` (skill `solution-architect`) | backtick |
+| skills/sar-volatilita-dekompozice/SKILL.md | _shared/sar-pravidla.md | `sar-pravidla.md` (skill `emr-konvence`, references/sar-pravidla.md) | backtick |
+| skills/sar-architektura-zapis/SKILL.md | _shared/sar-pravidla.md | `sar-pravidla.md` (skill `emr-konvence`, references/sar-pravidla.md) | backtick |
+| skills/sar-architektura-zapis/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/sar-architektura-zapis/SKILL.md | ../../IDesign/IDesign-MDG-Kontext.md | `IDesign-MDG-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/sar-validace-call-chains/SKILL.md | _shared/sar-pravidla.md | `sar-pravidla.md` (skill `emr-konvence`, references/sar-pravidla.md) | backtick |
+| skills/sar-validace-call-chains/SKILL.md | ../solution-architect/references/idesign/validace-call-chains.md | `references/idesign/validace-call-chains.md` (skill `solution-architect`) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../_archiv/Feedback-Metodika-v2-Integrace.md | `Feedback-Metodika-v2-Integrace.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../Zadani-EA-File-Bridge.md | `Zadani-EA-File-Bridge.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../podklady/ls-rules.png | `ls-rules.png` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../INTERFACES/current-implementation.md | `current-implementation.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../INTERFACES/Feedback-Interfaces-Integrace.md | `Feedback-Interfaces-Integrace.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../structural-modeller/references/attribute-naming-conventions.md | `references/attribute-naming-conventions.md` (skill `structural-modeller`) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../_archiv/mcp-vendor/Bug-Report-EA-MCP.md | `Bug-Report-EA-MCP.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../_archiv/mcp-vendor/Sparx-MCP-Odpoved-Testy-2026-07-07.md | `Sparx-MCP-Odpoved-Testy-2026-07-07.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../_archiv/mcp-vendor/Sparx-MCP-Odpoved-Testy-2026-07-07.md | `Sparx-MCP-Odpoved-Testy-2026-07-07.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../_archiv/mcp-vendor/tools-list-raw-2.8.4_2026-07-13.json | `tools-list-raw-2.8.4_2026-07-13.json` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../domain-types.yaml | `domain-types.yaml` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../ea-sql-expert/references/emr-specific-views-and-tables.md | `references/emr-specific-views-and-tables.md` (skill `ea-sql-expert`) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../ai-zapis/Restore-Runbook-AI-Zapis.md | `Restore-Runbook-AI-Zapis.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../ea-sql-expert/references/emr-specific-views-and-tables.md | `references/emr-specific-views-and-tables.md` (skill `ea-sql-expert`) | backtick |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | ../../ai-zapis/Restore-Runbook-AI-Zapis.md | `Restore-Runbook-AI-Zapis.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/qa-checklisty.md | ../../_archiv/Feedback-Metodika-v2-Integrace.md | `Feedback-Metodika-v2-Integrace.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/qa-checklisty.md | ../use-case-analyst/references/scenario-rules.md | `references/scenario-rules.md` (skill `use-case-analyst`) | backtick |
+| skills/emr-konvence/references/qc-verzovani.sql | ../../Verzovani-Kritika-a-Redesign.md | Verzovani-Kritika-a-Redesign.md (mimo workspace) | zbytkové ../../ |
+| skills/emr-konvence/references/sar-pravidla.md | ../../IDesign/IDesign-MDG-Kontext.md | `IDesign-MDG-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/sar-pravidla.md | ../../IDesign/IDesign-v-Bance-Delta.md | `IDesign-v-Bance-Delta.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/sar-pravidla.md | ../../IDesign/SAR-Validace-SQL.md | `SAR-Validace-SQL.md` (mimo workspace — vyžádej od uživatele) | backtick |
+Backtick → markdown link uvnitř stromu skillu: 185
+
+Sweep B1 (T6; profil doma; GUID whitelistu a hodnoty profilu povoleny):
+  povoleno   2× — GUID whitelistu profilu (např. copilot-instructions.md:17 {CCD344F6-9EAA-44eb-BAA4-4952E48526B7}; skills/eafb-bridge/SKILL.md:13 {CCD344F6-9EAA-44eb-BAA4-4952E48526B7})
+  povoleno 107× — kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID (např. skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:26 BRU91001-1; skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:60 WF-101; skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:71 PREXXXXX-1)
+  povoleno  13× — slovo password/token v próze bez přiřazení hodnoty (UC příklady Cockburn, DDL EA [Password]) — ne credential (např. copilot-instructions.md:26 token; skills/ea-sql-expert/references/EASchema_1558_SQLServer.sql:1921 Passw; skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md:64 token)
+  povoleno   1× — syntetický příklad Jira klíče DEMO-nnnnn v kanonu (prevzeti-zadani) — ne reálný projekt (např. skills/prevzeti-zadani/SKILL.md:9 DEMO-27698)
+  povoleno   2× — syntetický příklad URL s placeholderem <org> (ir-format, emr-zapis-pravidla) — ne reálná adresa (např. skills/emr-konvence/references/emr-zapis-pravidla.md:269 https://github.com/<org; skills/emr-konvence/references/ir-format.md:27 https://github.com/<org)
+  NEOŠETŘENÉ nálezy: 0
+
+Počty (AK-1): copilot-instructions 1 · agents 1 · instructions 2 · skillů 24 · souborů 105
+  skilly: e2e-f0-f1, ea-addin-developer, ea-sql-expert, eafb-bridge, emr-konvence, emr-qa, emr-scaffold, katalog-komponent, logicka-obrazovka, logicky-datovy-model, mapovani-rozhrani, prevzeti-zadani, re-interface, realizace-sluzby, realizace-uc, sar-architektura-zapis, sar-prevzeti-zadani, sar-validace-call-chains, sar-volatilita-dekompozice, solution-architect, structural-modeller, use-case-analyst, use-case-model, verzovani-release
+  [WARN] možné uříznutí uprostřed věty: skills/use-case-analyst/references/scenario-phrases.md — končí „…hou nastat v libovolném pořadí“
+
+[OK] dry-run: validace prošla, nic nezapsáno (105 souborů by vzniklo)
