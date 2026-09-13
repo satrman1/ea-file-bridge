@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-A3b",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "<GUID-A3>",
+     "type": "UseCase",
+     "name": "UC POC banka A3 zapis bez balickovych prav (NESMI VZNIKNOUT)"
+    }
+   ]
+  }
+ ]
+}

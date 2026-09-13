@@ -1,0 +1,9 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-T6C",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "query", "sql": "SELECT TOP 20 d.DocID, d.Version, d.DocDate, DATALENGTH(d.BinContent) / 1048576.0 AS mb FROM t_document d WHERE d.DocType = 'Baseline' ORDER BY d.DocDate DESC" },
+  { "op": "query", "sql": "SELECT COUNT(*) AS n, SUM(CAST(DATALENGTH(BinContent) AS bigint)) / 1048576.0 AS mb_total, MAX(DATALENGTH(BinContent)) / 1048576.0 AS mb_max FROM t_document WHERE DocType = 'Baseline'" }
+ ]
+}

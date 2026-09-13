@@ -1,0 +1,9 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-A2-read",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "ping", "echo": "banka-A2-read-neclen" },
+  { "op": "query", "sql": "SELECT TOP 20 p.Package_ID, p.Name FROM t_package p INNER JOIN t_package s ON s.Package_ID = p.Parent_ID WHERE s.ea_guid = '<GUID-SANDBOX>' ORDER BY p.Package_ID" }
+ ]
+}

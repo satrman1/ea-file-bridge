@@ -1,0 +1,12 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-A3a",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-SANDBOX>",
+   "name": "POC banka A3 zamceny (balickova prava)"
+  }
+ ]
+}

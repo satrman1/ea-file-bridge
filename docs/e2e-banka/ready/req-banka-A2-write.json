@@ -1,0 +1,12 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-A2-write",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-SANDBOX>",
+   "name": "POC banka A2 NESMI VZNIKNOUT (neclen write skupiny)"
+  }
+ ]
+}

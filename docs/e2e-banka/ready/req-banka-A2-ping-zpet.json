@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-A2-ping-zpet",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "ping", "echo": "banka-A2-zpet-ve-skupine" }
+ ]
+}
