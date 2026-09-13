@@ -1,5 +1,7 @@
 # AI import režim (vrátný) — návod
 
+> **Stav 2026-09-13:** platí **jen doma** (kód `src/gatekeeper.ps1`, `FB_Gatekeeper*` zůstává v kanonu). **V bance se vrátný nenasazuje** (rozhodnutí 4. 9., Z260904-5; `deploy_src` v deny) — POC banky 10.–13. 9. běžel přes pumpu a kit VS Code, bankovní E2E vrátného (zápřah 08-20 krok 4) a ověření DLP/EDR (krok 5) neproběhly a nejsou plánovány. Návod se nemaže: doma funkční.
+
 Tenhle režim umí jedno: zapneš ho jedním kliknutím v EA a od té chvíle stačí v Copilotu kliknout **Copy** na vygenerovanou dávku — a ona se sama zapíše do modelu. Odpověď ti přistane do schránky, vložíš ji zpět do Copilota (Ctrl+V). Žádné ruční ukládání souborů, žádná spuštěná pumpa.
 
 Mezi dávkami je EA normálně použitelná — zamrzne jen na pár sekund, když zrovna zpracovává dávku.

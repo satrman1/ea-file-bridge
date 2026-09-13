@@ -1,3 +1,7 @@
+# ⛔ HISTORIE — ruční šablona copilot-instructions, překonáno buildem `tools/build-vscode.py` (2026-09-07, Z260907b-2)
+
+> Od 7. 9. 2026 je `.github/copilot-instructions.md` **výstup buildu** ze šablony `IT-ANALYSIS/Skilly/_vscode/copilot-instructions.md` (profil `doma` / `banka`, `docs/BUILD-VSCODE.md`); tento soubor se **needituje ani nenasazuje**. Ponechán jako historie (v bance 10.–13. 9. se použil build, nouzově adaptovaný — N-B-11). Pozn. pro dávku Z260907-6 (Baseline politika, docs): cíl úprav = šablona v kanonu, ne tento soubor. Označeno 2026-09-13 (framecheck Z260913-1).
+
 # Copilot instructions — EA File Bridge (eafb/0.2)
 
 > Nasazení: obsah vložit do `.github/copilot-instructions.md` ve VS Code workspace na cílové stanici (nebo přiložit jako kontext). Laděno pro Claude rodinu (bankovní default Claude Opus 4.8). Placeholder `<TEST-DB>` nahraď skutečným názvem testovací databáze při nasazení.

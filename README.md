@@ -1,6 +1,8 @@
 # EA File Bridge
 
-Plně automatická náhrada MCP pro Enterprise Architect bez cizího instalovaného softwaru: AI driver (GitHub Copilot / Claude) komunikuje s EA přes souborový protokol **eafb/0.1** (`docs/PROTOKOL-EAFB.md`).
+> **Stav 2026-09-13:** poslední tag **`v0.14`** (9. 9.; `git tag -l | sort -V`), offline harness `node test\harness.js` = **248/248**, kanon `src/` = 106 souborů. **Ověřeno v bance 10.–13. 9. 2026 nad MS SQL (EMR_TEST): POC PASS s nálezy, Fáze 3 GO** — `docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md` (část A nasazení + první zápis, část B E2E `/e2e-f0-f1` + negativní testy A2/A3 + T6-C; bez interních hodnot banky). Doma živě: E2E pumpa 5. 9. (`docs/e2e-pumpa/`), baseline spike 7. 9. (`docs/baseline-spike/`), VS Code tenký řez 7. 9. + terminál 11. 9. (`docs/e2e-vscode/`), práva K8 v QEAX 9. 9. (`docs/e2e-k8-qeax/`).
+
+Plně automatická náhrada MCP pro Enterprise Architect bez cizího instalovaného softwaru: AI driver (GitHub Copilot / Claude) komunikuje s EA přes souborový protokol **eafb/0.2** (`docs/PROTOKOL-EAFB.md`; dokumentační verze v0.13).
 
 ```
 AI driver ──► requests\req-*.json ──► pumpa (pump.wsf, WSH) ──► COM ──► EA (executor FB_* v modelu)
@@ -17,7 +19,7 @@ AI driver ◄── responses\res-*.json ◄────────────
 | `src/` | kanon kódu executoru (operace elementu AICodeBridge; deploy = inject + restart pumpy; NOVÁ operace = bootstrap) |
 | `scripts/` | ITAN-Inject (nalití `src/` do existujících operací) + ITAN-Bootstrap (založení elementu/operací, idempotentní) — EA Scripting, **JScript**; cestu ke `src/` si najdou samy, jinak se zeptají dialogem |
 | `krok0/` | smoke testy prostředí (WSH, COM attach, XMLHTTP, free Copilot) + návod |
-| `docs/` | protokol eafb/0.1, návod domácí generálky, šablony copilot-instructions (domácí/bankovní) |
+| `docs/` | protokol eafb/0.2, návody (generálka doma, nasazení klikací/banka, schránka, vrátný), protokoly živých E2E `e2e-*/` (pumpa, VS Code, K8, banka), baseline spike, build VS Code, workspace metodiky; ⛔ historické soubory mají hlavičku |
 | `.github/` | kit pro Copilot (agent `sa-analytik`, Agent Skills, instrukce) — **výstup buildu** `tools/build-vscode.py` z kanonu skillů (`docs/BUILD-VSCODE.md`), needitovat ručně |
 | `tools/refresh-workspace.py` + `.cmd` | naplní **workspace repo metodiky** (`C:\GIT\ai-transfer`) — build `.github/`, vendorovaná kopie `pump.wsf` + `PUMP-VERSION`, skeleton (`docs/WORKSPACE-METODIKY.md`) |
 
