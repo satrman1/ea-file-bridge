@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S3-Q2",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT TOP 15 c.Stereotype AS vazba, o2.Stereotype AS cil, COUNT(*) AS n FROM t_connector c INNER JOIN t_object o2 ON o2.Object_ID = c.End_Object_ID WHERE c.Start_Object_ID = <ID-KOMPONENTA> GROUP BY c.Stereotype, o2.Stereotype ORDER BY n DESC"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 15 c.Stereotype AS vazba, o1.Stereotype AS zdroj, COUNT(*) AS n FROM t_connector c INNER JOIN t_object o1 ON o1.Object_ID = c.Start_Object_ID WHERE c.End_Object_ID = <ID-KOMPONENTA> GROUP BY c.Stereotype, o1.Stereotype ORDER BY n DESC"
+  }
+ ]
+}

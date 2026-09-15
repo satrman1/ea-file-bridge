@@ -1,0 +1,312 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S1-ldm",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-DEMO>",
+   "name": "LDM Hodnocení knihy (ukázka)",
+   "notes": "Ukázka EA File Bridge 22. 9. 2026 — logický datový model pro hodnocení knihy (cvičná doména Databáze knih)."
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "Class",
+     "stereotypes": [
+      "Entity"
+     ],
+     "name": "Kniha",
+     "notes": "Záznam knihy v databázi: název, rok vydání, vydavatelství, žánr, jazyk, anotace, autoři. Nese celkové hodnocení v procentech (agregát hlasů). "
+    },
+    {
+     "package": "$0",
+     "type": "Class",
+     "stereotypes": [
+      "Entity"
+     ],
+     "name": "Autor",
+     "notes": "Autor knihy; jedna kniha může mít více autorů, autor více knih. "
+    },
+    {
+     "package": "$0",
+     "type": "Class",
+     "stereotypes": [
+      "Entity"
+     ],
+     "name": "Vydavatelství",
+     "notes": "Vydavatelství knihy. "
+    },
+    {
+     "package": "$0",
+     "type": "Class",
+     "stereotypes": [
+      "Entity"
+     ],
+     "name": "Žánr",
+     "notes": "Žánr knihy (číselník). "
+    },
+    {
+     "package": "$0",
+     "type": "Class",
+     "stereotypes": [
+      "Entity"
+     ],
+     "name": "Hodnocení",
+     "notes": "Jeden hlas návštěvníka 1–5 hvězdiček k jedné knize; identifikace jen IP adresou, z jedné IP adresy ke knize nejvýše jednou. "
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$1[0]",
+   "attributes": [
+    {
+     "name": "idKnihy",
+     "type": "dtNumericIdentifier",
+     "notes": "Identifikátor knihy",
+     "position": 0
+    },
+    {
+     "name": "nazev",
+     "type": "dtVARCHAR(200)",
+     "notes": "Název knihy",
+     "position": 1
+    },
+    {
+     "name": "rokVydani",
+     "type": "dtNonNegativeInteger",
+     "notes": "Rok vydání",
+     "position": 2
+    },
+    {
+     "name": "jazyk",
+     "type": "dtVARCHAR(50)",
+     "notes": "Jazyk vydání",
+     "position": 3
+    },
+    {
+     "name": "anotace",
+     "type": "dtVARCHAR(4000)",
+     "notes": "Anotace knihy",
+     "position": 4
+    },
+    {
+     "name": "celkoveHodnoceniPct",
+     "type": "dtRatio",
+     "notes": "Celkové hodnocení v procentech (100 = nejlepší); prázdné = bez hodnocení",
+     "position": 5
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$1[1]",
+   "attributes": [
+    {
+     "name": "idAutora",
+     "type": "dtNumericIdentifier",
+     "notes": "Identifikátor autora",
+     "position": 0
+    },
+    {
+     "name": "jmeno",
+     "type": "dtVARCHAR(100)",
+     "notes": "Jméno",
+     "position": 1
+    },
+    {
+     "name": "prijmeni",
+     "type": "dtVARCHAR(100)",
+     "notes": "Příjmení",
+     "position": 2
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$1[2]",
+   "attributes": [
+    {
+     "name": "idVydavatelstvi",
+     "type": "dtNumericIdentifier",
+     "notes": "Identifikátor vydavatelství",
+     "position": 0
+    },
+    {
+     "name": "nazev",
+     "type": "dtVARCHAR(200)",
+     "notes": "Název vydavatelství",
+     "position": 1
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$1[3]",
+   "attributes": [
+    {
+     "name": "kodZanru",
+     "type": "dtVARCHAR(20)",
+     "notes": "Kód žánru (číselník)",
+     "position": 0
+    },
+    {
+     "name": "nazev",
+     "type": "dtVARCHAR(100)",
+     "notes": "Název žánru",
+     "position": 1
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$1[4]",
+   "attributes": [
+    {
+     "name": "idHodnoceni",
+     "type": "dtNumericIdentifier",
+     "notes": "Identifikátor hodnocení",
+     "position": 0
+    },
+    {
+     "name": "hvezdicky",
+     "type": "dtNonNegativeInteger",
+     "notes": "Hodnota 1–5 (5 nejlepší)",
+     "position": 1
+    },
+    {
+     "name": "ipAdresa",
+     "type": "dtVARCHAR(45)",
+     "notes": "IP adresa návštěvníka (IPv4/IPv6)",
+     "position": 2
+    },
+    {
+     "name": "casZadani",
+     "type": "dtDATETIME",
+     "notes": "Čas zadání hodnocení",
+     "position": 3
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$1[0]",
+     "target": "$1[1]",
+     "type": "Association",
+     "name": "napsal",
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "multiplicity": "0..*"
+     },
+     "targetEnd": {
+      "multiplicity": "1..*"
+     }
+    },
+    {
+     "source": "$1[0]",
+     "target": "$1[2]",
+     "type": "Association",
+     "name": "vydalo",
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "multiplicity": "0..*"
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$1[0]",
+     "target": "$1[3]",
+     "type": "Association",
+     "name": "patří do",
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "multiplicity": "0..*"
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$1[4]",
+     "target": "$1[0]",
+     "type": "Association",
+     "name": "hodnotí",
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "multiplicity": "0..*"
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$0",
+     "type": "CSOB-ITAN::LD-Structural",
+     "name": "LDM Hodnocení knihy",
+     "notes": "Logický datový model — vznikl dávkou EA File Bridge.",
+     "author": "AI via EA File Bridge",
+     "version": "1.0"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$8",
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 360,
+     "y": 220,
+     "width": 220,
+     "height": 170
+    },
+    {
+     "element": "$1[1]",
+     "x": 60,
+     "y": 40,
+     "width": 200,
+     "height": 120
+    },
+    {
+     "element": "$1[2]",
+     "x": 660,
+     "y": 40,
+     "width": 200,
+     "height": 110
+    },
+    {
+     "element": "$1[3]",
+     "x": 660,
+     "y": 420,
+     "width": 200,
+     "height": 110
+    },
+    {
+     "element": "$1[4]",
+     "x": 60,
+     "y": 420,
+     "width": 200,
+     "height": 130
+    }
+   ]
+  },
+  {
+   "op": "open_diagrams",
+   "diagrams": [
+    "$8"
+   ]
+  }
+ ]
+}

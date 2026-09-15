@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S3-Q3",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT TOP 8 o2.Name AS proces FROM t_connector c INNER JOIN t_object o2 ON o2.Object_ID = c.End_Object_ID WHERE c.Start_Object_ID = <ID-KOMPONENTA> AND c.Stereotype = 'ArchiMate_Serving' AND o2.Stereotype = 'ArchiMate_BusinessProcess' ORDER BY o2.Name"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 8 o2.Name AS sluzba FROM t_connector c INNER JOIN t_object o2 ON o2.Object_ID = c.End_Object_ID WHERE c.Start_Object_ID = <ID-KOMPONENTA> AND c.Stereotype = 'ArchiMate_Realization' AND o2.Stereotype = 'ArchiMate_ApplicationService' ORDER BY o2.Name"
+  }
+ ]
+}

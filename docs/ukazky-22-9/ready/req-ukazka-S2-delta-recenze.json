@@ -1,0 +1,88 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S2-delta",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "<GUID-STABLE-PKG>",
+     "type": "Class",
+     "stereotypes": [
+      "Entity"
+     ],
+     "name": "Recenze",
+     "notes": "Textová recenze návštěvníka ke knize (doplněno z M365 Copilota schránkovým kanálem)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$0[0]",
+   "attributes": [
+    {
+     "name": "idRecenze",
+     "type": "dtNumericIdentifier",
+     "notes": "Identifikátor recenze",
+     "position": 0
+    },
+    {
+     "name": "text",
+     "type": "dtVARCHAR(4000)",
+     "notes": "Text recenze",
+     "position": 1
+    },
+    {
+     "name": "ipAdresa",
+     "type": "dtVARCHAR(45)",
+     "notes": "IP adresa návštěvníka",
+     "position": 2
+    },
+    {
+     "name": "casZadani",
+     "type": "dtDATETIME",
+     "notes": "Čas zadání",
+     "position": 3
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$0[0]",
+     "target": "<GUID-STABLE-KNIHA>",
+     "type": "Association",
+     "name": "recenzuje",
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "multiplicity": "0..*"
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "<GUID-STABLE-DIAGRAM>",
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 360,
+     "y": 470,
+     "width": 220,
+     "height": 130
+    }
+   ]
+  },
+  {
+   "op": "open_diagrams",
+   "diagrams": [
+    "<GUID-STABLE-DIAGRAM>"
+   ]
+  }
+ ]
+}

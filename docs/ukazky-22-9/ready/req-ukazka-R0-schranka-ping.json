@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-R0-schranka",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "schranka z produkcniho VDE - kontrola slozky baseDir a prav uctu"
+  }
+ ]
+}

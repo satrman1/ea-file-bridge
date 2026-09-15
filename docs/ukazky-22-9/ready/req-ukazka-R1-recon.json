@@ -1,0 +1,39 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-R1-recon",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "ukazka-R1-recon"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 5 o.Object_Type, o.Stereotype, o.Name, p.Name AS pkg FROM t_object o INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY o.Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 5 d.Diagram_Type, d.StyleEx, d.Name FROM t_diagram d INNER JOIN t_package p ON p.Package_ID = d.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY d.Diagram_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 8 a.Name, a.Type, a.Classifier FROM t_attribute a INNER JOIN t_object o ON o.Object_ID = a.Object_ID INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY a.ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 5 c.Connector_Type, c.Stereotype, c.SourceCard, c.DestCard FROM t_connector c INNER JOIN t_object o ON o.Object_ID = c.Start_Object_ID INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY c.Connector_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 25 Stereotype, COUNT(*) AS n FROM t_object WHERE Stereotype LIKE 'ArchiMate_%' GROUP BY Stereotype ORDER BY n DESC"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 15 Stereotype, COUNT(*) AS n FROM t_connector WHERE Stereotype LIKE 'ArchiMate_%' GROUP BY Stereotype ORDER BY n DESC"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT TOP 5 Object_ID, Name, Stereotype, Package_ID FROM t_object WHERE Name = '<NAZEV-KOMPONENTY>' ORDER BY Object_ID"
+  }
+ ]
+}
