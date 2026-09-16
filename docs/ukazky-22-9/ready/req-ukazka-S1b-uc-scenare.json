@@ -1,0 +1,164 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S1b-uc-scenare",
+ "repo": "<TEST-DB>",
+ "notes": "S1b = druhý beat po S1a: scénáře + constrainty + lokální BRU na UC z S1a. Risk Gate ELEVATED vždy (scenarios/constraints/requirements) = dialog potvrzení clovekem. <GUID-S1A-UC> = GUID UC z ACK S1a (op 1, items[1]).",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "<GUID-S1A-UC>",
+   "scenarios": [
+    {
+     "name": "BE91101 Hodnoť knihu",
+     "type": "Basic Path",
+     "notes": "Hlavní úspěšný scénář UC-91101.",
+     "steps": [
+      {
+       "text": "Návštěvník požaduje zobrazení detailu knihy.",
+       "kind": "actor"
+      },
+      {
+       "text": "Systém zobrazí detail knihy včetně celkového hodnocení v procentech.",
+       "kind": "system",
+       "uses": "BRU91101-2"
+      },
+      {
+       "text": "Návštěvník zadá své hodnocení knihy.",
+       "kind": "actor"
+      },
+      {
+       "text": "Systém ověří platnost zadané hodnoty hodnocení.",
+       "kind": "system",
+       "uses": "BRU91101-1"
+      },
+      {
+       "text": "Systém ověří, že kniha z IP adresy návštěvníka dosud hodnocena nebyla.",
+       "kind": "system",
+       "uses": "BRU91101-3"
+      },
+      {
+       "text": "Systém uloží hodnocení ke knize spolu s IP adresou návštěvníka a časem zadání.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém přepočítá celkové hodnocení knihy.",
+       "kind": "system",
+       "uses": "BRU91101-2"
+      },
+      {
+       "text": "Systém potvrdí návštěvníkovi přijetí hodnocení a zobrazí aktualizované celkové hodnocení.",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "AF91101-1 Kniha bez hodnocení",
+     "type": "Alternate",
+     "notes": "Kniha zatím nemá žádné hodnocení.",
+     "attachTo": {
+      "scenario": "BE91101 Hodnoť knihu",
+      "step": 2
+     },
+     "join": 3,
+     "steps": [
+      {
+       "text": "Systém zjistí, že kniha nemá žádné hodnocení.",
+       "kind": "system",
+       "uses": "BRU91101-2"
+      },
+      {
+       "text": "Systém místo procent zobrazí, že kniha je bez hodnocení.",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "EF91101-1 Neplatná hodnota hodnocení",
+     "type": "Exception",
+     "notes": "Zadaná hodnota není v povoleném rozsahu.",
+     "attachTo": {
+      "scenario": "BE91101 Hodnoť knihu",
+      "step": 4
+     },
+     "join": 3,
+     "steps": [
+      {
+       "text": "Systém zjistí, že hodnota hodnocení není platná.",
+       "kind": "system",
+       "uses": "BRU91101-1"
+      },
+      {
+       "text": "Systém hodnocení odmítne, sdělí návštěvníkovi důvod a umožní zadání opravit.",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "EF91101-2 Opakované hodnocení ze stejné IP adresy",
+     "type": "Exception",
+     "notes": "Kniha už byla z této IP adresy hodnocena.",
+     "attachTo": {
+      "scenario": "BE91101 Hodnoť knihu",
+      "step": 5
+     },
+     "join": "End",
+     "steps": [
+      {
+       "text": "Systém zjistí, že kniha už byla z IP adresy návštěvníka hodnocena.",
+       "kind": "system",
+       "uses": "BRU91101-3"
+      },
+      {
+       "text": "Systém hodnocení odmítne a sdělí návštěvníkovi důvod; původní hodnocení zůstává beze změny.",
+       "kind": "system"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "<GUID-S1A-UC>",
+   "constraints": [
+    {
+     "name": "PRE91101-1 Kniha existuje v databázi",
+     "type": "Pre-condition",
+     "notes": "Detail knihy je dostupný návštěvníkovi bez přihlášení."
+    },
+    {
+     "name": "PRE91101-2 Návštěvník je identifikován IP adresou",
+     "type": "Pre-condition",
+     "notes": "Žádné přihlášení; identita návštěvníka = IP adresa."
+    },
+    {
+     "name": "PST91101-1 Hodnocení je uloženo",
+     "type": "Post-condition",
+     "notes": "Existuje záznam hodnocení: kniha, hodnota, IP adresa, čas zadání."
+    },
+    {
+     "name": "PST91101-2 Celkové hodnocení odpovídá všem hlasům",
+     "type": "Post-condition",
+     "notes": "Zobrazené procento odpovídá všem uloženým hodnocením knihy včetně nového."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "<GUID-S1A-UC>",
+   "requirements": [
+    {
+     "name": "BRU91101-1 Povolené hodnoty hodnocení",
+     "notes": "Hodnocení nabývá pouze hodnot 1, 2, 3, 4 nebo 5 hvězdiček (5 nejlepší, 1 nejhorší)."
+    },
+    {
+     "name": "BRU91101-2 Výpočet celkového hodnocení",
+     "notes": "Celkové hodnocení = průměr všech hlasů knihy převedený na procenta (samé 5★ = 100 %, samé 1★ = 0 %, průměr 3★ = 50 %). Kniha bez hlasů nezobrazuje procenta, ale „bez hodnocení“."
+    },
+    {
+     "name": "BRU91101-3 Jedno hodnocení z jedné IP adresy",
+     "notes": "Tutéž knihu lze z jedné IP adresy hodnotit jen jednou; hodnocení jiné knihy ze stejné IP adresy je možné."
+    }
+   ]
+  }
+ ]
+}

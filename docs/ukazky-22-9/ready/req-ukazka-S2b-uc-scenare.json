@@ -1,0 +1,89 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S2b-uc-scenare",
+ "repo": "<TEST-DB>",
+ "notes": "S2b = volitelný druhý beat S2: scénáře + constrainty + lokální BRU na UC-91202. Risk Gate ELEVATED vždy = popup potvrzení. <GUID-S2-UC> = GUID nového UC z ACK S2 (op 0, items[0]).",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "<GUID-S2-UC>",
+   "scenarios": [
+    {
+     "name": "BE91202 Zruš hodnocení",
+     "type": "Basic Path",
+     "notes": "Hlavní úspěšný scénář UC-91202.",
+     "steps": [
+      {
+       "text": "Návštěvník požaduje zrušení svého hodnocení knihy.",
+       "kind": "actor"
+      },
+      {
+       "text": "Systém ověří, že z IP adresy návštěvníka existuje hodnocení této knihy.",
+       "kind": "system",
+       "uses": "BRU91202-1"
+      },
+      {
+       "text": "Systém hodnocení odstraní.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém přepočítá celkové hodnocení knihy.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém potvrdí návštěvníkovi zrušení hodnocení.",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "EF91202-1 Hodnocení neexistuje",
+     "type": "Exception",
+     "notes": "Z IP adresy návštěvníka žádné hodnocení knihy není.",
+     "attachTo": {
+      "scenario": "BE91202 Zruš hodnocení",
+      "step": 2
+     },
+     "join": "End",
+     "steps": [
+      {
+       "text": "Systém zjistí, že z IP adresy návštěvníka kniha hodnocena nebyla.",
+       "kind": "system",
+       "uses": "BRU91202-1"
+      },
+      {
+       "text": "Systém zrušení odmítne a sdělí návštěvníkovi důvod.",
+       "kind": "system"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "<GUID-S2-UC>",
+   "constraints": [
+    {
+     "name": "PRE91202-1 Existuje hodnocení knihy z IP adresy návštěvníka",
+     "type": "Pre-condition",
+     "notes": "Návštěvník knihu z této IP adresy dříve hodnotil."
+    },
+    {
+     "name": "PST91202-1 Hodnocení je odstraněno",
+     "type": "Post-condition",
+     "notes": "Záznam hodnocení neexistuje a celkové hodnocení knihy je přepočítáno bez něj."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "<GUID-S2-UC>",
+   "requirements": [
+    {
+     "name": "BRU91202-1 Zrušit lze jen vlastní hodnocení",
+     "notes": "Zrušit lze pouze hodnocení zadané z téže IP adresy; jiná hodnocení knihy zůstávají beze změny."
+    }
+   ]
+  }
+ ]
+}

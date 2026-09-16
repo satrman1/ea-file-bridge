@@ -1,0 +1,49 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S2-alt-uc-delta-survey",
+ "repo": "<TEST-DB>",
+ "notes": "S2 ALTERNATIVA (ELEVATED): nový UC + asociace + umístění na EXISTUJÍCÍ stabilní survey diagram. Risk Gate: foreignDiagrams 1 > 0 = ELEVATED = EA dialog Ano/Ne/Storno (schránkový kanál). Použít jen jako záměrný beat „člověk potvrzuje“ — rozhodne zkouška.",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "<GUID-STABLE-PKG>",
+     "type": "UseCase",
+     "name": "UC-91202 Zruš hodnocení",
+     "notes": "Návštěvník zruší své dříve zadané hodnocení knihy; systém ho odstraní a přepočítá celkové hodnocení. Doplněno z M365 Copilota schránkovým kanálem (doplňující zadání mimo mini-BRD)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "<GUID-STABLE-AKTER>",
+     "target": "$0[0]",
+     "type": "Association",
+     "direction": "Unspecified"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "<GUID-STABLE-DIAGRAM>",
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 420,
+     "y": 290,
+     "width": 260,
+     "height": 110
+    }
+   ]
+  },
+  {
+   "op": "open_diagrams",
+   "diagrams": [
+    "<GUID-STABLE-DIAGRAM>"
+   ]
+  }
+ ]
+}

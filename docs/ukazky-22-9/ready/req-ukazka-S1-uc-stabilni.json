@@ -1,0 +1,93 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S1-uc-stabilni",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-DEMO>",
+   "name": "UC Hodnocení knihy (stabilní pro S2)",
+   "notes": "Ukázka EA File Bridge 22. 9. 2026 — Use Case model pro hodnocení knihy (cvičná doména Databáze knih, zadání zadani\\DBK-hodnot-knihu-brd.md). Stabilní kopie pro ukázku S2 — nemazat."
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "Actor",
+     "name": "Návštěvník",
+     "notes": "Nepřihlášený uživatel webu Databáze knih, identifikovaný jen IP adresou. Stabilní kopie pro ukázku S2 — nemazat."
+    },
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC-91201 Hodnoť knihu",
+     "notes": "Návštěvník na detailu knihy zadá vlastní hodnocení 1–5 hvězdiček; systém ho uloží s IP adresou a časem, přepočítá celkové hodnocení knihy v procentech a přijetí potvrdí. Pokrývá DEMO-91051, DEMO-91052, DEMO-91053. Stabilní kopie pro ukázku S2 — nemazat."
+    },
+    {
+     "package": "$0",
+     "type": "Boundary",
+     "name": "Databáze knih (DBK)",
+     "notes": "Hranice systému pro survey diagram (kanon: aktéři vně, UC uvnitř). Stabilní kopie pro ukázku S2 — nemazat."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$1[0]",
+     "target": "$1[1]",
+     "type": "Association",
+     "direction": "Unspecified"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$0",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "Use Case Survey of DBK",
+     "notes": "Přehledový (survey) UC diagram — vznikl dávkou EA File Bridge. Bez requirementů (ty patří na detail UC).",
+     "author": "AI via EA File Bridge",
+     "version": "1.0"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$3",
+   "elementPlacements": [
+    {
+     "element": "$1[2]",
+     "x": 300,
+     "y": 40,
+     "width": 520,
+     "height": 420
+    },
+    {
+     "element": "$1[1]",
+     "x": 420,
+     "y": 120,
+     "width": 260,
+     "height": 110
+    },
+    {
+     "element": "$1[0]",
+     "x": 60,
+     "y": 130,
+     "width": 90,
+     "height": 110
+    }
+   ]
+  },
+  {
+   "op": "open_diagrams",
+   "diagrams": [
+    "$3"
+   ]
+  }
+ ]
+}

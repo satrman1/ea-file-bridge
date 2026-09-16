@@ -1,0 +1,83 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S2-uc-delta",
+ "repo": "<TEST-DB>",
+ "notes": "S2 LOW: nový UC + asociace + VLASTNÍ survey diagram (umístění na existující diagram = foreignDiagrams > 0 = ELEVATED, viz alternativa S2-alt).",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "<GUID-STABLE-PKG>",
+     "type": "UseCase",
+     "name": "UC-91202 Zruš hodnocení",
+     "notes": "Návštěvník zruší své dříve zadané hodnocení knihy; systém ho odstraní a přepočítá celkové hodnocení. Doplněno z M365 Copilota schránkovým kanálem (doplňující zadání mimo mini-BRD)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "<GUID-STABLE-AKTER>",
+     "target": "$0[0]",
+     "type": "Association",
+     "direction": "Unspecified"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "<GUID-STABLE-PKG>",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "Use Case Survey of DBK (delta M365)",
+     "notes": "Přehledový UC diagram po doplnění UC-91202 — vznikl dávkou EA File Bridge ze schránky (M365 Copilot).",
+     "author": "AI via EA File Bridge",
+     "version": "1.1"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$2",
+   "elementPlacements": [
+    {
+     "element": "<GUID-STABLE-BOUNDARY>",
+     "x": 300,
+     "y": 40,
+     "width": 520,
+     "height": 420
+    },
+    {
+     "element": "<GUID-STABLE-UC>",
+     "x": 420,
+     "y": 120,
+     "width": 260,
+     "height": 110
+    },
+    {
+     "element": "$0[0]",
+     "x": 420,
+     "y": 290,
+     "width": 260,
+     "height": 110
+    },
+    {
+     "element": "<GUID-STABLE-AKTER>",
+     "x": 60,
+     "y": 200,
+     "width": 90,
+     "height": 110
+    }
+   ]
+  },
+  {
+   "op": "open_diagrams",
+   "diagrams": [
+    "$2"
+   ]
+  }
+ ]
+}

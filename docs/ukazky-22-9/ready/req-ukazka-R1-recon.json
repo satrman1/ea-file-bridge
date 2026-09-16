@@ -9,19 +9,19 @@
   },
   {
    "op": "query",
-   "sql": "SELECT TOP 5 o.Object_Type, o.Stereotype, o.Name, p.Name AS pkg FROM t_object o INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY o.Object_ID"
+   "sql": "SELECT TOP 5 Object_ID, Name, Stereotype, Package_ID FROM t_object WHERE Object_Type = 'UseCase' ORDER BY Object_ID DESC"
   },
   {
    "op": "query",
-   "sql": "SELECT TOP 5 d.Diagram_Type, d.StyleEx, d.Name FROM t_diagram d INNER JOIN t_package p ON p.Package_ID = d.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY d.Diagram_ID"
+   "sql": "SELECT TOP 1 Diagram_ID, Diagram_Type, StyleEx, Name FROM t_diagram WHERE Diagram_Type = 'Use Case' AND StyleEx LIKE '%MDGDgm=%' ORDER BY Diagram_ID DESC"
   },
   {
    "op": "query",
-   "sql": "SELECT TOP 8 a.Name, a.Type, a.Classifier FROM t_attribute a INNER JOIN t_object o ON o.Object_ID = a.Object_ID INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY a.ID"
+   "sql": "SELECT TOP 5 Object_ID, Name, Stereotype, Package_ID FROM t_object WHERE Object_Type = 'Actor' ORDER BY Object_ID DESC"
   },
   {
    "op": "query",
-   "sql": "SELECT TOP 5 c.Connector_Type, c.Stereotype, c.SourceCard, c.DestCard FROM t_connector c INNER JOIN t_object o ON o.Object_ID = c.Start_Object_ID INNER JOIN t_package p ON p.Package_ID = o.Package_ID WHERE p.Name LIKE 'LDM of %' ORDER BY c.Connector_ID"
+   "sql": "SELECT TOP 3 Object_ID, Name, Stereotype, Package_ID FROM t_object WHERE Object_Type = 'Boundary' ORDER BY Object_ID DESC"
   },
   {
    "op": "query",
