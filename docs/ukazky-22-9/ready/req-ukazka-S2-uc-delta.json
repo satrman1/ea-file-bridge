@@ -10,7 +10,7 @@
     {
      "package": "<GUID-STABLE-PKG>",
      "type": "UseCase",
-     "name": "UC-91202 Zruš hodnocení",
+     "name": "Zruš hodnocení",
      "notes": "Návštěvník zruší své dříve zadané hodnocení knihy; systém ho odstraní a přepočítá celkové hodnocení. Doplněno z M365 Copilota schránkovým kanálem (doplňující zadání mimo mini-BRD)."
     }
    ]
@@ -33,7 +33,7 @@
      "package": "<GUID-STABLE-PKG>",
      "type": "CSOB-ITAN::FA-Behavioral",
      "name": "Use Case Survey of DBK (delta M365)",
-     "notes": "Přehledový UC diagram po doplnění UC-91202 — vznikl dávkou EA File Bridge ze schránky (M365 Copilot).",
+     "notes": "Přehledový UC diagram po doplnění Zruš hodnocení — vznikl dávkou EA File Bridge ze schránky (M365 Copilot).",
      "author": "AI via EA File Bridge",
      "version": "1.1"
     }

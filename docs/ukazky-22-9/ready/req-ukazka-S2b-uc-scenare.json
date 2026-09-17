@@ -2,7 +2,7 @@
  "protocol": "eafb/0.2",
  "id": "ukazka-S2b-uc-scenare",
  "repo": "<TEST-DB>",
- "notes": "S2b = volitelný druhý beat S2: scénáře + constrainty + lokální BRU na UC-91202. Risk Gate ELEVATED vždy = popup potvrzení. <GUID-S2-UC> = GUID nového UC z ACK S2 (op 0, items[0]).",
+ "notes": "S2b = volitelný druhý beat S2: scénáře + constrainty + lokální BRU na „Zruš hodnocení“ (číslo UC přidělil repozitář — použij jméno z ACK S2). Risk Gate ELEVATED vždy = popup potvrzení. <GUID-S2-UC> = GUID nového UC z ACK S2 (op 0, items[0]).",
  "ops": [
   {
    "op": "create_or_update_scenarios",
@@ -11,7 +11,7 @@
     {
      "name": "BE91202 Zruš hodnocení",
      "type": "Basic Path",
-     "notes": "Hlavní úspěšný scénář UC-91202.",
+     "notes": "Hlavní úspěšný scénář „Zruš hodnocení“ (číslo UC přidělil repozitář — použij jméno z ACK S2).",
      "steps": [
       {
        "text": "Návštěvník požaduje zrušení svého hodnocení knihy.",

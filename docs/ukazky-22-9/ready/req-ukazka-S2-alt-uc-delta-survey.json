@@ -10,7 +10,7 @@
     {
      "package": "<GUID-STABLE-PKG>",
      "type": "UseCase",
-     "name": "UC-91202 Zruš hodnocení",
+     "name": "Zruš hodnocení",
      "notes": "Návštěvník zruší své dříve zadané hodnocení knihy; systém ho odstraní a přepočítá celkové hodnocení. Doplněno z M365 Copilota schránkovým kanálem (doplňující zadání mimo mini-BRD)."
     }
    ]

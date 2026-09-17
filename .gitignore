@@ -32,3 +32,6 @@ docs/e2e-vscode/refresh-workspace-last.log
 # kopie IT-ANALYSIS/re-fixtures pro zivy test PROTOKOL-TERMINAL.md
 .github-term/
 zadani/re-fixtures/
+
+# odkladiste git locku/tmp objektu z mountu Cowork (VM nema delete) — Milos maze rucne
+_to_delete/

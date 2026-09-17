@@ -11,7 +11,7 @@
     {
      "name": "BE91101 Hodnoť knihu",
      "type": "Basic Path",
-     "notes": "Hlavní úspěšný scénář UC-91101.",
+     "notes": "Hlavní úspěšný scénář „Hodnoť knihu“ (číslo UC přidělil repozitář — použij jméno z ACK S1a).",
      "steps": [
       {
        "text": "Návštěvník požaduje zobrazení detailu knihy.",

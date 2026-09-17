@@ -21,7 +21,7 @@
     {
      "package": "$0",
      "type": "UseCase",
-     "name": "UC-91101 Hodnoť knihu",
+     "name": "Hodnoť knihu",
      "notes": "Návštěvník na detailu knihy zadá vlastní hodnocení 1–5 hvězdiček; systém ho uloží s IP adresou a časem, přepočítá celkové hodnocení knihy v procentech a přijetí potvrdí. Pokrývá DEMO-91051, DEMO-91052, DEMO-91053."
     },
     {
