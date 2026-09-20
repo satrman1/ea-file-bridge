@@ -35,7 +35,9 @@ var self = this;
 var now = (typeof nowMs == "number") ? nowMs : new Date().getTime();
 var cl = (cfg && cfg.cleanup) ? cfg.cleanup : {};
 var prefix = (cfg && typeof cfg.autoPrefix == "string" && cfg.autoPrefix != "") ? cfg.autoPrefix : "FB-AUTO ";
-var keepK = (typeof cl.keepLastK == "number") ? cl.keepLastK : 3;
+// PODLAHA keepLastK >= 1 plati VZDY, i kdyby se sem dostala jina hodnota
+// (nalez M3: keepLastK 0 + menu "provest" by smazalo vsechny pre-image)
+var keepK = (typeof cl.keepLastK == "number" && cl.keepLastK >= 1) ? Math.floor(cl.keepLastK) : ((typeof cl.keepLastK == "number") ? 1 : 3);
 var maxAge = (typeof cl.maxAgeDays == "number") ? cl.maxAgeDays : 14;
 var perRun = (typeof cl.maxDeletesPerRun == "number") ? cl.maxDeletesPerRun : 20;
 var anomalyMax = (typeof cl.maxDeletesAnomaly == "number") ? cl.maxDeletesAnomaly : 200;
@@ -107,7 +109,7 @@ if (wantDelete && !res.anomaly && res.planned > 0) {
                 var re = /<baseline\s+([^>]*)\/?>/gi, m;
                 while ((m = re.exec(xml)) != null) {
                     var vm = /version="([^"]*)"/i.exec(m[1]), gm = /guid="([^"]*)"/i.exec(m[1]);
-                    if (vm && gm) { live[("" + gm[1]).toUpperCase()] = vm[1]; }
+                    if (vm && gm) { live[("" + gm[1]).toUpperCase()] = self.FB_XmlUnescape(vm[1]); }
                 }
                 liveCache[key] = live;
             }

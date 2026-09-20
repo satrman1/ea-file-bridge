@@ -21,6 +21,7 @@
 // navrat false = "failed" -> FB_Main vyda E_NO_BASELINE, zadne nove confirm.
 // Lokalni cache baselines-index.json se NEVEDE: nema ctenare (reuse cte
 // GetBaselines, uklid SQL t_document) - autorita je vzdy model (par. 6.1).
+var self = this;
 var t0 = new Date().getTime();
 var now = (typeof nowMs == "number") ? nowMs : t0;
 function res(status, guid, name, why) {
@@ -51,7 +52,7 @@ function listBaselines() {
     var re = /<baseline\s+([^>]*)\/?>/gi, m;
     while ((m = re.exec(xml)) != null) {
         var vm = /version="([^"]*)"/i.exec(m[1]), gm = /guid="([^"]*)"/i.exec(m[1]);
-        out.push({ version: vm ? vm[1] : "", guid: gm ? gm[1] : "" });
+        out.push({ version: vm ? self.FB_XmlUnescape(vm[1]) : "", guid: gm ? gm[1] : "" });
     }
     return out;
 }

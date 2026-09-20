@@ -41,10 +41,14 @@ else if (ItemName == "Uklid automatickych baselines (ukazat / provest)") {
     // odsud, pod dohledem (dispozice 4). Aktivace polozky = plny restart EA.
     var outU = "";
     try {
-        var cfgU = this.FB_BaselineConfig(Repository).cfg;
+        var cU = this.FB_BaselineConfig(Repository);
+        var cfgU = cU.cfg;
         var repU = this.FB_BaselineCleanup(Repository, cfgU, "report", true);
         outU = "" + repU.text;
-        if (repU.candidates.length > 0 && !repU.anomaly) {
+        if (cU.valid === false) {
+            // vadna politika = jen ukazat (s bezpecnymi defaulty), nikdy mazat (M3)
+            outU += "\n\nPOZOR: sekce baseline ve FB_RiskPolicy je nevalidni (" + cU.why + ") - mazani z menu je vypnute, oprav politiku.";
+        } else if (repU.candidates.length > 0 && !repU.anomaly) {
             var ansU = Session.Prompt(outU + "\n\nANO = tyto baselines TED SMAZAT (nevratne)   |   NE / Storno = jen ukazat", 3);
             if (ansU == 3) {
                 var delU = this.FB_BaselineCleanup(Repository, cfgU, "delete", true);

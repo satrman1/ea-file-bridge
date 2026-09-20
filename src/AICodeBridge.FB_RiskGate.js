@@ -276,7 +276,7 @@ function classifyDollar(m) {
     if (rname == "create_or_update_diagram") {
         var dit = (rop.diagrams || [])[itemIdx < 0 ? 0 : itemIdx];
         if (!dit) { return "UNCERTAIN"; }
-        return dit.diagram ? "EXISTING" : "OWN";
+        return (dit.diagram || dit.diagramID || dit.guid) ? "EXISTING" : "OWN"; // FB_OpDiagram: update pres diagram | diagramID | guid (H1)
     }
     if (rname == "create_element" || rname == "clone_package" || rname == "clone_elements"
         || rname == "create_baseline") { return "OWN"; }
@@ -563,8 +563,12 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         for (j = 0; j < lst.length; j++) {
             var dg = lst[j] || {};
             writeOps++;
-            if (dg.diagram) {
-                var tdg = touchDiagram(dg.diagram, "diagram.diagrams[" + j + "]");
+            // FB_OpDiagram bere UPDATE vetev pres diagram | diagramID | guid -
+            // cteni jen `diagram` delalo z updatu ciziho diagramu "create"
+            // (nalez H1 oponentury Baseline politiky 2026-09-20)
+            var dgRef = dg.diagram || dg.diagramID || dg.guid;
+            if (dgRef) {
+                var tdg = touchDiagram(dgRef, "diagram.diagrams[" + j + "]");
                 if (!tdg.own) { updatedExisting++; }
             } else {
                 createOps++;

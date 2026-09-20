@@ -97,9 +97,13 @@ if (sizeOk && scope.packages.length == 0) {
 var approx = (m && typeof m.updatedExistingApprox == "number") ? m.updatedExistingApprox : 0;
 if (metricsOk && scope && scope.unknown !== true && scope.destructive !== true
     && m.deleteTargets == 0 && m.affectedDiagrams == 0 && (m.updatedExisting - approx) <= 0) {
+    // T6-26: davka PROJDE, ale "po potvrzeni" - match/dedup muze existujici
+    // prvek prepsat, takze bez pre-image nikdy tise (nalez H2 oponentury
+    // 2026-09-20: bez dialogu by matchByName byl obchvat radku 4)
     out.action = "none";
     out.reason = sizeWhy + " - bez zalohy: jedina zmena je updatedExistingApprox " + approx + " (match/dedup, retry po zotaveni)";
-    out.lines.push("BEZ ZALOHY: " + sizeWhy + "; davka meni nejvys prvky dohledane pres match/dedupKey.");
+    out.confirmReasons.push("bez pre-image - " + sizeWhy + "; davka muze prepsat prvky dohledane pres match/dedupKey (updatedExistingApprox " + approx + ") - po potvrzeni se provede BEZ zalohy");
+    out.lines.push("BEZ ZALOHY: " + sizeWhy + "; davka muze prepsat prvky dohledane pres match/dedupKey. Po potvrzeni se provede bez pre-image.");
     return out;
 }
 // --- radek 4a: destruktivni podtrida ---
@@ -130,7 +134,8 @@ function freshManualOn(pkgObj) {
         var re = /<baseline\s+([^>]*)\/?>/gi, mx;
         while ((mx = re.exec(xml)) != null) {
             var vm = /version="([^"]*)"/i.exec(mx[1]);
-            if (vm && self.FB_BaselineName("parse", vm[1], prefix) == null && !self.FB_BaselineNameReserved(Repository, vm[1])) { names[vm[1]] = 1; }
+            var vn = vm ? self.FB_XmlUnescape(vm[1]) : "";
+            if (vm && self.FB_BaselineName("parse", vn, prefix) == null && !self.FB_BaselineNameReserved(Repository, vn)) { names[vn] = 1; }
         }
     } catch (eG) { return null; }
     var rr = null;

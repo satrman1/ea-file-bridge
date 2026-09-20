@@ -32,6 +32,9 @@
 //   connectors  package SOURCE
 //   owner       package rodic. elementu (atributy, operace, scenare, ...)
 //   diagram     package diagramu (op.diagram)
+//   diagramEls  package diagramu + packages ELEMENTU, ktere operace meni
+//               (apply_classifier_stereotypes prepisuje Type/Stereotype prvku
+//               na diagramu - ty mohou lezet jinde nez diagram; nalez M2)
 //   diagrams    package diagramu per polozka (diagrams[].diagram)
 //   delete      dle typu cile (package -> RODIC, vyjimka mimo whitelist)
 //   deleteTag   package vlastnika tagu
@@ -64,7 +67,7 @@ var SCOPE = {
     "create_or_update_scenarios":      { scope: "owner",      destr: "always" },
     "create_or_update_constraints":    { scope: "owner",      destr: "always" },
     "create_or_update_requirements":   { scope: "owner",      destr: "always" },
-    "apply_classifier_stereotypes":    { scope: "diagram",    destr: "no" },
+    "apply_classifier_stereotypes":    { scope: "diagramEls", destr: "no" },
     "find_or_create_referencing_sr":   { scope: "create",     destr: "no" },
     "deploy_src":                      { scope: "none",       destr: "no" }
 };
@@ -78,7 +81,12 @@ var SCOPE = {
 //  - create_baseline: explicitni zaloha sama nic nemeni.
 var self = this;
 var t0 = new Date().getTime();
-var budget = (cfg && typeof cfg.probeBudgetTotalMs == "number") ? cfg.probeBudgetTotalMs : 2000;
+// Rozpocet resolvu scope = rozpocet gate (risk.budgetMs, default 8000): je to
+// tataz prace (resolve cilu davky), ne sonda velikosti - probeBudgetTotalMs
+// patri jen FB_SubtreeCount (nalez M5: spolecny 2s strop by v bance delal
+// z vetsich davek navadenou cestu). Dotazy se v ramci davky cachuji.
+var budget = (risk && typeof risk.budgetMs == "number" && risk.budgetMs > 0) ? risk.budgetMs : 8000;
+var sqlCache = {};
 var maxPk = (cfg && typeof cfg.maxBaselinePackages == "number") ? cfg.maxBaselinePackages : 5;
 var unknownWhy = [], whySeen = {};
 function unk(msg) { if (whySeen[msg] != 1) { whySeen[msg] = 1; if (unknownWhy.length < 12) { unknownWhy.push(msg); } } }
@@ -97,8 +105,12 @@ function addPkgId(id, why, pow) {
 }
 function esc(s) { return ("" + s).replace(/'/g, "''"); }
 function rows(sql) {
+    if (typeof sqlCache[sql] != "undefined") { return sqlCache[sql]; }
     if (spent()) { return null; }
-    try { return self.FB_XmlRows(Repository.SQLQuery(sql)); } catch (eQ) { return null; }
+    var rq = null;
+    try { rq = self.FB_XmlRows(Repository.SQLQuery(sql)); } catch (eQ) { rq = null; }
+    sqlCache[sql] = rq;
+    return rq;
 }
 function isArr(v) { return Object.prototype.toString.call(v) == "[object Array]"; }
 function blank(v) { return v === null || typeof v == "undefined" || ("" + v) == ""; }
@@ -123,7 +135,7 @@ function dollarOwn(ref, opIdx) {
         return !!x && !x.guid && !x.packageID && !x.matchByName;
     }
     if (rn == "create_or_update_connectors") { x = (rop.connectors || [])[it]; return !!x && !x.guid && !x.connectorID && !x.match && !x.dedupKey; }
-    if (rn == "create_or_update_diagram") { x = (rop.diagrams || [])[it]; return !!x && !x.diagram; }
+    if (rn == "create_or_update_diagram") { x = (rop.diagrams || [])[it]; return !!x && !x.diagram && !x.diagramID && !x.guid; }
     if (rn == "create_element" || rn == "clone_package" || rn == "clone_elements") { return true; }
     return false;
 }
@@ -208,7 +220,18 @@ for (i = 0; i < req.ops.length; i++) {
         for (j = 0; j < lst.length; j++) {
             var e = lst[j] || {};
             if (e.guid || e.elementID) { addEl(e.guid || e.elementID, ctx + ".elements[" + j + "]", i, name + " (update)"); }
-            else if (e.matchByName || e.dedupKey) {
+            else if (e.dedupKey) {
+                // dedupKey hleda GLOBALNE (TV ai.dedup prezije presun i
+                // prejmenovani - FB_DedupFind): package = kde prvek OPRAVDU
+                // lezi, ne deklarovany e.package (nalez M1)
+                var rdk = rows("SELECT o.Package_ID FROM t_object o INNER JOIN t_objectproperties p ON p.Object_ID = o.Object_ID WHERE p.Property = 'ai.dedup' AND p.Value = '" + esc(e.dedupKey) + "'");
+                if (rdk == null || rdk.length > 1) { unk(ctx + ".elements[" + j + "]: dedupKey '" + e.dedupKey + "' " + (rdk == null ? "nelze dohledat" : "neni jednoznacny")); }
+                else if (rdk.length == 1) { addPkgId(rdk[0].Package_ID, name + " (dedupKey - existujici prvek)"); }
+                else if (e.matchByName) {
+                    var pmd = pkgRow(e["package"], ctx + ".elements[" + j + "].package", i); if (pmd && !pmd.own) { addPkgId(pmd.id, name + " (matchByName)"); }
+                }
+            }
+            else if (e.matchByName) {
                 // create-or-update: existujici prvek muze lezet v cilovem package
                 if (e.owningElement) { addEl(e.owningElement, ctx + ".elements[" + j + "].owningElement", i, name + " (match/dedup)"); }
                 else { var pm = pkgRow(e["package"], ctx + ".elements[" + j + "].package", i); if (pm && !pm.own) { addPkgId(pm.id, name + " (match/dedup)"); } }
@@ -229,19 +252,41 @@ for (i = 0; i < req.ops.length; i++) {
             if (c.guid || c.connectorID) {
                 // par. 4.2: update dle guid - gate endpointy neresolvuje -> unknown
                 unk(ctx + ".connectors[" + j + "]: update konektoru dle guid/ID - endpointy se neresolvuji");
-            } else if (c.match || c.dedupKey) {
-                addEl(c.source, ctx + ".connectors[" + j + "].source", i, name + " (match/dedup, package source)");
+            } else if (c.dedupKey) {
+                var rck = rows("SELECT c.Start_Object_ID FROM t_connector c INNER JOIN t_connectortag t ON t.ElementID = c.Connector_ID WHERE t.Property = 'ai.dedup' AND t.VALUE = '" + esc(c.dedupKey) + "'");
+                if (rck == null || rck.length > 1) { unk(ctx + ".connectors[" + j + "]: dedupKey '" + c.dedupKey + "' " + (rck == null ? "nelze dohledat" : "neni jednoznacny")); }
+                else if (rck.length == 1) { addEl("" + rck[0].Start_Object_ID, ctx + ".connectors[" + j + "].dedup", i, name + " (dedupKey - existujici konektor, package source)"); }
+                else if (c.match) { addEl(c.source, ctx + ".connectors[" + j + "].source", i, name + " (match, package source)"); }
+            } else if (c.match) {
+                addEl(c.source, ctx + ".connectors[" + j + "].source", i, name + " (match, package source)");
             }
         }
     } else if (sc.scope == "owner") {
         addEl(o.element, ctx + ".element", i, name);
     } else if (sc.scope == "diagram") {
         addDgm(o.diagram, ctx + ".diagram", i, name);
+    } else if (sc.scope == "diagramEls") {
+        addDgm(o.diagram, ctx + ".diagram", i, name);
+        if (isArr(o.elementIDs) && o.elementIDs.length > 0) {
+            for (j = 0; j < o.elementIDs.length; j++) { addEl(o.elementIDs[j], ctx + ".elementIDs[" + j + "]", i, name + " (meneny prvek)"); }
+        } else if (dollarOwn(o.diagram, i) === null && !blank(o.diagram)) {
+            // bez filtru = vsechny objekty diagramu
+            var dt0 = ("" + o.diagram).replace(/^\s+|\s+$/g, "");
+            var rdo = (dt0.charAt(0) == "{")
+                ? rows("SELECT DISTINCT o.Package_ID FROM t_diagramobjects x INNER JOIN t_object o ON o.Object_ID = x.Object_ID INNER JOIN t_diagram g ON g.Diagram_ID = x.Diagram_ID WHERE g.ea_guid = '" + esc(dt0) + "'")
+                : (/^[0-9]+$/.test(dt0) ? rows("SELECT DISTINCT o.Package_ID FROM t_diagramobjects x INNER JOIN t_object o ON o.Object_ID = x.Object_ID WHERE x.Diagram_ID = " + parseInt(dt0, 10)) : null);
+            if (rdo == null) { unk(ctx + ": objekty diagramu nelze vycist"); }
+            else { for (j = 0; j < rdo.length; j++) { addPkgId(rdo[j].Package_ID, name + " (prvek na diagramu)"); } }
+        }
     } else if (sc.scope == "diagrams") {
         lst = o.diagrams || [];
         for (j = 0; j < lst.length; j++) {
             var d = lst[j] || {};
-            if (name == "update_diagram_properties" || d.diagram) { addDgm(d.diagram, ctx + ".diagrams[" + j + "]", i, name); }
+            // FB_OpDiagram bere UPDATE vetev pres diagram | diagramID | guid
+            // (nalez H1 oponentury 2026-09-20: cteni jen `diagram` delalo
+            // z updatu "cisty create")
+            var dref2 = d.diagram || d.diagramID || d.guid;
+            if (name == "update_diagram_properties" || dref2) { addDgm(dref2, ctx + ".diagrams[" + j + "]", i, name); }
         }
     } else if (sc.scope == "docs") {
         lst = o.documents || [];

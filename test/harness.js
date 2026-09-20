@@ -2495,6 +2495,11 @@ function blRepo(opts) {
             return pick(M.pk, function (p) { return ids.indexOf(p[1]) >= 0 || p[0] == root; },
                 function (p) { return { Package_ID: p[0], Parent_ID: p[1] }; });
         } },
+        { re: /t_objectproperties/i, rows: function (sql) { var m = /Value = '([^']+)'/i.exec(sql); var d = (opts.dedupEl || {})[m ? m[1] : ""];
+            return (d || []).map(function (pid) { return { Package_ID: pid }; }); } },
+        { re: /t_connectortag/i, rows: function (sql) { var m = /VALUE = '([^']+)'/i.exec(sql); var d = (opts.dedupConn || {})[m ? m[1] : ""];
+            return (d || []).map(function (oid) { return { Start_Object_ID: oid }; }); } },
+        { re: /t_diagramobjects/i, rows: function () { return (opts.diagramObjPkgs || []).map(function (p) { return { Package_ID: p }; }); } },
         { re: /FROM t_object WHERE/i, rows: function (sql) { var k = key(sql);
             return pick(M.el, function (e) { return match(k, e[0], e[3], e[2]); },
                 function (e) { return { Object_ID: e[0], ea_guid: e[3], Package_ID: e[1], Object_Type: "Class", Name: e[2] }; }); } },
@@ -2557,10 +2562,11 @@ function blRepo(opts) {
     repo._sqlLog = sqlLog;
     return repo;
 }
+var SCOPE_REPO_OPTS = { dedupEl: { "k-exist": [14], "k-dup": [11, 12] }, dedupConn: { "ck-exist": [102] }, diagramObjPkgs: [11, 14] };
 function scopeOf(ops, cfgOver) {
     var cfg = B.FB_BaselineConfig.call(B, mkRepo()).cfg;
     for (var k in (cfgOver || {})) { cfg[k] = cfgOver[k]; }
-    return B.FB_BaselinePolicy.call(B, blRepo(), { ops: ops }, null, cfg, regFull());
+    return B.FB_BaselinePolicy.call(B, blRepo(SCOPE_REPO_OPTS), { ops: ops }, null, cfg, regFull());
 }
 function ids(sc) { return sc.packages.map(function (p) { return p.id; }).sort(function (a, b) { return a - b; }).join(","); }
 
@@ -2595,7 +2601,15 @@ t("BL-2 T6-29 runtime: zapisova operace bez polozky SCOPE = unknown + missingSco
     ["package create -> nic", [{ op: "create_or_update_package", parent: "{PK-11}", name: "n" }], "", false],
     ["package matchByName -> rodic", [{ op: "create_or_update_package", parent: "{PK-11}", name: "n", matchByName: true }], "11", false],
     ["connectors create -> nic", [{ op: "create_or_update_connectors", connectors: [{ source: 101, target: 102, type: "Association" }] }], "", false],
-    ["connectors dedupKey -> package SOURCE", [{ op: "create_or_update_connectors", connectors: [{ source: 102, target: 101, dedupKey: "k" }] }], "12", false],
+    ["connectors dedupKey existujici -> package SOURCE skutecneho konektoru (ne deklarovaneho source)", [{ op: "create_or_update_connectors", connectors: [{ source: 101, target: 104, dedupKey: "ck-exist" }] }], "12", false],
+    ["connectors dedupKey neexistujici -> cisty create", [{ op: "create_or_update_connectors", connectors: [{ source: 102, target: 101, dedupKey: "ck-new" }] }], "", false],
+    ["connectors match -> package SOURCE", [{ op: "create_or_update_connectors", connectors: [{ source: 102, target: 101, match: true }] }], "12", false],
+    ["M1 elements dedupKey: prvek lezi JINDE nez deklarovany package -> package, kde opravdu je", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}", dedupKey: "k-exist" }] }], "14", false],
+    ["M1 elements dedupKey neexistujici -> cisty create; nejednoznacny -> unknown", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}", dedupKey: "k-new" }] }], "", false],
+    ["M1 elements dedupKey nejednoznacny -> unknown", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}", dedupKey: "k-dup" }] }], "", true],
+    ["H1 create_or_update_diagram update pres guid / diagramID (aliasy FB_OpDiagram) -> package diagramu", [{ op: "create_or_update_diagram", diagrams: [{ guid: "{DG-201}", name: "n" }, { diagramID: 201, notes: "x" }] }], "12", false],
+    ["H1 $N na diagram aktualizovany pres guid NENI vlastni", [{ op: "create_or_update_diagram", diagrams: [{ guid: "{DG-201}", name: "n" }] }, { op: "layout_connectors", diagram: "$0" }], "12", true],
+    ["M2 apply_classifier_stereotypes s elementIDs -> package diagramu + packages menenych prvku", [{ op: "apply_classifier_stereotypes", diagram: 201, elementIDs: [101, 104] }], "11,12,14", false],
     ["connectors update dle guid -> unknown", [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-301}", name: "n" }] }], "", true],
     ["attributes -> package rodice", [{ op: "create_or_update_attributes", element: 102, attributes: [{ name: "a" }] }], "12", false],
     ["operations bez parameters -> package rodice, nedestruktivni", [{ op: "create_or_update_operations", element: 103, operations: [{ name: "o" }] }], "13", false, function (sc) { eq(sc.destructive, false); }],
@@ -2626,7 +2640,7 @@ t("BL-2 T6-29 runtime: zapisova operace bez polozky SCOPE = unknown + missingSco
     ["create_or_update_diagram update -> package diagramu; create -> nic", [{ op: "create_or_update_diagram", diagrams: [{ diagram: 201, name: "n" }, { name: "novy", "package": "{PK-14}" }] }], "12", false],
     ["place_elements_on_diagram -> package diagramu", [{ op: "place_elements_on_diagram", diagram: 201, elementPlacements: [{ element: 101 }] }], "12", false],
     ["scenarios / constraints / requirements -> package rodice, destruktivni (V2d rebuild)", [{ op: "create_or_update_scenarios", element: 101, scenarios: [] }, { op: "create_or_update_constraints", element: 102, constraints: [] }, { op: "create_or_update_requirements", element: 104, requirements: [] }], "11,12,14", false, function (sc) { eq(sc.destructive, true); eq(sc.destructiveOps.length, 3); }],
-    ["apply_classifier_stereotypes -> package diagramu", [{ op: "apply_classifier_stereotypes", diagram: 201 }], "12", false],
+    ["M2 apply_classifier_stereotypes bez filtru -> package diagramu + packages vsech objektu diagramu", [{ op: "apply_classifier_stereotypes", diagram: 201 }], "11,12,14", false],
     ["find_or_create_referencing_sr -> create", [{ op: "find_or_create_referencing_sr", targetPackage: "{PK-11}", name: "SR" }], "", false],
     ["deploy_src -> none", [{ op: "deploy_src", files: [] }], "", false],
     ["T6-27 $N na vysledek CTECI operace -> unknown", [{ op: "find_elements_by_name", name: "x" }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "", true],
@@ -2875,7 +2889,10 @@ t("BL-3 T6-10: update nad prahem (mimo destruktivni podtridu) -> confirm 'bez pr
         eq(r2.status, "confirm_required", "bez rucni baseline se neprovede"); ok(r2.confirm.nonce != r.confirm.nonce, "novy nonce");
         ok(memFs.files[r2.confirm.pendingPath], "soubor zustava v pending");
         repo._addBaseline("{PK-11}", "Pred upravou A", 3); // rucni baseline nad PREDKEM cile, uvnitr whitelistu
-        var r3 = confirmFile(repo, r2, "t610", true);
+        var tagged = null, oT = B.FB_RiskAuditTags; B.FB_RiskAuditTags = function (R, g, risk, bl) { tagged = bl; return ""; };
+        var r3;
+        try { r3 = confirmFile(repo, r2, "t610", true); } finally { B.FB_RiskAuditTags = oT; }
+        ok(tagged && tagged.decision == "skipped", "audit dostava sekci baseline s decision (tag ai.baseline)");
         eq(r3.status, "done", JSON.stringify(r3).substring(0, 500)); eq(r3.baseline.decision, "skipped");
         eq(r3.baseline.manual.ok, true); eq(autoNames(repo, "{PK-13}").length + autoNames(repo, "{PK-11}").length, 0, "0 FB-AUTO baselines");
     });
@@ -2940,7 +2957,9 @@ t("BL-3 T6-14: ELEVATED potvrzena -> baseline az PO potvrzeni; v okne freshWithi
         repo._addBaseline("{PK-14}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", tok, new Date().getTime() - 40 * 60000, false), 40);
         var r = runFile(repo, DEL_C, "t614");
         eq(repo._createCalls, 0, "pred potvrzenim nic");
+        var atOp = -1; B.FB_OpDelete = function () { atOp = repo._createCalls; return { op: "delete_from_model", status: "ok", items: [] }; };
         var r2 = confirmFile(repo, r, "t614", true);
+        eq(atOp, 1, "v okamziku prvni zapisove operace uz baseline existuje (a vznikla az po potvrzeni)");
         eq(r2.baseline.decision, "created"); eq(autoNames(repo, "{PK-14}").length, 2);
         ok(typeof r2.baseline.elapsedMs == "number");
         // druha ELEVATED davka hned potom -> reuse freshWithinMin
@@ -2950,16 +2969,18 @@ t("BL-3 T6-14: ELEVATED potvrzena -> baseline az PO potvrzeni; v okne freshWithi
     } finally { B.FB_OpDelete = oD; }
 });
 t("BL-3 T6-15: CreateBaseline vraci false / hazi / FB_CheckWrite odmitne -> E_NO_BASELINE terminalne, bez confirm, nic zapsano", function () {
+    var opCalls = 0, oEl = B.FB_OpElements; B.FB_OpElements = function () { opCalls++; return { op: "create_or_update_elements", status: "ok", items: [] }; };
     [{ createFalse: true }, { createThrows: true }].forEach(function (o) {
         blReset(); var repo = blRepo(o);
         var r = runText(repo, UPD_A1);
+        eq(opCalls, 0, "operace se nesmi zavolat");
         eq(r.code, "E_NO_BASELINE", JSON.stringify(o)); eq(r.status, "error"); eq(r.results[0].status, "skipped");
         ok(!r.confirm); eq(r.baseline.decision, "failed");
     });
     blReset(); var repo2 = blRepo();
     var oC = B.FB_CheckWrite; B.FB_CheckWrite = function () { return { code: "E_WHITELIST", message: "mimo whitelist" }; };
-    try { var r2 = runText(repo2, UPD_A1); eq(r2.code, "E_NO_BASELINE"); contains(r2.message, "E_WHITELIST"); eq(repo2._createCalls, 0); }
-    finally { B.FB_CheckWrite = oC; }
+    try { var r2 = runText(repo2, UPD_A1); eq(r2.code, "E_NO_BASELINE"); contains(r2.message, "E_WHITELIST"); eq(repo2._createCalls, 0); eq(opCalls, 0); }
+    finally { B.FB_CheckWrite = oC; B.FB_OpElements = oEl; }
 });
 t("BL-3 T6-15b: potvrzena ELEVATED davka, zaloha selze -> E_NO_BASELINE, soubor do rejected (ne nove confirm)", function () {
     blReset(); var repo = blRepo({ createFalse: true });
@@ -2985,12 +3006,25 @@ t("BL-3 T6-25: metriky gate nespocitany + update existujiciho -> zaloha VZNIKNE 
         eq(r2.baseline.decision, "created", JSON.stringify(r2.baseline)); eq(autoNames(repo, "{PK-13}").length, 1);
     });
 });
-t("BL-3 T6-26: opravna davka pres dedupKey/matchByName nad prahem -> projde bez E_NO_BASELINE, vykazuje updatedExistingApprox", function () {
+t("BL-3 T6-26 / H2: matchByName na EXISTUJICI prvek ve velke package -> projde PO POTVRZENI (nikdy tise, nikdy E_NO_BASELINE), vykazuje updatedExistingApprox", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    var calls = 0, oE = B.FB_OpElements; B.FB_OpElements = function () { calls++; return { op: "create_or_update_elements", status: "ok", items: [] }; };
+    try {
+        withPolicy(polBase({ thresholdsShadow: false, requireRecoveryForUpdates: true }), function () {
+            var r = runFile(repo, [{ op: "create_or_update_elements", elements: [{ name: "ElA", type: "Class", "package": "{PK-11}", matchByName: true, notes: "prepis" }] }], "t626");
+            eq(r.status, "confirm_required", "bez pre-image nikdy bez dialogu: " + JSON.stringify(r).substring(0, 300)); eq(calls, 0);
+            contains(r.risk.riskReasons.join("; "), "match/dedupKey"); eq(r.baseline.updatedExistingApprox, 1);
+            var r2 = confirmFile(repo, r, "t626", true);
+            eq(r2.status, "done", JSON.stringify(r2).substring(0, 300)); ok(r2.code != "E_NO_BASELINE"); eq(calls, 1);
+            eq(r2.baseline.decision, "none"); contains(r2.baseline.reason, "updatedExistingApprox"); eq(repo._createCalls, 0);
+        });
+    } finally { B.FB_OpElements = oE; }
+});
+t("BL-3 T6-26b: dedupKey, ktery v modelu NEEXISTUJE -> skutecny create, bez dialogu a bez zalohy", function () {
     blReset(); var repo = blRepo({ mult: 9000 });
     withPolicy(polBase({ thresholdsShadow: false, requireRecoveryForUpdates: true }), function () {
         var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "Retry", type: "Class", "package": "{PK-11}", dedupKey: "k1" }] }]);
-        ok(r.code != "E_NO_BASELINE", JSON.stringify(r).substring(0, 300)); ok(r.status != "confirm_required", "zadny dialog navic");
-        eq(r.baseline.decision, "none"); contains(r.baseline.reason, "updatedExistingApprox"); eq(r.baseline.updatedExistingApprox, 1);
+        ok(r.status != "confirm_required" && r.code != "E_NO_BASELINE", JSON.stringify(r).substring(0, 300)); eq(r.baseline.decision, "none");
     });
 });
 t("BL-3 T6-27: $N odkaz na existujici prvek -> velikost neznama (navadena cesta), nikdy cisty create", function () {
@@ -3032,7 +3066,7 @@ t("BL-3 pad planu/rozhodnuti: nikdy tichy zapis - vynucene potvrzeni s duvodem",
         contains("" + B.FB_ConfirmSummary.call(B, r), "BEZ pre-image");
     } finally { B.FB_BaselinePlan = o; }
 });
-t("BL-3 E_NO_BASELINE: adaptery radi soubor do rejected; chat ACK nerika 'rozdel davku'", function () {
+t("BL-3 E_NO_BASELINE: adaptery V SRC radi soubor do rejected (pump.wsf NE - transport se v teto davce nemeni, nalez k rozhodnuti); chat ACK nerika 'rozdel davku'", function () {
     ["AICodeBridge.FB_Process.js", "AICodeBridge.FB_ClipboardImport.js", "AICodeBridge.FB_ProcessFolder.js", "AICodeBridge.FB_ConfirmPending.js"].forEach(function (f) {
         contains(fs.readFileSync(path.join(SRC, f), "utf8"), "E_NO_BASELINE", f);
     });
@@ -3300,11 +3334,11 @@ t("BL-5 autorita pred smazanim: baseline, ktera v GetBaselines pod timto GUID/jm
     var realGet = repo.GetProjectInterface;
     repo.GetProjectInterface = function () {
         var pi = realGet(); var g = pi.GetBaselines;
-        pi.GetBaselines = function (x) { return g(x).replace(/version="FB-AUTO [^"]*"/, 'version="Prejmenovano rucne"'); };
+        pi.GetBaselines = function (x) { var all = g(x).match(/version="FB-AUTO [^"]*"/g); return g(x).replace(all[all.length - 1], 'version="Prejmenovano rucne"'); };
         return pi;
     };
-    var r = B.FB_BaselineCleanup.call(B, repo, clCfg({ keepLastK: 0 }), "delete", true);
-    eq(r.failed.length, 1); contains(r.failed[0].why, "GetBaselines"); eq(r.deleted.length, 5);
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", true);
+    eq(r.failed.length, 1); contains(r.failed[0].why, "GetBaselines"); eq(r.deleted.length, 2);
 });
 t("BL-5 selhani jednoho DeleteBaseline neshodi zbytek behu", function () {
     blReset(); var repo = clRepo(six());
@@ -3328,7 +3362,7 @@ t("BL-5 zdroj: DeleteBaseline se vola z jedineho mista (FB_BaselineCleanup)", fu
     });
     eq(where.join(","), "AICodeBridge.FB_BaselineCleanup.js");
 });
-t("BL-5 T6-32 hak v executoru: dve zapisove davky za sebou (i schrankovy kanal jde pres FB_Main) -> uklid PRAVE jednou; po okne znovu", function () {
+t("BL-5 T6-32 (harness verze pres FB_Main - hrdlo vsech kanalu vcetne schranky; schrankovy kanal sam = zivy beh -7): dve zapisove davky za sebou -> uklid PRAVE jednou; po okne znovu", function () {
     blReset(); var repo = clRepo(six());
     var calls = 0, o = B.FB_BaselineCleanup;
     B.FB_BaselineCleanup = function () { calls++; return o.apply(B, arguments); };
@@ -3368,6 +3402,52 @@ t("BL-5 menu: polozka existuje; klik = report -> Ano -> delete s force; bez kand
     try { B.EA_MenuClick.call(B, repo2, "TreeView", "-AI Bridge", "Uklid automatickych baselines (ukazat / provest)"); }
     finally { Session.Prompt = oP; }
     eq(repo2._deleteCalls, 0, "Ne = nic se nemaze");
+});
+
+// ===========================================================================
+// BASELINE POLITIKA - opravy z nezavisle oponentury 2026-09-20 (H1, M3, L3)
+// ===========================================================================
+t("BL-R H1 gate: create_or_update_diagram s guid / diagramID = UPDATE ciziho diagramu (ne create) -> ELEVATED, zaloha package diagramu", function () {
+    blReset(); var repo = blRepo();
+    var g = B.FB_RiskGate.call(B, repo, { ops: [{ op: "create_or_update_diagram", diagrams: [{ guid: "{DG-201}", "package": "{PK-12}", name: "X" }] }] }, regFull());
+    eq(g.metrics.updatedExisting, 1); eq(g.metrics.createOps, 0); eq(g.metrics.affectedDiagrams, 1); eq(g.riskLevel, "ELEVATED");
+    var oD = B.FB_OpDiagram; B.FB_OpDiagram = function () { return { op: "create_or_update_diagram", status: "ok", items: [] }; };
+    try {
+        var r = runFile(repo, [{ op: "create_or_update_diagram", diagrams: [{ diagramID: 201, notes: "prepis" }] }], "th1");
+        eq(r.status, "confirm_required"); ok(r.baseline.reason != "cisty create", "nikdy falesne 'cisty create'");
+        var r2 = confirmFile(repo, r, "th1", true);
+        eq(r2.baseline.decision, "created"); eq(autoNames(repo, "{PK-12}").length, 1);
+    } finally { B.FB_OpDiagram = oD; }
+});
+t("BL-R M3: keepLastK < 1 nebo necele = nevalidni politika VZDY (i pri mode report); uklid drzi podlahu 1 i kdyby dostal 0", function () {
+    [{ keepLastK: 0, maxAgeDays: 14 }, { keepLastK: 2.5, maxAgeDays: 14 }].forEach(function (c) {
+        eq(withPolicy(polBase({ cleanup: c }), function () { return B.FB_BaselineConfig.call(B, mkRepo()).valid; }), false, JSON.stringify(c));
+    });
+    blReset(); var repo = clRepo(six());
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg({ keepLastK: 0 }), "delete", true);
+    eq(r.deleted.length, 5); eq(repo._countBaselines(), 1, "posledni pre-image dvojice (package, uzivatel) zustava vzdy");
+});
+t("BL-R M3 menu: nevalidni politika -> jen ukazat, mazani vypnute", function () {
+    blReset(); var repo = clRepo(six());
+    var oP = Session.Prompt, asked = [], shown = "";
+    Session.Prompt = function (m, kind) { asked.push(kind); shown = "" + m; return 3; };
+    try {
+        withPolicy(polBase({ cleanup: { mode: "report", keepLastK: 0, maxAgeDays: 14 } }), function () {
+            B.EA_MenuClick.call(B, repo, "TreeView", "-AI Bridge", "Uklid automatickych baselines (ukazat / provest)");
+        });
+    } finally { Session.Prompt = oP; }
+    eq(repo._deleteCalls, 0); eq(asked.join(","), "0"); contains(shown, "nevalidni");
+});
+t("BL-R L3: jmeno rucni baseline s XML entitami (&, uvozovky) se v navadene ceste sparuje s t_document", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    var b = repo._addBaseline("{PK-13}", "Pred R&D upravou", 2);
+    var realGet = repo.GetProjectInterface;
+    repo.GetProjectInterface = function () { var pi = realGet(); var g = pi.GetBaselines;
+        pi.GetBaselines = function (x) { return g(x).replace("Pred R&D upravou", "Pred R&amp;D upravou"); }; return pi; };
+    withPolicy(polBase({ thresholdsShadow: false }), function () {
+        var r = runFile(repo, UPD_A1, "tl3");
+        eq(r.baseline.manual.ok, true, JSON.stringify(r.baseline.manual));
+    });
 });
 
 // ------------------------------------------------------------------ vysledek

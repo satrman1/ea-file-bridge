@@ -105,7 +105,8 @@ if (has(sec, "cleanup")) {
         if (has(cl, "keepLastK") && !has(cl, "maxAgeDays")) { bad.push("cleanup.keepLastK bez cleanup.maxAgeDays"); }
         if (has(cl, "maxAgeDays") && !has(cl, "keepLastK")) { bad.push("cleanup.maxAgeDays bez cleanup.keepLastK"); }
         if (cl.mode == "delete" && !has(cl, "keepLastK")) { bad.push("cleanup.mode 'delete' bez cleanup.keepLastK"); }
-        if (cl.mode == "delete" && isNum(cl.keepLastK) && cl.keepLastK < 1) { bad.push("cleanup.mode 'delete' s keepLastK < 1 (zadna podlaha)"); }
+        // podlaha se validuje VZDY (menu "provest" maze i pri mode report - M3)
+        if (isNum(cl.keepLastK) && (cl.keepLastK < 1 || Math.floor(cl.keepLastK) != cl.keepLastK)) { bad.push("cleanup.keepLastK musi byt cele cislo >= 1 (podlaha per balicek+uzivatel)"); }
         var eRun = has(cl, "maxDeletesPerRun") ? cl.maxDeletesPerRun : DEF.cleanup.maxDeletesPerRun;
         var eAno = has(cl, "maxDeletesAnomaly") ? cl.maxDeletesAnomaly : DEF.cleanup.maxDeletesAnomaly;
         if (isNum(eRun) && isNum(eAno) && eAno < eRun) { bad.push("cleanup.maxDeletesAnomaly < cleanup.maxDeletesPerRun"); }
