@@ -29,6 +29,8 @@ var DEF = {
     probeBudgetMs: 500,
     probeBudgetTotalMs: 2000,
     useCte: false,
+    thresholdsShadow: true,        // true = subtreeMax/maxBaselineElements jen meri;
+                                   // false az po kalibraci T6-C (rozhodnuti cloveka)
     freshWithinMin: 15,
     sessionMaxHours: 12,
     requireRecoveryForUpdates: false,
@@ -80,6 +82,7 @@ for (n = 0; n < NUMS.length; n++) {
 if (has(sec, "maxBaselinePackages") && isNum(sec.maxBaselinePackages) && sec.maxBaselinePackages < 1) { bad.push("maxBaselinePackages < 1"); }
 if (has(sec, "sessionMaxHours") && isNum(sec.sessionMaxHours) && sec.sessionMaxHours <= 0) { bad.push("sessionMaxHours <= 0"); }
 if (has(sec, "useCte") && typeof sec.useCte != "boolean") { bad.push("useCte neni boolean"); }
+if (has(sec, "thresholdsShadow") && typeof sec.thresholdsShadow != "boolean") { bad.push("thresholdsShadow neni boolean"); }
 if (has(sec, "requireRecoveryForUpdates") && typeof sec.requireRecoveryForUpdates != "boolean") { bad.push("requireRecoveryForUpdates neni boolean"); }
 if (has(sec, "sessionBaseline") && sec.sessionBaseline != "auto" && sec.sessionBaseline != "off") { bad.push("sessionBaseline musi byt 'auto' nebo 'off'"); }
 if (has(sec, "autoPrefix")) {

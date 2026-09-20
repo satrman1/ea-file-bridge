@@ -370,6 +370,30 @@ if (writesInBatch > 0) {
         this.Log(Repository, "FB " + reqId + " -> E_RISK_BLOCKED (" + risk.riskReasons.join("; ") + ")");
         return this.FB_JsonStringify(resp, 1);
     }
+    // --- BASELINE POLITIKA (zadani v1.2 par. 4.6/2): plan zalohy se pocita
+    // PO klasifikaci (mimo budgetMs gate) a PRED confirm - dialog tak predem
+    // rika, co se zazalohuje. Pri potvrzenem behu se prepocita (par. 4.6/4).
+    // Z260907-2: SHADOW - sekce baseline{} jen meri a vykazuje, chovani davky
+    // se nemeni. Chyba planu nikdy neshodi davku (posture unknown).
+    var blPlan = null;
+    try { blPlan = this.FB_BaselinePlan(Repository, req, risk, REG); }
+    catch (eBl) { blPlan = null; resp.baseline = { decision: "shadow", posture: "unknown", reason: "FB_BaselinePlan selhal: " + eBl.message, packages: [] }; }
+    if (blPlan != null) {
+        resp.baseline = blPlan.section;
+        // chybejici sekce politiky: warning nejvys 1x denne (state-blwarn.txt)
+        try {
+            if (blPlan.cfgWarnings && blPlan.cfgWarnings.length > 0) {
+                var dW = new Date();
+                var dayW = dW.getFullYear() + "-" + pad2m(dW.getMonth() + 1) + "-" + pad2m(dW.getDate());
+                if (("" + this.FB_StateFile(Repository, "blwarn")) != dayW) {
+                    if (!resp.warnings) { resp.warnings = []; }
+                    for (var bw = 0; bw < blPlan.cfgWarnings.length; bw++) { resp.warnings.push(blPlan.cfgWarnings[bw]); }
+                    this.FB_StateFile(Repository, "blwarn", dayW);
+                    this.Log(Repository, "FB " + reqId + " -> " + blPlan.cfgWarnings.join(" | "));
+                }
+            }
+        } catch (eBw) { }
+    }
     // --- ELEVATED: vynucene potvrzeni (V2 - konec shadow rezimu) ---
     if (risk.riskLevel == "ELEVATED") {
         if (!confirmedRun) {

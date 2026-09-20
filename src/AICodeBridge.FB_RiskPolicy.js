@@ -37,7 +37,8 @@
 //             VOLITELNA sekce; cte a validuje ji VYHRADNE FB_BaselineConfig:
 //             CHYBEJICI sekce = politika zustava validni (bezpecne defaulty
 //             + warning), PRITOMNA nekonzistentni = zapisove davky ELEVATED.
-//             subtreeMax / maxBaselineElements jsou SHADOW (jen meri).
+//             subtreeMax / maxBaselineElements jsou SHADOW (jen meri), dokud
+//             sekce nenese thresholdsShadow: false (az po kalibraci T6-C).
 //             Klice: subtreeMax, maxBaselineElements, maxBaselinePackages,
 //             probeBudgetMs, probeBudgetTotalMs, useCte, freshWithinMin,
 //             sessionMaxHours, requireRecoveryForUpdates (JEN destruktivni

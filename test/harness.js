@@ -2334,7 +2334,7 @@ t("BL-1 config: chybejici sekce = validni + warning + bezpecne defaulty presne d
     var c = withPolicy(polBase(), function () { return B.FB_BaselineConfig.call(B, mkRepo()); });
     eq(c.valid, true); eq(c.present, false); eq(c.warnings.length, 1);
     eq(JSON.stringify(c.cfg), JSON.stringify({ subtreeMax: 5000, maxBaselineElements: 10000, maxBaselinePackages: 5,
-        probeBudgetMs: 500, probeBudgetTotalMs: 2000, useCte: false, freshWithinMin: 15, sessionMaxHours: 12,
+        probeBudgetMs: 500, probeBudgetTotalMs: 2000, useCte: false, thresholdsShadow: true, freshWithinMin: 15, sessionMaxHours: 12,
         requireRecoveryForUpdates: false, sessionBaseline: "off", autoPrefix: "FB-AUTO ", cleanupEveryHours: 24,
         cleanup: { mode: "report", keepLastK: 3, maxAgeDays: 14, maxDeletesPerRun: 20, maxDeletesAnomaly: 200, requireWriteGroup: true } }));
 });
@@ -2432,6 +2432,298 @@ t("BL-1 rezervace drzi i kdyz politika prefix zmeni (stary FB-AUTO porad rezervo
         eq(B.FB_BaselineNameReserved.call(B, mkRepo(), "autobl x"), true);
         eq(B.FB_BaselineNameReserved.call(B, mkRepo(), "FB-AUTO x"), true);
         eq(B.FB_BaselineNameReserved.call(B, mkRepo(), "FB 2026"), false);
+    });
+});
+
+// ===========================================================================
+// BASELINE POLITIKA - cast 2: SCOPE + sonda + posture + baseline{} shadow
+// (Z260907-2)
+// ===========================================================================
+var WL_GUID = "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}";
+function blModel() {
+    // strom: 1 Model > 10 #FB-TEST (whitelist) > 11 A > 13 A1 ; 10 > 12 B ; 10 > 14..18 C..G
+    var pk = [[1, 0, "Model", "{PK-1}"], [10, 1, "#FB-TEST", WL_GUID], [11, 10, "A", "{PK-11}"], [12, 10, "B", "{PK-12}"],
+              [13, 11, "A1", "{PK-13}"], [14, 10, "C", "{PK-14}"], [15, 10, "D", "{PK-15}"], [16, 10, "E", "{PK-16}"],
+              [17, 10, "F", "{PK-17}"], [18, 10, "G", "{PK-18}"], [19, 10, "Prazdny", "{PK-19}"]];
+    var el = [[101, 11, "ElA", "{EL-101}"], [102, 12, "ElB", "{EL-102}"], [103, 13, "ElA1", "{EL-103}"], [104, 14, "ElC", "{EL-104}"],
+              [105, 15, "ElD", "{EL-105}"], [106, 16, "ElE", "{EL-106}"], [107, 17, "ElF", "{EL-107}"], [108, 18, "ElG", "{EL-108}"],
+              [109, 11, "Lifeline", "{EL-109}"], [110, 11, "Dvojnik", "{EL-110}"], [111, 12, "Dvojnik", "{EL-111}"]];
+    var dg = [[201, 12, "SeqB", "{DG-201}"]];
+    return { pk: pk, el: el, dg: dg, conn: [[301, 101, "{CN-301}"]], attr: [[401, 102]], oper: [[501, 103]] };
+}
+function blRepo(opts) {
+    opts = opts || {};
+    var M = blModel();
+    var sqlLog = [];
+    function pick(list, where, cols) {
+        var out = [];
+        list.forEach(function (r) { if (where(r)) { out.push(cols(r)); } });
+        return out;
+    }
+    function inList(sql, col) {
+        var m = new RegExp(col + " IN \\(([0-9, ]+)\\)", "i").exec(sql);
+        return m ? m[1].split(",").map(function (x) { return parseInt(x, 10); }) : [];
+    }
+    function key(sql) {
+        var m;
+        if ((m = /ea_guid = '([^']+)'/i.exec(sql))) { return { guid: m[1] }; }
+        if ((m = /(?:Object_ID|Package_ID|Diagram_ID|Connector_ID|OperationID|\bID) = (\d+)/i.exec(sql))) { return { id: parseInt(m[1], 10) }; }
+        if ((m = /Name = '([^']+)'/i.exec(sql))) { return { name: m[1] }; }
+        return {};
+    }
+    function match(k, id, guid, name) { return (k.guid && k.guid == guid) || (k.id && k.id == id) || (k.name && k.name == name); }
+    var rules = [
+        { re: /#AI-LOG/i, rows: [] },
+        { re: /JavascriptAddin/i, rows: [] },
+        { re: /COUNT\(\*\) AS c FROM t_object/i, rows: function (sql) {
+            sqlLog.push(sql);
+            if (opts.countFails) { return []; }
+            var ids = inList(sql, "Package_ID");
+            var n = M.el.filter(function (e) { return ids.indexOf(e[1]) >= 0; }).length;
+            return [{ c: (opts.countZero ? 0 : n * (opts.mult || 1)) }];
+        } },
+        { re: /^WITH/i, rows: function (sql) { sqlLog.push(sql); return [{ packages: 3, elements: 42 }]; } },
+        { re: /FROM t_package WHERE Parent_ID IN/i, rows: function (sql) {
+            sqlLog.push(sql);
+            if (opts.expandFails) { return []; }
+            var ids = inList(sql, "Parent_ID");
+            var root = parseInt(/OR Package_ID = (\d+)/i.exec(sql)[1], 10);
+            return pick(M.pk, function (p) { return ids.indexOf(p[1]) >= 0 || p[0] == root; },
+                function (p) { return { Package_ID: p[0], Parent_ID: p[1] }; });
+        } },
+        { re: /FROM t_object WHERE/i, rows: function (sql) { var k = key(sql);
+            return pick(M.el, function (e) { return match(k, e[0], e[3], e[2]); },
+                function (e) { return { Object_ID: e[0], ea_guid: e[3], Package_ID: e[1], Object_Type: "Class", Name: e[2] }; }); } },
+        { re: /FROM t_package WHERE/i, rows: function (sql) { var k = key(sql);
+            return pick(M.pk, function (p) { return match(k, p[0], p[3], p[2]); },
+                function (p) { return { Package_ID: p[0], ea_guid: p[3], Parent_ID: p[1], Name: p[2] }; }); } },
+        { re: /FROM t_diagram WHERE/i, rows: function (sql) { var k = key(sql);
+            return pick(M.dg, function (d) { return match(k, d[0], d[3], d[2]); },
+                function (d) { return { Diagram_ID: d[0], ea_guid: d[3], Package_ID: d[1], Name: d[2] }; }); } },
+        { re: /FROM t_connector WHERE/i, rows: function (sql) { var k = key(sql);
+            return pick(M.conn, function (c) { return match(k, c[0], c[2], null); }, function (c) { return { Start_Object_ID: c[1] }; }); } },
+        { re: /FROM t_attribute WHERE/i, rows: function (sql) { var k = key(sql);
+            return pick(M.attr, function (a) { return k.id == a[0]; }, function (a) { return { Object_ID: a[1] }; }); } },
+        { re: /FROM t_operation WHERE/i, rows: function (sql) { var k = key(sql);
+            return pick(M.oper, function (a) { return k.id == a[0]; }, function (a) { return { Object_ID: a[1] }; }); } }
+    ];
+    var repo = mkRepo({ sqlRules: rules, repositoryType: opts.repositoryType });
+    M.pk.forEach(function (p) { repo._addPackage({ id: p[0], parentID: p[1], name: p[2], guid: p[3] }); });
+    M.el.forEach(function (e) { repo._addElement({ id: e[0], packageID: e[1], name: e[2], guid: e[3] }); });
+    repo._sqlLog = sqlLog;
+    return repo;
+}
+function scopeOf(ops, cfgOver) {
+    var cfg = B.FB_BaselineConfig.call(B, mkRepo()).cfg;
+    for (var k in (cfgOver || {})) { cfg[k] = cfgOver[k]; }
+    return B.FB_BaselinePolicy.call(B, blRepo(), { ops: ops }, null, cfg, regFull());
+}
+function ids(sc) { return sc.packages.map(function (p) { return p.id; }).sort(function (a, b) { return a - b; }).join(","); }
+
+t("BL-2 T6-29 uplnost SCOPE: kazda w:true operace registru ma polozku a SCOPE nema polozku mimo registr", function () {
+    var reg = regFull();
+    var src = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_BaselinePolicy.js"), "utf8");
+    var blk = /var SCOPE = \{([\s\S]*?)\n\};/.exec(src);
+    ok(blk, "blok SCOPE nalezen");
+    var scope = {}, rex = /"([a-z0-9_]+)":\s*\{\s*scope:\s*"([A-Za-z]+)",\s*destr:\s*"(no|always|rebuild|params)"/g, m;
+    while ((m = rex.exec(blk[1])) != null) { scope[m[1]] = m[2]; }
+    var missing = [], extra = [], nW = 0;
+    for (var op in reg) { if (reg[op].w) { nW++; if (!scope[op]) { missing.push(op); } } }
+    for (var s in scope) { if (!reg[s] || !reg[s].w) { extra.push(s); } }
+    ok(nW >= 27, "registr ma mit aspon 27 zapisovych operaci, nalezeno " + nW);
+    eq(missing.join(","), "", "zapisove operace BEZ polozky SCOPE");
+    eq(extra.join(","), "", "polozky SCOPE mimo registr / pro cteci operace");
+});
+t("BL-2 T6-29 runtime: zapisova operace bez polozky SCOPE = unknown + missingScope", function () {
+    var reg = regFull(); reg["nova_zapisova_op"] = { w: true };
+    var sc = B.FB_BaselinePolicy.call(B, blRepo(), { ops: [{ op: "nova_zapisova_op" }] }, null, null, reg);
+    eq(sc.unknown, true); eq(sc.missingScope.join(","), "nova_zapisova_op");
+});
+// tabulka par. 4.2: [popis, ops, ocekavane packages, unknown, dalsi kontrola]
+[
+    ["create_element = cisty create", [{ op: "create_element", "package": "{PK-11}", name: "X" }], "", false],
+    ["elements update -> Element.PackageID", [{ op: "create_or_update_elements", elements: [{ guid: "{EL-103}", name: "n" }] }], "13", false],
+    ["elements cisty create -> nic", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}" }] }], "", false],
+    ["elements matchByName -> cilovy package", [{ op: "create_or_update_elements", elements: [{ name: "n", matchByName: true, "package": "{PK-12}" }] }], "12", false],
+    ["elements update jmenem, ktere neni jednoznacne -> unknown", [{ op: "create_or_update_elements", elements: [{ elementID: "Dvojnik" }] }], "", true],
+    ["move_elements -> OBE packages + volumeUnknown", [{ op: "move_elements", "package": 12, elements: [101] }], "11,12", false, function (sc) { eq(sc.volumeUnknown, true); }],
+    ["package update -> tyz package", [{ op: "create_or_update_package", guid: "{PK-13}", name: "n" }], "13", false],
+    ["package create -> nic", [{ op: "create_or_update_package", parent: "{PK-11}", name: "n" }], "", false],
+    ["package matchByName -> rodic", [{ op: "create_or_update_package", parent: "{PK-11}", name: "n", matchByName: true }], "11", false],
+    ["connectors create -> nic", [{ op: "create_or_update_connectors", connectors: [{ source: 101, target: 102, type: "Association" }] }], "", false],
+    ["connectors dedupKey -> package SOURCE", [{ op: "create_or_update_connectors", connectors: [{ source: 102, target: 101, dedupKey: "k" }] }], "12", false],
+    ["connectors update dle guid -> unknown", [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-301}", name: "n" }] }], "", true],
+    ["attributes -> package rodice", [{ op: "create_or_update_attributes", element: 102, attributes: [{ name: "a" }] }], "12", false],
+    ["operations bez parameters -> package rodice, nedestruktivni", [{ op: "create_or_update_operations", element: 103, operations: [{ name: "o" }] }], "13", false, function (sc) { eq(sc.destructive, false); }],
+    ["operations s parameters -> destruktivni podtrida", [{ op: "create_or_update_operations", element: 103, operations: [{ name: "o", parameters: [{ name: "p" }] }] }], "13", false, function (sc) { eq(sc.destructive, true); }],
+    ["T6-33 messages rebuild -> package DIAGRAMU (ne lifeliny), destruktivni", [{ op: "create_or_update_messages", diagram: 201, rebuild: true, messages: [{ source: 109, target: 101, name: "m", seqNo: 1 }] }], "12", false, function (sc) { eq(sc.destructive, true); }],
+    ["messages bez rebuild -> package diagramu, nedestruktivni", [{ op: "create_or_update_messages", diagram: "{DG-201}", messages: [{ source: 109, target: 101, name: "m" }] }], "12", false, function (sc) { eq(sc.destructive, false); }],
+    ["delete element -> vlastnici package", [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }], "14", false, function (sc) { eq(sc.destructive, true); }],
+    ["T6-12 delete package -> RODIC", [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PK-13}" }] }], "11", false],
+    ["T6-28 delete korenove whitelist package -> package sam + parentOutOfWhitelist", [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "10", false, function (sc) { eq(sc.packages[0].parentOutOfWhitelist, true); }],
+    ["delete diagram -> package diagramu", [{ op: "delete_from_model", targets: [{ type: "Diagram", id: 201 }] }], "12", false],
+    ["delete connector -> package source", [{ op: "delete_from_model", targets: [{ type: "Connector", id: 301 }] }], "11", false],
+    ["delete attribute -> package rodice", [{ op: "delete_from_model", targets: [{ type: "Attribute", id: 401 }] }], "12", false],
+    ["delete operation / parameter -> package rodice", [{ op: "delete_from_model", targets: [{ type: "Operation", id: 501 }, { type: "Parameter", id: 501, name: "p" }] }], "13", false],
+    ["delete attribute s neexistujicim rodicem -> unknown", [{ op: "delete_from_model", targets: [{ type: "Attribute", id: 999 }] }], "", true],
+    ["deleteTag element -> package vlastnika", [{ op: "delete_taggedvalue_from_model", targets: [{ type: "ElementTaggedValue", id: 105, name: "t" }] }], "15", false, function (sc) { eq(sc.destructive, true); }],
+    ["deleteTag connector -> package source", [{ op: "delete_taggedvalue_from_model", targets: [{ type: "ConnectorTaggedValue", guid: "{CN-301}", name: "t" }] }], "11", false],
+    ["deleteTag nezname vlastnictvi -> unknown", [{ op: "delete_taggedvalue_from_model", targets: [{ type: "OperationTaggedValue", id: 999, name: "t" }] }], "", true],
+    ["remove_elements_from_diagram -> package diagramu", [{ op: "remove_elements_from_diagram", diagram: 201, elementIDs: [101] }], "12", false],
+    ["create_baseline -> nic", [{ op: "create_baseline", "package": "{PK-11}" }], "", false],
+    ["clone_package -> rodic zdroje + volumeUnknown", [{ op: "clone_package", "package": "{PK-13}" }], "11", false, function (sc) { eq(sc.volumeUnknown, true); }],
+    ["clone_elements s cilem -> cilovy package", [{ op: "clone_elements", "package": "{PK-12}", elements: [101] }], "12", false, function (sc) { eq(sc.volumeUnknown, true); }],
+    ["clone_elements bez cile -> package zdroje", [{ op: "clone_elements", elements: [103] }], "13", false],
+    ["import docs -> package elementu, destruktivni", [{ op: "import_element_linked_documents", documents: [{ element: 106, path: "x" }] }], "16", false, function (sc) { eq(sc.destructive, true); }],
+    ["layout_connectors -> package diagramu", [{ op: "layout_connectors", diagram: 201 }], "12", false],
+    ["change_connector_visibility -> package diagramu", [{ op: "change_connector_visibility", diagram: 201, connectorIDs: [301] }], "12", false],
+    ["update_diagram_properties -> package diagramu", [{ op: "update_diagram_properties", diagrams: [{ diagram: 201, name: "n" }] }], "12", false],
+    ["set_diagram_object_style -> package diagramu", [{ op: "set_diagram_object_style", diagram: 201, objects: [] }], "12", false],
+    ["create_or_update_diagram update -> package diagramu; create -> nic", [{ op: "create_or_update_diagram", diagrams: [{ diagram: 201, name: "n" }, { name: "novy", "package": "{PK-14}" }] }], "12", false],
+    ["place_elements_on_diagram -> package diagramu", [{ op: "place_elements_on_diagram", diagram: 201, elementPlacements: [{ element: 101 }] }], "12", false],
+    ["scenarios / constraints / requirements -> package rodice, destruktivni (V2d rebuild)", [{ op: "create_or_update_scenarios", element: 101, scenarios: [] }, { op: "create_or_update_constraints", element: 102, constraints: [] }, { op: "create_or_update_requirements", element: 104, requirements: [] }], "11,12,14", false, function (sc) { eq(sc.destructive, true); eq(sc.destructiveOps.length, 3); }],
+    ["apply_classifier_stereotypes -> package diagramu", [{ op: "apply_classifier_stereotypes", diagram: 201 }], "12", false],
+    ["find_or_create_referencing_sr -> create", [{ op: "find_or_create_referencing_sr", targetPackage: "{PK-11}", name: "SR" }], "", false],
+    ["deploy_src -> none", [{ op: "deploy_src", files: [] }], "", false],
+    ["T6-27 $N na vysledek CTECI operace -> unknown", [{ op: "find_elements_by_name", name: "x" }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "", true],
+    ["$N na CREATE vetev teto davky -> vlastni prvek, nic", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}" }] }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "", false],
+    ["$N na UPDATE vetev -> unknown", [{ op: "create_or_update_elements", elements: [{ guid: "{EL-101}", name: "n" }] }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "11", true],
+    ["cteci operace se ignoruji", [{ op: "ping" }, { op: "query", sql: "SELECT 1" }], "", false]
+].forEach(function (c) {
+    t("BL-2 SCOPE: " + c[0], function () {
+        var sc = scopeOf(c[1]);
+        eq(ids(sc), c[2], "packages (" + sc.unknownWhy.join("; ") + ")");
+        eq(sc.unknown, c[3], "unknown: " + sc.unknownWhy.join("; "));
+        if (c[4]) { c[4](sc); }
+    });
+});
+t("BL-2 T6-7: cile ve 3 sourozeneckych packages -> 3 packages, zadny spolecny predek", function () {
+    var sc = scopeOf([{ op: "create_or_update_elements", elements: [{ elementID: 104 }, { elementID: 105 }, { elementID: 106 }] }]);
+    eq(ids(sc), "14,15,16"); eq(sc.overLimit, false);
+});
+t("BL-2 T6-8: potomek + predek -> 1 package (predek); hluboky potomek take", function () {
+    var sc = scopeOf([{ op: "create_or_update_elements", elements: [{ elementID: 103 }, { elementID: 101 }] }]);
+    eq(ids(sc), "11");
+    var sc2 = scopeOf([{ op: "create_or_update_elements", elements: [{ elementID: 103 }] }, { op: "create_or_update_package", guid: WL_GUID, name: "n" }]);
+    eq(ids(sc2), "10", "A1 je vnuk #FB-TEST");
+});
+t("BL-2 T6-9: 7 packages > maxBaselinePackages -> overLimit, nikdy spolecny predek", function () {
+    var sc = scopeOf([{ op: "create_or_update_elements", elements: [{ elementID: 101 }, { elementID: 102 }, { elementID: 104 }, { elementID: 105 }, { elementID: 106 }, { elementID: 107 }, { elementID: 108 }] }]);
+    eq(sc.packages.length, 7); eq(sc.overLimit, true);
+    ok(ids(sc).split(",").indexOf("10") < 0, "spolecny predek #FB-TEST nesmi byt v mnozine");
+});
+t("BL-2 sonda: iterativni expanze po urovnich -> spravny IN seznam a soucet", function () {
+    var repo = blRepo();
+    var r = B.FB_SubtreeCount.call(B, repo, 11, { probeBudgetMs: 500 }, 2000);
+    eq(r.status, "ok", r.why); eq(r.packages, 2, "11 + 13"); eq(r.elements, 4, "101,109,110 v 11 + 103 v 13"); eq(r.method, "iter");
+    var cnt = repo._sqlLog.filter(function (s) { return /COUNT/.test(s); });
+    eq(cnt.length, 1); contains(cnt[0], "IN (11,13)");
+    ok(!repo._sqlLog.some(function (s) { return /^WITH/i.test(s); }), "bez useCte zadny WITH");
+});
+t("BL-2 sonda B6: soucet 0 nad existujici package = unknown (nikdy pod prahem)", function () {
+    eq(B.FB_SubtreeCount.call(B, blRepo(), 19, { probeBudgetMs: 500 }, 2000).status, "unknown");
+    eq(B.FB_SubtreeCount.call(B, blRepo({ countZero: true }), 11, { probeBudgetMs: 500 }, 2000).status, "unknown");
+});
+t("BL-2 sonda: selhani dotazu (zadny radek ani pro koren / COUNT bez radku) = unknown", function () {
+    var a = B.FB_SubtreeCount.call(B, blRepo({ expandFails: true }), 11, { probeBudgetMs: 500 }, 2000);
+    eq(a.status, "unknown"); contains(a.why, "koren");
+    eq(B.FB_SubtreeCount.call(B, blRepo({ countFails: true }), 11, { probeBudgetMs: 500 }, 2000).status, "unknown");
+    eq(B.FB_SubtreeCount.call(B, blRepo(), 999, { probeBudgetMs: 500 }, 2000).status, "unknown", "neexistujici package");
+});
+t("BL-2 T6-16 (harness): vycerpany rozpocet = unknown", function () {
+    eq(B.FB_SubtreeCount.call(B, blRepo(), 11, { probeBudgetMs: 500 }, 0).status, "unknown", "celkovy strop vycerpan");
+    var repo = blRepo();
+    var origQ = repo.SQLQuery;
+    repo.SQLQuery = function (sql) { var e = new Date().getTime() + 5; while (new Date().getTime() < e) { } return origQ(sql); };
+    eq(B.FB_SubtreeCount.call(B, repo, 11, { probeBudgetMs: 1 }, 2000).status, "unknown", "probeBudgetMs 1");
+});
+t("BL-2 sonda useCte: SQLite -> WITH RECURSIVE, MS SQL -> WITH, JET -> iterativne", function () {
+    var a = blRepo({ repositoryType: "SL3" });
+    var ra = B.FB_SubtreeCount.call(B, a, 11, { probeBudgetMs: 500, useCte: true }, 2000);
+    eq(ra.method, "cte"); eq(ra.elements, 42); ok(/^WITH RECURSIVE sub/.test(a._sqlLog[0]), a._sqlLog[0]);
+    var b = blRepo({ repositoryType: "SQLSVR" });
+    B.FB_SubtreeCount.call(B, b, 11, { probeBudgetMs: 500, useCte: true }, 2000);
+    ok(/^WITH sub/.test(b._sqlLog[0]), b._sqlLog[0]);
+    var c = blRepo({ repositoryType: "JET" });
+    eq(B.FB_SubtreeCount.call(B, c, 11, { probeBudgetMs: 500, useCte: true }, 2000).method, "iter");
+});
+t("BL-2 zdroj: WITH RECURSIVE jen ve vetvi useCte FB_SubtreeCount", function () {
+    L.files.forEach(function (f) {
+        var code = fs.readFileSync(path.join(SRC, f), "utf8").split(/\r?\n/).filter(function (l) { return !/^\s*\/\//.test(l); }).join("\n");
+        if (f != "AICodeBridge.FB_SubtreeCount.js") { ok(code.indexOf("WITH RECURSIVE") < 0, f); }
+    });
+});
+t("BL-2 recoveryPosture: 4 zdroje unknown + overLimit none + shadow prahy", function () {
+    var M = { metricsComplete: true }, S = { unknown: false, overLimit: false, packages: [] }, okP = [{ status: "ok", elements: 9000 }];
+    eq(B.FB_RecoveryPosture.call(B, M, S, okP, { subtreeMax: 5000 }).posture, "full", "shadow: prah nerozhoduje");
+    eq(B.FB_RecoveryPosture.call(B, M, S, okP, { subtreeMax: 5000, thresholdsShadow: false }).posture, "none", "po kalibraci rozhoduje");
+    eq(B.FB_RecoveryPosture.call(B, { metricsComplete: false }, S, okP, {}).posture, "unknown", "(1) metriky");
+    eq(B.FB_RecoveryPosture.call(B, null, S, okP, {}).posture, "unknown", "(1) metriky null");
+    eq(B.FB_RecoveryPosture.call(B, M, S, [{ status: "unknown", why: "rozpocet" }], {}).posture, "unknown", "(2-4) sonda");
+    eq(B.FB_RecoveryPosture.call(B, M, { unknown: true, unknownWhy: ["$N"], packages: [] }, [], {}).posture, "unknown", "(5) scope");
+    eq(B.FB_RecoveryPosture.call(B, M, { unknown: false, overLimit: true, packages: [1, 2, 3, 4, 5, 6], maxBaselinePackages: 5 }, [], {}).posture, "none");
+    eq(B.FB_RecoveryPosture.call(B, M, null, [], {}).posture, "unknown", "scope null");
+});
+// rezim cesty k souboru (kontrakt I5) v harnessu: binarni cteni mock neumi ->
+// FB_FileBytes vraci null jako v EA runtime a FB_Main cte soubor textove
+function asEaRuntime(fn) {
+    var orig = B.FB_FileBytes;
+    B.FB_FileBytes = function () { return null; };
+    try { return fn(); } finally { B.FB_FileBytes = orig; }
+}
+function mainBl(ops, repoOpts) {
+    blReset(); delete B._fbAccessCache; delete B._fbPrevExc;
+    var repo = blRepo(repoOpts);
+    var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "bl-" + (++guidSeq), repo: "EAEXAMPLE.QEA", ops: ops }));
+    return { resp: JSON.parse(out), repo: repo };
+}
+t("BL-2 T6-1 FB_Main: cteci davka nema sekci baseline", function () {
+    var r = mainBl([{ op: "ping", echo: "x" }]);
+    eq(typeof r.resp.baseline, "undefined");
+});
+t("BL-2 FB_Main: mutujici davka ma sekci baseline (shadow) s merenim; chovani davky beze zmeny", function () {
+    var r = mainBl([{ op: "create_or_update_elements", elements: [{ guid: "{EL-103}", notes: "x" }] }]);
+    var b = r.resp.baseline;
+    ok(b, "sekce baseline chybi"); eq(b.decision, "shadow"); eq(b.posture, "full"); eq(b.needsBaseline, true);
+    eq(b.packages.length, 1); eq(b.packages[0].guid, "{PK-13}"); eq(b.packages[0].subtreeCount, 1);
+    eq(b.packages[0].path, "Model.#FB-TEST.A.A1"); eq(b.subtreeMax, 5000);
+    ok(b.probeMs <= 500, "T6-2: probeMs v rozpoctu");
+    eq(r.resp.risk.riskLevel, "LOW", "shadow nesmi zmenit klasifikaci");
+});
+t("BL-2 T6-4 FB_Main: cisty create -> needsBaseline false, zadna sonda", function () {
+    var r = mainBl([{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
+    eq(r.resp.baseline.needsBaseline, false); eq(r.resp.baseline.packages.length, 0);
+    ok(!r.repo._sqlLog.some(function (s) { return /COUNT/.test(s); }), "sonda se u cisteho create nepousti");
+});
+t("BL-2 FB_Main: ELEVATED davka ma sekci baseline uz v confirm_required (par. 4.6/2)", function () {
+    blReset();
+    var repo = blRepo();
+    var p = "C:\\HARNESS\\EA-File-Bridge\\requests\\req-bl-conf.json";
+    memFs.files[p] = JSON.stringify({ protocol: "eafb/0.2", id: "bl-conf", repo: "EAEXAMPLE.QEA",
+        ops: [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }] });
+    var resp = asEaRuntime(function () { return JSON.parse(B.FB_Main.call(B, repo, p)); });
+    eq(resp.status, "confirm_required", JSON.stringify(resp).substring(0, 300));
+    eq(resp.baseline.packages[0].guid, "{PK-14}");
+});
+t("BL-2 FB_Main: pad FB_BaselinePlan neshodi davku (posture unknown)", function () {
+    var orig = B.FB_BaselinePlan;
+    B.FB_BaselinePlan = function () { throw new Error("bum"); };
+    try {
+        var r = mainBl([{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
+        eq(r.resp.baseline.posture, "unknown"); ok(r.resp.status == "done" || r.resp.status == "error");
+        ok(r.resp.code != "E_EXCEPTION");
+    } finally { B.FB_BaselinePlan = orig; }
+});
+t("BL-2 T6-31 FB_Main: politika bez sekce baseline -> warning v response nejvys 1x denne, davka LOW probehne", function () {
+    withPolicy(polBase(), function () {
+        blReset(); delete B._fbAccessCache;
+        var repo = blRepo();
+        function run(id) { return JSON.parse(B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA",
+            ops: [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PK-11}" }] }] }))); }
+        var a = run("bl-w1"), b = run("bl-w2");
+        eq(a.risk.riskLevel, "LOW");
+        ok(a.warnings && /sekci 'baseline'/.test(a.warnings.join(" ")), "prvni davka nese warning");
+        ok(!b.warnings || !/sekci 'baseline'/.test(b.warnings.join(" ")), "druha davka tyz den uz ne");
     });
 });
 
