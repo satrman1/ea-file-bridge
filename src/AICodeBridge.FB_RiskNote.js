@@ -38,5 +38,6 @@ if (baseline) {
         if (bp[bi].name) { bn.push((bp[bi].path || bp[bi].guid) + " -> " + bp[bi].name + " [" + (bp[bi].result || "?") + "]"); }
     }
     if (bn.length > 0) { s += ": " + bn.join(", "); }
+    if (baseline.journal && baseline.journal.manifestRef) { s += " | journal=" + baseline.journal.manifestRef + " (" + baseline.journal.targets + " cilu)"; }
 }
 return s;

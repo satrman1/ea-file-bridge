@@ -3094,6 +3094,112 @@ t("BL-3 I4 SessionStart: repo bez whitelist polozky -> varovani E_REPO (z identi
     contains(out, "zadna whitelist polozka neodpovida"); contains(out, "E_REPO");
 });
 
+// ===========================================================================
+// BASELINE POLITIKA - cast 4: minimalni journal (Z260907-4)
+// ===========================================================================
+var JR_BASE = "C:\\GIT\\ea-file-bridge"; // FB_Config.baseDir pro EAEXAMPLE.QEA
+function journalOf(repo, id) {
+    var k = JR_BASE + "\\journal\\" + id + ".json";
+    return memFs.files[k] ? JSON.parse(memFs.files[k]) : null;
+}
+function jrRepo() {
+    var repo = blRepo({ login: "jnovak" });
+    var el = repo.GetElementByID(103);
+    el.Name = "ElA1"; el.Notes = "stare poznamky"; el.Alias = "A-1"; el.Stereotype = "entity"; el.StereotypeEx = "entity";
+    var tv = el.TaggedValues.AddNew("sa.status", ""); tv.Value = "draft";
+    var at = { AttributeID: 401, AttributeGUID: "{AT-401}", Name: "kod", Type: "dtVarchar50", Default: "X", Notes: "n", TaggedValues: mkColl() };
+    var el2 = repo.GetElementByID(102);
+    el2.Attributes = mkColl(); el2.Attributes._items.push(at);
+    var par = { Name: "p1", Type: "int", Default: "0", Notes: "", Position: 0 };
+    var me = { MethodID: 501, MethodGUID: "{OP-501}", Name: "najdi", ReturnType: "boolean", Notes: "", Parameters: mkColl(), TaggedValues: mkColl() };
+    me.Parameters._items.push(par);
+    el.Methods = mkColl(); el.Methods._items.push(me);
+    return repo;
+}
+t("BL-4 journal: pre-image PRESNE tech poli, ktera davka meni (element + tagy), manifest vedle baseline", function () {
+    blReset(); var repo = jrRepo();
+    var stubs = B.FB_OpElements; B.FB_OpElements = function () { return { op: "create_or_update_elements", status: "ok", items: [] }; };
+    try {
+        var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ guid: "{EL-103}", notes: "nove", alias: "A-2",
+            taggedValues: [{ name: "sa.status", value: "final" }, { name: "novy.tag", value: "1" }] }] }], "jr1");
+        eq(r.baseline.decision, "created"); eq(r.baseline.journal.targets, 1); eq(r.baseline.journal.covered[0], "{EL-103}");
+        var mf = journalOf(repo, "jr1");
+        ok(mf, "manifest neexistuje"); eq(r.baseline.journal.manifestRef, JR_BASE + "\\journal\\jr1.json");
+        eq(mf.kind, "eafb-journal/1"); eq(mf.user, "jnovak"); ok(/^s\d{8}-\d+$/.test(mf.session));
+        var tg = mf.targets[0];
+        eq(JSON.stringify(tg.fields), JSON.stringify({ Alias: "A-1", Notes: "stare poznamky" }), "jen menena pole");
+        eq(tg.tags["sa.status"], "draft"); eq(tg.tags["novy.tag"], null, "null = tag pred davkou neexistoval");
+        eq(mf.baselines[0].pkgGuid, "{PK-13}"); ok(/^FB-AUTO jnovak /.test(mf.baselines[0].name), "dvojice package -> jmeno baseline");
+        contains(mf.limitation, "per-uzivatelske"); ok(mf.restore.length > 20);
+    } finally { B.FB_OpElements = stubs; }
+});
+t("BL-4 journal: package, atribut (match jmenem) a operace s parameters; create vetve se nezaznamenavaji", function () {
+    blReset(); var repo = jrRepo();
+    repo.GetPackageByID(13).Notes = "pkg notes";
+    var cfg = B.FB_BaselineConfig.call(B, repo).cfg;
+    var jr = B.FB_Journal.call(B, repo, { ops: [
+        { op: "create_or_update_package", guid: "{PK-13}", notes: "x" },
+        { op: "create_or_update_attributes", element: 102, attributes: [{ name: "kod", type: "dtInt" }, { name: "novyAtribut", type: "dtInt" }] },
+        { op: "create_or_update_operations", element: 103, operations: [{ operationID: 501, returnType: "int", parameters: [{ name: "q", type: "string" }] }] },
+        { op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }
+    ] }, "jr2", cfg, { token: "s20260920-1" }, { packages: [] });
+    eq(jr.targets, 3); eq(jr.uncovered.length, 0, jr.uncovered.join(";"));
+    var mf = journalOf(repo, "jr2");
+    eq(mf.targets[0].kind, "package"); eq(mf.targets[0].fields.Notes, "pkg notes");
+    eq(mf.targets[1].kind, "attribute"); eq(JSON.stringify(mf.targets[1].fields), JSON.stringify({ Name: "kod", Type: "dtVarchar50" }));
+    eq(mf.targets[2].kind, "operation"); eq(mf.targets[2].fields.ReturnType, "boolean");
+    eq(mf.targets[2].parameters.length, 1); eq(mf.targets[2].parameters[0].name, "p1");
+});
+t("BL-4 journal: co NEKRYJE, vypise (diagramy, scenare, mazani, $N, match/dedup) - nikdy mlcky", function () {
+    blReset(); var repo = jrRepo();
+    var jr = B.FB_Journal.call(B, repo, { ops: [
+        { op: "update_diagram_properties", diagrams: [{ diagram: 201, name: "n" }] },
+        { op: "create_or_update_scenarios", element: 101, scenarios: [] },
+        { op: "delete_from_model", targets: [{ type: "Element", id: 104 }] },
+        { op: "create_or_update_elements", elements: [{ guid: "$0", notes: "x" }, { name: "M", matchByName: true, "package": "{PK-11}" }] },
+        { op: "ping" }, { op: "get_elements_information", elements: [101] }
+    ] }, "jr3", null, null, null);
+    eq(jr.targets, 0); eq(jr.uncovered.length, 5, jr.uncovered.join(" | ")); eq(jr.manifestRef, "");
+});
+t("BL-4 journal: strop cilu -> zbytek uncovered", function () {
+    blReset(); var repo = jrRepo();
+    var els = []; for (var i = 0; i < 205; i++) { els.push({ guid: "{EL-103}", notes: "x" + i }); }
+    var jr = B.FB_Journal.call(B, repo, { ops: [{ op: "create_or_update_elements", elements: els }] }, "jr4", null, null, null);
+    eq(jr.targets, 200); eq(jr.uncovered.length > 0, true); contains(jr.uncovered[0], "strop 200");
+});
+t("BL-4 journal: selhani (pad sberu / zapisu manifestu) nikdy neshodi davku; cil = nekryt", function () {
+    blReset(); var repo = jrRepo();
+    var o = B.FB_Journal, oE = B.FB_OpElements;
+    B.FB_OpElements = function () { return { op: "create_or_update_elements", status: "ok", items: [] }; };
+    B.FB_Journal = function () { throw new Error("disk plny"); };
+    try {
+        var r = runText(repo, UPD_A1, "jr5");
+        eq(r.status, "done"); contains(r.baseline.journal.why, "disk plny"); eq(r.baseline.journal.covered.length, 0);
+    } finally { B.FB_Journal = o; B.FB_OpElements = oE; }
+    var oR = B.FB_ResolveBaseDir; B.FB_ResolveBaseDir = function () { throw new Error("baseDir"); };
+    try {
+        var jr = B.FB_Journal.call(B, repo, { ops: UPD_A1 }, "jr6", null, null, null);
+        eq(jr.covered.length, 0); contains(jr.why, "manifest");
+    } finally { B.FB_ResolveBaseDir = oR; }
+});
+t("BL-4 journal jen pod prahem: navadena cesta (nad prahem) i destruktivni E_NO_BASELINE journal NEVOLAJI; rozhodnuti o zaloze journal nemeni", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    var calls = 0, o = B.FB_Journal; B.FB_Journal = function () { calls++; return { targets: 0, covered: [], uncovered: [], manifestRef: "" }; };
+    try {
+        withPolicy(polBase({ thresholdsShadow: false }), function () {
+            var r = runFile(repo, UPD_A1, "jr7");
+            eq(r.status, "confirm_required"); eq(r.baseline.action, "guided", "journal z radku 4 neudela radek 3");
+        });
+        withPolicy(polBase({ thresholdsShadow: false, requireRecoveryForUpdates: true }), function () {
+            eq(runFile(repo, DEL_C, "jr8").code, "E_NO_BASELINE");
+        });
+        eq(calls, 0);
+    } finally { B.FB_Journal = o; }
+});
+t("BL-4 audit Notes nese odkaz na manifest journalu", function () {
+    contains(B.FB_RiskNote.call(B, { riskLevel: "LOW", metrics: {} }, { decision: "created", packages: [], journal: { manifestRef: "C:\\x\\journal\\a.json", targets: 2 } }), "journal=C:\\x\\journal\\a.json (2 cilu)");
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

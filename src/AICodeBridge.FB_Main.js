@@ -580,6 +580,14 @@ if (writesInBatch > 0 && blPlan != null && blDec != null && blDec.action == "cre
     if (blCreated.length == 0 && blReused.length > 0) { resp.baseline.reason = resp.baseline.packages[0].reuse; }
     resp.baseline.created = blCreated;
     resp.baseline.reused = blReused;
+    // MINIMALNI JOURNAL (par. 4.9): pre-image menenych poli resolvovanych cilu
+    // - jen pod prahem (= tady, vedle mikro-baseline), pred prvni zapisovou op.
+    // Rozhodnuti o zaloze NEMENI (radek 3 par. 4.4 se nestavi). Best-effort.
+    try {
+        var jr = this.FB_Journal(Repository, req, reqId, blPlan.cfg, blTok, resp.baseline);
+        resp.baseline.journal = { targets: jr.targets, covered: jr.covered, uncovered: jr.uncovered, manifestRef: jr.manifestRef };
+        if (jr.why) { resp.baseline.journal.why = jr.why; }
+    } catch (eJr) { resp.baseline.journal = { targets: 0, covered: [], uncovered: [], manifestRef: "", why: "FB_Journal selhal: " + eJr.message }; }
     resp.baseline.elapsedMs = new Date().getTime() - blT0;
 }
 // --- provedeni davky (stop-on-error) ---

@@ -7,6 +7,9 @@ responses/
 # perzistentni stav bridge (FB_StateFile v baseDir) - stanice-zavisly runtime,
 # ne kanon: id posledni zapisove davky, citac spiku, W8 flag
 state-*.txt
+# restore manifesty minimalniho journalu (FB_Journal, Baseline politika par. 4.9) -
+# pre-image dat z EA repozitare, stanice-zavisle, do gitu nepatri
+journal/
 
 # testovaci PNG (generalka P6)
 *.png
