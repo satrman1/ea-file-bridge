@@ -445,6 +445,13 @@ else if (code == "E_RISK_BLOCKED") {
         + clip((resp.risk && resp.risk.riskReasons) ? resp.risk.riskReasons.join("; ") : (resp.message || ""), 400)
         + " Zadny jednoklikovy override (cesta ven = zmena FB_RiskPolicy nebo rucni prace v EA).";
 }
+else if (code == "E_NO_BASELINE") {
+    // Baseline politika par. 7: pre-image nelze poridit - terminalni, NENI to
+    // vyzva k rozdeleni davky (stejny zakaz jako 4b W4)
+    out = "EAFB BEZ ZALOHY " + id + " (E_NO_BASELINE): nic neprovedeno, davka v rejected\\. "
+        + clip((resp.baseline && resp.baseline.reason) ? resp.baseline.reason : (resp.message || ""), 300)
+        + " Reseni je na cloveku (rucni baseline v EA nad balickem cile / mensi balicek / spravce) - davku NEDEL na mensi a neposilej znovu beze zmeny.";
+}
 else if (code == "E_RISK_REJECTED" || st == "rejected") {
     out = "EAFB ZAMITNUTO " + id + ": davka zamitnuta clovekem v potvrzovacim dialogu - nic neprovedeno, soubor v rejected\\.";
 }

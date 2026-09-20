@@ -204,6 +204,10 @@ function resolveDiagram(ref) {
 
 // --- metriky ---
 var writeOps = 0, createOps = 0, updatedExisting = 0, deleteTargets = 0, moveOps = 0;
+// Baseline politika par. 4.4 (B5/b): konzervativni pripocet updatedExisting
+// u match/dedup se vykazuje ZVLAST - vyjima se z rozhodnuti o navadene ceste,
+// NE z rozhodnuti o porizeni zalohy. Do prahu a metricsMatch nevstupuje.
+var updatedExistingApprox = 0;
 var elSet = {}, elCount = 0, pkgSet = {}, pkgCount = 0, dgmSet = {}, dgmCount = 0;
 function addEl(k) { if (elSet[k] != 1) { elSet[k] = 1; elCount++; } }
 function addPkg(k) { if (pkgSet[k] != 1) { pkgSet[k] = 1; pkgCount++; } }
@@ -414,7 +418,7 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
                 }
             } else {
                 createOps++;
-                if (e.matchByName || e.dedupKey) { updatedExisting++; } // konzervativne: muze byt UPDATE
+                if (e.matchByName || e.dedupKey) { updatedExisting++; updatedExistingApprox++; } // konzervativne: muze byt UPDATE
                 if (typeof e.name != "undefined" && e.name !== null && ("" + e.name) != "") {
                     guardRaw(e.name, "elements[" + j + "].name");
                 }
@@ -431,7 +435,7 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
                 touchPackage(p.guid || p.packageID, "packages[" + j + "]", true);
             } else {
                 createOps++;
-                if (p.matchByName) { updatedExisting++; }
+                if (p.matchByName) { updatedExisting++; updatedExistingApprox++; }
                 if (p.name) { guardRaw(p.name, "packages[" + j + "].name"); }
                 touchPackage(p.parent, "packages[" + j + "].parent", false);
             }
@@ -447,7 +451,7 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
                 addEl("conn:" + (c.guid || c.connectorID));
             } else {
                 createOps++;
-                if (c.match || c.dedupKey) { updatedExisting++; }
+                if (c.match || c.dedupKey) { updatedExisting++; updatedExistingApprox++; }
                 touchElement(c.source, "connectors[" + j + "].source", false, false);
                 touchElement(c.target, "connectors[" + j + "].target", false, false);
             }
@@ -675,6 +679,7 @@ return {
         deleteTargets: deleteTargets, affectedElements: elCount,
         affectedPackages: pkgCount, affectedDiagrams: dgmCount,
         moveOps: moveOps, // iterace 6: skutecne presuny (operace move_elements)
+        updatedExistingApprox: updatedExistingApprox, // cast updatedExisting z match/dedup (B5/b)
         metricsComplete: !(budgetHit || metricsIncomplete)
     },
     elapsedMs: (new Date().getTime() - t0),

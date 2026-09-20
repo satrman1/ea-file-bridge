@@ -1,4 +1,4 @@
-// AICodeBridge.FB_RiskNote(risk)
+// AICodeBridge.FB_RiskNote(risk, baseline)
 // Textovy souhrn riskovych poli pro audit Notes / Log (iterace 4b).
 // risk == null (ciste ctena davka / gate nebezel) -> prazdny retezec.
 if (risk === null || typeof risk == "undefined") { return ""; }
@@ -29,5 +29,14 @@ if (risk.confirm) {
 }
 if (risk.riskReasons && risk.riskReasons.length > 0) {
     s += " | duvody: " + risk.riskReasons.join("; ");
+}
+// Baseline politika par. 4.6/7: radek o zaloze (restore manifest v Notes auditu)
+if (baseline) {
+    s += " | baseline=" + (baseline.decision || "?") + (baseline.reason ? " (" + baseline.reason + ")" : "");
+    var bp = baseline.packages || [], bn = [];
+    for (var bi = 0; bi < bp.length; bi++) {
+        if (bp[bi].name) { bn.push((bp[bi].path || bp[bi].guid) + " -> " + bp[bi].name + " [" + (bp[bi].result || "?") + "]"); }
+    }
+    if (bn.length > 0) { s += ": " + bn.join(", "); }
 }
 return s;

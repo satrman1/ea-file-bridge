@@ -1924,11 +1924,15 @@ t("FB_Main: delete error po castecnem smazani -> FB_LogChanges se vola (Output n
         { type: "Package", id: 1077, name: "P4 Mail (pumpa)", path: "M.P4 Mail (pumpa)", deleted: true },
         { type: "Package", id: 0, name: "{0}", deleted: false, code: "E_NOT_FOUND", index: 1 } ] }; };
     B.FB_RiskGate = function () { return { riskLevel: "LOW", riskReasons: [], policyValid: true, metrics: {}, summary: {} }; };
+    // Baseline politika (Z260907-3): test je o FB_LogChanges, ne o zaloze -
+    // rozhodnuti o baseline se stubuje stejne jako gate (mock cile neresolvuje)
+    var oBd = B.FB_BaselineDecide;
+    B.FB_BaselineDecide = function () { return { action: "none", reason: "stub", confirmReasons: [], manual: null, lines: [] }; };
     var out;
     try {
         out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: "t-p8c", repo: "EAEXAMPLE.QEA",
             ops: [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{A}" }, { type: "Package", guid: "{0}" }] }] }));
-    } finally { B.FB_OpDelete = oD; B.FB_RiskGate = oG; }
+    } finally { B.FB_OpDelete = oD; B.FB_RiskGate = oG; B.FB_BaselineDecide = oBd; }
     var resp = JSON.parse(out);
     eq(resp.status, "error", out.substring(0, 300));
     var del = repo._output.filter(function (o) { return o.text.indexOf("[smazano]") >= 0 && o.text.indexOf("P4 Mail (pumpa)") >= 0; });
@@ -2507,7 +2511,47 @@ function blRepo(opts) {
         { re: /FROM t_operation WHERE/i, rows: function (sql) { var k = key(sql);
             return pick(M.oper, function (a) { return k.id == a[0]; }, function (a) { return { Object_ID: a[1] }; }); } }
     ];
-    var repo = mkRepo({ sqlRules: rules, repositoryType: opts.repositoryType });
+    var BLS = {}; // pkgGuid -> [{ guid, version, docDate }]
+    function isoNow(ms) { var d = new Date(ms); function p(x) { return (x < 10 ? "0" : "") + x; }
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()); }
+    rules.unshift({ re: /FROM t_document/i, rows: function (sql) {
+        sqlLog.push(sql);
+        var out = [], g = /ElementID = '([^']+)'/i.exec(sql);
+        for (var pg in BLS) {
+            if (g && g[1] != pg) { continue; }
+            BLS[pg].forEach(function (b, ix) { out.push({ DocID: b.guid, ElementID: pg, Version: b.version, DocDate: b.docDate }); });
+        }
+        return out;
+    } });
+    var repo = mkRepo({ sqlRules: rules, repositoryType: opts.repositoryType, login: opts.login, securityEnabled: opts.securityEnabled });
+    repo._baselines = BLS;
+    repo._createCalls = 0; repo._deleteCalls = 0;
+    repo._addBaseline = function (pkgGuid, version, ageMin) {
+        if (!BLS[pkgGuid]) { BLS[pkgGuid] = []; }
+        var b = { guid: mkGuid(), version: version, docDate: isoNow(new Date().getTime() - (ageMin || 0) * 60000) };
+        BLS[pkgGuid].push(b); return b;
+    };
+    repo._countBaselines = function () { var n = 0; for (var pg in BLS) { n += BLS[pg].length; } return n; };
+    repo.GetProjectInterface = function () {
+        return {
+            GUIDtoXML: function (g) { return g; },
+            CreateBaseline: function (g, name) {
+                repo._createCalls++;
+                if (opts.createThrows) { throw new Error("mock: CreateBaseline COM chyba"); }
+                if (opts.createFalse) { return false; }
+                repo._addBaseline(g, name, 0); return true;
+            },
+            GetBaselines: function (g) {
+                return "<EA.BaseLines>" + (BLS[g] || []).map(function (b) {
+                    return '<Baseline name="x" version="' + b.version + '" notes="" guid="' + b.guid + '"/>'; }).join("") + "</EA.BaseLines>";
+            },
+            DeleteBaseline: function (bg) {
+                repo._deleteCalls++;
+                for (var pg in BLS) { for (var i = 0; i < BLS[pg].length; i++) { if (BLS[pg][i].guid == bg) { BLS[pg].splice(i, 1); return true; } } }
+                return false;
+            }
+        };
+    };
     M.pk.forEach(function (p) { repo._addPackage({ id: p[0], parentID: p[1], name: p[2], guid: p[3] }); });
     M.el.forEach(function (e) { repo._addElement({ id: e[0], packageID: e[1], name: e[2], guid: e[3] }); });
     repo._sqlLog = sqlLog;
@@ -2681,15 +2725,6 @@ t("BL-2 T6-1 FB_Main: cteci davka nema sekci baseline", function () {
     var r = mainBl([{ op: "ping", echo: "x" }]);
     eq(typeof r.resp.baseline, "undefined");
 });
-t("BL-2 FB_Main: mutujici davka ma sekci baseline (shadow) s merenim; chovani davky beze zmeny", function () {
-    var r = mainBl([{ op: "create_or_update_elements", elements: [{ guid: "{EL-103}", notes: "x" }] }]);
-    var b = r.resp.baseline;
-    ok(b, "sekce baseline chybi"); eq(b.decision, "shadow"); eq(b.posture, "full"); eq(b.needsBaseline, true);
-    eq(b.packages.length, 1); eq(b.packages[0].guid, "{PK-13}"); eq(b.packages[0].subtreeCount, 1);
-    eq(b.packages[0].path, "Model.#FB-TEST.A.A1"); eq(b.subtreeMax, 5000);
-    ok(b.probeMs <= 500, "T6-2: probeMs v rozpoctu");
-    eq(r.resp.risk.riskLevel, "LOW", "shadow nesmi zmenit klasifikaci");
-});
 t("BL-2 T6-4 FB_Main: cisty create -> needsBaseline false, zadna sonda", function () {
     var r = mainBl([{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
     eq(r.resp.baseline.needsBaseline, false); eq(r.resp.baseline.packages.length, 0);
@@ -2705,15 +2740,6 @@ t("BL-2 FB_Main: ELEVATED davka ma sekci baseline uz v confirm_required (par. 4.
     eq(resp.status, "confirm_required", JSON.stringify(resp).substring(0, 300));
     eq(resp.baseline.packages[0].guid, "{PK-14}");
 });
-t("BL-2 FB_Main: pad FB_BaselinePlan neshodi davku (posture unknown)", function () {
-    var orig = B.FB_BaselinePlan;
-    B.FB_BaselinePlan = function () { throw new Error("bum"); };
-    try {
-        var r = mainBl([{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
-        eq(r.resp.baseline.posture, "unknown"); ok(r.resp.status == "done" || r.resp.status == "error");
-        ok(r.resp.code != "E_EXCEPTION");
-    } finally { B.FB_BaselinePlan = orig; }
-});
 t("BL-2 T6-31 FB_Main: politika bez sekce baseline -> warning v response nejvys 1x denne, davka LOW probehne", function () {
     withPolicy(polBase(), function () {
         blReset(); delete B._fbAccessCache;
@@ -2725,6 +2751,347 @@ t("BL-2 T6-31 FB_Main: politika bez sekce baseline -> warning v response nejvys 
         ok(a.warnings && /sekci 'baseline'/.test(a.warnings.join(" ")), "prvni davka nese warning");
         ok(!b.warnings || !/sekci 'baseline'/.test(b.warnings.join(" ")), "druha davka tyz den uz ne");
     });
+});
+
+// ===========================================================================
+// BASELINE POLITIKA - cast 3: lazy baseline, reuse, E_NO_BASELINE, navadena
+// cesta, razitka, confirm dialog, FB_SessionStart (Z260907-3)
+// ===========================================================================
+var BL_BASE = "C:\\HARNESS\\EA-File-Bridge";
+function autoNames(repo, pkgGuid) {
+    return (repo._baselines[pkgGuid] || []).map(function (b) { return b.version; }).filter(function (v) { return /^FB-AUTO /.test(v); });
+}
+function runText(repo, ops, id) {
+    delete B._fbAccessCache; delete B._fbPrevExc;
+    return JSON.parse(B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: id || ("bl3-" + (++guidSeq)), repo: "EAEXAMPLE.QEA", ops: ops })));
+}
+// davka souborem (kontrakt I5) -> confirm okruh jde odehrat cely
+function runFile(repo, ops, id) {
+    delete B._fbAccessCache; delete B._fbPrevExc;
+    var p = BL_BASE + "\\requests\\req-" + id + ".json";
+    memFs.files[p] = JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops });
+    var out = asEaRuntime(function () { return B.FB_Main.call(B, repo, p); });
+    memFs.files[BL_BASE + "\\responses\\res-" + id + ".json"] = out;
+    return JSON.parse(out);
+}
+function confirmFile(repo, first, id, approve) {
+    var out = asEaRuntime(function () {
+        return B.FB_ConfirmPending.call(B, repo, first.confirm.pendingPath, first.confirm.nonce, first.confirm.payloadHash, "okno", approve);
+    });
+    memFs.files[BL_BASE + "\\responses\\res-" + id + ".json"] = out;
+    return JSON.parse(out);
+}
+var UPD_A1 = [{ op: "create_or_update_elements", elements: [{ guid: "{EL-103}", notes: "x" }] }];
+var DEL_C = [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }];
+
+t("BL-3 jmeno: format + parse celotvarem; legacy / AI-pre / rucni mimo mnozinu", function () {
+    var ms = new Date(2026, 7, 21, 9, 14, 3).getTime();
+    var n = B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", "s20260821-1", ms, false);
+    eq(n, "FB-AUTO jnovak s20260821-1 2026-08-21 09:14:03");
+    var p = B.FB_BaselineName.call(B, "parse", n, "FB-AUTO ");
+    eq(p.login, "jnovak"); eq(p.token, "s20260821-1"); eq(p.ms, ms); eq(p.session, false);
+    var s = B.FB_BaselineName.call(B, "format", "FB-AUTO ", "", "s20260821-2", ms, true);
+    eq(s, "FB-AUTO - s20260821-2 2026-08-21 09:14:03 (session)", "prazdny login -> '-'");
+    eq(B.FB_BaselineName.call(B, "parse", s, "FB-AUTO ").session, true);
+    eq(B.FB_BaselineName.call(B, "format", "FB-AUTO ", "DOM\\jan novak", "s20260821-1", ms, false).split(" ")[1], "DOM\\jan_novak");
+    ["FB 2026-08-21 09:14:03", "AI-pre-S-r1", "Pred refaktorem", "FB-AUTO jnovak s20260821-1", "FB-AUTO jnovak s20260821-1 2026-08-21 09:14:03 navic",
+     "xFB-AUTO jnovak s20260821-1 2026-08-21 09:14:03", "FB-AUTOjnovak s20260821-1 2026-08-21 09:14:03"].forEach(function (x) {
+        eq(B.FB_BaselineName.call(B, "parse", x, "FB-AUTO "), null, x);
+    });
+});
+t("BL-3 zdroj: regex jmena je definovan 1x (FB_BaselineName) a parser necte atribut date", function () {
+    L.files.forEach(function (f) {
+        var code = fs.readFileSync(path.join(SRC, f), "utf8").split(/\r?\n/).filter(function (l) { return !/^\s*\/\//.test(l); }).join("\n");
+        if (f != "AICodeBridge.FB_BaselineName.js") { ok(!/s\\\\d\{8\}-\\\\d\+\) \(/.test(code), f + " ma vlastni kopii regexu jmena"); }
+        if (/FB_(AutoBaseline|BaselineName|BaselineDecide|BaselineCleanup)\.js$/.test(f)) { ok(!/date="/.test(code) && !/"date"/.test(code), f + " cte atribut date"); }
+    });
+});
+t("BL-3 T6-1: cteci davka -> zadna baseline, response bez sekce baseline", function () {
+    blReset(); var repo = blRepo();
+    var r = runText(repo, [{ op: "ping", echo: "x" }, { op: "get_selected_context" }]);
+    eq(typeof r.baseline, "undefined"); eq(repo._createCalls, 0);
+});
+t("BL-3 T6-4: cisty create do existujici package -> zadna baseline, LOW, decision none / cisty create", function () {
+    blReset(); var repo = blRepo();
+    var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
+    eq(r.risk.riskLevel, "LOW"); eq(r.baseline.decision, "none"); eq(r.baseline.reason, "cisty create"); eq(repo._createCalls, 0);
+    ok(!repo._sqlLog.some(function (s) { return /COUNT/.test(s); }), "sonda se u cisteho create nepousti");
+});
+t("BL-3 T6-5: update pod prahem -> prave 1 baseline nad NEJBLIZSI vlastnici package, jmeno FB-AUTO <login> <token> <cas>", function () {
+    blReset(); var repo = blRepo({ login: "jnovak" });
+    var r = runText(repo, UPD_A1);
+    eq(r.baseline.decision, "created", JSON.stringify(r.baseline)); eq(repo._countBaselines(), 1);
+    var nm = autoNames(repo, "{PK-13}");
+    eq(nm.length, 1, "baseline nad A1, ne nad vetvi");
+    var p = B.FB_BaselineName.call(B, "parse", nm[0], "FB-AUTO ");
+    ok(p != null, nm[0]); eq(p.login, "jnovak"); ok(/^s\d{8}-1$/.test(p.token));
+    eq(r.baseline.packages[0].name, nm[0]); eq(r.baseline.created[0], nm[0]); eq(r.baseline.packages[0].subtreeCount, 1);
+    ok(typeof r.baseline.elapsedMs == "number");
+    ok(r.results.length == 1 && r.results[0].op == "create_or_update_elements", "auto-baseline neni operace v results");
+});
+t("BL-3 T6-6: tentyz update podruhe v teze session -> zadna dalsi baseline, reason reuse session", function () {
+    blReset(); var repo = blRepo({ login: "jnovak" });
+    runText(repo, UPD_A1);
+    var r2 = runText(repo, UPD_A1);
+    eq(r2.baseline.decision, "reused"); eq(r2.baseline.reason, "reuse session"); eq(repo._countBaselines(), 1);
+});
+t("BL-3 reuse LOW: baseline JINEHO uzivatele se stejnym tokenem se nepocita", function () {
+    blReset(); var repo = blRepo({ login: "jnovak" });
+    var tok = B.FB_SessionToken.call(B, repo, null).token;
+    repo._addBaseline("{PK-13}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "kolega", tok, new Date().getTime() - 3600000, false), 60);
+    var r = runText(repo, UPD_A1);
+    eq(r.baseline.decision, "created"); eq(autoNames(repo, "{PK-13}").length, 2);
+});
+t("BL-3 T6-7 / T6-8: 3 sourozenci -> 3 baselines; potomek + predek -> 1 baseline nad predkem", function () {
+    blReset(); var repo = blRepo();
+    var r = runFile(repo, [{ op: "create_or_update_elements", elements: [{ elementID: 104, notes: "a" }, { elementID: 105, notes: "b" }, { elementID: 106, notes: "c" }] }], "t67");
+    eq(r.status, "confirm_required", "affectedPackages 3 > 1 = ELEVATED"); eq(repo._createCalls, 0);
+    var r2 = confirmFile(repo, r, "t67", true);
+    eq(r2.baseline.decision, "created", JSON.stringify(r2).substring(0, 400)); eq(repo._countBaselines(), 3);
+    eq(autoNames(repo, WL_GUID).length, 0, "nikdy baseline spolecneho predka");
+    blReset(); var repo8 = blRepo();
+    var r8 = runFile(repo8, [{ op: "create_or_update_elements", elements: [{ elementID: 103, notes: "a" }, { elementID: 101, notes: "b" }] }], "t68");
+    var r8b = (r8.status == "confirm_required") ? confirmFile(repo8, r8, "t68", true) : r8;
+    eq(repo8._countBaselines(), 1); eq(autoNames(repo8, "{PK-11}").length, 1);
+});
+t("BL-3 T6-9: 7 packages (nad maxBaselinePackages) -> 0 baselines, rezim bez package zalohy (navadena cesta), nikdy predek", function () {
+    blReset(); var repo = blRepo();
+    var ops = [{ op: "create_or_update_elements", elements: [101, 102, 104, 105, 106, 107, 108].map(function (i) { return { elementID: i, notes: "x" }; }) }];
+    var polNB = polBase(B.FB_RiskPolicy.call(B)[0].baseline)(); polNB[0].block = { deleteTargets: 100, writeOps: 500, updatedExisting: 100, affectedPackages: 50 };
+    var r = withPolicy(function () { return polNB; }, function () { return runFile(repo, ops, "t69"); });
+    eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300)); eq(r.baseline.action, "guided");
+    contains(r.baseline.reason, "maxBaselinePackages"); eq(repo._createCalls, 0);
+});
+t("BL-3 T6-10: update nad prahem (mimo destruktivni podtridu) -> confirm 'bez pre-image'; bez rucni baseline se po potvrzeni NEPROVEDE; s ni ano, 0 FB-AUTO, tag ai.baseline", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    var pol = polBase({ thresholdsShadow: false, subtreeMax: 5000 });
+    withPolicy(pol, function () {
+        var r = runFile(repo, UPD_A1, "t610");
+        eq(r.status, "confirm_required"); eq(r.baseline.action, "guided"); contains(r.baseline.reason, "nad prahem");
+        contains(r.risk.riskReasons.join("; "), "bez pre-image"); contains(r.risk.riskReasons.join("; "), "nutna rucni baseline nad Model.#FB-TEST.A.A1");
+        var sum = "" + B.FB_ConfirmSummary.call(B, r);
+        contains(sum, "BEZ AUTOMATICKE ZALOHY"); contains(sum, "Ctrl+Alt+B");
+        var r2 = confirmFile(repo, r, "t610", true);
+        eq(r2.status, "confirm_required", "bez rucni baseline se neprovede"); ok(r2.confirm.nonce != r.confirm.nonce, "novy nonce");
+        ok(memFs.files[r2.confirm.pendingPath], "soubor zustava v pending");
+        repo._addBaseline("{PK-11}", "Pred upravou A", 3); // rucni baseline nad PREDKEM cile, uvnitr whitelistu
+        var r3 = confirmFile(repo, r2, "t610", true);
+        eq(r3.status, "done", JSON.stringify(r3).substring(0, 500)); eq(r3.baseline.decision, "skipped");
+        eq(r3.baseline.manual.ok, true); eq(autoNames(repo, "{PK-13}").length + autoNames(repo, "{PK-11}").length, 0, "0 FB-AUTO baselines");
+    });
+});
+t("BL-3 navadena cesta: stara rucni baseline (mimo freshWithinMin) ani FB-AUTO/rezervovane jmeno nestaci", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    repo._addBaseline("{PK-13}", "Stara rucni", 120);
+    repo._addBaseline("{PK-13}", "FB-AUTO kolega s20260101-1 2026-01-01 10:00:00", 1);
+    repo._addBaseline("{PK-13}", "fb-auto podvrh", 1);
+    withPolicy(polBase({ thresholdsShadow: false }), function () {
+        var r = runFile(repo, UPD_A1, "t610b");
+        eq(r.baseline.manual.ok, false);
+    });
+});
+t("BL-3 T6-11: destruktivni podtrida nad prahem + requireRecoveryForUpdates -> E_NO_BASELINE, nic zapsano, audit, zadny confirm", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    var called = 0, oD = B.FB_OpDelete, oA = B.FB_Audit, audits = [];
+    B.FB_OpDelete = function () { called++; return { op: "delete_from_model", status: "ok", items: [] }; };
+    B.FB_Audit = function (R, id, summary) { audits.push(summary); return ""; };
+    try {
+        withPolicy(polBase({ thresholdsShadow: false, requireRecoveryForUpdates: true }), function () {
+            var r = runFile(repo, DEL_C, "t611");
+            eq(r.code, "E_NO_BASELINE", JSON.stringify(r).substring(0, 300)); eq(r.status, "error");
+            eq(r.results[0].status, "skipped"); eq(called, 0); eq(repo._createCalls, 0);
+            eq(audits.length, 1); contains(audits[0], "E_NO_BASELINE");
+            ok(!r.confirm, "zadne confirm_required");
+        });
+    } finally { B.FB_OpDelete = oD; B.FB_Audit = oA; }
+});
+t("BL-3 T6-11b: dev (requireRecoveryForUpdates false) -> destruktivni nad prahem jde navadenou cestou, ne E_NO_BASELINE", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    withPolicy(polBase({ thresholdsShadow: false }), function () {
+        var r = runFile(repo, DEL_C, "t611b");
+        eq(r.status, "confirm_required"); eq(r.baseline.action, "guided");
+    });
+});
+t("BL-3 T6-12: delete package X -> baseline nad RODICEM X (po potvrzeni)", function () {
+    blReset(); var repo = blRepo();
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [] }; };
+    try {
+        var r = runFile(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PK-13}" }] }], "t612");
+        eq(r.status, "confirm_required"); eq(repo._createCalls, 0);
+        var r2 = confirmFile(repo, r, "t612", true);
+        eq(r2.status, "done", JSON.stringify(r2).substring(0, 300));
+        eq(autoNames(repo, "{PK-11}").length, 1); eq(autoNames(repo, "{PK-13}").length, 0);
+    } finally { B.FB_OpDelete = oD; }
+});
+t("BL-3 T6-13: ELEVATED davka ZAMITNUTA v dialogu -> 0 baselines", function () {
+    blReset(); var repo = blRepo();
+    var r = runFile(repo, DEL_C, "t613");
+    eq(r.status, "confirm_required"); eq(r.baseline.decision, "planned");
+    contains("" + B.FB_ConfirmSummary.call(B, r), "Zaloha pred zapisem: Model.#FB-TEST.C (1 prvku)");
+    var r2 = confirmFile(repo, r, "t613", false);
+    eq(r2.code, "E_RISK_REJECTED"); eq(repo._createCalls, 0); eq(repo._countBaselines(), 0);
+});
+t("BL-3 T6-14: ELEVATED potvrzena -> baseline az PO potvrzeni; v okne freshWithinMin reuse, mimo okno cerstva", function () {
+    blReset(); var repo = blRepo({ login: "jnovak" });
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [] }; };
+    try {
+        var tok = B.FB_SessionToken.call(B, repo, null).token;
+        // FB-AUTO tehoz uzivatele a session, ale 40 min stara -> ELEVATED ji NEpouzije
+        repo._addBaseline("{PK-14}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", tok, new Date().getTime() - 40 * 60000, false), 40);
+        var r = runFile(repo, DEL_C, "t614");
+        eq(repo._createCalls, 0, "pred potvrzenim nic");
+        var r2 = confirmFile(repo, r, "t614", true);
+        eq(r2.baseline.decision, "created"); eq(autoNames(repo, "{PK-14}").length, 2);
+        ok(typeof r2.baseline.elapsedMs == "number");
+        // druha ELEVATED davka hned potom -> reuse freshWithinMin
+        var r3 = runFile(repo, DEL_C, "t614b");
+        var r4 = confirmFile(repo, r3, "t614b", true);
+        eq(r4.baseline.decision, "reused"); eq(r4.baseline.reason, "reuse freshWithinMin"); eq(autoNames(repo, "{PK-14}").length, 2);
+    } finally { B.FB_OpDelete = oD; }
+});
+t("BL-3 T6-15: CreateBaseline vraci false / hazi / FB_CheckWrite odmitne -> E_NO_BASELINE terminalne, bez confirm, nic zapsano", function () {
+    [{ createFalse: true }, { createThrows: true }].forEach(function (o) {
+        blReset(); var repo = blRepo(o);
+        var r = runText(repo, UPD_A1);
+        eq(r.code, "E_NO_BASELINE", JSON.stringify(o)); eq(r.status, "error"); eq(r.results[0].status, "skipped");
+        ok(!r.confirm); eq(r.baseline.decision, "failed");
+    });
+    blReset(); var repo2 = blRepo();
+    var oC = B.FB_CheckWrite; B.FB_CheckWrite = function () { return { code: "E_WHITELIST", message: "mimo whitelist" }; };
+    try { var r2 = runText(repo2, UPD_A1); eq(r2.code, "E_NO_BASELINE"); contains(r2.message, "E_WHITELIST"); eq(repo2._createCalls, 0); }
+    finally { B.FB_CheckWrite = oC; }
+});
+t("BL-3 T6-15b: potvrzena ELEVATED davka, zaloha selze -> E_NO_BASELINE, soubor do rejected (ne nove confirm)", function () {
+    blReset(); var repo = blRepo({ createFalse: true });
+    var r = runFile(repo, DEL_C, "t615");
+    var r2 = confirmFile(repo, r, "t615", true);
+    eq(r2.code, "E_NO_BASELINE"); ok(!memFs.files[r.confirm.pendingPath], "soubor uz neni v pending");
+    ok(Object.keys(memFs.files).some(function (k) { return /\\rejected\\req-t615/.test(k); }), "soubor v rejected");
+});
+t("BL-3 T6-16: velikost neznama (sonda selze) -> jako nad prahem, nikdy pod prahem", function () {
+    blReset(); var repo = blRepo({ countFails: true });
+    var r = runFile(repo, UPD_A1, "t616");
+    eq(r.status, "confirm_required"); eq(r.baseline.action, "guided"); contains(r.baseline.reason, "velikost neznama"); eq(repo._createCalls, 0);
+});
+t("BL-3 T6-25: metriky gate nespocitany + update existujiciho -> zaloha VZNIKNE a dialog nerika 'cisty create'", function () {
+    blReset(); var repo = blRepo();
+    var polArr = polBase(B.FB_RiskPolicy.call(B)[0].baseline)(); polArr[0].budgetMs = -1;
+    withPolicy(function () { return polArr; }, function () {
+        var r = runFile(repo, UPD_A1, "t625");
+        eq(r.status, "confirm_required"); eq(r.risk.metrics.metricsComplete, false);
+        var sum = "" + B.FB_ConfirmSummary.call(B, r);
+        contains(sum, "Rozsah davky se nepodarilo spocitat"); ok(sum.indexOf("jen vytvari") < 0, "nikdy cisty create");
+        var r2 = confirmFile(repo, r, "t625", true);
+        eq(r2.baseline.decision, "created", JSON.stringify(r2.baseline)); eq(autoNames(repo, "{PK-13}").length, 1);
+    });
+});
+t("BL-3 T6-26: opravna davka pres dedupKey/matchByName nad prahem -> projde bez E_NO_BASELINE, vykazuje updatedExistingApprox", function () {
+    blReset(); var repo = blRepo({ mult: 9000 });
+    withPolicy(polBase({ thresholdsShadow: false, requireRecoveryForUpdates: true }), function () {
+        var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "Retry", type: "Class", "package": "{PK-11}", dedupKey: "k1" }] }]);
+        ok(r.code != "E_NO_BASELINE", JSON.stringify(r).substring(0, 300)); ok(r.status != "confirm_required", "zadny dialog navic");
+        eq(r.baseline.decision, "none"); contains(r.baseline.reason, "updatedExistingApprox"); eq(r.baseline.updatedExistingApprox, 1);
+    });
+});
+t("BL-3 T6-27: $N odkaz na existujici prvek -> velikost neznama (navadena cesta), nikdy cisty create", function () {
+    blReset(); var repo = blRepo();
+    var r = runFile(repo, [{ op: "find_elements_by_name", name: "ElA" }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "t627");
+    eq(r.status, "confirm_required"); eq(r.baseline.action, "guided"); ok(r.baseline.reason.indexOf("cisty create") < 0);
+    contains(r.baseline.manual.missing.join(";"), "koren whitelistu");
+});
+t("BL-3 T6-28: delete korenove whitelist package -> povinne confirm s vysvetlenim, baseline nad package samym, nikdy E_WHITELIST", function () {
+    blReset(); var repo = blRepo();
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [] }; };
+    try {
+        var r = runFile(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "t628");
+        eq(r.status, "confirm_required"); contains(r.risk.riskReasons.join("; "), "parentOutOfWhitelist");
+        contains("" + B.FB_ConfirmSummary.call(B, r), "ZANIKNE");
+        var r2 = confirmFile(repo, r, "t628", true);
+        eq(r2.status, "done", JSON.stringify(r2).substring(0, 300)); eq(autoNames(repo, WL_GUID).length, 1);
+    } finally { B.FB_OpDelete = oD; }
+});
+t("BL-3 razitka: ai.baseline tag (pkgGuid;name;decision) + radek v Notes auditu", function () {
+    var tags = {}, el = {};
+    var repo = mkRepo(); repo.GetElementByGuid = function () { return el; };
+    var oS = B.SetTag; B.SetTag = function (e, n, v) { tags[n] = v; };
+    try {
+        B.FB_RiskAuditTags.call(B, repo, "{AUD}", { riskLevel: "LOW", riskReasons: [] },
+            { decision: "created", packages: [{ guid: "{PK-13}", name: "FB-AUTO - s20260907-1 2026-09-07 10:00:00", result: "created" }] });
+    } finally { B.SetTag = oS; }
+    eq(tags["ai.baseline"], "pkgGuid={PK-13};name=FB-AUTO - s20260907-1 2026-09-07 10:00:00;decision=created");
+    var note = B.FB_RiskNote.call(B, { riskLevel: "LOW", metrics: {} }, { decision: "none", reason: "cisty create", packages: [] });
+    contains(note, "baseline=none (cisty create)");
+    eq(B.FB_RiskNote.call(B, { riskLevel: "LOW", metrics: {} }).indexOf("baseline="), -1, "bez sekce beze zmeny");
+});
+t("BL-3 pad planu/rozhodnuti: nikdy tichy zapis - vynucene potvrzeni s duvodem", function () {
+    blReset(); var repo = blRepo();
+    var o = B.FB_BaselinePlan; B.FB_BaselinePlan = function () { throw new Error("bum"); };
+    try {
+        var r = runFile(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PK-11}" }] }], "tpad");
+        eq(r.status, "confirm_required"); contains(r.risk.riskReasons.join("; "), "Baseline politika selhala"); eq(r.baseline.decision, "failed");
+        contains("" + B.FB_ConfirmSummary.call(B, r), "BEZ pre-image");
+    } finally { B.FB_BaselinePlan = o; }
+});
+t("BL-3 E_NO_BASELINE: adaptery radi soubor do rejected; chat ACK nerika 'rozdel davku'", function () {
+    ["AICodeBridge.FB_Process.js", "AICodeBridge.FB_ClipboardImport.js", "AICodeBridge.FB_ProcessFolder.js", "AICodeBridge.FB_ConfirmPending.js"].forEach(function (f) {
+        contains(fs.readFileSync(path.join(SRC, f), "utf8"), "E_NO_BASELINE", f);
+    });
+    var ack = "" + B.FB_ChatRender.call(B, { id: "x", status: "error", code: "E_NO_BASELINE", message: "m", baseline: { reason: "nad prahem" }, results: [] });
+    contains(ack, "E_NO_BASELINE"); contains(ack, "NEDEL");
+});
+t("BL-3 T6-24 regrese: den dev skillu (scaffold + UC + vlastni diagram) -> zadny dialog navic, baselines <= dotcene packages", function () {
+    blReset(); var repo = blRepo();
+    var day = [
+        [{ op: "create_or_update_package", parent: "{PK-11}", name: "UC-1" }],
+        [{ op: "create_or_update_elements", elements: [{ name: "UC-1", type: "UseCase", "package": "{PK-11}" }] },
+         { op: "create_or_update_diagram", diagrams: [{ name: "UC-1 FA", type: "Activity", "package": "{PK-11}" }] },
+         { op: "place_elements_on_diagram", diagram: "$1", elementPlacements: [{ element: "$0" }] }],
+        [{ op: "create_or_update_attributes", element: 101, attributes: [{ name: "a" }] }],
+        [{ op: "create_or_update_attributes", element: 109, attributes: [{ name: "b" }] }],
+        [{ op: "create_or_update_elements", elements: [{ guid: "{EL-101}", notes: "n" }] }]
+    ];
+    var stub = function (n) { return function () { return { op: n, status: "ok", guid: mkGuid(), items: [{ guid: mkGuid(), id: ++guidSeq }] }; }; };
+    var keep = {}; ["FB_OpPackage", "FB_OpElements", "FB_OpDiagram", "FB_OpPlaceElements", "FB_OpAttributes"].forEach(function (k) { keep[k] = B[k]; B[k] = stub(k); });
+    try {
+        day.forEach(function (ops, ix) {
+            var r = runText(repo, ops, "t624-" + ix);
+            eq(r.status, "done", "davka " + ix + ": " + JSON.stringify(r).substring(0, 300));
+            eq(r.risk.riskLevel, "LOW", "davka " + ix + " bez dialogu");
+        });
+    } finally { for (var k in keep) { B[k] = keep[k]; } }
+    eq(repo._countBaselines(), 1, "3 menici davky do teze package = 1 baseline (reuse session)");
+});
+// --- FB_SessionStart ---
+t("BL-3 T6-2 SessionStart 'off': zadna baseline; hlaseni nese identitu repa a cesty whitelistu", function () {
+    blReset(); var repo = blRepo();
+    var out = withPolicy(polBase({ sessionBaseline: "off" }), function () { return "" + B.FB_SessionStart.call(B, repo); });
+    eq(repo._createCalls, 0); contains(out, "EAEXAMPLE.QEA"); contains(out, "Model.#FB-TEST"); contains(out, "az pred prvnim zapisem");
+});
+t("BL-3 T6-3 SessionStart 'auto' nad prahem: 0 baselines, 'preskocena (nad limitem)' s poctem", function () {
+    blReset(); var repo = blRepo({ mult: 1000 });
+    var out = "" + B.FB_SessionStart.call(B, repo);
+    eq(repo._createCalls, 0); contains(out, "preskocena (nad limitem)"); contains(out, "11000 prvku > 5000");
+});
+t("BL-3 SessionStart 'auto' pod prahem: baseline pod autoPrefix se sufixem (session); druhy start v teze session = reuse", function () {
+    blReset(); var repo = blRepo();
+    var out = "" + B.FB_SessionStart.call(B, repo);
+    var nm = autoNames(repo, WL_GUID);
+    eq(nm.length, 1); ok(/ \(session\)$/.test(nm[0]), nm[0]); ok(B.FB_BaselineName.call(B, "parse", nm[0], "FB-AUTO ").session);
+    contains(out, "vytvorena nad: Model.#FB-TEST");
+    ok(!(repo._baselines[WL_GUID] || []).some(function (b) { return /^FB \d{4}/.test(b.version); }), "legacy tvar 'FB <datum>' se uz nevyrabi");
+    var out2 = "" + B.FB_SessionStart.call(B, repo);
+    eq(autoNames(repo, WL_GUID).length, 1); contains(out2, "uz existuje");
+});
+t("BL-3 I4 SessionStart: CreateBaseline false -> hlasi SELHANI (ne 'vytvoreno') a NEvaruje o chybejicim whitelistu", function () {
+    blReset(); var repo = blRepo({ createFalse: true });
+    var out = "" + B.FB_SessionStart.call(B, repo);
+    contains(out, "SELHALA"); ok(out.indexOf("vytvorena nad") < 0); ok(out.indexOf("E_REPO") < 0, "whitelist je v poradku");
+});
+t("BL-3 I4 SessionStart: repo bez whitelist polozky -> varovani E_REPO (z identity, ne z poctu zaloh)", function () {
+    blReset();
+    var repo = mkRepo({ connectionString: "C:\\X\\JINY.QEA" });
+    var out = "" + B.FB_SessionStart.call(B, repo);
+    contains(out, "zadna whitelist polozka neodpovida"); contains(out, "E_REPO");
 });
 
 // ------------------------------------------------------------------ vysledek

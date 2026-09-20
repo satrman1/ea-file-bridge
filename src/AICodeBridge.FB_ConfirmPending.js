@@ -168,6 +168,7 @@ if (out.indexOf("\"status\":\"confirm_required\"") >= 0) {
     return out;
 }
 var toRejected = (out.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
+    || (out.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0) // Baseline politika par. 7
     || (out.indexOf("\"code\":\"E_PARSE\"") >= 0)
     || (out.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0);
 try { moveTo(toRejected ? rejDir : procDir); }

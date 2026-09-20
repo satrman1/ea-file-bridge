@@ -163,6 +163,7 @@ if (respText.indexOf("\"status\":\"confirm_required\"") >= 0) {
     // done/error/rejected -> archiv (stejny zivotni cyklus jako GUI fallback)
     var rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
         || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
+            || (respText.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0) // Baseline politika par. 7
         || (respText.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0);
     if (fso.FileExists(reqPath)) {
         fso.MoveFile(reqPath, (rejected ? DIR_REJ : DIR_PROC) + "\\" + reqName.replace(/\.json$/i, "") + "." + ts() + ".json");

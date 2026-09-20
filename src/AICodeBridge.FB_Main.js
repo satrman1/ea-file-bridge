@@ -262,6 +262,7 @@ function resolveRefs(v) {
 // Ciste ctene (Č) davky jdou mimo gate. Neznama operace se pocita jako
 // zapisova (fail-closed; exekuci ji stejne zastavi E_UNKNOWN_OP).
 var risk = null;
+var blPlan = null, blDec = null; // Baseline politika (plan + rozhodnuti davky)
 var writesInBatch = 0;
 for (var wi = 0; wi < req.ops.length; wi++) {
     var wname = "" + (req.ops[wi] && req.ops[wi].op ? req.ops[wi].op : "?");
@@ -373,13 +374,48 @@ if (writesInBatch > 0) {
     // --- BASELINE POLITIKA (zadani v1.2 par. 4.6/2): plan zalohy se pocita
     // PO klasifikaci (mimo budgetMs gate) a PRED confirm - dialog tak predem
     // rika, co se zazalohuje. Pri potvrzenem behu se prepocita (par. 4.6/4).
-    // Z260907-2: SHADOW - sekce baseline{} jen meri a vykazuje, chovani davky
-    // se nemeni. Chyba planu nikdy neshodi davku (posture unknown).
-    var blPlan = null;
+    // Rozhodnuti (FB_BaselineDecide, par. 4.4): none | create | guided | refuse.
+    // ZALOHA SAMA vznika az tesne pred prvni zapisovou operaci - u ELEVATED
+    // tedy az PO potvrzeni (par. 4.6/3+5; zamitnuta davka nesmi plodit zalohy).
+    // Prahy velikosti jsou SHADOW, dokud politika nema thresholdsShadow: false.
+    // Pad planu/rozhodnuti davku neshodi, ale NIKDY nepusti tichy zapis:
+    // vynuti potvrzeni s duvodem (clovek vi, ze pise bez pre-image).
     try { blPlan = this.FB_BaselinePlan(Repository, req, risk, REG); }
-    catch (eBl) { blPlan = null; resp.baseline = { decision: "shadow", posture: "unknown", reason: "FB_BaselinePlan selhal: " + eBl.message, packages: [] }; }
+    catch (eBl) { blPlan = null; resp.baseline = { decision: "failed", posture: "unknown", reason: "FB_BaselinePlan selhal: " + eBl.message, packages: [] }; }
     if (blPlan != null) {
+        try { blDec = this.FB_BaselineDecide(Repository, blPlan, risk); }
+        catch (eBd) { blDec = null; blPlan.section.reason = "FB_BaselineDecide selhal: " + eBd.message; }
+    }
+    if (blPlan == null || blDec == null) {
+        if (blPlan != null) { resp.baseline = blPlan.section; resp.baseline.decision = "failed"; }
+        if (risk.riskLevel == "LOW") { risk.riskLevel = "ELEVATED"; }
+        risk.riskReasons.push("Baseline politika selhala (" + resp.baseline.reason + ") - zapis by probehl BEZ pre-image; vyzaduje potvrzeni cloveka (fail-closed)");
+    }
+    if (blPlan != null && blDec != null) {
         resp.baseline = blPlan.section;
+        resp.baseline.decision = (blDec.action == "create") ? "planned" : ((blDec.action == "none") ? "none" : (blDec.action == "guided" ? "skipped" : "failed"));
+        resp.baseline.reason = blDec.reason;
+        resp.baseline.action = blDec.action;
+        resp.baseline.lines = blDec.lines;
+        if (blDec.manual) { resp.baseline.manual = blDec.manual; }
+        if (risk.metrics && typeof risk.metrics.updatedExistingApprox == "number" && risk.metrics.updatedExistingApprox > 0) {
+            resp.baseline.updatedExistingApprox = risk.metrics.updatedExistingApprox;
+        }
+        // radek 4a: destruktivni podtrida bez moznosti zalohy -> terminalne
+        if (blDec.action == "refuse") {
+            return emitNoBaseline("pre-image nelze poridit: " + blDec.reason);
+        }
+        // vynucene potvrzeni (navadena cesta / parentOutOfWhitelist) - i pro LOW
+        if (blDec.confirmReasons.length > 0) {
+            if (risk.riskLevel == "LOW") { risk.riskLevel = "ELEVATED"; }
+            for (var bcr = 0; bcr < blDec.confirmReasons.length; bcr++) { risk.riskReasons.push(blDec.confirmReasons[bcr]); }
+        }
+        // navadena cesta: potvrzeno, ale rucni baseline porad chybi -> NEprovest,
+        // nove confirm_required s navodem (soubor zustava v pending\)
+        if (blDec.action == "guided" && confirmedRun && !(blDec.manual && blDec.manual.ok)) {
+            risk.riskReasons.push("Potvrzeno, ale cerstva rucni baseline stale chybi - davka se NEPROVEDLA; udelej baseline a potvrd znovu, nebo davku zamitni");
+            return emitConfirmRequired();
+        }
         // chybejici sekce politiky: warning nejvys 1x denne (state-blwarn.txt)
         try {
             if (blPlan.cfgWarnings && blPlan.cfgWarnings.length > 0) {
@@ -491,6 +527,61 @@ function emitConfirmRequired() {
     self.Log(Repository, "FB " + reqId + " -> confirm_required (" + risk.riskReasons.join("; ") + ")");
     return self.FB_JsonStringify(resp, 1);
 }
+// --- Baseline politika: E_NO_BASELINE (par. 7) - JEDINY kod pro "pre-image
+// nelze poridit". Terminalni (W10): nic se neprovedlo, zadne nove
+// confirm_required, soubor patri do rejected\, audit SE zapise.
+function emitNoBaseline(why) {
+    resp.status = "error";
+    resp.code = "E_NO_BASELINE";
+    resp.message = "Baseline politika: " + why + ". Nic nebylo provedeno. Co s tim: (1) udelej v EA rucni baseline nad balickem cile "
+        + "(Ctrl+Alt+B -> New Baseline, jmeno bez prefixu FB-AUTO) a davku posli znovu, (2) pracuj v mensim balicku, "
+        + "(3) pri E_WHITELIST / zamcenem balicku se obrat na spravce. Davku NEDEL na mensi jen kvuli obejiti teto kontroly.";
+    resp.results = [];
+    for (var nb = 0; nb < req.ops.length; nb++) {
+        resp.results.push({ op: "" + (req.ops[nb] && req.ops[nb].op ? req.ops[nb].op : "?"), status: "skipped" });
+    }
+    if (!resp.baseline) { resp.baseline = { packages: [] }; }
+    resp.baseline.decision = "failed";
+    resp.baseline.reason = why;
+    if (confirmedRun && risk) { risk.confirm = { required: true, confirmedByUser: true, channel: "" + ctx.channel, timestamp: nowTextM() }; }
+    var nbSummary = "error E_NO_BASELINE: " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + why + self.FB_RiskNote(risk, resp.baseline);
+    try {
+        var agN = self.FB_Audit(Repository, reqId, nbSummary, "" + reqText);
+        resp.audit = { aiLogGuid: agN };
+        self.FB_RiskAuditTags(Repository, agN, risk, resp.baseline);
+    } catch (e3n) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3n.message }; }
+    self.Log(Repository, "FB " + reqId + " -> E_NO_BASELINE (" + why + ")");
+    return self.FB_JsonStringify(resp, 1);
+}
+// --- Baseline politika: LAZY BASELINE (par. 4.1, 4.6/5) - tesne pred prvni
+// zapisovou operaci; u ELEVATED az tady = PO potvrzeni. Neni to operace
+// davky: nejde do results ani do metrik, jen do sekce baseline{}.
+if (writesInBatch > 0 && blPlan != null && blDec != null && blDec.action == "create") {
+    var blT0 = new Date().getTime();
+    var blTok = null;
+    try { blTok = this.FB_SessionToken(Repository, blPlan.cfg); } catch (eTk) { blTok = null; }
+    var blKlass = (confirmedRun || risk.riskLevel == "ELEVATED") ? "ELEVATED" : "LOW";
+    var blCreated = [], blReused = [];
+    for (var bk = 0; bk < blPlan.scope.packages.length; bk++) {
+        var bpk = blPlan.scope.packages[bk];
+        var bres = null;
+        try { bres = this.FB_AutoBaseline(Repository, bpk.guid, blPlan.cfg, blTok, blKlass, false); }
+        catch (eAb) { bres = { status: "failed", why: "FB_AutoBaseline selhal: " + eAb.message, name: "", guid: "" }; }
+        if (!bres || bres.status == "failed") {
+            resp.baseline.elapsedMs = new Date().getTime() - blT0;
+            return emitNoBaseline("zalohu balicku '" + (bpk.path || bpk.name) + "' se nepodarilo poridit (" + (bres ? bres.why : "?") + ")");
+        }
+        resp.baseline.packages[bk].name = bres.name;
+        resp.baseline.packages[bk].baselineGuid = bres.guid;
+        resp.baseline.packages[bk].result = bres.status;
+        if (bres.status == "created") { blCreated.push(bres.name); } else { blReused.push(bres.name); resp.baseline.packages[bk].reuse = bres.why; }
+    }
+    resp.baseline.decision = (blCreated.length > 0) ? "created" : "reused";
+    if (blCreated.length == 0 && blReused.length > 0) { resp.baseline.reason = resp.baseline.packages[0].reuse; }
+    resp.baseline.created = blCreated;
+    resp.baseline.reused = blReused;
+    resp.baseline.elapsedMs = new Date().getTime() - blT0;
+}
 // --- provedeni davky (stop-on-error) ---
 var okc = 0, errc = 0, failed = false;
 for (var i = 0; i < req.ops.length; i++) {
@@ -551,11 +642,11 @@ if (writesInBatch > 0 && (okc > 0 || partialDel)) {
     try { this._fbLastWriteReqId = reqId; this.FB_StateFile(Repository, "lastwrite", reqId); } catch (eLr) { }
 }
 var summary = resp.status + ": " + req.ops.length + " ops (" + okc + " ok, " + errc + " chyb)"
-    + this.FB_RiskNote(risk);
+    + this.FB_RiskNote(risk, resp.baseline);
 try {
     var ag = this.FB_Audit(Repository, reqId, summary, "" + reqText);
     resp.audit = { aiLogGuid: ag };
-    this.FB_RiskAuditTags(Repository, ag, risk);
+    this.FB_RiskAuditTags(Repository, ag, risk, resp.baseline);
 } catch (e3) {
     resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3.message };
 }

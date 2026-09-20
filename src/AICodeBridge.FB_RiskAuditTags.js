@@ -1,4 +1,4 @@
-// AICodeBridge.FB_RiskAuditTags(Repository, auditGuid, risk)
+// AICodeBridge.FB_RiskAuditTags(Repository, auditGuid, risk, baseline)
 // Riskova pole na audit Artifact v #AI-LOG jako tagged values (iterace 4b,
 // zadani par. 8). Plne metriky + duvody jsou v Notes (FB_RiskNote); tagy
 // nesou strojove citelny vytah (limit TV ~255 znaku -> oriznuti).
@@ -30,6 +30,27 @@ try {
              + (risk.confirm.channel ? ";channel=" + risk.confirm.channel : "")
              + (risk.confirm.timestamp ? ";at=" + risk.confirm.timestamp : "")
              + (risk.confirm.integrityFailed ? ";integrityFailed=1" : "")).substring(0, 250));
+    }
+    // Baseline politika par. 4.6/7 (W11): restore manifest pro par. 12f/T3 -
+    // res-*.json lezi v per-user slozce, tag na audit Artifactu prezije.
+    // Tvar: pkgGuid=...;name=...;decision=... per package, oddelovac |
+    if (baseline) {
+        var parts = [], pk = baseline.packages || [];
+        for (var bi = 0; bi < pk.length; bi++) {
+            parts.push("pkgGuid=" + (pk[bi].guid || "") + ";name=" + (pk[bi].name || "") + ";decision=" + (pk[bi].result || baseline.decision || ""));
+        }
+        if (parts.length == 0) { parts.push("decision=" + (baseline.decision || "") + ";reason=" + (baseline.reason || "")); }
+        var full = parts.join("|");
+        // limit TV ~255: delsi vycet se deli do ai.baseline, ai.baseline.2, ...
+        var chunkNo = 1, cur = "";
+        for (var ci = 0; ci < parts.length; ci++) {
+            var add = (cur == "" ? "" : "|") + parts[ci];
+            if (cur != "" && (cur.length + add.length) > 250) {
+                this.SetTag(el, (chunkNo == 1 ? "ai.baseline" : "ai.baseline." + chunkNo), cur);
+                chunkNo++; cur = parts[ci];
+            } else { cur += add; }
+        }
+        if (cur != "") { this.SetTag(el, (chunkNo == 1 ? "ai.baseline" : "ai.baseline." + chunkNo), cur.substring(0, 250)); }
     }
 } catch (eT) { }
 return "";

@@ -48,6 +48,17 @@ if (sm.paths && sm.paths.length > 0) {
     if (sm.paths.length > 1) { for (var pi = 0; pi < sm.paths.length; pi++) { L.push("  - " + sm.paths[pi]); } }
 }
 if (sm.diagrams && sm.diagrams.length > 0) { L.push("Diagramy: " + sm.diagrams.join(", ")); }
+// --- ZALOHA (Baseline politika par. 4.6/2): dialog PREDEM rika, co se
+// zazalohuje a co ne. Texty sklada FB_BaselineDecide z metricsComplete a
+// posture - pri nespocitanych metrikach NIKDY "cisty create".
+var bl = resp.baseline || null;
+if (bl && bl.lines && bl.lines.length > 0) {
+    L.push("");
+    for (var bli = 0; bli < bl.lines.length; bli++) { L.push("" + bl.lines[bli]); }
+} else if (bl && bl.decision == "failed") {
+    L.push("");
+    L.push("POZOR: zalohu se nepodarilo naplanovat (" + (bl.reason || "?") + ") - zapis probehne BEZ pre-image.");
+}
 // --- proc se ptam (plainu, prvni konkretni duvod) ---
 if (risk.riskReasons && risk.riskReasons.length > 0) {
     L.push("");
