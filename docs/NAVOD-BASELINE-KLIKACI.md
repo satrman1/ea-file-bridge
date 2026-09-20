@@ -32,7 +32,7 @@ Znamená: zálohu nešlo pořídit a dávka je z těch, které bez zálohy nejed
 | 1. Přečíst důvod | `res-<id>.json` → `message` a `baseline.reason` | — | „zalohu balicku '…' se nepodarilo poridit (…)" nebo „… destruktivni operace bez moznosti zalohy" |
 | 2a. Důvod obsahuje `E_WHITELIST` nebo „locked" | — | balíček je mimo povolenou větev / zamčený → obrať se na správce | — |
 | 2b. Důvod „velikost neznama" / „nad prahem" | EA | udělej ruční baseline nad balíčkem cíle (postup B/2) a **pošli dávku znovu** s novým id | dávka tentokrát skončí dialogem z oddílu B a po potvrzení proběhne *(platí na dev stanici; v bance s `requireRecoveryForUpdates: true` destruktivní dávka nad velkým balíčkem neprojde nikdy — pracuj v menším balíčku)* |
-| 3. Kde je původní soubor | `requests\rejected\` (schránka, složka, vrátný) · **u pumpy zatím `requests\processed\`** | — | známá odchylka, viz PROTOKOL §6j bod 6 |
+| 3. Kde je původní soubor | `requests\rejected\` (pumpa, schránka, složka i vrátný) | — | soubor s časovým razítkem v názvu |
 
 ## D. Úklid automatických záloh
 

@@ -37,6 +37,8 @@ End Function
 //  - Po startu se cekajici davky v pending\ znovu nabidnou (bezstavovost:
 //    potvrzeni prezije restart pumpy i EA).
 //  - rejected\ nove i pro E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky).
+//  - 2026-09-20 (Baseline politika par. 7): rejected\ i pro E_NO_BASELINE;
+//    konzole rozlisuje "chybi rucni baseline" od re-klasifikace metrik.
 // v0.13 (lekce E2E VS Code 2026-09-07, N5): jedina instance - zamek
 //    requests\.pump.lock drzeny po dobu behu; druhy start vypise
 //    "Pumpa uz bezi" a skonci (exit 2). Viz komentar u zamku nize.
@@ -191,12 +193,16 @@ function promptConfirm(repo, bridge, pendPath, respText) {
         writeUtf8(DIR_RES + "\\" + responseName(name), out);
         if (out.indexOf("\"reloadCode\":true") >= 0) { needReload = true; }
         if (out.indexOf("\"status\":\"confirm_required\"") >= 0) {
-            echo("Re-klasifikace: metriky se zmenily - nove potvrzeni s novym nonce.");
+            // Baseline politika (navadena cesta): potvrzeno, ale cerstva rucni
+            // baseline chybi -> executor davku NEprovedl a zada nove potvrzeni
+            if (out.indexOf("rucni baseline stale chybi") >= 0) { echo("NEPROVEDENO: chybi cerstva rucni baseline (viz dialog) - udelej ji v EA a potvrd znovu, nebo davku zamitni."); }
+            else { echo("Re-klasifikace: metriky se zmenily - nove potvrzeni s novym nonce."); }
             respText = out;
             continue;
         }
         if (out.indexOf("\"code\":\"E_RISK_REJECTED\"") >= 0) { echo("ZAMITNUTO " + name + " -> rejected\\"); }
         else if (out.indexOf("\"code\":\"E_RISK_INTEGRITY\"") >= 0) { echo("E_RISK_INTEGRITY " + name + " (payload zmenen) -> rejected\\"); }
+        else if (out.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0) { echo("E_NO_BASELINE " + name + " (zalohu nelze poridit, nic neprovedeno) -> rejected\\"); }
         else if (out.indexOf("\"status\":\"done\"") >= 0) { echo("POTVRZENO a provedeno " + name + " -> processed\\"); }
         else { echo("POTVRZENO " + name + ", vysledek s chybou - viz " + responseName(name)); }
         return needReload;
@@ -248,9 +254,12 @@ function processFile(repo, bridge, file) {
         respText = "" + bridge.FB_Main(repo, path);
         // rejected: E_PARSE (nevalidni JSON) + E_RISK_BLOCKED (BLOCKED davka)
         // + E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky, B1)
+        // + E_NO_BASELINE (Baseline politika par. 7: pre-image nelze poridit -
+        //   nic se neprovedlo; stejne razeni jako adaptery v src/)
         rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
             || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
-            || (respText.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0);
+            || (respText.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0)
+            || (respText.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0);
     }
 
     writeUtf8(DIR_RES + "\\" + responseName(name), respText);

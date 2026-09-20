@@ -3066,7 +3066,11 @@ t("BL-3 pad planu/rozhodnuti: nikdy tichy zapis - vynucene potvrzeni s duvodem",
         contains("" + B.FB_ConfirmSummary.call(B, r), "BEZ pre-image");
     } finally { B.FB_BaselinePlan = o; }
 });
-t("BL-3 E_NO_BASELINE: adaptery V SRC radi soubor do rejected (pump.wsf NE - transport se v teto davce nemeni, nalez k rozhodnuti); chat ACK nerika 'rozdel davku'", function () {
+t("BL-3 E_NO_BASELINE: vsechny adaptery vcetne pump.wsf radi soubor do rejected; chat ACK nerika 'rozdel davku'", function () {
+    var pump = fs.readFileSync(path.join(SRC, "..", "pump.wsf"), "utf8");
+    ok(/rejected = [\s\S]{0,400}E_NO_BASELINE/.test(pump), "pump.wsf: E_NO_BASELINE chybi ve vyrazu rejected");
+    contains(pump, "rucni baseline stale chybi");
+    contains(fs.readFileSync(path.join(SRC, "AICodeBridge.FB_Main.js"), "utf8"), "rucni baseline stale chybi", "kotva, kterou pumpa hleda, musi byt ve FB_Main");
     ["AICodeBridge.FB_Process.js", "AICodeBridge.FB_ClipboardImport.js", "AICodeBridge.FB_ProcessFolder.js", "AICodeBridge.FB_ConfirmPending.js"].forEach(function (f) {
         contains(fs.readFileSync(path.join(SRC, f), "utf8"), "E_NO_BASELINE", f);
     });
