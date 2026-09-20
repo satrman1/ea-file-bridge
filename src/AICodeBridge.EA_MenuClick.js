@@ -34,6 +34,29 @@ else if (ItemName == "Stav bridge (kam zapisuje / co cte)") {
     catch (eSt) { outS = "CHYBA nacteni stavu: " + eSt.message; }
     Session.Prompt(outS, 0);
 }
+else if (ItemName == "Uklid automatickych baselines (ukazat / provest)") {
+    // Baseline politika par. 6.3/5: report vzdy; "provest" = mode delete s
+    // force (bez stropu maxDeletesPerRun, strop anomalie plati) JEN po
+    // vyslovnem Ano a jen pro write skupinu. PRVNI OSTRE MAZANI ma probehnout
+    // odsud, pod dohledem (dispozice 4). Aktivace polozky = plny restart EA.
+    var outU = "";
+    try {
+        var cfgU = this.FB_BaselineConfig(Repository).cfg;
+        var repU = this.FB_BaselineCleanup(Repository, cfgU, "report", true);
+        outU = "" + repU.text;
+        if (repU.candidates.length > 0 && !repU.anomaly) {
+            var ansU = Session.Prompt(outU + "\n\nANO = tyto baselines TED SMAZAT (nevratne)   |   NE / Storno = jen ukazat", 3);
+            if (ansU == 3) {
+                var delU = this.FB_BaselineCleanup(Repository, cfgU, "delete", true);
+                outU = "" + delU.text;
+            } else { outU = ""; }
+        }
+    } catch (eUk) { outU = "CHYBA uklidu baselines: " + eUk.message; }
+    if (outU != "") {
+        try { Session.Output("[AI Bridge] " + outU); } catch (eOU) { }
+        Session.Prompt(outU, 0);
+    }
+}
 else if (ItemName == "Nav spike (test navigace)") {
     // SPIKE iterace 5 (B-V3): krokovaci sonda navigacnich COM volani.
     // Pad kroku NENI zachytitelny (par. 1a/4) - vyhodnoceni podle Output

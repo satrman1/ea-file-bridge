@@ -2728,7 +2728,7 @@ t("BL-2 T6-1 FB_Main: cteci davka nema sekci baseline", function () {
 t("BL-2 T6-4 FB_Main: cisty create -> needsBaseline false, zadna sonda", function () {
     var r = mainBl([{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
     eq(r.resp.baseline.needsBaseline, false); eq(r.resp.baseline.packages.length, 0);
-    ok(!r.repo._sqlLog.some(function (s) { return /COUNT/.test(s); }), "sonda se u cisteho create nepousti");
+    ok(!r.repo._sqlLog.some(function (s) { return /COUNT\(\*\) AS c FROM t_object/.test(s); }), "sonda se u cisteho create nepousti");
 });
 t("BL-2 FB_Main: ELEVATED davka ma sekci baseline uz v confirm_required (par. 4.6/2)", function () {
     blReset();
@@ -2815,7 +2815,7 @@ t("BL-3 T6-4: cisty create do existujici package -> zadna baseline, LOW, decisio
     blReset(); var repo = blRepo();
     var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "Novy", type: "Class", "package": "{PK-11}" }] }]);
     eq(r.risk.riskLevel, "LOW"); eq(r.baseline.decision, "none"); eq(r.baseline.reason, "cisty create"); eq(repo._createCalls, 0);
-    ok(!repo._sqlLog.some(function (s) { return /COUNT/.test(s); }), "sonda se u cisteho create nepousti");
+    ok(!repo._sqlLog.some(function (s) { return /COUNT\(\*\) AS c FROM t_object/.test(s); }), "sonda se u cisteho create nepousti");
 });
 t("BL-3 T6-5: update pod prahem -> prave 1 baseline nad NEJBLIZSI vlastnici package, jmeno FB-AUTO <login> <token> <cas>", function () {
     blReset(); var repo = blRepo({ login: "jnovak" });
@@ -3198,6 +3198,176 @@ t("BL-4 journal jen pod prahem: navadena cesta (nad prahem) i destruktivni E_NO_
 });
 t("BL-4 audit Notes nese odkaz na manifest journalu", function () {
     contains(B.FB_RiskNote.call(B, { riskLevel: "LOW", metrics: {} }, { decision: "created", packages: [], journal: { manifestRef: "C:\\x\\journal\\a.json", targets: 2 } }), "journal=C:\\x\\journal\\a.json (2 cilu)");
+});
+
+// ===========================================================================
+// BASELINE POLITIKA - cast 5: uklid automatickych baselines (Z260907-5)
+// ===========================================================================
+var DAY = 86400000;
+function clName(login, daysAgo, n, session) {
+    return B.FB_BaselineName.call(B, "format", "FB-AUTO ", login, "s20260101-" + (n || 1), new Date().getTime() - daysAgo * DAY, session === true);
+}
+function clRepo(specs, opts) {
+    // specs: [pkgGuid, login, daysAgo] - DocDate zamerne nesouvisi se jmenem (vek se bere ZE JMENA)
+    var repo = blRepo(opts);
+    specs.forEach(function (s, i) { repo._addBaseline(s[0], (s.length > 3) ? s[3] : clName(s[1], s[2], i + 1), 0); });
+    return repo;
+}
+function clCfg(over) {
+    var cfg = B.FB_BaselineConfig.call(B, mkRepo()).cfg;
+    for (var k in (over || {})) { cfg.cleanup[k] = over[k]; }
+    return cfg;
+}
+function six() { return [20, 25, 30, 35, 40, 45].map(function (d) { return ["{PK-11}", "jnovak", d]; }); }
+t("BL-5 T6-17 report: 6 starych FB-AUTO tehoz uzivatele, K=3 -> 0 smazano, 'smazal bych 3', DeleteBaseline se NEVOLA", function () {
+    blReset(); var repo = clRepo(six());
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "report", false);
+    eq(r.mode, "report"); eq(r.total, 6); eq(r.candidates.length, 3); eq(r.planned, 3); eq(r.deleted.length, 0);
+    eq(repo._deleteCalls, 0); eq(repo._countBaselines(), 6); contains(r.text, "Smazal bych 3");
+    contains(r.text, "uzivatel jnovak");
+});
+t("BL-5 T6-18 delete: smazany PRAVE 3 nejstarsi, zustanou 3 nejnovejsi; audit vyjmenovava GUIDy s loginem", function () {
+    blReset(); var repo = clRepo(six());
+    var audits = [], oA = B.FB_Audit; B.FB_Audit = function (R, id, summary, text) { audits.push({ id: id, summary: summary, text: text }); return "{AUD}"; };
+    var r;
+    try { r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", false); } finally { B.FB_Audit = oA; }
+    eq(r.mode, "delete"); eq(r.deleted.length, 3); eq(repo._deleteCalls, 3); eq(repo._countBaselines(), 3);
+    var left = autoNames(repo, "{PK-11}").map(function (n) { return B.FB_BaselineName.call(B, "parse", n, "FB-AUTO ").ms; });
+    ok(left.every(function (ms) { return (new Date().getTime() - ms) < 31 * DAY; }), "zustaly 3 nejnovejsi (20, 25, 30 dni)");
+    eq(audits.length, 1); r.deleted.forEach(function (d) { contains(audits[0].text, d.guid); }); contains(audits[0].text, "uzivatel jnovak");
+});
+t("BL-5 T6-19: legacy 'FB <datum>', 'AI-pre-*', rucni a podvrzena jmena nejsou ani kandidat a report je nezminuje", function () {
+    blReset();
+    var repo = clRepo([["{PK-11}", "", 0, "FB 2026-01-01 10:00:00"], ["{PK-11}", "", 0, "AI-pre-S-r1"], ["{PK-11}", "", 0, "Pred refaktorem"],
+        ["{PK-11}", "", 0, "FB-AUTO jnovak s20260101-1 2026-01-01 10:00:00 navic"], ["{PK-11}", "", 0, "FB-AUTO jnovak 2026-01-01 10:00:00"]]);
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg({ keepLastK: 0 }), "delete", true);
+    eq(r.total, 0); eq(r.candidates.length, 0); eq(repo._deleteCalls, 0); eq(repo._countBaselines(), 5);
+    ok(r.text.indexOf("Pred refaktorem") < 0 && r.text.indexOf("AI-pre") < 0);
+});
+t("BL-5 T6-20: 8 FB-AUTO starych 7 dnu, K=3, maxAgeDays 14 -> 0 smazano (AND, ne OR)", function () {
+    blReset(); var sp = []; for (var i = 0; i < 8; i++) { sp.push(["{PK-11}", "jnovak", 7]); }
+    var repo = clRepo(sp);
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", false);
+    eq(r.candidates.length, 0); eq(repo._deleteCalls, 0);
+});
+t("BL-5 podlaha per (package, uzivatel): kolega A s novejsimi zalohami nevytlaci jediny pre-image kolegy B", function () {
+    blReset();
+    var sp = [["{PK-11}", "kolegaB", 60]];
+    for (var i = 0; i < 5; i++) { sp.push(["{PK-11}", "kolegaA", 1 + i]); }
+    var repo = clRepo(sp);
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", false);
+    eq(r.candidates.length, 0, "B ma jedinou zalohu = je v jeho keepLastK"); eq(repo._deleteCalls, 0);
+    // stejna package, jiny balicek teze osoby se take nemicha
+    blReset(); var repo2 = clRepo(six().concat([["{PK-12}", "jnovak", 90]]));
+    eq(B.FB_BaselineCleanup.call(B, repo2, clCfg(), "report", false).candidates.length, 3, "PK-12 ma jedinou -> drzi se");
+});
+t("BL-5 T6-21: 40 kandidatu, maxDeletesPerRun 20 -> prave 20 NEJSTARSICH + 'zbyva 20'; 250 kandidatu -> anomalie, 0 smazano", function () {
+    blReset(); var sp = []; for (var i = 0; i < 43; i++) { sp.push(["{PK-11}", "jnovak", 20 + i]); }
+    var repo = clRepo(sp);
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", false);
+    eq(r.candidates.length, 40); eq(r.deleted.length, 20); eq(r.remaining, 20); contains(r.text, "zbyva 20");
+    var oldestLeft = Math.max.apply(null, autoNames(repo, "{PK-11}").map(function (n) { return new Date().getTime() - B.FB_BaselineName.call(B, "parse", n, "FB-AUTO ").ms; }));
+    ok(oldestLeft < 43.5 * DAY && oldestLeft > 41.5 * DAY, "smazano 20 nejstarsich (63..43 dni), nejstarsi zbyla ~42 dni: " + (oldestLeft / DAY));
+    blReset(); var sp2 = []; for (var j = 0; j < 253; j++) { sp2.push(["{PK-11}", "jnovak", 20 + j]); }
+    var repo2 = clRepo(sp2);
+    var r2 = B.FB_BaselineCleanup.call(B, repo2, clCfg(), "delete", true);
+    eq(r2.anomaly, true); eq(r2.deleted.length, 0); eq(repo2._deleteCalls, 0); contains(r2.text, "ANOMALIE");
+});
+t("BL-5 menu (force): maze vic nez maxDeletesPerRun, strop anomalie plati", function () {
+    blReset(); var sp = []; for (var i = 0; i < 43; i++) { sp.push(["{PK-11}", "jnovak", 20 + i]); }
+    var repo = clRepo(sp);
+    eq(B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", true).deleted.length, 40);
+});
+t("BL-5 T6-22: uklid necte zadny lokalni index - kandidati jen z modelu; selhany SELECT = nic se nedeje", function () {
+    ok(fs.readFileSync(path.join(SRC, "AICodeBridge.FB_BaselineCleanup.js"), "utf8").split(/\r?\n/).filter(function (l) { return !/^\s*\/\//.test(l); }).join("\n").indexOf("baselines-index") < 0);
+    blReset(); var repo = clRepo(six());
+    repo.SQLQuery = function () { throw new Error("db"); };
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", true);
+    eq(r.deleted.length, 0); eq(repo._deleteCalls, 0); contains(r.text, "selhal");
+});
+t("BL-5 T6-23 (dev nahrada): uzivatel mimo write skupinu -> delete se NESPUSTI, report ano", function () {
+    blReset(); var repo = clRepo(six());
+    var oU = B.FB_UserAccess; B.FB_UserAccess = function () { return { access: "read", login: "ctenar", reason: "neni clen" }; };
+    try {
+        var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", true);
+        eq(r.mode, "report"); eq(r.requestedMode, "delete"); eq(repo._deleteCalls, 0); eq(r.candidates.length, 3); contains(r.text, "write skupinu");
+    } finally { B.FB_UserAccess = oU; }
+});
+t("BL-5 autorita pred smazanim: baseline, ktera v GetBaselines pod timto GUID/jmenem neni, se nemaze", function () {
+    blReset(); var repo = clRepo(six());
+    var oldest = repo._baselines["{PK-11}"].slice().sort(function (a, b) { return a.version < b.version ? -1 : 1; });
+    // SQL vraci radek, ktery API uz nezna (jmeno mezitim zmeneno na rucni)
+    var realGet = repo.GetProjectInterface;
+    repo.GetProjectInterface = function () {
+        var pi = realGet(); var g = pi.GetBaselines;
+        pi.GetBaselines = function (x) { return g(x).replace(/version="FB-AUTO [^"]*"/, 'version="Prejmenovano rucne"'); };
+        return pi;
+    };
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg({ keepLastK: 0 }), "delete", true);
+    eq(r.failed.length, 1); contains(r.failed[0].why, "GetBaselines"); eq(r.deleted.length, 5);
+});
+t("BL-5 selhani jednoho DeleteBaseline neshodi zbytek behu", function () {
+    blReset(); var repo = clRepo(six());
+    var realGet = repo.GetProjectInterface, n = 0;
+    repo.GetProjectInterface = function () { var pi = realGet(); var d = pi.DeleteBaseline;
+        pi.DeleteBaseline = function (g) { n++; if (n == 1) { throw new Error("COM"); } return d(g); }; return pi; };
+    var r = B.FB_BaselineCleanup.call(B, repo, clCfg(), "delete", false);
+    eq(r.failed.length, 1); eq(r.deleted.length, 2);
+});
+t("BL-5 session baselines (sufix) spadaji pod tutez retenci; vek se bere ZE JMENA, ne z DocDate", function () {
+    blReset();
+    var repo = blRepo();
+    for (var i = 0; i < 5; i++) { repo._addBaseline(WL_GUID, clName("jnovak", 30 + i, i + 1, true), 0); } // DocDate = dnes
+    eq(B.FB_BaselineCleanup.call(B, repo, clCfg(), "report", false).candidates.length, 2);
+});
+t("BL-5 zdroj: DeleteBaseline se vola z jedineho mista (FB_BaselineCleanup)", function () {
+    var where = [];
+    L.files.forEach(function (f) {
+        var code = fs.readFileSync(path.join(SRC, f), "utf8").split(/\r?\n/).filter(function (l) { return !/^\s*\/\//.test(l); }).join("\n");
+        if (/\.DeleteBaseline\(/.test(code)) { where.push(f); }
+    });
+    eq(where.join(","), "AICodeBridge.FB_BaselineCleanup.js");
+});
+t("BL-5 T6-32 hak v executoru: dve zapisove davky za sebou (i schrankovy kanal jde pres FB_Main) -> uklid PRAVE jednou; po okne znovu", function () {
+    blReset(); var repo = clRepo(six());
+    var calls = 0, o = B.FB_BaselineCleanup;
+    B.FB_BaselineCleanup = function () { calls++; return o.apply(B, arguments); };
+    try {
+        var a = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "N1", type: "Class", "package": "{PK-12}" }] }], "cl1");
+        var b = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "N2", type: "Class", "package": "{PK-12}" }] }], "cl2");
+        eq(calls, 1); ok(a.cleanup && a.cleanup.mode == "report" && a.cleanup.candidates == 3, JSON.stringify(a.cleanup)); eq(typeof b.cleanup, "undefined");
+        contains((a.warnings || []).join(" "), "smazal bych 3"); eq(repo._deleteCalls, 0, "vychozi politika = report");
+        runText(repo, [{ op: "ping" }], "cl3"); eq(calls, 1, "cteci davka uklid nespousti");
+        eq(B.FB_BaselineCleanupHook.call(B, repo, new Date().getTime() + 25 * 3600000) != null, true, "po cleanupEveryHours znovu");
+        var st = ("" + B.FB_StateFile.call(B, repo, "cleanup")).split("|"); eq(st[1], "2", "pocitadlo behu");
+    } finally { B.FB_BaselineCleanup = o; }
+});
+t("BL-5 hak: pad uklidu neshodi davku a nebezi pak pri kazde davce; vadna politika = zadny uklid", function () {
+    blReset(); var repo = clRepo(six());
+    var calls = 0, o = B.FB_BaselineCleanup; B.FB_BaselineCleanup = function () { calls++; throw new Error("bum"); };
+    try {
+        eq(runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "N1", type: "Class", "package": "{PK-12}" }] }], "cl4").status, "done");
+        runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "N2", type: "Class", "package": "{PK-12}" }] }], "cl5");
+        eq(calls, 1);
+    } finally { B.FB_BaselineCleanup = o; }
+    blReset();
+    withPolicy(polBase({ cleanup: { mode: "delete" } }), function () { eq(B.FB_BaselineCleanupHook.call(B, clRepo(six())), null); });
+});
+t("BL-5 menu: polozka existuje; klik = report -> Ano -> delete s force; bez kandidatu jen informace", function () {
+    blReset();
+    var items = B.EA_GetMenuItems.call(B, mkRepo(), "TreeView", "-AI Bridge");
+    ok(items.indexOf("Uklid automatickych baselines (ukazat / provest)") >= 0, items.join("|"));
+    var repo = clRepo(six());
+    var oP = Session.Prompt; var asked = [];
+    Session.Prompt = function (m, kind) { asked.push(kind); return kind == 3 ? 3 : 1; };
+    try { B.EA_MenuClick.call(B, repo, "TreeView", "-AI Bridge", "Uklid automatickych baselines (ukazat / provest)"); }
+    finally { Session.Prompt = oP; }
+    eq(asked.join(","), "3,0"); eq(repo._deleteCalls, 3);
+    blReset(); var repo2 = clRepo(six()); asked = [];
+    Session.Prompt = function (m, kind) { asked.push(kind); return kind == 3 ? 4 : 1; };
+    try { B.EA_MenuClick.call(B, repo2, "TreeView", "-AI Bridge", "Uklid automatickych baselines (ukazat / provest)"); }
+    finally { Session.Prompt = oP; }
+    eq(repo2._deleteCalls, 0, "Ne = nic se nemaze");
 });
 
 // ------------------------------------------------------------------ vysledek

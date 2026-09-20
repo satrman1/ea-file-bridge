@@ -670,4 +670,21 @@ try {
     else if (writesInBatch > 0) { this._fbPrevExc = false; try { this.FB_StateFile(Repository, "w8", null); } catch (eW8b) { } }
 } catch (eW8) { }
 this.Log(Repository, "FB " + reqId + " -> " + summary);
+// --- Baseline politika par. 6.3: UKLID automatickych baselines - hak v
+// executoru (plati pro vsechny kanaly stejne), PO dokonceni zapisove davky,
+// nejvys 1x za cleanupEveryHours (state-cleanup.txt). Nikdy neshodi davku.
+if (writesInBatch > 0) {
+    try {
+        var clr = this.FB_BaselineCleanupHook(Repository);
+        if (clr != null) {
+            resp.cleanup = clr;
+            if (clr.anomaly || clr.candidates > 0) {
+                if (!resp.warnings) { resp.warnings = []; }
+                resp.warnings.push("Uklid automatickych baselines [" + clr.mode + "]: kandidatu " + clr.candidates
+                    + (clr.mode == "delete" ? ", smazano " + clr.deleted : ", smazal bych " + clr.planned)
+                    + (clr.anomaly ? " - ANOMALIE, nemaze se nic" : "") + " (detail: Output tab AI Bridge; menu AI Bridge -> Uklid automatickych baselines)");
+            }
+        }
+    } catch (eClr) { }
+}
 return this.FB_JsonStringify(resp, 1);

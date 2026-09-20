@@ -12,6 +12,9 @@ if (MenuName == "-AI Bridge") {
         "Zapnout AI import rezim (vratny)",
         "-",
         "Stav bridge (kam zapisuje / co cte)",
+        // Baseline politika par. 6.3/5 (Z260907-5): nova polozka menu se
+        // v EA projevi az po PLNEM RESTARTU EA (PROTOKOL par. 1a)
+        "Uklid automatickych baselines (ukazat / provest)",
         "About AI Bridge"
     ];
     try {
