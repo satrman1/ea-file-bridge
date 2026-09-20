@@ -53,12 +53,20 @@ function sideCars(resDir, rn, respText) {
     } catch (eS) { }
 }
 // W8: cesta pres vratneho nesmi session baseline tise preskocit - launcher
-// ji vola, ale FB_Process ji pri prvnim uziti dozene (in-memory flag,
-// zanika s restartem EA = novou session)
-if (!this._fbSessionStarted) {
-    try { this.FB_SessionStart(Repository); } catch (eSs) { }
-    this._fbSessionStarted = true;
-}
+// ji vola, ale FB_Process ji pri prvnim uziti dozene. Zdroj "uz bezi
+// session" = SESSION TOKEN executoru (FB_SessionToken, state-session.txt;
+// Baseline politika v1.2 par. 4.5): FB_SessionStart se vola JEN kdyz je
+// token cerstve zalozeny (fresh). Nalez B1 (spike 2026-09-07, C0 40 -> C1 41
+// -> C2 41): puvodni in-memory priznak v EA runtime mezi vyvolanimi
+// PREZIVAL, takze tahle zmena NENI oprava padu ani duplicit - je to
+// sjednoceni na jediny zdroj session (token), ktery sdili jmeno automaticke
+// baseline, reuse i uklid. Selhani tokenu nesmi shodit prikaz (best-effort).
+try {
+    var sTok = this.FB_SessionToken(Repository, null);
+    if (sTok && sTok.fresh === true) {
+        try { this.FB_SessionStart(Repository); } catch (eSs) { }
+    }
+} catch (eTok) { }
 var cmd = "";
 try {
     var parts = ("" + SearchText).split("|");

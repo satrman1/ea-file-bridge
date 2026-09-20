@@ -18,6 +18,16 @@ var chk = this.FB_CheckWrite(Repository, pkg);
 if (chk != null) { return { op: "create_baseline", status: "error", code: chk.code, message: chk.message }; }
 var name = (op.name && ("" + op.name) != "") ? ("" + op.name)
     : ("AI-pre-" + (op.session ? "" + op.session : "S") + "-" + reqId);
+// REZERVACE PREFIXU (Baseline politika v1.2 par. 6.1 / 4.7, podminka 4 / B4):
+// jmenny prostor automatickych baselines patri EXECUTORU. Bez toho by bezna
+// LOW davka zalozila baselines pojmenovane jako automaticke a vytlacila
+// pravy pre-image z keepLastK (nebo mu ve jmene vyrobila stari). Test je
+// zamerne SIRSI nez celotvarovy vzor uklidu: case-insensitive, bez ohledu na
+// uvodni mezery a na koncovou mezeru prefixu. Pokus navic eskaluje FB_RiskGate.
+if (this.FB_BaselineNameReserved(Repository, name)) {
+    return { op: "create_baseline", status: "error", code: "E_ARGS",
+        message: "Jmeno baseline '" + name + "': prefix FB-AUTO je vyhrazen executoru (automaticke baselines). Zvol jine jmeno nebo pole name vynech (default AI-pre-...)." };
+}
 var notes = (typeof op.notes != "undefined") ? ("" + op.notes)
     : ("EA File Bridge - mikro-baseline pred zapisem (davka " + reqId + ")");
 var pi = Repository.GetProjectInterface();

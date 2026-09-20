@@ -2219,6 +2219,222 @@ t("N4 FB_Main: res je odsazeny, parsovatelny FB_JsonParse i JSON.parse, textove 
     ok(outE.indexOf("\"code\":\"E_PARSE\"") >= 0, "kotva '\"code\":\"E_PARSE\"' musi v odsazenem res prezit");
 });
 
+// ===========================================================================
+// BASELINE POLITIKA (zadani v1.2) - cast 1: session token, konfigurace,
+// rezervace prefixu (Z260907-1)
+// ===========================================================================
+function blReset() { memFs.files = {}; memFs.folders = {}; delete B._fbSessionTokMem; }
+function withPolicy(polFn, fn) {
+    var orig = B.FB_RiskPolicy;
+    B.FB_RiskPolicy = polFn;
+    try { return fn(); } finally { B.FB_RiskPolicy = orig; }
+}
+function polBase(baselineSec) {
+    // politika s uplnou mapou classes (prevzata z ostre) + volitelna sekce baseline
+    var real = B.FB_RiskPolicy.call(B)[0];
+    return function () {
+        var p = { repo: "EAEXAMPLE.QEA", classes: real.classes, elevate: real.elevate, block: real.block,
+                  budgetMs: 8000, hashMaxChars: 2000000 };
+        if (typeof baselineSec != "undefined") { p.baseline = baselineSec; }
+        return [p];
+    };
+}
+var T0 = new Date(2026, 8, 7, 10, 50, 15).getTime(); // 2026-09-07 10:50:15 lokalne
+function sessFile() {
+    for (var k in memFs.files) { if (/state-session\.txt$/.test(k)) { return memFs.files[k]; } }
+    return null;
+}
+t("BL-1 token: prvni volani zalozi s<RRRRMMDD>-1, zapise soubor, fresh", function () {
+    blReset();
+    var r = B.FB_SessionToken.call(B, mkRepo(), null, T0);
+    eq(r.token, "s20260907-1"); eq(r.fresh, true); eq(r.persisted, true);
+    eq(r.created, "2026-09-07 10:50:15");
+    eq(sessFile(), "s20260907-1|2026-09-07 10:50:15", "format souboru");
+});
+t("BL-1 token: druhe volani v okne = tentyz token, fresh false", function () {
+    blReset();
+    var repo = mkRepo();
+    B.FB_SessionToken.call(B, repo, null, T0);
+    var r = B.FB_SessionToken.call(B, repo, null, T0 + 11 * 3600000);
+    eq(r.token, "s20260907-1"); eq(r.fresh, false);
+});
+t("BL-1 token: expirace dle sessionMaxHours (12 h) -> novy token, poradi v dni +1", function () {
+    blReset();
+    var repo = mkRepo();
+    B.FB_SessionToken.call(B, repo, null, T0);
+    var r = B.FB_SessionToken.call(B, repo, null, T0 + 12 * 3600000 + 1000);
+    eq(r.fresh, true); eq(r.token, "s20260907-2", "tyz den -> n+1");
+    var r2 = B.FB_SessionToken.call(B, repo, null, T0 + 40 * 3600000);
+    eq(r2.token, "s20260909-1", "jiny den -> n od 1");
+});
+t("BL-1 token: sessionMaxHours z cfg (1 h)", function () {
+    blReset();
+    var repo = mkRepo();
+    B.FB_SessionToken.call(B, repo, { sessionMaxHours: 1 }, T0);
+    eq(B.FB_SessionToken.call(B, repo, { sessionMaxHours: 1 }, T0 + 59 * 60000).fresh, false);
+    eq(B.FB_SessionToken.call(B, repo, { sessionMaxHours: 1 }, T0 + 61 * 60000).fresh, true);
+});
+t("BL-1 token: necitelny obsah souboru / cas v budoucnosti -> novy token", function () {
+    blReset();
+    var repo = mkRepo();
+    B.FB_StateFile.call(B, repo, "session", "nesmysl");
+    eq(B.FB_SessionToken.call(B, repo, null, T0).fresh, true);
+    B.FB_StateFile.call(B, repo, "session", "s20260907-5|2026-09-07 23:00:00");
+    var r = B.FB_SessionToken.call(B, repo, null, T0);
+    eq(r.fresh, true, "cas v budoucnosti je neduveryhodny"); eq(r.token, "s20260907-6");
+});
+t("BL-1 token: best-effort - selhani zapisu neshodi volani a druhe volani neni znovu fresh", function () {
+    blReset();
+    var orig = B.FB_StateFile;
+    B.FB_StateFile = function (R, name, value) { if (typeof value == "undefined") { return ""; } return "" + value; }; // zapis se "ztrati"
+    try {
+        var r1 = B.FB_SessionToken.call(B, mkRepo(), null, T0);
+        eq(r1.fresh, true); eq(r1.persisted, false);
+        var r2 = B.FB_SessionToken.call(B, mkRepo(), null, T0 + 60000);
+        eq(r2.fresh, false, "pametovy fallback"); eq(r2.token, r1.token);
+        B.FB_StateFile = function () { throw new Error("disk"); };
+        delete B._fbSessionTokMem;
+        ok(B.FB_SessionToken.call(B, mkRepo(), null, T0).token.length > 0, "vyjimka FB_StateFile nesmi probublat");
+    } finally { B.FB_StateFile = orig; blReset(); }
+});
+t("BL-1 FB_Process: dve vyvolani za sebou = 1x FB_SessionStart; po expiraci tokenu 2x", function () {
+    blReset();
+    var calls = 0, origS = B.FB_SessionStart;
+    B.FB_SessionStart = function () { calls++; return ""; };
+    try {
+        var repo = mkRepo();
+        B.FB_Process.call(B, repo, "ping|a", null);
+        B.FB_Process.call(B, repo, "ping|b", null);
+        eq(calls, 1, "session start jen pri fresh tokenu");
+        // expirace: prepis souboru na 13 h stary token
+        var old = new Date(new Date().getTime() - 13 * 3600000);
+        function p2(x) { return (x < 10 ? "0" : "") + x; }
+        B.FB_StateFile.call(B, repo, "session", "s20200101-1|" + old.getFullYear() + "-" + p2(old.getMonth() + 1) + "-" + p2(old.getDate())
+            + " " + p2(old.getHours()) + ":" + p2(old.getMinutes()) + ":" + p2(old.getSeconds()));
+        B.FB_Process.call(B, repo, "ping|c", null);
+        eq(calls, 2, "po expiraci nova session");
+    } finally { B.FB_SessionStart = origS; blReset(); }
+});
+t("BL-1 FB_Process: vyjimka FB_SessionStart / FB_SessionToken neshodi prikaz", function () {
+    blReset();
+    var origS = B.FB_SessionStart, origT = B.FB_SessionToken;
+    B.FB_SessionStart = function () { throw new Error("baseline api"); };
+    try {
+        eq(B.FB_Process.call(B, mkRepo(), "ping|x", null), "T");
+        B.FB_SessionToken = function () { throw new Error("token"); };
+        eq(B.FB_Process.call(B, mkRepo(), "ping|y", null), "T");
+    } finally { B.FB_SessionStart = origS; B.FB_SessionToken = origT; blReset(); }
+});
+t("BL-1 zdroj: _fbSessionStarted uz v src neni", function () {
+    L.files.forEach(function (f) {
+        ok(fs.readFileSync(path.join(SRC, f), "utf8").indexOf("_fbSessionStarted") < 0, f);
+    });
+});
+t("BL-1 config: chybejici sekce = validni + warning + bezpecne defaulty presne dle par. 5", function () {
+    var c = withPolicy(polBase(), function () { return B.FB_BaselineConfig.call(B, mkRepo()); });
+    eq(c.valid, true); eq(c.present, false); eq(c.warnings.length, 1);
+    eq(JSON.stringify(c.cfg), JSON.stringify({ subtreeMax: 5000, maxBaselineElements: 10000, maxBaselinePackages: 5,
+        probeBudgetMs: 500, probeBudgetTotalMs: 2000, useCte: false, freshWithinMin: 15, sessionMaxHours: 12,
+        requireRecoveryForUpdates: false, sessionBaseline: "off", autoPrefix: "FB-AUTO ", cleanupEveryHours: 24,
+        cleanup: { mode: "report", keepLastK: 3, maxAgeDays: 14, maxDeletesPerRun: 20, maxDeletesAnomaly: 200, requireWriteGroup: true } }));
+});
+t("BL-1 config: repo bez polozky politiky = chybejici sekce (validni, warning)", function () {
+    var c = B.FB_BaselineConfig.call(B, mkRepo({ connectionString: "C:\\X\\JINY.QEA" }));
+    eq(c.valid, true); eq(c.present, false); eq(c.cfg.sessionBaseline, "off");
+});
+t("BL-1 config: ostra dev politika ma sekci, validni, sessionBaseline auto, mode report", function () {
+    var c = B.FB_BaselineConfig.call(B, mkRepo());
+    eq(c.valid, true, c.why); eq(c.present, true); eq(c.warnings.length, 0);
+    eq(c.cfg.sessionBaseline, "auto"); eq(c.cfg.cleanup.mode, "report"); eq(c.cfg.requireRecoveryForUpdates, false);
+});
+t("BL-1 config: castecna sekce se doplni defaulty", function () {
+    var c = withPolicy(polBase({ freshWithinMin: 5 }), function () { return B.FB_BaselineConfig.call(B, mkRepo()); });
+    eq(c.valid, true, c.why); eq(c.cfg.freshWithinMin, 5); eq(c.cfg.maxBaselinePackages, 5); eq(c.cfg.cleanup.keepLastK, 3);
+});
+[
+    ["keepLastK bez maxAgeDays", { cleanup: { keepLastK: 3 } }],
+    ["mode delete bez keepLastK", { cleanup: { mode: "delete" } }],
+    ["maxDeletesAnomaly < maxDeletesPerRun", { cleanup: { maxDeletesPerRun: 50, maxDeletesAnomaly: 10 } }],
+    ["maxDeletesAnomaly < default maxDeletesPerRun", { cleanup: { maxDeletesAnomaly: 10 } }],
+    ["neciselna hodnota", { subtreeMax: "5000" }],
+    ["sessionBaseline mimo vycet", { sessionBaseline: "on" }],
+    ["autoPrefix bez koncove mezery", { autoPrefix: "FB-AUTO" }],
+    ["cleanup neni objekt", { cleanup: "report" }]
+].forEach(function (c) {
+    t("BL-1 config: nekonzistentni sekce (" + c[0] + ") = NEVALIDNI + defaulty", function () {
+        var r = withPolicy(polBase(c[1]), function () { return B.FB_BaselineConfig.call(B, mkRepo()); });
+        eq(r.valid, false); eq(r.present, true); ok(r.why.length > 0);
+        eq(r.cfg.cleanup.mode, "report", "vadne hodnoty se nepouziji"); eq(r.cfg.autoPrefix, "FB-AUTO ");
+    });
+});
+var REG_BL = { "create_baseline": { w: true }, "create_or_update_elements": { w: true } };
+function regFull() {
+    var mainSrc = fs.readFileSync(path.join(SRC, "AICodeBridge.FB_Main.js"), "utf8");
+    var regM = /var REG = \{([\s\S]*?)\n\};/.exec(mainSrc);
+    var reg = {}, rex = /"([a-z0-9_]+)":\s*\{\s*fn:\s*"[A-Za-z_]+",\s*w:\s*(true|false)/g, m1;
+    while ((m1 = rex.exec(regM[1])) != null) { reg[m1[1]] = { w: m1[2] == "true" }; }
+    return reg;
+}
+t("BL-1 gate T6-31: politika BEZ sekce baseline -> LOW davka zustane LOW", function () {
+    var r = withPolicy(polBase(), function () {
+        return B.FB_RiskGate.call(B, mkRepo(), { ops: [{ op: "create_baseline", "package": "{P}" }] }, regFull());
+    });
+    eq(r.riskLevel, "LOW", r.riskReasons.join("; ")); eq(r.baselinePolicyValid, true);
+});
+t("BL-1 gate T6-31: sekce pritomna a nekonzistentni -> ELEVATED, tridy/prahy plati dal", function () {
+    var r = withPolicy(polBase({ cleanup: { mode: "delete" } }), function () {
+        return B.FB_RiskGate.call(B, mkRepo(), { ops: [{ op: "create_baseline", "package": "{P}" }] }, regFull());
+    });
+    eq(r.riskLevel, "ELEVATED"); eq(r.baselinePolicyValid, false);
+    eq(r.policyValid, true, "vadna baseline sekce nesmi vypnout vynucovani trid (BLOCKED)");
+    contains(r.riskReasons.join("; "), "W14");
+});
+function blCreateRepo() {
+    var repo = mkRepo();
+    var created = [];
+    repo._created = created;
+    repo.GetProjectInterface = function () {
+        return { GUIDtoXML: function (g) { return g; },
+                 CreateBaseline: function (g, n) { created.push(n); return true; },
+                 GetBaselines: function () { return ""; } };
+    };
+    return repo;
+}
+function callCreate(repo, name) {
+    var oP = B.FB_ResolvePkg, oC = B.FB_CheckWrite;
+    B.FB_ResolvePkg = function () { return { PackageGUID: "{P}", PackageID: 1, Name: "P" }; };
+    B.FB_CheckWrite = function () { return null; };
+    try { return B.FB_OpBaselineCreate.call(B, repo, { op: "create_baseline", "package": "{P}", name: name }, "r1"); }
+    finally { B.FB_ResolvePkg = oP; B.FB_CheckWrite = oC; }
+}
+["FB-AUTO x", "fb-auto x", "  FB-AUTO jnovak s20260907-1 2026-09-07 10:00:00", "FB-AUTO"].forEach(function (nm) {
+    t("BL-1 T6-30 create_baseline '" + nm + "' -> E_ARGS, zadna baseline", function () {
+        var repo = blCreateRepo();
+        var r = callCreate(repo, nm);
+        eq(r.code, "E_ARGS"); contains(r.message, "vyhrazen executoru"); eq(repo._created.length, 0);
+    });
+});
+["FB 2026-09-07 10:00:00", "AI-pre-S-r1", "Pred refaktorem", undefined].forEach(function (nm) {
+    t("BL-1 create_baseline '" + nm + "' -> povoleno (mimo rezervovany prostor)", function () {
+        var repo = blCreateRepo();
+        var r = callCreate(repo, nm);
+        eq(r.status, "ok", JSON.stringify(r)); eq(repo._created.length, 1);
+    });
+});
+t("BL-1 T6-30 gate: pokus o rezervovane jmeno eskaluje LOW -> ELEVATED; bezne jmeno zustava LOW", function () {
+    var bad = B.FB_RiskGate.call(B, mkRepo(), { ops: [{ op: "create_baseline", "package": "{P}", name: "fb-auto podvrh" }] }, regFull());
+    eq(bad.riskLevel, "ELEVATED"); contains(bad.riskReasons.join("; "), "B4");
+    var good = B.FB_RiskGate.call(B, mkRepo(), { ops: [{ op: "create_baseline", "package": "{P}", name: "AI-pre-x" }] }, regFull());
+    eq(good.riskLevel, "LOW", good.riskReasons.join("; "));
+});
+t("BL-1 rezervace drzi i kdyz politika prefix zmeni (stary FB-AUTO porad rezervovan)", function () {
+    withPolicy(polBase({ autoPrefix: "AUTOBL " }), function () {
+        eq(B.FB_BaselineNameReserved.call(B, mkRepo(), "autobl x"), true);
+        eq(B.FB_BaselineNameReserved.call(B, mkRepo(), "FB-AUTO x"), true);
+        eq(B.FB_BaselineNameReserved.call(B, mkRepo(), "FB 2026"), false);
+    });
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

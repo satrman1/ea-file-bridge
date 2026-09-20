@@ -87,6 +87,21 @@ if (polValid) {
     }
 }
 if (!polValid) { elevate("Politika nevalidni (" + polWhy + ") - fail-closed W9: zadny auto-write"); }
+// --- Baseline politika par. 5 (W14): CHYBEJICI sekce `baseline` = validni
+// (defaulty, T6-31: LOW zustane LOW); PRITOMNA nekonzistentni = ELEVATED.
+// Zamerne NEshazuje polValid - tridy a prahy (vcetne BLOCKED) plati dal;
+// vadna baseline sekce smi jen eskalovat, nikdy uvolnit vynucovani.
+var blValid = true;
+try {
+    var blc = this.FB_BaselineConfig(Repository);
+    if (blc && blc.valid === false) {
+        blValid = false;
+        elevate("Baseline politika nevalidni (" + blc.why + ") - fail-closed W14: zadny auto-write");
+    }
+} catch (eBlc) {
+    blValid = false;
+    elevate("FB_BaselineConfig selhal: " + eBlc.message + " - fail-closed W14");
+}
 var budget = (polValid && typeof pol.budgetMs == "number") ? pol.budgetMs : 8000;
 var budgetHit = false;
 function checkBudget() {
@@ -495,6 +510,13 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         for (j = 0; j < lst.length; j++) { touchElement(lst[j], "removeFromDiagram.elementIDs[" + j + "]", false, false); }
     } else if (name == "create_baseline") {
         writeOps++;
+        // Baseline politika par. 6.1 (B4): pokus o jmeno v REZERVOVANEM
+        // prostoru automatickych baselines eskaluje NAD tridu politiky (vzor
+        // W2a/W2b); exekuce ho navic odmitne E_ARGS (FB_OpBaselineCreate)
+        var bnRes = false;
+        try { bnRes = (typeof o.name != "undefined" && o.name !== null && self.FB_BaselineNameReserved(Repository, "" + o.name) === true); }
+        catch (eBn) { bnRes = true; } // nejistota = fail-closed
+        if (bnRes) { elevate("create_baseline se jmenem v rezervovanem prostoru automatickych baselines (prefix FB-AUTO) - B4; exekuce odmitne E_ARGS"); }
     } else if (name == "clone_package") {
         writeOps++; createOps++;
         addReason("clone_package: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)");
@@ -646,6 +668,7 @@ return {
     riskLevel: (level == 3 ? "BLOCKED" : (level == 2 ? "ELEVATED" : "LOW")),
     riskReasons: reasons,
     policyValid: polValid,
+    baselinePolicyValid: blValid,
     summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames, paths: tgtPaths },
     metrics: {
         writeOps: writeOps, createOps: createOps, updatedExisting: updatedExisting,
