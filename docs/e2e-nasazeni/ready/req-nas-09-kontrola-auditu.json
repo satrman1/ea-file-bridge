@@ -1,0 +1,10 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-09-kontrola-auditu",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "query", "sql": "SELECT o.Object_ID, o.Name, o.Object_Type, o.CreatedDate FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name LIKE 'FB nas-0%' ORDER BY o.Object_ID" },
+  { "op": "query", "sql": "SELECT o.Object_ID, o.ea_guid, o.Name FROM t_object o WHERE o.Name LIKE 'FBT Nasazeni prvek%' ORDER BY o.Object_ID" },
+  { "op": "query", "sql": "SELECT p.Property, p.Value FROM t_objectproperties p WHERE p.Object_ID IN (SELECT Object_ID FROM t_object WHERE Object_Type = 'Artifact' AND Name = 'FB nas-08-low-zapis') ORDER BY p.Property" }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-01-ping",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "ping", "echo": "nas-01 pojistka nasazeni" }
+ ]
+}

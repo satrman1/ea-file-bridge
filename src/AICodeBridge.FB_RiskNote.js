@@ -1,6 +1,13 @@
 // AICodeBridge.FB_RiskNote(risk, baseline)
 // Textovy souhrn riskovych poli pro audit Notes / Log (iterace 4b).
 // risk == null (ciste ctena davka / gate nebezel) -> prazdny retezec.
+// Parametr baseline pribyl az po v0.14 (Baseline politika 20. 9.). Cte se
+// VYHRADNE pres typeof (FB-PU-01, zive 2026-10-10: bootstrap do te doby
+// parametry existujici operace nesrovnal -> EA runtime metodu kompiloval
+// bez nej a kazdy zapis spadl "Objekt baseline neni definovan" AZ PO
+// provedeni, bez auditu). Pravidlo PROTOKOL-EAFB kap. 11: novy parametr
+// existujici operace se cte jen pres typeof.
+var bl = (typeof baseline != "undefined") ? baseline : null;
 if (risk === null || typeof risk == "undefined") { return ""; }
 var m = risk.metrics || {};
 var s = " | risk=" + risk.riskLevel
@@ -31,13 +38,13 @@ if (risk.riskReasons && risk.riskReasons.length > 0) {
     s += " | duvody: " + risk.riskReasons.join("; ");
 }
 // Baseline politika par. 4.6/7: radek o zaloze (restore manifest v Notes auditu)
-if (baseline) {
-    s += " | baseline=" + (baseline.decision || "?") + (baseline.reason ? " (" + baseline.reason + ")" : "");
-    var bp = baseline.packages || [], bn = [];
+if (bl) {
+    s += " | baseline=" + (bl.decision || "?") + (bl.reason ? " (" + bl.reason + ")" : "");
+    var bp = bl.packages || [], bn = [];
     for (var bi = 0; bi < bp.length; bi++) {
         if (bp[bi].name) { bn.push((bp[bi].path || bp[bi].guid) + " -> " + bp[bi].name + " [" + (bp[bi].result || "?") + "]"); }
     }
     if (bn.length > 0) { s += ": " + bn.join(", "); }
-    if (baseline.journal && baseline.journal.manifestRef) { s += " | journal=" + baseline.journal.manifestRef + " (" + baseline.journal.targets + " cilu)"; }
+    if (bl.journal && bl.journal.manifestRef) { s += " | journal=" + bl.journal.manifestRef + " (" + bl.journal.targets + " cilu)"; }
 }
 return s;

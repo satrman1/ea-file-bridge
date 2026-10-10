@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-13-uklid",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "delete_from_model", "targets": [ { "type": "Package", "guid": "{CB5A1D30-EC54-4267-B7BD-7CD65F79B567}" } ] }
+ ]
+}

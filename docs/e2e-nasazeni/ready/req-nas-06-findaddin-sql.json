@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-06-findaddin-sql",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "query", "sql": "SELECT o.ea_guid, o.Object_ID, o.Stereotype, p.Name AS PkgName FROM t_object o LEFT JOIN t_package p ON p.Package_ID = o.Package_ID WHERE o.Name = 'AICodeBridge'" }
+ ]
+}

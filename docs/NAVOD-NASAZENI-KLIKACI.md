@@ -1,6 +1,6 @@
 # Nasazení EA File Bridge — klikací návod (bez terminálu)
 
-Verze **v1.1**, 2026-09-10 (vlákno Z260908-5, po živém nasazení v bance) · Kód: **v0.14 + opravy `d53164c`/`47fdbb2`** (`docs/PROTOKOL-EAFB.md` v0.14, registr **42 operací**, harness 248/248) · **Proveden: Miloš, v bance St 10. 9. 2026 — PASS s nálezy** (`docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`); v1.1 zapracovává korekce z K8 QEAX (`docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`) a z banky (N-B-1…10)
+Verze **v1.2**, 2026-10-10 (vlákno Z261004b-1, pojistka nasazení FB-PU-01 — ověřeno živě doma; v1.1 2026-09-10 vlákno Z260908-5, po živém nasazení v bance) · Kód: **v0.14 + opravy `d53164c`/`47fdbb2`** (`docs/PROTOKOL-EAFB.md` v0.14, registr **42 operací**, harness 248/248) · **Proveden: Miloš, v bance St 10. 9. 2026 — PASS s nálezy** (`docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`); v1.1 zapracovává korekce z K8 QEAX (`docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`) a z banky (N-B-1…10)
 
 > **Co tenhle soubor je.** Postup v pořadí, v jakém se to v bance skutečně klikne — od pullu kurýrního klonu po první ping. Žádný terminál: git jde přes **VS Code → Source Control**, kód do modelu přes **EA UI**, dávky přes **pumpu (dvojklik)** nebo **schránku (menu v EA)**.
 > **Co tenhle soubor NENÍ.** Není to protokol testu (ty jsou `docs/e2e-pumpa/PROTOKOL-E2E-PUMPA.md` a `docs/e2e-k8-qeax/PROTOKOL-K8.md`) ani plán fáze 2 POC (`docs/NAVOD-NASAZENI-BANKA.md`, který na tenhle návod odkazuje).
@@ -115,8 +115,20 @@ Kód executoru žije **jako operace elementu `AICodeBridge`** (stereotyp `Javasc
   Hotovo: <X> operaci zalozeno, <Y> nahran kod (souboru v src: 105).
   ```
   Od v0.14 souhrn pokračuje: `Receptions: <A> zalozeno, <B> prepnuto na lokalni Signal, <C> parametry opraveny.` a před ním řádky `RX <handler> -> reception prepnuta…` / `PX <handler> -> parametry reception opraveny: (…) -> (…)`.
+  **Od 10. 10. 2026 (bootstrap po FB-PU-01)** je v souhrnu navíc `Parametry: <P> operaci srovnano podle hlavicky (radky PX).` a před ním řádek za každou existující operaci, která měla v modelu jiný seznam parametrů než hlavička souboru:
+  ```
+  PX  FB_RiskAuditTags: (Repository, auditGuid, risk) -> (Repository, auditGuid, risk, baseline)
+  PX  FB_RiskNote: (risk) -> (risk, baseline)
+  …
+  Hotovo: 14 operaci zalozeno, 119 nahran kod (souboru v src: 119). Parametry: 2 operaci srovnano podle hlavicky (radky PX). Receptions: 0 zalozeno, 0 prepnuto na lokalni Signal, 0 parametry opraveny.
+  POZOR: 2 operaci melo v modelu jiny seznam parametru nez hlavicka souboru (radky PX vyse) - …
+  ```
+  Řádky `PX` jsou **žádoucí** — bez tohoto srovnání by pumpa i EA runtime volaly nové tělo operace se starými parametry a každý zápis by spadl až po provedení (`E_EXCEPTION` „Objekt baseline není definován", prvky v modelu, audit chybí — nález FB-PU-01, živě doma 10. 10. 2026). Počet `P` si **zapiš** a porovnej s výstupem `tools\diff-signatures.py` z release poznámky verze; po restartu následuje **Kontrola parametrů po nasazení** (kap. 4a).
   - element z léta (banka 10. 9.): `85 operaci zalozeno, 105 nahran kod`, `Receptions: 4 zalozeno` — v pořádku;
-  - opakovaný běh: `0 operaci zalozeno, 105 nahran kod`, receptions 0/0/0;
+  - nasazení verze s Baseline politikou nad prvek v0.14 (doma 10. 10.): `14 operaci zalozeno, 119 nahran kod`, `Parametry: 2 operaci srovnano` (`FB_RiskNote`, `FB_RiskAuditTags`);
+  - opakovaný běh: `0 operaci zalozeno, 119 nahran kod`, `Parametry: 0`, receptions 0/0/0;
+  - **`VAROVANI: v modelu je N elementu jmenem AICodeBridge`** + výpis `ElementID, stereotyp, package` (N-B-4, banka má 2): kód dostal jen ten se stereotypem `JavascriptAddin` (`<- CIL`); druhý zapiš jako kandidáta na úklid;
+  - **`STOP: 2 elementy AICodeBridge se stereotypem JavascriptAddin`**: nic se nezměnilo — nelze rozhodnout, kam kód patří; odstraň nebo přejmenuj nadbytečný element a spusť znovu;
   - **`BEZ RECEPTION (Signal chybi): EA_…`** = v Broadcast Types cílového modelu chybí signál toho jména → menu/dvojklik nebude, pumpa funguje; zapiš jako nález;
   - **`PX EA_MenuClick …`** = bootstrap opravil signaturu reception (Sparx: `EA_MenuClick(Repository, MenuLocation, MenuName, ItemName)` — 4 argumenty; starší bootstrap zakládal 3 → každý klik v menu končil `Unhandled menu item: -AI Bridge`, banka N-B-1).
   - **Cesta ke `src\`:** v bance klon není na `C:\GIT`, skript se zeptá dialogem — zadej `<KORP>\src`.
@@ -172,6 +184,23 @@ Kód executoru žije **jako operace elementu `AICodeBridge`** (stereotyp `Javasc
 - **PROČ TO NEJDE OBEJÍT:** reload projektu **nestačí**. Kód pro EA runtime (menu, dvojklik v Output tabu, GUI fallback) se načítá jen při startu EA. Totéž platí po **každé** změně kódu nebo configů v modelu a po každé změně členství v security skupině (cache `FB_UserAccess` platí na session) — **a to i pro pumpu**: členství si cachuje i běžící pumpa (kód běží v jejím procesu), takže po změně skupiny **restartuj EA i pumpu** (K8 N-K8-8, banka: ping hlásil `read` i po přidání do skupiny, dokud se pumpa nerestartovala).
 - **KDYŽ MENU JE, ALE KLIK NIC NEDĚLÁ** a v Output tabu „AI Bridge“ je `Unhandled menu item: -AI Bridge` → reception `EA_MenuClick` má špatné parametry → spusť bootstrap v0.14+ (řádek `PX`) a restartuj (7.10).
 - **KDYŽ MENU MLČÍ:** viz troubleshooting 7.1.
+
+---
+
+# 4a. Kontrola parametrů po nasazení (od v1.2 — FB-PU-01)
+
+- **CO:** ověřit, že seznam parametrů **každé** operace v modelu odpovídá hlavičce souboru ve `src\`. Pumpa i EA runtime skládají funkci z parametrů v modelu — jeden chybějící parametr znamená zápis, který spadne až po provedení (bez auditu).
+- **KDY:** po každém bootstrapu + restartu (kap. 2.2 → 4), **před** pingem a před každou zápisovou dávkou. Doma tuto kontrolu dělá Claude ze `res`; v bance ji dělá Copilot nebo ty.
+- **KDE:** pumpa (kap. 6.1) nebo schránka (6.2) — dotaz je čtecí.
+- **JAK:** dávka `docs\e2e-banka\ready\req-banka-kontrola-parametru.json` (v bance přes `<KORP>\banka-ready\` + `tools\banka-dosad.cmd`, dosadí `<TEST-DB>`):
+  ```json
+  { "protocol": "eafb/0.2", "id": "banka-kontrola-parametru", "repo": "<TEST-DB>",
+    "ops": [ { "op": "query", "sql": "SELECT o.Name AS operace, p.Pos, p.Name AS parametr FROM t_operation o LEFT JOIN t_operationparams p ON p.OperationID = o.OperationID WHERE o.Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin') ORDER BY o.Name, p.Pos" } ] }
+  ```
+  Dotaz si prvek najde sám (jméno + stereotyp), funguje v SQLite i MS SQL (bez `TOP`, výsledek má řádově 250 řádků — `TOP N` tu není potřeba). Výsledek (`responses\res-banka-kontrola-parametru.json`, pole `rows[]` s `operace`, `Pos`, `parametr`) porovnej s prvním řádkem každého souboru `src\AICodeBridge.<operace>.js` (`// AICodeBridge.<operace>(a, b)`); `EA_*` handlery bez závorek v hlavičce se porovnávají proti Sparx signaturám (`EA_MenuClick(Repository, MenuLocation, MenuName, ItemName)` atd. — seznam `EA_ARGS` v bootstrapu).
+- **OČEKÁVANÝ VÝSLEDEK:** **0 rozdílů** a počet operací v modelu = počet souborů `src\AICodeBridge.*.js` (10. 10. 2026: 119). Výtah pro chat (v bance bez interních hodnot): `operaci v modelu: N, rozdilu: 0`.
+- **KDYŽ JE ROZDÍL:** **nepokračuj.** Bootstrap neproběhl nad tím elementem, nad kterým pumpa běží (viz `VAROVANI` v 2.2 — dva elementy `AICodeBridge`), nebo pumpa běží nad jiným projektem. Spusť bootstrap znovu (musí vypsat řádek `PX` pro každou rozdílnou operaci), plný restart EA + pumpy, kontrolu zopakuj.
+- **PROČ:** nález FB-PU-01 (revize 4. 10. 2026, `IT-ANALYSIS/AUDIT-usability-pumpy-2026-10-04.md` kap. 3.1), živě ověřený doma 10. 10. 2026 (`docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md`): bootstrap do té doby parametry existujících operací nesrovnával; čtecí dávky a ping prošly, chyba se ukázala až u prvního zápisu.
 
 ---
 
@@ -245,7 +274,7 @@ Všech šest je zároveň **chráněný element** (`PROTOKOL-EAFB.md` §8 bod 8)
 ## 5.7 Nasadit configy a ověřit
 
 - **CO:** dostat upravené soubory z disku do modelu.
-- **JAK:** spusť znovu **ITAN-Bootstrap** (2.2, tentokrát už jen doplní kód — element existuje) → **plný restart EA** (krok 4).
+- **JAK:** spusť znovu **ITAN-Bootstrap** (2.2, tentokrát už jen doplní kód — element existuje) → **plný restart EA** (krok 4) → **kontrola parametrů** (4a; po opakovaném bootstrapu musí být `Parametry: 0 operaci srovnano` a 0 rozdílů).
 - **OČEKÁVANÝ VÝSLEDEK:** menu **Specialize → AI Bridge → Stav bridge (kam zapisuje / co cte)** ukáže identitu repozitáře, whitelist packages **s plnou cestou** a složku výměny. Když tam vidíš `<TEST-DB>` a `<AI-SANDBOX>`, configy jsou v modelu.
 - **KONTROLA, KTEROU NEPŘESKAKUJ:** dokud je v configu placeholder (`<TEST-DB>` doslova), **žádný zápis neprojde** — `E_REPO`. To je fail-secure, ne porucha.
 
@@ -405,6 +434,7 @@ Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 
 - **Příčina (banka 10. 9., N-B-1):** reception `EA_MenuClick` má 3 parametry místo 4 (`Repository, MenuLocation, MenuName, ItemName`); EA předává argumenty pozičně, do `ItemName` přišel název podmenu. Vzniklo bootstrapem před `d53164c` (domácí receptions z vendor šablony to neměly).
 - **Řešení:** bootstrap v0.14+ → řádek `PX EA_MenuClick -> parametry reception opraveny …` → plný restart EA.
+- **Stejná třída chyby u běžných operací (FB-PU-01, od 10. 10. 2026):** zápis skončí `E_EXCEPTION` „Objekt baseline není definován" (nebo jiný „… není definován") **až po provedení** — prvky v modelu jsou, audit chybí, dávka je v `rejected\`. Příčina: operace má v modelu starší seznam parametrů než soubor. Řešení: bootstrap z 10. 10. 2026+ (řádky `PX <operace>: (staré) -> (nové)`), plný restart EA + pumpy, kontrola parametrů (4a). Prvky z nedokončené dávky ukliď ručně nebo dávkou — opravná dávka by je založila podruhé.
 
 ## 7.11 Pumpa „visí“ na `Zpracovavam …`, EA reaguje, žádný dialog
 
@@ -412,6 +442,22 @@ Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 - **Řešení:** zavři pumpu (křížek), přesuň soubor z `requests\` pryč (jinak si ho pumpa po startu vezme znovu), přepiš dotaz s `TOP N` / `WHERE`, spusť pumpu. Prevence: kontext repa v korporátním repu s řády velkých tabulek + pravidlo `TOP N` v kitu.
 
 ---
+
+# 8. Doma: nasazení jako v bance (od v1.2)
+
+Rozhodnutí 4. 10. 2026 (revize FB-PU-01, bod 4), upřesněno 10. 10. 2026: **nasazení verze** se doma dělá **stejnou cestou jako v bance — bootstrapem, ne `deploy_src`**, jinak se třída chyb „parametry v modelu ≠ hlavička" doma nikdy neukáže (`deploy_src` parametry srovnává od v0.10, starý bootstrap ne). `deploy_src` pumpou zůstává nástrojem pro **ladění kódu** mezi nasazeními (rychlá smyčka, pumpa se sama přenačte); pro nasazení verze (před tagem, před kurýrem do banky) se nepoužívá. Pořadí doma, s odkazy na bankovní kroky:
+
+| # | Krok | Kapitola | Doma navíc |
+|---|---|---|---|
+| 1 | `node test\harness.js` — vše PASS; `python tools\diff-signatures.py <předchozí tag> HEAD` — změněné signatury do release poznámky | `PROTOKOL-EAFB.md` kap. 11 | — |
+| 2 | Bootstrap: Specialize → Scripting → `ITAN-Bootstrap` → vložit obsah `scripts\ITAN-Bootstrap File Bridge.js` → Save → Run; zapsat řádky `PX` a souhrn | 2.2 | cesta `src\` se najde sama (`C:\GIT\ea-file-bridge\src\`) |
+| 3 | Plný restart EA (File → Exit) + restart pumpy | 4 | pumpa: zavřít okno, dvojklik `pump.wsf` |
+| 4 | Kontrola parametrů — 0 rozdílů | 4a | dávku vhazuje a vyhodnocuje Claude (`res`) |
+| 5 | Stav bridge (Specialize → AI Bridge → Stav bridge) — jen kontrola identity a whitelistu; configy se doma nemění | 5.7 | — |
+| 6 | Ping pumpou | 6.1 | `"repo": "EAEXAMPLE.QEA"` |
+| 7 | LOW zápis do `#FB-TEST` + kontrola auditu v `#AI-LOG`; ELEVATED dávka s oknem Ne i Ano; úklid testovacího balíčku | `docs/e2e-nasazeni/` | vzor dávek `docs/e2e-nasazeni/ready/req-nas-*.json` |
+
+Bankovní kroky 1 (kurýrní klon), 3 (Manage Add-Ins), 5.1–5.6 (configy) a 6.2 (schránka) doma odpadají — element, add-in i configy už v modelu jsou. Živě proběhlo 10. 10. 2026 (`docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md`): nejdřív se starým bootstrapem (past potvrzena: `E_EXCEPTION` až po zápisu), pak s novým (`PX` 2×, 0 rozdílů, zápis + audit, okno Ne/Ano).
 
 ## Kam dál
 
@@ -426,5 +472,6 @@ Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 
 ## Changelog
 
+- **v1.2 — 2026-10-10** (vlákno Z261004b-1, pojistka nasazení FB-PU-01 — živě doma): 2.2 očekávaný výstup s řádky `PX <operace>: (staré) -> (nové)`, `Parametry: P operaci srovnano` a varování / STOP při více elementech `AICodeBridge` (N-B-4); nový krok **4a Kontrola parametrů po nasazení** (čtecí dávka `docs/e2e-banka/ready/req-banka-kontrola-parametru.json`, 0 rozdílů, jinak nepokračovat); 5.7 odkaz na 4a; 7.10 obecná varianta pasti; nová kap. **8 Doma: nasazení jako v bance** (bootstrap, ne `deploy_src`). Zdroj: `IT-ANALYSIS/AUDIT-usability-pumpy-2026-10-04.md` kap. 3.1, `docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md`.
 - **v1.1 — 2026-09-10** (vlákno Z260908-5, po živém nasazení v bance St 10. 9. — PASS s nálezy): blok 2 = jen bootstrap (Copy/Paste nepoužívat; bootstrap zakládá receptions i opravuje jejich parametry — řádky `RX`/`PX`), blok 3 sloupce Groups/Status Optional v security modelu, blok 4 + 5.4 + 7.2 restart **EA i pumpy** po změně členství, 5.1 `auditPkg` povinný + `baseDir = <KORP>`, 5.5 nejmenší bankovní RiskPolicy, 6.1 dávky do `<KORP>\requests\` přes `banka-dosad`, nová 6.4 čtecí recon + pravidlo `TOP N`, 7.7 prázdný výsledek ≠ `E_SQL` (od `47fdbb2`), nové 7.10 (Unhandled menu item) a 7.11 (pumpa visí na velkém SELECTu), placeholder `<GUID-AILOG>`. Zdroj: `docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`, `docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`.
 - **v1.0 — 2026-09-04** (vlákno Z260904-5): vznik. Deliverable ze zadání kap. 5 („klikací návod pro Miloše"), nikdy dřív nedodaný. Pokrývá stav po iteracích 5–7 včetně prokliků per typ artefaktu a plné cesty v ELEVATED dialogu (commit `689c7ad`) a konfiguračních sekcí se security modelem (commit `79bce7f`).

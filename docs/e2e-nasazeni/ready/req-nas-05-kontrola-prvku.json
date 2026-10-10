@@ -1,0 +1,10 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-05-kontrola-prvku",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "query", "sql": "SELECT p.Package_ID, p.ea_guid, p.Name FROM t_package p WHERE p.Name = 'FBT-NASAZENI'" },
+  { "op": "query", "sql": "SELECT o.Object_ID, o.ea_guid, o.Name, o.Object_Type FROM t_object o WHERE o.Name = 'FBT Nasazeni prvek 1'" },
+  { "op": "query", "sql": "SELECT o.Object_ID, o.Name, o.CreatedDate FROM t_object o WHERE o.Name LIKE 'FB nas-03%' OR (o.Object_Type = 'Artifact' AND o.Name LIKE 'FB nas-%')" }
+ ]
+}

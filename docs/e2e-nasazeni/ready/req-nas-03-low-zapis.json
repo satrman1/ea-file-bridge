@@ -1,0 +1,23 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-03-low-zapis",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+   "name": "FBT-NASAZENI"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "Class",
+     "name": "FBT Nasazeni prvek 1",
+     "notes": "Vytvoreno davkou nas-03-low-zapis (Z261004b-1, pojistka nasazeni FB-PU-01). Uklid davkou v temze vlakne."
+    }
+   ]
+  }
+ ]
+}

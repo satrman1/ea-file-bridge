@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-08-low-zapis",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{CB5A1D30-EC54-4267-B7BD-7CD65F79B567}",
+     "type": "Class",
+     "name": "FBT Nasazeni prvek 2",
+     "notes": "Vytvoreno davkou nas-08-low-zapis po nasazeni opravy FB-PU-01 (Z261004b-1). Uklid davkou v temze vlakne."
+    }
+   ]
+  }
+ ]
+}

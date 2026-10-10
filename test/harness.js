@@ -2069,6 +2069,140 @@ t("ITAN-Bootstrap: EA_ARGS = Sparx broadcast signatury (EA_MenuClick ma MenuName
     ok(code.indexOf("parametry opraveny") >= 0, "souhrn hlasi pocet opravenych signatur");
     eq(KNOWN_ARGS.EA_MenuClick.join(","), "Repository,MenuLocation,MenuName,ItemName", "harness KNOWN_ARGS = tataz signatura");
 });
+// --- FB-PU-01 + N-B-4 (2026-10-10): MOCK BEH bootstrapu v Node nad mockem EA Scripting
+// (vzor IT-ANALYSIS/audity/sim-revize-pumpy-2026-10-04/agent-ch/exp9-bootstrap.js).
+// Skutecny skript scripts\ITAN-Bootstrap File Bridge.js bezi nad src\ z repa.
+function bootColl(factory) {
+    var items = [];
+    var c = { _items: items, GetAt: function (i) { return items[i]; }, Refresh: function () { },
+        AddNew: function (n, t) { var it = factory(n, t); items.push(it); return it; },
+        DeleteAt: function (i) { items.splice(i, 1); } };
+    Object.defineProperty(c, "Count", { get: function () { return items.length; } });
+    return c;
+}
+function bootMethod(n) {
+    var m = { Name: n, Code: "", StyleEx: "", _updates: 0,
+        Parameters: bootColl(function (pn) { return { Name: pn, Position: 0, Update: function () { return true; } }; }),
+        Update: function () { m._updates++; return true; }, GetLastError: function () { return ""; } };
+    return m;
+}
+function bootElement(id, params) {
+    // params = { operace: [parametry] } -> existujici operace "z modelu"
+    var e = { Name: "AICodeBridge", ElementID: id, ElementGUID: "{ADDIN-" + id + "}", StereotypeEx: "", Notes: "",
+        Methods: bootColl(bootMethod), Update: function () { return true; } };
+    for (var k in (params || {})) {
+        var m = e.Methods.AddNew(k, "String");
+        params[k].forEach(function (pn, i) { var p = m.Parameters.AddNew(pn, "String"); p.Position = i; });
+    }
+    e._params = function (name) {
+        var mm = e.Methods._items.filter(function (x) { return x.Name == name; })[0];
+        return mm ? mm.Parameters._items.map(function (p) { return p.Name; }) : null;
+    };
+    return e;
+}
+function runBootstrap(opts) {
+    // opts.rows = radky dotazu na elementy AICodeBridge [{ id, guid, stereo, pkg, el }]
+    opts = opts || {};
+    var out = [], byGuid = {};
+    (opts.rows || []).forEach(function (r) { byGuid[r.guid] = r.el; });
+    var code = fs.readFileSync(path.join(__dirname, "..", "scripts", "ITAN-Bootstrap File Bridge.js"), "utf8");
+    function map(p) { return ("" + p).replace(/^[CD]:\\GIT\\ea-file-bridge\\src\\?$/i, SRC).replace(/^[CD]:\\GIT\\ea-file-bridge\\src\\/i, SRC + path.sep); }
+    var created = null;
+    var pkg = { Name: "Add-Ins", Elements: bootColl(function () { created = bootElement(999, {}); return created; }) };
+    var g = {
+        Session: { Output: function (m) { out.push("" + m); }, Input: function () { return ""; } },
+        Repository: {
+            EnsureOutputVisible: function () { },
+            SQLQuery: function (sql) {
+                if (/WHERE o\.Name = 'AICodeBridge'/.test(sql)) {
+                    return "<EADATA><Dataset_0><Data>" + (opts.rows || []).map(function (r) {
+                        return "<Row><ea_guid>" + r.guid + "</ea_guid><Object_ID>" + r.id + "</Object_ID><Stereotype>" + (r.stereo || "") + "</Stereotype><PkgName>" + (r.pkg || "") + "</PkgName></Row>";
+                    }).join("") + "</Data></Dataset_0></EADATA>";
+                }
+                var m = /Object_Type = 'Signal' AND Name = '([^']+)'/.exec(sql);
+                if (m) { return (opts.signals || {})[m[1]] ? "<ea_guid>" + opts.signals[m[1]] + "</ea_guid>" : ""; }
+                return "";
+            },
+            GetElementByGuid: function (gd) { return byGuid[gd] || null; },
+            GetTreeSelectedPackage: function () { return opts.noPkg ? null : pkg; }
+        },
+        ActiveXObject: function (progId) {
+            if (/FileSystemObject/i.test(progId)) { return {
+                FolderExists: function (p) { try { return fs.statSync(map(p)).isDirectory(); } catch (e) { return false; } },
+                GetFolder: function (p) { return { Files: fs.readdirSync(map(p)).map(function (n) { return { Name: n }; }) }; } }; }
+            return { Type: 2, Charset: "", Open: function () { }, Close: function () { }, _b: "",
+                LoadFromFile: function (p) { this._b = fs.readFileSync(map(p), "utf8"); }, ReadText: function () { return this._b; } };
+        },
+        Enumerator: function (coll) { var i = 0; this.atEnd = function () { return i >= coll.length; }; this.moveNext = function () { i++; }; this.item = function () { return coll[i]; }; }
+    };
+    var names = Object.keys(g);
+    var fn = Function.apply(null, names.concat([code]));
+    fn.apply(null, names.map(function (k) { return g[k]; }));
+    return { out: out, created: created, px: out.filter(function (l) { return /^PX  /.test(l); }), done: out.filter(function (l) { return /^Hotovo:/.test(l); })[0] || "" };
+}
+var BOOT_SIGNALS = { EA_Connect: "{S1}", EA_GetMenuItems: "{S2}", EA_MenuClick: "{S3}", EA_OnOutputItemDoubleClicked: "{S4}" };
+t("ITAN-Bootstrap mock FB-PU-01: existujici operace s 1 parametrem, hlavicka se 2 -> po behu 2 parametry, radek PX a pocet v souhrnu", function () {
+    // stav v0.14 v modelu: FB_RiskNote(risk), FB_RiskAuditTags(Repository, auditGuid, risk), Log bez id
+    var el = bootElement(11037, { FB_RiskNote: ["risk"], FB_RiskAuditTags: ["Repository", "auditGuid", "risk"],
+        Log: ["Repository", "msg"], FB_Main: ["Repository", "requestText"], EA_MenuClick: ["Repository", "MenuLocation", "ItemName"] });
+    var r = runBootstrap({ rows: [{ id: 11037, guid: "{ADDIN-11037}", stereo: "JavascriptAddin", pkg: "EA Addins", el: el }], signals: BOOT_SIGNALS });
+    eq(el._params("FB_RiskNote").join(","), "risk,baseline", "FB_RiskNote musi dostat parametr baseline: " + r.out.join("\n"));
+    eq(el._params("FB_RiskAuditTags").join(","), "Repository,auditGuid,risk,baseline");
+    eq(el._params("Log").join(","), "Repository,msg,id");
+    eq(el._params("FB_Main").join(","), "Repository,requestText", "shodna signatura se nesaha");
+    eq(el._params("EA_MenuClick").join(","), "Repository,MenuLocation,MenuName,ItemName", "reception dal podle EA_ARGS");
+    ok(r.px.some(function (l) { return l == "PX  FB_RiskNote: (risk) -> (risk, baseline)"; }), "radek PX FB_RiskNote: " + r.px.join(" | "));
+    ok(r.px.some(function (l) { return /^PX  Log: \(Repository, msg\) -> \(Repository, msg, id\)$/.test(l); }), "radek PX Log");
+    ok(r.px.some(function (l) { return /^PX  EA_MenuClick -> parametry reception opraveny/.test(l); }), "radek PX reception (bod 5 beze zmeny)");
+    contains(r.done, "Parametry: 3 operaci srovnano podle hlavicky (radky PX)", r.done);
+    contains(r.done, "1 parametry opraveny", r.done);
+    ok(r.out.some(function (l) { return /^POZOR: 3 operaci melo v modelu jiny seznam parametru/.test(l); }), "varovani POZOR s poctem");
+    var files = fs.readdirSync(SRC).filter(function (f) { return /^AICodeBridge\..+\.js$/.test(f); }).length;
+    contains(r.done, (files - 5) + " operaci zalozeno, " + files + " nahran kod", "chybejici operace zalozeny, kod vsude: " + r.done);
+    // idempotence: druhy beh = 0 PX, 0 zalozeno
+    var r2 = runBootstrap({ rows: [{ id: 11037, guid: "{ADDIN-11037}", stereo: "JavascriptAddin", pkg: "EA Addins", el: el }], signals: BOOT_SIGNALS });
+    eq(r2.px.length, 0, "druhy beh nesmi nic srovnavat: " + r2.px.join(" | "));
+    contains(r2.done, "0 operaci zalozeno"); contains(r2.done, "Parametry: 0 operaci srovnano");
+    ok(!r2.out.some(function (l) { return /^POZOR/.test(l); }), "bez POZOR pri 0 srovnanych");
+});
+t("ITAN-Bootstrap mock: parametry se srovnavaji podle hlavicky KAZDE operace (zadny seznam SIG) - zamena poradi i nadbytecny parametr", function () {
+    var el = bootElement(1, { FB_OpPing: ["op", "Repository"], FB_Whitelist: ["Repository"] });
+    var r = runBootstrap({ rows: [{ id: 1, guid: "{ADDIN-1}", stereo: "JavascriptAddin", pkg: "P", el: el }], signals: BOOT_SIGNALS });
+    eq(el._params("FB_OpPing").join(","), "Repository,op", "poradi podle hlavicky");
+    eq(el._params("FB_Whitelist").join(","), "", "hlavicka bez parametru -> parametry odebrany");
+    contains(r.done, "Parametry: 2 operaci srovnano");
+});
+t("ITAN-Bootstrap mock N-B-4: dva elementy AICodeBridge, jeden se stereotypem -> VAROVANI se seznamem (ElementID, stereotyp, package), kod jde do toho se stereotypem", function () {
+    var good = bootElement(10, { FB_RiskNote: ["risk"] }), bad = bootElement(20, { FB_RiskNote: ["risk"] });
+    var r = runBootstrap({ rows: [
+        { id: 20, guid: "{ADDIN-20}", stereo: "", pkg: "Letni pozustatek", el: bad },
+        { id: 10, guid: "{ADDIN-10}", stereo: "JavascriptAddin", pkg: "EA Addins", el: good }], signals: BOOT_SIGNALS });
+    ok(r.out.some(function (l) { return /^VAROVANI: v modelu je 2 elementu jmenem AICodeBridge/.test(l); }), "varovani: " + r.out.slice(0, 6).join(" | "));
+    ok(r.out.some(function (l) { return /ElementID 20, stereotyp '', package 'Letni pozustatek'.*ignorovan/.test(l); }), "radek o elementu bez stereotypu");
+    ok(r.out.some(function (l) { return /ElementID 10, stereotyp 'JavascriptAddin', package 'EA Addins'.*CIL/.test(l); }), "radek o cili");
+    eq(good._params("FB_RiskNote").join(","), "risk,baseline", "cil dostal parametry");
+    eq(bad._params("FB_RiskNote").join(","), "risk", "element bez stereotypu se nesaha");
+    ok(good.Methods.Count > 100 && bad.Methods.Count == 1, "kod jen do cile");
+    ok(!r.out.some(function (l) { return /^STOP/.test(l); }), "jeden kandidat = zadny STOP");
+});
+t("ITAN-Bootstrap mock N-B-4: dva elementy se stereotypem JavascriptAddin -> STOP s vypisem, nic se nemeni", function () {
+    var a = bootElement(10, { FB_RiskNote: ["risk"] }), b = bootElement(11, { FB_RiskNote: ["risk"] });
+    var r = runBootstrap({ rows: [
+        { id: 10, guid: "{ADDIN-10}", stereo: "JavascriptAddin", pkg: "EA Addins", el: a },
+        { id: 11, guid: "{ADDIN-11}", stereo: "JavascriptAddin", pkg: "Jinde", el: b }], signals: BOOT_SIGNALS });
+    ok(r.out.some(function (l) { return /^STOP: 2 elementy AICodeBridge se stereotypem JavascriptAddin/.test(l); }), "STOP: " + r.out.join(" | "));
+    ok(r.out.some(function (l) { return /ElementID 11, stereotyp 'JavascriptAddin', package 'Jinde'/.test(l); }), "vypis obou");
+    eq(r.done, "", "zadny souhrn Hotovo");
+    eq(a.Methods.Count, 1); eq(b.Methods.Count, 1); eq(a._params("FB_RiskNote").join(","), "risk");
+    eq(r.created, null, "nezaklada se novy element");
+});
+t("ITAN-Bootstrap mock: zadny element -> zalozi v oznacenem package (chovani beze zmeny)", function () {
+    var r = runBootstrap({ rows: [], signals: BOOT_SIGNALS });
+    ok(r.created != null, "element zalozen");
+    ok(r.out.some(function (l) { return /ZALOZEN v package 'Add-Ins'/.test(l); }));
+    eq(r.px.length, 0); contains(r.done, "Parametry: 0 operaci srovnano");
+    eq(r.created._params("FB_RiskNote").join(","), "risk,baseline", "nova operace s parametry z hlavicky");
+});
 // --- K8 A3 (Z260904-6): FB_InterpretError - vetev balickovych prav (zastupny vzor)
 t("FB_InterpretError: Group Lock hlaska -> E_PERMISSION (ne E_LOCKED), puvodni text zachovan", function () {
     var r = B.FB_InterpretError.call(B, "Element 'X' is locked by group 'EAFB Locked'. You are not a member of this group.");
@@ -3452,6 +3586,113 @@ t("BL-R L3: jmeno rucni baseline s XML entitami (&, uvozovky) se v navadene cest
         var r = runFile(repo, UPD_A1, "tl3");
         eq(r.baseline.manual.ok, true, JSON.stringify(r.baseline.manual));
     });
+});
+
+// ===========================================================================
+// FB-PU-01 (revize usability pumpy 2026-10-04 kap. 3.1; zive doma 2026-10-10,
+// docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md): bootstrap do 2026-10-10 u
+// existujici operace prepsal jen Code a parametry nechal. Pumpa i EA runtime
+// skladaji funkci ze seznamu parametru v MODELU (pump.wsf Code loader), takze
+// FB_RiskNote nasazena nad prvek v0.14 bezela jako function(risk) a telo
+// `if (baseline)` padlo "Objekt baseline neni definovan" AZ PO provedeni
+// zapisu (prvky v modelu, audit chybi, davka v rejected\).
+// Test: zkompilovat FB_RiskNote / FB_RiskAuditTags PRESNE tak, jak je pumpa
+// sestavi z modelu po bankovnim bootstrapu (seznam parametru z tagu v0.14),
+// a pustit pres FB_Main LOW zapis - bez opravy (typeof) musi spadnout,
+// s opravou projit vcetne auditu.
+// ===========================================================================
+var V014_ARGS = { FB_RiskNote: ["risk"], FB_RiskAuditTags: ["Repository", "auditGuid", "risk"] };
+function srcOf(name) { return fs.readFileSync(path.join(SRC, "AICodeBridge." + name + ".js"), "utf8").replace(/^﻿/, ""); }
+function withModelSignatures(args, patch, fn) {
+    // args = { operace: [parametry v modelu] }; patch = volitelna uprava zdroje (negativni dukaz)
+    var orig = {};
+    for (var k in args) {
+        orig[k] = B[k];
+        var code = srcOf(k);
+        if (patch) { code = patch(k, code); }
+        B[k] = Function.apply(null, args[k].concat([code]));
+    }
+    try { return fn(); } finally { for (var k2 in orig) { B[k2] = orig[k2]; } }
+}
+function lowWriteWithAudit(id, holder) {
+    blReset(); delete B._fbAccessCache; delete B._fbPrevExc;
+    var repo = blRepo();
+    var aud = repo._addPackage({ id: 900, name: "#AI-LOG", guid: "{AUDIT-PU01}" });
+    if (holder) { holder.repo = repo; holder.audit = aud; holder.target = repo.GetPackageByGuid("{PK-11}"); }
+    var origCfg = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", auditPkg: "{AUDIT-PU01}" }]; };
+    try {
+        var out = B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA",
+            ops: [{ op: "create_or_update_elements", elements: [{ name: "FBT Nasazeni prvek 1", type: "Class", "package": "{PK-11}" }] }] }));
+        return { resp: JSON.parse(out), audit: aud, repo: repo };
+    } finally { B.FB_Config = origCfg; }
+}
+t("FB-PU-01: FB_RiskNote/FB_RiskAuditTags se signaturou z modelu v0.14 (bez baseline) -> LOW zapis projde a audit vznikne (typeof)", function () {
+    var r = withModelSignatures(V014_ARGS, null, function () { return lowWriteWithAudit("pu01-fix"); });
+    eq(r.resp.status, "done", JSON.stringify(r.resp).substring(0, 300));
+    eq(r.resp.results[0].status, "ok");
+    eq(r.audit.Elements.Count, 1, "audit Artifact v #AI-LOG musi vzniknout i se starou signaturou");
+    ok(/risk=LOW/.test("" + r.audit.Elements.GetAt(0).Notes), "Notes auditu nesou riskovy souhrn: " + r.audit.Elements.GetAt(0).Notes);
+});
+t("FB-PU-01 dukaz pasti: telo, ktere cte baseline PRIMO (stav cf88594), se signaturou v0.14 spadne az po provedeni zapisu - prvek v modelu je, audit chybi", function () {
+    var noTypeof = function (name, code) {
+        var fixed = 'var bl = (typeof baseline != "undefined") ? baseline : null;';
+        ok(code.indexOf(fixed) >= 0, name + ": oprava (typeof) ve zdroji chybi");
+        return code.replace(fixed, "var bl = baseline;");
+    };
+    var failed = null, r = null, h = {};
+    try { r = withModelSignatures(V014_ARGS, noTypeof, function () { return lowWriteWithAudit("pu01-past", h); }); }
+    catch (e) { failed = e; }
+    if (failed) {
+        // pumpa z teto vyjimky dela E_EXCEPTION (res bez id, protokol eafb/0.1) a davku odlozi do rejected\
+        ok(/baseline/.test("" + failed.message), "ocekavan pad na nedefinovane baseline: " + failed.message);
+    } else {
+        ok(r.resp.status != "done", "bez typeof nesmi projit cisty done: " + JSON.stringify(r.resp).substring(0, 200));
+    }
+    eq(h.target.Elements.Count, 1, "zapis uz PROBEHL (prvek v modelu je) - pad prisel az v souhrnu");
+    eq(h.audit.Elements.Count, 0, "audit v #AI-LOG CHYBI - to je ta past (zive 2026-10-10: res-nas-03-low-zapis.json + res-nas-05-kontrola-prvku.json)");
+});
+t("FB-PU-01 pravidlo (PROTOKOL-EAFB kap. 11): parametr baseline pribyly po v0.14 se v FB_RiskNote a FB_RiskAuditTags cte JEN pres typeof", function () {
+    ["FB_RiskNote", "FB_RiskAuditTags"].forEach(function (name) {
+        var code = srcOf(name).split(/\r?\n/).filter(function (l) { return !/^\s*\/\//.test(l); }).join("\n")
+            .replace(/"[^"]*"/g, '""');                       // retezce (" | baseline=", "ai.baseline") pryc
+        var direct = code.replace(/typeof\s+baseline\b/g, "").replace(/\?\s*baseline\s*:/g, "");
+        ok(!/\bbaseline\b/.test(direct), name + ": prime cteni parametru baseline mimo typeof: " + (/.*\bbaseline\b.*/.exec(direct) || [""])[0]);
+    });
+});
+
+// --- tools/diff-signatures.py (2026-10-10, FB-PU-01 bod 5): pred kazdym tagem vypsat operace se zmenenym
+// seznamem parametru. Test ho spusti nad v0.14..HEAD; bez pythonu nebo bez tagu v klonu jen varuje (bankovni
+// korporatni repo tagy nemusi mit) - nastroj je pro vydani doma.
+t("tools/diff-signatures.py: v0.14 -> HEAD vypise jen operace se zmenenym seznamem parametru (FB_RiskNote, FB_RiskAuditTags) a vraci exit 1; --json strojove", function () {
+    var cp = require("child_process");
+    var root = path.join(__dirname, "..");
+    var tagOk = cp.spawnSync("git", ["-c", "core.quotepath=off", "rev-parse", "-q", "--verify", "v0.14^{commit}"], { cwd: root, env: Object.assign({}, process.env, { GIT_OPTIONAL_LOCKS: "0" }) });
+    if (tagOk.error || tagOk.status !== 0) { console.log("  (preskoceno: git nebo tag v0.14 v tomto klonu neni - diff-signatures je nastroj pro vydani doma)"); return; }
+    var run = null, pyExe = "";
+    ["python", "python3", "py"].some(function (exe) {
+        var r = cp.spawnSync(exe, [path.join(root, "tools", "diff-signatures.py"), "v0.14", "HEAD", "--json"], { cwd: root, encoding: "utf8", env: Object.assign({}, process.env, { GIT_OPTIONAL_LOCKS: "0" }) });
+        if (r.error || r.status === null) { return false; }
+        run = r; pyExe = exe; return true;
+    });
+    if (!run) { console.log("  (preskoceno: python neni v PATH)"); return; }
+    ok(run.status === 1, "exit 1 = zmeny signatur existujicich operaci; stdout: " + run.stdout + " stderr: " + run.stderr);
+    var j = JSON.parse(run.stdout.replace(/^\uFEFF/, ""));
+    var changed = j.changed.map(function (c) { return c.op + ":" + c.old.join(",") + "->" + c.new.join(","); }).sort();
+    eq(changed.join(" | "), "FB_RiskAuditTags:Repository,auditGuid,risk->Repository,auditGuid,risk,baseline | FB_RiskNote:risk->risk,baseline");
+    ok(j.added.some(function (a) { return a.op == "FB_AutoBaseline"; }), "nove soubory od v0.14 jsou v 'added', ne ve 'changed'");
+    eq(j.removed.length, 0);
+    // kazda zmenena operace musi novy parametr cist pres typeof (pravidlo kap. 11) - kontrola nad zdrojem
+    j.changed.forEach(function (c) {
+        var code = srcOf(c.op);
+        c.new.slice(c.old.length).forEach(function (pn) {
+            ok(new RegExp("typeof\\s+" + pn + "\\s*!=\\s*\"undefined\"").test(code), c.op + ": novy parametr " + pn + " se musi cist pres typeof");
+        });
+    });
+    // citelny vystup bez --json
+    var txt = cp.spawnSync(pyExe, [path.join(root, "tools", "diff-signatures.py"), "v0.14", "HEAD"], { cwd: root, encoding: "utf8", env: Object.assign({}, process.env, { GIT_OPTIONAL_LOCKS: "0" }) });
+    contains(txt.stdout, "FB_RiskNote: (risk) -> (risk, baseline)");
+    contains(txt.stdout, "Zmenene signatury existujicich operaci: 2");
 });
 
 // ------------------------------------------------------------------ vysledek

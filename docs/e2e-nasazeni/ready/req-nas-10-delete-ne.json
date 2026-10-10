@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "nas-10-delete-ne",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "delete_from_model", "targets": [ { "type": "Element", "guid": "{0AE34654-4C5C-40e5-8205-A5E1F65B5C48}" } ] }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-kontrola-parametru",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "query", "sql": "SELECT o.Name AS operace, p.Pos, p.Name AS parametr FROM t_operation o LEFT JOIN t_operationparams p ON p.OperationID = o.OperationID WHERE o.Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin') ORDER BY o.Name, p.Pos" }
+ ]
+}

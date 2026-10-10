@@ -3,6 +3,10 @@
 // zadani par. 8). Plne metriky + duvody jsou v Notes (FB_RiskNote); tagy
 // nesou strojove citelny vytah (limit TV ~255 znaku -> oriznuti).
 // Audit nesmi shodit davku - vse best-effort.
+// Parametr baseline pribyl az po v0.14 - cte se jen pres typeof (FB-PU-01,
+// PROTOKOL-EAFB kap. 11); bez nej by se uvnitr try jen tise ztratil tag
+// ai.baseline (restore manifest), coz je presne to, co nema byt tiche.
+var bl = (typeof baseline != "undefined") ? baseline : null;
 if (risk === null || typeof risk == "undefined") { return ""; }
 if (auditGuid === null || typeof auditGuid == "undefined" || ("" + auditGuid) == "") { return ""; }
 try {
@@ -34,12 +38,12 @@ try {
     // Baseline politika par. 4.6/7 (W11): restore manifest pro par. 12f/T3 -
     // res-*.json lezi v per-user slozce, tag na audit Artifactu prezije.
     // Tvar: pkgGuid=...;name=...;decision=... per package, oddelovac |
-    if (baseline) {
-        var parts = [], pk = baseline.packages || [];
+    if (bl) {
+        var parts = [], pk = bl.packages || [];
         for (var bi = 0; bi < pk.length; bi++) {
-            parts.push("pkgGuid=" + (pk[bi].guid || "") + ";name=" + (pk[bi].name || "") + ";decision=" + (pk[bi].result || baseline.decision || ""));
+            parts.push("pkgGuid=" + (pk[bi].guid || "") + ";name=" + (pk[bi].name || "") + ";decision=" + (pk[bi].result || bl.decision || ""));
         }
-        if (parts.length == 0) { parts.push("decision=" + (baseline.decision || "") + ";reason=" + (baseline.reason || "")); }
+        if (parts.length == 0) { parts.push("decision=" + (bl.decision || "") + ";reason=" + (bl.reason || "")); }
         var full = parts.join("|");
         // limit TV ~255: delsi vycet se deli do ai.baseline, ai.baseline.2, ...
         var chunkNo = 1, cur = "";

@@ -20,6 +20,20 @@
 //      se prestavi - EA preda argumenty POZICNE, chybejici parametr posune
 //      vsechny dalsi (EA_MenuClick bez MenuName -> ItemName = nazev podmenu,
 //      Output "Unhandled menu item: -AI Bridge"). Idempotentni jako vse ostatni.
+//   6. (od 2026-10-10, nalez FB-PU-01 revize usability pumpy, zive doma)
+//      PARAMETRY KAZDE existujici operace se srovnaji podle hlavicky souboru
+//      "// AICodeBridge.Nazev(a, b)" - stejna logika jako deploy_src (v0.10).
+//      Do te doby bootstrap u existujici operace prepsal jen kod: pumpa i EA
+//      runtime skladaji funkci z parametru v MODELU, takze FB_RiskNote(risk)
+//      z v0.14 bezela s novym telem bez parametru baseline a kazdy zapis
+//      spadl "Objekt baseline neni definovan" AZ PO provedeni (prvky
+//      v modelu, audit chybi, davka v rejected\). Radek "PX <operace>:
+//      (stare) -> (nove)" + pocet v souhrnu. Po nasazeni VZDY kontrolni
+//      dotaz (docs\NAVOD-NASAZENI-KLIKACI.md, Kontrola parametru po nasazeni).
+//   7. (od 2026-10-10, nalez N-B-4 z banky) vice elementu jmenem AICodeBridge
+//      v modelu -> vypis vsech (ElementID, stereotyp, package) jako VAROVANI;
+//      bere se ten se stereotypem JavascriptAddin. Dva se stereotypem = STOP
+//      (nelze rozhodnout, kam nalevat kod) - uklid rucne, pak znovu.
 //
 // PRED SPUSTENIM:
 //   - v Project Browseru OZNAC package, kam ma element patrit (jen pri
@@ -124,11 +138,37 @@ function readUtf8(path) {
     return s;
 }
 
+function xmlField(row, name) {
+    var m = new RegExp("<" + name + ">([^<]*)</" + name + ">", "i").exec(row);
+    return m ? m[1] : "";
+}
+// bod 7 hlavicky (N-B-4): vsechny elementy jmenem AICodeBridge, ne jen prvni
+// se stereotypem. Vraci { el, stop } - stop = true znamena STOP celeho behu.
 function findAddin() {
     var xml = "" + Repository.SQLQuery(
-        "SELECT ea_guid FROM t_object WHERE Name = '" + ADDIN_NAME + "' AND Stereotype = 'JavascriptAddin'");
-    var m = /<ea_guid>([^<]+)<\/ea_guid>/i.exec(xml);
-    return m ? Repository.GetElementByGuid(m[1]) : null;
+        "SELECT o.ea_guid, o.Object_ID, o.Stereotype, p.Name AS PkgName FROM t_object o"
+        + " LEFT JOIN t_package p ON p.Package_ID = o.Package_ID"
+        + " WHERE o.Name = '" + ADDIN_NAME + "'");
+    var rows = [], re = /<Row>([\s\S]*?)<\/Row>/gi, rm;
+    while ((rm = re.exec(xml)) != null) {
+        rows.push({ guid: xmlField(rm[1], "ea_guid"), id: xmlField(rm[1], "Object_ID"),
+            stereo: xmlField(rm[1], "Stereotype"), pkg: xmlField(rm[1], "PkgName") });
+    }
+    var cands = [];
+    for (var ri = 0; ri < rows.length; ri++) { if (rows[ri].stereo == "JavascriptAddin") { cands.push(rows[ri]); } }
+    if (rows.length > 1) {
+        Session.Output("VAROVANI: v modelu je " + rows.length + " elementu jmenem " + ADDIN_NAME + " (N-B-4) - kod dostane JEN ten se stereotypem JavascriptAddin:");
+        for (var rj = 0; rj < rows.length; rj++) {
+            Session.Output("  - ElementID " + rows[rj].id + ", stereotyp '" + rows[rj].stereo + "', package '" + rows[rj].pkg + "'"
+                + (rows[rj].stereo == "JavascriptAddin" ? "  <- CIL" : "  (ignorovan; kandidat na uklid)"));
+        }
+    }
+    if (cands.length > 1) {
+        Session.Output("STOP: " + cands.length + " elementy " + ADDIN_NAME + " se stereotypem JavascriptAddin - nelze rozhodnout, kam nalevat kod. Nic nezmeneno. Odstran/prejmenuj nadbytecny element a spust znovu.");
+        return { el: null, stop: true };
+    }
+    if (cands.length == 0) { return { el: null, stop: false }; }
+    return { el: Repository.GetElementByGuid(cands[0].guid), stop: false };
 }
 
 function main() {
@@ -144,7 +184,9 @@ function main() {
     Session.Output("Slozka src: " + SRC_DIR);
 
     // 1) element
-    var el = findAddin();
+    var found = findAddin();
+    if (found.stop) { return; }
+    var el = found.el;
     if (el == null) {
         var pkg = Repository.GetTreeSelectedPackage();
         if (pkg == null) {
@@ -180,7 +222,7 @@ function main() {
     //    cizi SignalGUID.
     var sigMap = {};
     for (var sj = 0; sj < SIG.length; sj++) { sigMap[SIG[sj].n] = SIG[sj].p; }
-    var created = 0, coded = 0, skippedEa = "", recFixed = 0, recNew = 0, parFixed = 0;
+    var created = 0, coded = 0, skippedEa = "", recFixed = 0, recNew = 0, parFixed = 0, parSynced = 0;
     // signatury EA_ handleru bez zavorek v hlavicce (stejne jako harness KNOWN_ARGS)
     var EA_ARGS = {
         EA_Connect: ["Repository"],
@@ -207,6 +249,37 @@ function main() {
         }
         meth.Parameters.Refresh();
         Session.Output("PX  " + opName + " -> parametry reception opraveny: (" + haveP.join(", ") + ") -> (" + wantP.join(", ") + ")");
+        return true;
+    }
+    // bod 6 hlavicky (FB-PU-01): parametry z hlavicky souboru; null = hlavicka
+    // bez zavorek (EA_ lifecycle handlery) - signatura se NEsaha (ridi EA_ARGS)
+    function headerParams(opName, code) {
+        var hm = new RegExp("AICodeBridge\\." + opName + "\\s*\\(([^)]*)\\)").exec(code.replace(/^\uFEFF/, "").substring(0, 500));
+        if (!hm) { return null; }
+        var out = [];
+        if (hm[1].replace(/\s/g, "") != "") {
+            var raw = hm[1].split(",");
+            for (var pj = 0; pj < raw.length; pj++) { out.push(raw[pj].replace(/^\s+|\s+$/g, "")); }
+        }
+        return out;
+    }
+    // bod 6: srovnani parametru EXISTUJICI operace podle hlavicky (logika
+    // deploy_src, src\AICodeBridge.FB_OpDeploySrc.js) - jmeno + poradi
+    function syncParams(meth, opName, code) {
+        var wantP = headerParams(opName, code);
+        if (wantP == null) { return false; }
+        var haveP = [];
+        for (var hp = 0; hp < meth.Parameters.Count; hp++) { haveP.push("" + meth.Parameters.GetAt(hp).Name); }
+        if (haveP.join(",") == wantP.join(",")) { return false; }
+        for (var dp = meth.Parameters.Count - 1; dp >= 0; dp--) { meth.Parameters.DeleteAt(dp, false); }
+        meth.Parameters.Refresh();
+        for (var np = 0; np < wantP.length; np++) {
+            var par3 = meth.Parameters.AddNew(wantP[np], "String");
+            par3.Position = np;
+            par3.Update();
+        }
+        meth.Parameters.Refresh();
+        Session.Output("PX  " + opName + ": (" + haveP.join(", ") + ") -> (" + wantP.join(", ") + ")");
         return true;
     }
     function signalGuidFor(opName) {
@@ -258,14 +331,20 @@ function main() {
             have[name] = m;
             created++;
             if (isEa) { m.StyleEx = "Reception=1;SignalGUID=" + sg + ";"; recNew++; }
-        } else if (isEa && sg != "") {
+        } else if (isEa) {
+            // receptions: parametry podle EA_ARGS (bod 5), i kdyz Signal v modelu neni
             if (syncEaParams(m, name)) { parFixed++; }
-            var haveStyle = "" + m.StyleEx;
-            if (haveStyle.toUpperCase().indexOf(("SignalGUID=" + sg + ";").toUpperCase()) < 0) {
-                m.StyleEx = "Reception=1;SignalGUID=" + sg + ";";
-                recFixed++;
-                Session.Output("RX  " + name + " -> reception prepnuta na lokalni Signal " + sg + (haveStyle.indexOf("Reception=1") < 0 ? " (doplneno)" : " (byl cizi GUID - preneseny add-in)"));
+            if (sg != "") {
+                var haveStyle = "" + m.StyleEx;
+                if (haveStyle.toUpperCase().indexOf(("SignalGUID=" + sg + ";").toUpperCase()) < 0) {
+                    m.StyleEx = "Reception=1;SignalGUID=" + sg + ";";
+                    recFixed++;
+                    Session.Output("RX  " + name + " -> reception prepnuta na lokalni Signal " + sg + (haveStyle.indexOf("Reception=1") < 0 ? " (doplneno)" : " (byl cizi GUID - preneseny add-in)"));
+                }
             }
+        } else {
+            // bod 6 (FB-PU-01): KAZDA existujici operace dostane parametry podle hlavicky
+            if (syncParams(m, name, code)) { parSynced++; }
         }
         m.Code = code;
         m.Update();
@@ -275,8 +354,12 @@ function main() {
     el.Methods.Refresh();
 
     Session.Output("Hotovo: " + created + " operaci zalozeno, " + coded + " nahran kod (souboru v src: " + names.length + ")."
+        + " Parametry: " + parSynced + " operaci srovnano podle hlavicky (radky PX)."
         + " Receptions: " + recNew + " zalozeno, " + recFixed + " prepnuto na lokalni Signal, " + parFixed + " parametry opraveny."
         + (skippedEa != "" ? " BEZ RECEPTION (Signal chybi): " + skippedEa : ""));
+    if (parSynced > 0) {
+        Session.Output("POZOR: " + parSynced + " operaci melo v modelu jiny seznam parametru nez hlavicka souboru (radky PX vyse) - bez tohoto srovnani by EA runtime i pumpa volaly nove telo se starymi parametry (FB-PU-01). Po restartu spust kontrolni dotaz parametru (NAVOD-NASAZENI-KLIKACI.md).");
+    }
     Session.Output("DALSI KROKY: 1) zkontroluj configy v src (FB_Whitelist/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,");
     Session.Output("2) PLNY restart EA (kod EA runtime) a spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.");
 }
