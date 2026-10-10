@@ -1,0 +1,54 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "ukazka-S2-survey-update",
+ "repo": "<TEST-DB>",
+ "notes": "S2 záloha (21. 9.): nový UC jako element v OTHER ELEMENTS + asociace + doplnění na EXISTUJÍCÍ survey v GLOBAL VIEWS. foreignDiagrams 1 > 0 = ELEVATED = dialog Ano/Ne. Číslo UC je v názvu (repozitář ho 21. 9. nepřidělil). Souřadnice v op 3 dosadit z t_diagramobjects (Scenar § 2).",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "<GUID-FBTEST>",
+   "name": "OTHER ELEMENTS"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC-91002 Zruš hodnocení",
+     "notes": "Návštěvník zruší své dříve zadané hodnocení knihy; systém ho odstraní a přepočítá celkové hodnocení. Doplněno z M365 Copilota schránkovým kanálem."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "<GUID-AKTER>",
+     "target": "$1[0]",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "<GUID-SURVEY>",
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 420,
+     "y": 290,
+     "width": 260,
+     "height": 110
+    }
+   ]
+  },
+  {
+   "op": "open_diagrams",
+   "diagrams": [
+    "<GUID-SURVEY>"
+   ]
+  }
+ ]
+}

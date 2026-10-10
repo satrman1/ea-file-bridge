@@ -38,3 +38,13 @@ zadani/re-fixtures/
 
 # odkladiste git locku/tmp objektu z mountu Cowork (VM nema delete) — Milos maze rucne
 _to_delete/
+
+# Python venv (NAVOD-PYTHON-312-VENV.md: projekty bezi na nativnim Pythonu, venv jen lokalni zaloha)
+.venv*/
+
+# zamerne neverzovane (fronta 2026-10-10, bod a): nesou udaje o prostredi banky
+# (verze VS Code/Copilot na produkci, nazvy prostredi stanic, pip index/proxy, rezim WSH).
+# Analyza kompatibility kitu .github/ se starsim VS Code + sonda prostredi Pythonu
+# (skript + protokol s vysledky) zustavaji jen lokalne; obecna cast = docs/NAVOD-PYTHON-312-VENV.md
+docs/KOMPATIBILITA-VSCODE-*.md
+docs/spike-python/
