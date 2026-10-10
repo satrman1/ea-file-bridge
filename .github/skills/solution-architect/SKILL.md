@@ -117,3 +117,5 @@ každý blok architektury musí sloužit některému objective.
 Urči režim ze zadání a načti jen relevantní reference. Volatility a jejich verdikty vždy
 předkládej člověku k rozhodnutí — identifikace volatilit je jediná část Metody, která není
 mechanická, a „the fact that it wasn't difficult should be a red flag".
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

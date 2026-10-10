@@ -97,3 +97,5 @@ Popisy v češtině, identifikátory v angličtině.
 ## Chování po aktivaci
 
 Okamžitě začni pracovat se zadáním. Ze zadání odvoď režim. Pokud to z kontextu nejde poznat, navrhni vhodný režim nebo se zeptej.
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

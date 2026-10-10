@@ -1,6 +1,6 @@
 # EMR Bridge protokol (dávková předávka agent ↔ executor)
 
-**Rev. 2026-08-29 (framecheck):** kanál pro EA je v bance **výhradně EA File Bridge** — agent MCP nikdy nemá (rozhodnutí 2026-08-16, [emr-zapis-pravidla](emr-zapis-pravidla.md) §7b): zápis i čtení jde JSON dávkou `requests/` → executor bridge → `responses/`. Markdown vrstva inbox/outbox níže je předávka **mezi agenty** (analytik-agent ↔ EMR agent) NAD touto JSON vrstvou — obě vrstvy nezaměňovat. Doma (Cowork) může Claude použít domácí MCP, ale jen pro test/dev — není to vzor pro banku a žádný „plný MCP režim pro Copilot" se neplánuje. Historie: protokol vznikl pro hybridní režim Zoo Code (community fork Roo Code) — ten je překonaný mezikrok (Metodika v2 §17.2).
+Kanál pro EA je v bance **výhradně EA File Bridge** — agent MCP nikdy nemá ([emr-zapis-pravidla](emr-zapis-pravidla.md) §7b): zápis i čtení jde JSON dávkou `requests/` → executor bridge → `responses/`. Markdown vrstva inbox/outbox níže je předávka **mezi agenty** (analytik-agent ↔ EMR agent) NAD touto JSON vrstvou — obě vrstvy nezaměňovat. Doma (Cowork) může Claude použít domácí MCP, ale jen pro test/dev — není to vzor pro banku a žádný „plný MCP režim pro Copilot" se neplánuje.
 
 ## Dělba rolí
 
@@ -36,12 +36,12 @@ projekt: <název>
 ## Operace (závazně dle _shared/emr-zapis-pravidla.md)
 1. create_or_update_elements: Behavioral Rule "BRU-0042 Validace limitu"
    - owner: package `RULES (REUSABLE)` (přepoužitelné pravidlo, konvence `BRU-####` s pomlčkou — §3), notes: |...|
-2. create_or_update_connectors: {GUID UC} —Usage(«use»)→ $g1, direction: FromSourceToTarget (✅ N-K3-1; UC—Realization→BRU je překonané)
+2. create_or_update_connectors: {GUID UC} —Usage(«use»)→ $g1, direction: FromSourceToTarget
 3. create_or_update_requirements: element {GUID UC}, requirements: [{name: "BRU00123-1 Kontrola disponibilního zůstatku", notes: |...|}]
 ...
 ```
 
-⚠ **Lokální pravidla `BRU<čísloUC>-Y` (bez pomlčky) NEJSOU samostatný element pod UC** — od U5 rev. 2026-08-21 jsou to internal requirements uvnitř UC (záložka Responsibilities → Requirements, `t_objectrequires`) a zapisují se operací `create_or_update_requirements` (iterace 6 bridge, docs v0.12 §6i), **bez konektoru**. Dřívější vzor „element pod UC + Usage konektor" (N-K3-2) platí už jen pro přepoužitelná `BRU-####`.
+⚠ **Lokální pravidla `BRU<čísloUC>-Y` (bez pomlčky) NEJSOU samostatný element pod UC** — jsou to internal requirements uvnitř UC (záložka Responsibilities → Requirements, `t_objectrequires`) a zapisují se operací `create_or_update_requirements` (Dokumentace bridge §6i), **bez konektoru**. Vzor „samostatný element + Usage konektor" platí jen pro přepoužitelná `BRU-####`.
 
 Pravidla příkazů:
 - **Jedna dávka = jeden ucelený artefaktový celek** (celý UC package, celá QA sada) — minimalizuj počet předávek.
@@ -66,4 +66,4 @@ Tabulka: fáze, brána, poslední Gate Record, rozpracované dávky (id, typ, st
 3. Analytik-agent nikdy needituje outbox ani STATE.md; EMR agent nikdy needituje obsah příkazu (jen frontmatter `stav`).
 4. GUID z výsledků přenáší analytik-agent do navazujících dávek — to je jediná „paměť" mezi dávkami vedle EMR.
 5. HUMAN_DECISION (brány) probíhá u analytik-agenta; Gate Record zapisuje EMR agent dávkou `typ: zapis`.
-6. EMR agent vynucuje ochranné vrstvy [emr-zapis-pravidla](emr-zapis-pravidla.md) §12: razítka na vše AI-created, mikro-baseline před zápisem do existující package, vykázání objemu dávky v result + při překročení orientační soft úrovně `failed` s žádostí o potvrzení uživatelem (✅ R2 — tvrdý stop se zatím neaplikuje), update cizího obsahu bez odkazu na schválený dry-run = `failed`.
+6. EMR agent vynucuje ochranné vrstvy [emr-zapis-pravidla](emr-zapis-pravidla.md) §12: razítka na vše AI-created, mikro-baseline před zápisem do existující package, vykázání objemu dávky v result + při překročení orientační soft úrovně `failed` s žádostí o potvrzení uživatelem (tvrdý stop se zatím neaplikuje), update cizího obsahu bez odkazu na schválený dry-run = `failed`.

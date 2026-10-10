@@ -86,9 +86,9 @@ ConstraintInternal --> enumConstraintType
 | N-SCN07 | Postcondition              | `PSTXXXXX-Y` Constraint typu postcondition                                                                                                                                                                                                                                            |
 | N-SCN08 | Asumption                  | `ASUXXXXX-Y` Constraint typu invariant                                                                                                                                                                                                                                                |
 
-## Fyzické umístění v EA (U2 rev. 2026-08-17)
+## Fyzické umístění v EA
 
-Původní U2 (2026-07-02: scénář = strukturovaný text v notes UC, Scenarios tab se neplní) bylo **revidováno 2026-08-17** — mechanika zápisu do Scenarios tab existuje a je ověřená (`create_or_update_scenarios`, ea-file-bridge PROTOKOL-EAFB v0.5 §6b, dávka 20260818-28). Platí: **scénáře žijí výhradně v Scenarios tab, notes UC se pro scénáře nepoužívá** (žádné zrcadlo).
+**Scénáře žijí výhradně v Scenarios tab, notes UC se pro scénáře nepoužívá** (žádné zrcadlo). Zapisuje je operace `create_or_update_scenarios` (ea-file-bridge, PROTOKOL-EAFB §6b).
 
 Mapování metamodelu na operaci `create_or_update_scenarios`:
 
@@ -98,9 +98,9 @@ Mapování metamodelu na operaci `create_or_update_scenarios`:
 | Step.Action | `steps[].text` (odkazy na BRU přes ID přímo v textu kroku) |
 | Step.Actor type (Human/System) | `steps[].kind`: `actor` \| `system` |
 | Step.Uses | `steps[].uses` (dále k dispozici `results`, `state`) |
-| Vazba AF/EF na krok BE | `attachTo{scenario, step}`; návrat `join` — **EA drží návrat na KROK** (záložka Scenarios → Entry Points, sloupec `Join`: číslo kroku BE nebo `End`). ✅ **Zápis jde dávkou** od iterace 6 bridge (2026-08-21, docs v0.12 §6i): `join: <číslo kroku hostitelského scénáře>` (executor ho přeloží na GUID kroku), `"End"` nebo vynechané pole = větev končí; jméno scénáře, číslo mimo rozsah i `join` bez `attachTo` = **warning + End**. Návrat formuluj na úrovni KROKU („návrat do kroku M"), ne scénáře. Dřívější ruční krok ZRUŠEN. ⚠ Historie: nález N-1 („join = jméno scénáře, EA neumí návrat na krok") byl **VYVRÁCEN** — EA to umí, neuměl to bridge |
-| Constraint internal (PRE/PST/ASU) | **mimo Scenarios tab** → internal constraints (záložka Constraints, t_objectconstraint); operace bridge `create_or_update_constraints` (✅ hotová 2026-08-19) |
-| Behavioral Rule — local (BRU) | **mimo Scenarios tab** → **internal requirement uvnitř UC** (záložka Responsibilities → Requirements, `t_objectrequires`; název `BRU<čísloUC>-Y Název`, text v Notes) — ✅ U5 rev. 2026-08-21, dřívější „samostatný element pod UC + Usage konektor" (N-K3-2) je překonané. ✅ **Zápis jde dávkou: bridge operace `create_or_update_requirements`** (iterace 6, 2026-08-21) — ruční krok ZRUŠEN. **Přepoužitelné** `BRU-####` zůstávají samostatným elementem v RULES (REUSABLE) + konektor UC —Usage «use»→ BRU |
+| Vazba AF/EF na krok BE | `attachTo{scenario, step}`; návrat `join` — **EA drží návrat na KROK** (záložka Scenarios → Entry Points, sloupec `Join`: číslo kroku BE nebo `End`). **Zápis jde dávkou** (Dokumentace bridge §6i): `join: <číslo kroku hostitelského scénáře>` (executor ho přeloží na GUID kroku), `"End"` nebo vynechané pole = větev končí; jméno scénáře, číslo mimo rozsah i `join` bez `attachTo` = **warning + End**. Návrat formuluj na úrovni KROKU („návrat do kroku M"), ne scénáře |
+| Constraint internal (PRE/PST/ASU) | **mimo Scenarios tab** → internal constraints (záložka Constraints, t_objectconstraint); operace bridge `create_or_update_constraints` |
+| Behavioral Rule — local (BRU) | **mimo Scenarios tab** → **internal requirement uvnitř UC** (záložka Responsibilities → Requirements, `t_objectrequires`; název `BRU<čísloUC>-Y Název`, text v Notes), bez samostatného elementu a bez konektoru. **Zápis jde dávkou: bridge operace `create_or_update_requirements`**. **Přepoužitelné** `BRU-####` jsou samostatným elementem v RULES (REUSABLE) + konektor UC —Usage «use»→ BRU |
 
 Update scénářů = deterministický rebuild (V2d): dávka vždy nese kompletní sadu scénářů UC, executor smaže a postaví znovu.
 

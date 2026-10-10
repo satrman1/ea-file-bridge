@@ -15,11 +15,15 @@ Implementace per platforma: **Cowork** = AskUserQuestion/odpověď v chatu; **VS
 
 Vedle bran existuje ještě **mikro-rozhodnutí nad diffem**: každá dávka s updatem/delete cizího obsahu vyžaduje schválení dry-run diffu per GUID ([emr-zapis-pravidla](emr-zapis-pravidla.md) §12a) — nečeká na bránu a bránu nenahrazuje. Diff schvaluje autor sám, s auditní stopou (✅ R3).
 
+## Rozsah kroku — režim „až do brány“
+
+Výchozí rytmus je jeden mezikrok = jedno předložení člověku (např. identifikace UC → scénáře; LDM entity → atributy → relace). Řekne-li uživatel **„až do brány“** (nebo bránu jmenuje: „až do G1“), zpracuj všechny mezikroky až k nejbližší G-bráně najednou a předlož **jeden souhrnný návrh**; mezikroky tím dostávají tier A (auto-pass), bránu rozhoduje vždy člověk. Zastav dřív jen u nejasnosti, která mění rozsah (chybějící aktér, sporná granularita, chybějící entita) — to je otázka, ne mezikrok. Zápis do EMR do režimu nepatří: brána stojí před ním. U rozsáhlých zadání (řádově > 5 UC / > 15 entit) upozorni, že souhrnný návrh bude dlouhý, a nabídni rozdělení po celcích.
+
 ## Gate package (WP1) — jediný podklad brány (✅ 2026-07-17, `Zadani-levnejsi-review.md`)
 
 Podklad brány generuje `sa-orchestrator` **jedním spuštěním, bez ručního skládání**. Review = rozhodování nad diffem a rizikem, ne čtení všeho: člověk neprochází strom v EA, EA klient slouží jen pro spot-check.
 
-**Uložení (✅ rozhodnuto 2026-07-14, konzistence P2):** element **Artifact** `GP-<gate>-<datum>` v `/Projects/<Projekt>/#GATES` vedle Gate Recordu; obsah = markdown v **linked documentu** Artifactu (`import_element_linked_documents`). Tagged values: `gate`, `datum`, `tier` (návrh stroje), `qa-verdikt` (pass/pass-s-varovanimi/fail).
+**Uložení (✅ rozhodnuto 2026-07-14, konzistence P2):** element **Artifact** `GP-<gate>-<datum>` v `/Projects/<Projekt>/#GATES` vedle Gate Recordu; obsah = dokument v **linked documentu** Artifactu, zapsaný operací `import_element_linked_documents` **ve formátu RTF** — `documents[{element, rtf_b64}]`, nebo `file` = cesta k `.rtf` ve složce výměny. EA i bridge přijímají do linked documentu jen RTF (EA navíc DOCX), **markdown ne**: text gate package se před zápisem převede do jednoduchého RTF (nadpisy, odstavce, tučné, odrážky, jednoduchá tabulka; kódová stránka 1250 kvůli češtině). Tagged values: `gate`, `datum`, `tier` (návrh stroje), `qa-verdikt` (pass/pass-s-varovanimi/fail).
 
 **Struktura dokumentu (pevné pořadí):**
 

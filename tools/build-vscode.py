@@ -38,7 +38,7 @@ import shutil
 import sys
 from pathlib import Path
 
-BUILD_VERSION = "1.1"
+BUILD_VERSION = "1.2"
 
 # ---------------------------------------------------------------------------
 # Konstanty — sady skillů (Zadani-Portace-VSCode-v2.md kap. 5.1 + AK-1)
@@ -123,6 +123,10 @@ SHARED_TARGET_SKILL = "emr-konvence"               # `_shared/` → skills/emr-k
 # (kap. 3.3: qc-verzovani.sql → references verzovani-release / emr-qa). Ostatní
 # odkazy na `_shared/*.md` se přepisují na ukazatel na skill emr-konvence (PV-R4 i).
 SHARED_COPY_ON_REFERENCE = {"qc-verzovani.sql"}
+# Soubory `_shared/`, které se do kitu NEkopírují (fronta 2026-10-10, bod b4): provenance
+# pravidel (`emr-zapis-changelog.md`) je pro lidi, model ji číst nemá — do
+# skills/emr-konvence/references/ nepatří; odkaz na ni ze skillu by byl chyba kanonu.
+SHARED_EXCLUDE = {"emr-zapis-changelog.md"}
 
 # Šablony (kontrakt dávky): povinné pro každou sadu.
 TEMPLATE_REQUIRED = [
@@ -188,11 +192,13 @@ MANIFEST_NAME = "skills-manifest.md"
 # ---------------------------------------------------------------------------
 
 def safe_console():
-    """Windows konzole (cp1250/cp852) nesmí spadnout na UTF-8 znacích v logu."""
+    """Výstup vždy UTF-8 (i v rouře podprocesu, kde by jinak platilo locale stanice,
+    typicky cp1250 — testy a nadřazené skripty dekódují UTF-8); errors="replace"
+    = Windows konzole (cp852) nesmí spadnout na znacích mimo svou stránku."""
     for name in ("stdout", "stderr"):
         stream = getattr(sys, name)
         try:
-            enc = stream.encoding or "utf-8"
+            enc = "utf-8"
             wrapped = io.TextIOWrapper(stream.buffer, encoding=enc, errors="replace",
                                        line_buffering=True)
             setattr(sys, name, wrapped)
@@ -554,7 +560,7 @@ class Build(object):
 
         def copy_hook(fname):
             src = shared_dir / fname
-            if not src.is_file():
+            if not src.is_file() or fname in SHARED_EXCLUDE:
                 return False
             rel = "references/" + fname
             if rel not in tree:
@@ -649,6 +655,9 @@ class Build(object):
         shared_dir = self.kanon / "_shared"
         if shared_dir.is_dir():
             for rel, data in self.read_tree(shared_dir).items():
+                if rel in SHARED_EXCLUDE:
+                    self.log("  _shared/%s vynechán (SHARED_EXCLUDE)" % rel)
+                    continue
                 shared_files["references/" + rel] = data
         else:
             self.err("kanon: chybí složka _shared/ (%s)" % shared_dir)

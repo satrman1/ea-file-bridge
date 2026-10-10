@@ -41,8 +41,9 @@ demo). ID šablon a katalogu dohledat čerstvě (`find_packages_by_name` — ID 
    komponenty, Realization na oba, kompozit `IDS-IDesign::Service Contract Detail`
    s komponentou a oběma IF. Žádné facetování bez pokynu SARa (D9). Po createch
    retro-read + případný FQ update binding (§4.11).
-5. **Big Picture**: diagram Generic Oveview, **POUZE pojmenované INSTANCE** komponent
-   z katalogu (Object + classifierID + plain stereotyp — vzor §7g); vazby jen
+5. **Big Picture**: diagram Generic Oveview, **POUZE NEPOJMENOVANÉ INSTANCE** komponent
+   z katalogu (`Object`, **`name: ""` explicitně**, `classifierID` = komponenta, plain stereotyp
+   classifiera — zobrazí se `:NázevKomponenty`; vzor §7g pravidel zápisu); vazby jen
    IDS-Sync/IDS-Async (M→M async); žádné duplicitní vazby.
 6. **Dynamic Architecture View**: per core UC element **IDS-Core Use Case Dynamics**
    (Collaboration) v package „Dynamic Architecture View" + kompozit s **POUZE LINKY**
@@ -63,3 +64,5 @@ pracovní prostor; žurnál + baseline + restore manifest existují. Pak `sar-va
 `find_packages_by_name, create_or_update_package, create_or_update_elements,
 create_or_update_diagram, create_or_update_connectors, place_elements_on_diagram,
 create_baseline, get_elements_information, get_diagrams_information, reload_diagrams`
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

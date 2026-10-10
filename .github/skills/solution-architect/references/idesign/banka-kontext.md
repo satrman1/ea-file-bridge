@@ -40,8 +40,8 @@ je Löwy 2008–2015; tento soubor říká, co z ní v bance platí jinak.
   s odůvodněním; potvrzuje člověk (G1/G2).
 - **SR × PR (✅ D8):** operace v rozhraní se stereotypem **`IDS-Process Contract`**
   se nerealizuje Service realizací, ale **Proces realizací (PR)** — stejný tvar vč.
-  operation linku, ale pod ní BPMN diagram (Camunda). Detail a stav propsání:
-  `Skilly/_shared/emr-zapis-pravidla.md` §7e.
+  operation linku, ale pod ní BPMN diagram (Camunda). Detail:
+  `Skilly/emr-scaffold/SKILL.md`, odstavec „SR × PR“ (v `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) pravidlo není).
 - **Kontrakty v praxi (✅ D9):** contract factoring dle doktríny (facety, díl 3) se
   dělá **jen u exponovaných integračních komponent — a těch je málo**. Typický vzor:
   **jeden common interface + jeden proposed interface** (proposed = odemčený kvůli

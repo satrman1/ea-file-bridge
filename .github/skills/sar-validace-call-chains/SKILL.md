@@ -53,3 +53,5 @@ core use cases a objectives z SA-G0/G1.
 ## Kontrola výstupu
 Všechny core UC pokryty call chainy; každý smell vyřešen nebo zdůvodněn; žádný blok
 bez objective; QA jen nad zpětně přečteným stavem; vrácení kategorizována (WP5).
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

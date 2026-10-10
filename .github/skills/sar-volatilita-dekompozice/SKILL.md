@@ -54,3 +54,5 @@ schvaluje Miloš (+ SAR reviewer, je-li k dispozici — otázka SA1).
 Žádná volatilita bez lidského verdiktu; žádná komponenta bez klasifikace a krycího
 objective; dekompozice odvozená z volatilit (ne ze zadání ani z obrazovek); test
 odolnosti proveden; nic v EMR.
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

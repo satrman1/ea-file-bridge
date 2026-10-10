@@ -76,7 +76,7 @@ nikdy nepoužívat (vyhrazen šabloně; QC ho vynechává).
    **`IDS01_Status`** (Proposed → Production → Decomission; ✅ D-b — enum žije jako TV).
    **Sémantické facetování (více kontraktů) jen u exponovaných integračních komponent,
    rozhodnutí SARa.** Rozhraní se stereotypem `IDS-Process Contract` patří Camunda
-   procesům (SR×PR — §7e obecných pravidel).
+   procesům (SR×PR — pravidlo v `emr-scaffold/SKILL.md`, odstavec „SR × PR“).
 9. Jména: Manager/RA/Resources = podstatná jména; Engine = slovesné podstatné jméno;
    nikdy jméno po kroku zadání či obrazovce.
 10. Diagram typy MDG (`IDS-IDesign::…`) přes MCP fungují (✅ pilot kolo 1 — diagramy

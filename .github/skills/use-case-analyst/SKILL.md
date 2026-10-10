@@ -86,9 +86,9 @@ Názvy sekcí anglicky, obsah česky:
 **Post Conditions:** Stav systému po ukončení UC (pojmenování: PSTXXXXX-Y).
 **Behavioral Rules:** Pravidla chování oddělená od kroků scénáře — každé má ID (BRUXXXXX-Y), z kroků se odkazuj přes toto ID. Důvod oddělení: scénář zůstane čitelný na první průchod.
 
-### Zápis do EA (U2 rev. 2026-08-17)
+### Zápis do EA
 
-Scénáře se do EA zapisují strukturovaně do **Scenarios tab** operací bridge `create_or_update_scenarios` — notes UC se pro scénáře nepoužívá. Výstup specifikace proto strukturuj tak, aby šel 1:1 převést na dávku (mapování polí v [scenario-rules](references/scenario-rules.md), sekce Fyzické umístění): Basic Path/Alternative/Exception → `scenarios[].type`, kroky → `steps[{text, kind: actor|system, uses}]`, kotvení AF/EF na krok BE → `attachTo{scenario, step}` + `join` = **číslo kroku** hostitelského scénáře (✅ jde dávkou od iterace 6 bridge, 2026-08-21). Preconditions/Postconditions/Assumptions patří do internal constraints (záložka Constraints — operace `create_or_update_constraints`, ✅ hotová 2026-08-19). Behavioral Rules dvojím způsobem: **přepoužitelné `BRU-####`** = samostatné elementy v `RULES (REUSABLE)` + konektor Usage «use»; **lokální `BRU<čísloUC>-Y`** = internal requirements uvnitř UC (operace `create_or_update_requirements`, U5 rev. 2026-08-21) — pod UC tedy jako element **nevznikají**.
+Scénáře se do EA zapisují strukturovaně do **Scenarios tab** operací bridge `create_or_update_scenarios` — notes UC se pro scénáře nepoužívá. Výstup specifikace proto strukturuj tak, aby šel 1:1 převést na dávku (mapování polí v [scenario-rules](references/scenario-rules.md), sekce Fyzické umístění): Basic Path/Alternative/Exception → `scenarios[].type`, kroky → `steps[{text, kind: actor|system, uses}]`, kotvení AF/EF na krok BE → `attachTo{scenario, step}` + `join` = **číslo kroku** hostitelského scénáře (jde dávkou). Preconditions/Postconditions/Assumptions patří do internal constraints (záložka Constraints — operace `create_or_update_constraints`). Behavioral Rules dvojím způsobem: **přepoužitelné `BRU-####`** = samostatné elementy v `RULES (REUSABLE)` + konektor Usage «use»; **lokální `BRU<čísloUC>-Y`** = internal requirements uvnitř UC (operace `create_or_update_requirements`) — pod UC tedy jako element **nevznikají**.
 
 ### Volba typu scénáře
 
@@ -105,3 +105,5 @@ Pravidla v [mermaid-rules](references/mermaid-rules.md) zajišťují, že diagra
 ## Chování po aktivaci
 
 Okamžitě začni pracovat se zadáním. Ze zadání odvoď, zda jde o identifikaci nebo specifikaci. Pokud to z kontextu opravdu nejde poznat, zeptej se — ale jen na to, co konkrétně chybí.
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

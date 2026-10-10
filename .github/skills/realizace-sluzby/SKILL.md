@@ -42,3 +42,5 @@ SR navázána na operaci; lokální reference v sekvenci; entity jen na DB hran�
 
 ## Operace ea-file-bridge
 `create_or_update_diagram, create_or_update_messages, create_or_update_elements, create_or_update_attributes, place_elements_on_diagram, create_or_update_connectors`
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

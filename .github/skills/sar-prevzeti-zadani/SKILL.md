@@ -58,3 +58,5 @@ s confidence flags (WP4). Předlož **SA-G0** (HUMAN_DECISION).
 ## Kontrola výstupu
 Objectives bez technologií; mise mluví o blocích, ne features; každý core UC kandidát
 má byznysovou hodnotu; kandidáti volatilit mají zdroj (ne spekulace); nic nezapsáno do EMR.
+
+**Rozsah kroku:** platí režim „až do brány“ — na pokyn uživatele zpracuj všechny mezikroky k nejbližší bráně najednou a předlož jeden souhrnný návrh (`hitl-brany.md` (skill `emr-konvence`, references/hitl-brany.md), § Rozsah kroku).

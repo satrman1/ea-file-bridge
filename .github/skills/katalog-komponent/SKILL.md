@@ -29,7 +29,7 @@ license: Complete terms in LICENSE.txt
 4e. **Granularita interfaců (✅ D9 delty, 2026-07-19):** typický vzor komponenty = **jeden common interface + jeden proposed interface** — proposed existuje kvůli logice zámků (proposed odemčený pro všechny, master zamčený), NE kvůli sémantickému členění. **Sémantické facetování kontraktů (více interfaců dle IDesign contract factoring) se dělá jen u exponovaných integračních komponent a je to rozhodnutí SARa** — nenavrhuj nové interfacy z vlastní iniciativy; nové operace patří na existující proposed interface. Granularita operací = doména ITANa se supervizí SARa (šedá zóna dle seniority) — návrhy operací předkládej s odůvodněním.
 
 **Dynamic View (per typ UC):**
-5. Dynamic View vyjmenovává komponenty a typy volání povolené pro daný typ UC; je připojen k UC a determinuje instance v UCR/SR sekvencích (mechanismus ⚠ D1–D6 — element typ, umístění, konektor, číselník typů UC).
+5. Dynamic View vyjmenovává komponenty a typy volání povolené pro daný typ UC; je připojen k UC a determinuje instance v UCR/SR sekvencích (mechanismus D1–D6 — element typ, umístění, konektor, číselník typů UC — zmapován v `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) §12 Dynamic View / Core Use Case).
 6. Při zavedení nové komponenty/typu volání aktualizuj dotčené Dynamic Views.
 
 **Kafka / událostní rozhraní (metodika v2, kap. 5.4.4 — nová oblast, dosud bez precedentu v repu):**

@@ -21,5 +21,5 @@
 ## Traceabilita na požadavky
 
 * Každý UC pokrývá ≥ 1 funkční požadavek (vazba požadavek ↔ UC je povinná).
-* Není-li v cílovém prostředí registr požadavků dostupný (sandbox, POC): požadavky NIKDY nevymýšlej — nepokrytí vykaž ve shrnutí návrhu jako confidence flag / nález pro člověka (✅ N-6 POC 2026-08-21).
+* Není-li v cílovém prostředí registr požadavků dostupný (sandbox, POC): požadavky NIKDY nevymýšlej — nepokrytí vykaž ve shrnutí návrhu jako confidence flag / nález pro člověka.
 

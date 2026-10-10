@@ -21,7 +21,7 @@ Před create do existujícího obsahu `find_*` / `query` v cílové větvi; exis
 
 ## 3. Pojmenování
 
-- **UC** `UC-#####` — counter se přes bridge **neaplikuje**: dohledej nejvyšší obsazené číslo v cílové větvi (`query`), přiděl max+1, vykaž „posunout Auto Name Counter na N+1" jako ruční krok. `UCR-#####` sdílí číslo.
+- **UC** `UC-#####` — **v bance číslo případu užití přiděluje repozitář** při create: UC pošli **bez prefixu** (jen název), číslo přečti z ACK, pak odvozeniny. Jen doma (`eaexample`) se counter přes bridge neaplikuje: dohledej nejvyšší obsazené číslo v cílové větvi (`query`), přiděl max+1, vykaž „posunout Auto Name Counter na N+1" jako ruční krok. `UCR-#####` sdílí číslo.
 - Scénáře `BEXXXXX Jméno` / `AFXXXXX-Y` / `EFXXXXX-Y`; constrainty `PREXXXXX-Y` / `PSTXXXXX-Y` / `ASUXXXXX-Y`.
 - **BRU**: přepoužitelná `BRU-####` = element `Behavioral Rule` v `RULES (REUSABLE)` + Usage z UC; lokální `BRU<čísloUC>-Y` (bez pomlčky) = **internal requirement uvnitř UC** (`create_or_update_requirements`), žádný element ani konektor.
 - **LS** `SSS-LS<čísloUC>[-Y]_Název česky` (celé číslo UC); parts česky v jednotném čísle; operace CamelCase.
