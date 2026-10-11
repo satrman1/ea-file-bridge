@@ -1,0 +1,122 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-99-uklid",
+ "status":"done",
+ "results":[
+  {
+   "op":"delete_from_model",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "type":"Package",
+     "id":1115,
+     "name":"FBT-B1",
+     "path":"Example Model.Model Based Add-Ins.EA Addins.#FB-TEST.FBT-B1",
+     "deleted":true
+    }
+   ]
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-11 22:59:04",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Operace 'delete_from_model' je politikou klasifikovana ELEVATED",
+   "Prah ELEVATED prekrocen: deleteTargets 1 > 0"
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "delete_from_model":1
+   },
+   "targets":[],
+   "packages":[
+    "FBT-B1"
+   ],
+   "diagrams":[],
+   "paths":[
+    "Example Model.Model Based Add-Ins.EA Addins.#FB-TEST.FBT-B1"
+   ]
+  },
+  "metrics":{
+   "writeOps":1,
+   "createOps":0,
+   "updatedExisting":0,
+   "deleteTargets":1,
+   "affectedElements":0,
+   "affectedPackages":1,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":68,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "payloadHash":"75d5cef9cffcc06aadb13c6197d43ca23d9ccf5979af53cb80dfabff87a979c5",
+  "hashMs":0,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-11 22:59:16"
+  }
+ },
+ "baseline":{
+  "decision":"reused",
+  "reason":"reuse session",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+    "name":"FB-AUTO - s20261011-2 2026-10-11 22:58:19 (session)",
+    "path":"Example Model.Model Based Add-Ins.EA Addins.#FB-TEST",
+    "packageName":"#FB-TEST",
+    "subtreeCount":146,
+    "probeMs":16,
+    "status":"ok",
+    "baselineGuid":"{20DF4B3F-A9BE-432f-9EA7-9911740A5279}",
+    "result":"reused",
+    "reuse":"reuse session"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":16,
+  "elapsedMs":35,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: Example Model.Model Based Add-Ins.EA Addins.#FB-TEST (146 prvku)"
+  ],
+  "created":[],
+  "reused":[
+   "FB-AUTO - s20261011-2 2026-10-11 22:58:19 (session)"
+  ],
+  "journal":{
+   "targets":0,
+   "covered":[],
+   "uncovered":[
+    "delete_from_model[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"",
+   "why":"zadny cil v rozsahu journalu"
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":8,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{BF78E8F9-C7B9-46a6-949E-8E67BEB841FF}"
+ }
+}

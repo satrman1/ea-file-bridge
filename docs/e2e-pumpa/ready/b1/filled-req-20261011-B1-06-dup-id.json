@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-06-dup-id",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Dup test B1"
+    }
+   ]
+  }
+ ]
+}

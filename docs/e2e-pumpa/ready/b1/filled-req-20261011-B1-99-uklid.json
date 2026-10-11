@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-99-uklid",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Package",
+     "guid": "{90FD373E-D643-49a8-90A2-7E104FBB3846}"
+    }
+   ]
+  }
+ ]
+}

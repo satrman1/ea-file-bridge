@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-11a-mereni",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  }
+ ]
+}

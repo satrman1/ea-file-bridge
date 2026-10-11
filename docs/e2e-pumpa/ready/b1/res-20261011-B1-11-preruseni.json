@@ -1,0 +1,250 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-11-preruseni",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"11859516"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"11859516"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"11859516"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"11859516"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"11859516"
+    }
+   ]
+  },
+  {
+   "op":"create_or_update_elements",
+   "status":"ok",
+   "count":19,
+   "items":[
+    {
+     "guid":"{8449C001-5605-4a40-95CA-D3B48880E5D3}",
+     "id":11733,
+     "name":"Preruseni B1 01",
+     "created":true
+    },
+    {
+     "guid":"{777CDB76-CC1A-402e-9389-263CFD70E3BD}",
+     "id":11734,
+     "name":"Preruseni B1 02",
+     "created":true
+    },
+    {
+     "guid":"{650D0BEA-3673-4df3-9E39-0CB6E7DFDE74}",
+     "id":11735,
+     "name":"Preruseni B1 03",
+     "created":true
+    },
+    {
+     "guid":"{9FE39D21-65E9-44c4-99D1-3D046429F0B4}",
+     "id":11736,
+     "name":"Preruseni B1 04",
+     "created":true
+    },
+    {
+     "guid":"{8F000505-53FE-4f83-8C42-9E2224133990}",
+     "id":11737,
+     "name":"Preruseni B1 05",
+     "created":true
+    },
+    {
+     "guid":"{2C9FEA2C-C8BE-45d9-9DCD-8A92860DEF3F}",
+     "id":11738,
+     "name":"Preruseni B1 06",
+     "created":true
+    },
+    {
+     "guid":"{0F2FC3F0-2ABD-4e5f-80B8-B2EA2D096C43}",
+     "id":11739,
+     "name":"Preruseni B1 07",
+     "created":true
+    },
+    {
+     "guid":"{28EED1A8-D454-4555-9548-BDD893252FFB}",
+     "id":11740,
+     "name":"Preruseni B1 08",
+     "created":true
+    },
+    {
+     "guid":"{D2D70D62-ACDB-4f1d-863D-0FC1428C1C0D}",
+     "id":11741,
+     "name":"Preruseni B1 09",
+     "created":true
+    },
+    {
+     "guid":"{C54D596C-C4FA-494f-997A-A0120E161331}",
+     "id":11742,
+     "name":"Preruseni B1 10",
+     "created":true
+    },
+    {
+     "guid":"{A1A5B5EE-A408-43fd-A19C-BD421D791CE1}",
+     "id":11743,
+     "name":"Preruseni B1 11",
+     "created":true
+    },
+    {
+     "guid":"{F6E623FF-80E7-49e1-A04E-19583ECEF597}",
+     "id":11744,
+     "name":"Preruseni B1 12",
+     "created":true
+    },
+    {
+     "guid":"{D3C7311A-4821-4d78-A00B-ED405A5D3C55}",
+     "id":11745,
+     "name":"Preruseni B1 13",
+     "created":true
+    },
+    {
+     "guid":"{80F7D458-C3B6-48f8-BD06-10F4CBDE8ED5}",
+     "id":11746,
+     "name":"Preruseni B1 14",
+     "created":true
+    },
+    {
+     "guid":"{A31E2962-B4F2-4836-88CF-B78B3D74C04E}",
+     "id":11747,
+     "name":"Preruseni B1 15",
+     "created":true
+    },
+    {
+     "guid":"{67DD034E-ECD0-4ccc-AFA4-CC5CC4ABE941}",
+     "id":11748,
+     "name":"Preruseni B1 16",
+     "created":true
+    },
+    {
+     "guid":"{BB1EFECA-7AA2-4a7e-BD4B-6AA884513774}",
+     "id":11749,
+     "name":"Preruseni B1 17",
+     "created":true
+    },
+    {
+     "guid":"{277C8542-92FC-4020-8FDA-9E91DE216CBA}",
+     "id":11750,
+     "name":"Preruseni B1 18",
+     "created":true
+    },
+    {
+     "guid":"{028EABF8-63D6-4242-984F-C2BA9CCF70B3}",
+     "id":11751,
+     "name":"Preruseni B1 19",
+     "created":true
+    }
+   ],
+   "guid":"{8449C001-5605-4a40-95CA-D3B48880E5D3}",
+   "id":11733
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-11 22:46:24",
+ "risk":{
+  "riskLevel":"LOW",
+  "riskReasons":[],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "create_or_update_elements":1
+   },
+   "targets":[],
+   "packages":[
+    "FBT-B1"
+   ],
+   "diagrams":[],
+   "paths":[]
+  },
+  "metrics":{
+   "writeOps":19,
+   "createOps":19,
+   "updatedExisting":0,
+   "deleteTargets":0,
+   "affectedElements":0,
+   "affectedPackages":1,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":6,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "payloadHash":"35c075aadaeacbc967ab82ced6ece28fdb860221705ea3b50a0e9631f9e3aaeb",
+  "hashMs":7,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":false
+  }
+ },
+ "baseline":{
+  "decision":"none",
+  "reason":"cisty create",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":false,
+  "packages":[],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":0,
+  "elapsedMs":2,
+  "action":"none",
+  "lines":[
+   "Bez zalohy - davka jen vytvari (undo = smazani dle razitek)."
+  ]
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":7,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{FD75B152-D8E9-4386-97FB-40473A1FA8A2}"
+ },
+ "ownSession":{
+  "added":19
+ }
+}

@@ -1,0 +1,233 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-07-scenare-vlastni",
+ "status":"done",
+ "results":[
+  {
+   "op":"create_or_update_scenarios",
+   "status":"ok",
+   "count":1,
+   "removed":0,
+   "items":[
+    {
+     "guid":"{A412C412-4C61-4a5f-9013-EFDB16A268F3}",
+     "name":"Basic Path",
+     "type":"Basic Path",
+     "steps":4,
+     "created":true
+    }
+   ],
+   "readback":{
+    "api":[
+     {
+      "guid":"{A412C412-4C61-4a5f-9013-EFDB16A268F3}",
+      "name":"Basic Path",
+      "type":"Basic Path",
+      "steps":[
+       {
+        "name":"Ctenar vybere knihu",
+        "stepType":1,
+        "uses":"",
+        "results":"",
+        "state":""
+       },
+       {
+        "name":"System overi dostupnost",
+        "stepType":0,
+        "uses":"",
+        "results":"",
+        "state":""
+       },
+       {
+        "name":"Ctenar potvrdi vypujcku",
+        "stepType":1,
+        "uses":"",
+        "results":"",
+        "state":""
+       },
+       {
+        "name":"System zaeviduje vypujcku",
+        "stepType":0,
+        "uses":"",
+        "results":"",
+        "state":""
+       }
+      ],
+      "xmlLen":575
+     }
+    ],
+    "tableRowCount":1
+   },
+   "guid":"{A412C412-4C61-4a5f-9013-EFDB16A268F3}",
+   "id":11716
+  },
+  {
+   "op":"create_or_update_constraints",
+   "status":"ok",
+   "count":2,
+   "removed":0,
+   "items":[
+    {
+     "name":"Ctenar je prihlasen",
+     "type":"Pre-condition",
+     "created":true
+    },
+    {
+     "name":"Vypujcka je zaevidovana",
+     "type":"Post-condition",
+     "created":true
+    }
+   ],
+   "readback":{
+    "api":[
+     {
+      "name":"Vypujcka je zaevidovana",
+      "type":"Post-condition",
+      "notes":"",
+      "status":"Proposed"
+     },
+     {
+      "name":"Ctenar je prihlasen",
+      "type":"Pre-condition",
+      "notes":"",
+      "status":"Proposed"
+     }
+    ],
+    "tableRowCount":2
+   },
+   "guid":"{762C6AEA-3E80-4897-B0CD-0B4AA166E5E6}",
+   "id":11716
+  },
+  {
+   "op":"create_or_update_requirements",
+   "status":"ok",
+   "count":1,
+   "removed":0,
+   "items":[
+    {
+     "name":"BRU-B1-1 Vypujcka max 5 knih",
+     "type":"Functional",
+     "created":true
+    }
+   ],
+   "readback":{
+    "api":[
+     {
+      "name":"BRU-B1-1 Vypujcka max 5 knih",
+      "type":"Functional",
+      "notes":"",
+      "status":"Proposed"
+     }
+    ],
+    "tableRowCount":1
+   },
+   "guid":"{762C6AEA-3E80-4897-B0CD-0B4AA166E5E6}",
+   "id":11716
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-11 22:39:02",
+ "risk":{
+  "riskLevel":"LOW",
+  "riskReasons":[
+   "Operace 'create_or_update_scenarios' nad prvkem zalozenym touto session - bez okna (pravidlo 3, ownSessionLow)",
+   "Operace 'create_or_update_constraints' nad prvkem zalozenym touto session - bez okna (pravidlo 3, ownSessionLow)",
+   "Operace 'create_or_update_requirements' nad prvkem zalozenym touto session - bez okna (pravidlo 3, ownSessionLow)"
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "create_or_update_scenarios":1,
+    "create_or_update_constraints":1,
+    "create_or_update_requirements":1
+   },
+   "targets":[
+    "UC-B1 Vypujc knihu"
+   ],
+   "packages":[],
+   "diagrams":[],
+   "paths":[]
+  },
+  "metrics":{
+   "writeOps":4,
+   "createOps":0,
+   "updatedExisting":3,
+   "deleteTargets":0,
+   "affectedElements":1,
+   "affectedPackages":1,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":12,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "payloadHash":"9399c61adf926c869a33b470608c49fc36e1cb02d9428f72cc677df610d494c1",
+  "hashMs":2,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":false
+  }
+ },
+ "baseline":{
+  "decision":"created",
+  "reason":"pod prahem",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+    "name":"FB-AUTO - s20261011-2 2026-10-11 22:39:03",
+    "path":"Example Model.Model Based Add-Ins.EA Addins.#FB-TEST.FBT-B1",
+    "packageName":"FBT-B1",
+    "subtreeCount":5,
+    "probeMs":335,
+    "status":"ok",
+    "baselineGuid":"{3040F5AE-F1A2-457a-8279-63FCD3075146}",
+    "result":"created"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":335,
+  "elapsedMs":1475,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: Example Model.Model Based Add-Ins.EA Addins.#FB-TEST.FBT-B1 (5 prvku)"
+  ],
+  "created":[
+   "FB-AUTO - s20261011-2 2026-10-11 22:39:03"
+  ],
+  "reused":[],
+  "journal":{
+   "targets":0,
+   "covered":[],
+   "uncovered":[
+    "create_or_update_scenarios[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "create_or_update_constraints[1]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "create_or_update_requirements[2]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"",
+   "why":"zadny cil v rozsahu journalu"
+  }
+ },
+ "qc":{
+  "checks":0,
+  "findings":[],
+  "elapsedMs":3,
+  "skippedScope":1,
+  "status":"bez_kontrol",
+  "reason":"zadna kontrola se netykala teto zmeny (scope balicku neznamy)"
+ },
+ "audit":{
+  "aiLogGuid":"{D1E70B57-8954-45e4-887E-180DD281C6F6}"
+ },
+ "ownSession":{
+  "added":1
+ }
+}

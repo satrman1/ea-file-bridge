@@ -112,6 +112,8 @@ Zápisové výsledky nesou `guid` + `id` (a `items[]` s `{guid, id, name, create
 
 ### 3b. Stavy `res` — odpověď jako stavový záznam dávky (v0.16, balík B1 — Z261004b-3, revize usability pumpy P1)
 
+> **Ověřeno živě doma 11. 10. 2026 22:36–22:59** (`docs/e2e-pumpa/VYSLEDKY-2026-10-11-B1.md` kap. 5): 13/13 scénářů §3b–3d — `processing`/`since`, `E_INTERRUPTED` po zavření pumpy uprostřed dávky, `E_DUPLICATE_ID`, `E_UNKNOWN_OP`/`E_ARGS` bez okna, znovu poslaná čekající dávka = okno znovu bez restartu, pravidlo 3 bez oken, `riskPolicy` v pingu, kontrola parametrů 0 rozdílů.
+
 V kanálu se souborem (pumpa, GUI fallback, schránka) je `responses\res-<jméno>.json` **stavový záznam dávky**, ne jen její výsledek. `FB_Main` ho zapíše **sám při převzetí** (`{"protocol":"eafb/0.2","id":…,"status":"processing","since":"RRRR-MM-DD HH:MM:SS","repository":…,"file":…}`) a adaptér ho po doběhnutí přepíše konečným výsledkem jako dosud. Každý `res` od v0.16 nese `since` = čas převzetí dávky (u `confirm_required` tedy „čeká od"; po re-klasifikaci zůstává původní).
 
 | `res-<jméno>.json` | Význam pro agenta | Co dělat |

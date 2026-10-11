@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-10-delete-pomocny",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Element",
+     "guid": "{13AE7F21-A690-4544-AA70-F9DA8FB7E6A6}"
+    }
+   ]
+  }
+ ]
+}

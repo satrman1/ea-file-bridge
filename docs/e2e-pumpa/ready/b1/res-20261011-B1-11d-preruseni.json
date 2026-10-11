@@ -1,0 +1,220 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-11d-preruseni",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"0"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"0"
+    }
+   ]
+  },
+  {
+   "op":"create_or_update_elements",
+   "status":"ok",
+   "count":19,
+   "items":[
+    {
+     "guid":"{8B613F28-1D5C-4085-B7E3-A969D00EEE6A}",
+     "id":11793,
+     "name":"Preruseni4 B1 01",
+     "created":true
+    },
+    {
+     "guid":"{999533E8-6E01-46a6-BF3F-D13DBD04225E}",
+     "id":11794,
+     "name":"Preruseni4 B1 02",
+     "created":true
+    },
+    {
+     "guid":"{A7BFEC78-7D09-42fb-993A-D93B944526B0}",
+     "id":11795,
+     "name":"Preruseni4 B1 03",
+     "created":true
+    },
+    {
+     "guid":"{24A2618E-CAEC-4c24-BFC9-06D962A0B69C}",
+     "id":11796,
+     "name":"Preruseni4 B1 04",
+     "created":true
+    },
+    {
+     "guid":"{7B0890E5-578B-41de-8A53-8CF31E4A88CC}",
+     "id":11797,
+     "name":"Preruseni4 B1 05",
+     "created":true
+    },
+    {
+     "guid":"{35157B2E-ACA9-464e-B851-62A3492B1A90}",
+     "id":11798,
+     "name":"Preruseni4 B1 06",
+     "created":true
+    },
+    {
+     "guid":"{50C9EDA8-D100-4928-AC8B-AA86F44E9026}",
+     "id":11799,
+     "name":"Preruseni4 B1 07",
+     "created":true
+    },
+    {
+     "guid":"{87B8A30F-5921-4675-8318-46FD5CDE802F}",
+     "id":11800,
+     "name":"Preruseni4 B1 08",
+     "created":true
+    },
+    {
+     "guid":"{A81E3FAB-B1AD-4065-9036-F0F12E04C658}",
+     "id":11801,
+     "name":"Preruseni4 B1 09",
+     "created":true
+    },
+    {
+     "guid":"{1CFD58B6-EE64-4b95-BC14-D6C6DF053411}",
+     "id":11802,
+     "name":"Preruseni4 B1 10",
+     "created":true
+    },
+    {
+     "guid":"{1519CCA0-A338-49a2-9D30-DC49F8A9C6DE}",
+     "id":11803,
+     "name":"Preruseni4 B1 11",
+     "created":true
+    },
+    {
+     "guid":"{F3432D35-53A0-4960-97E4-EE6ACF212FB4}",
+     "id":11804,
+     "name":"Preruseni4 B1 12",
+     "created":true
+    },
+    {
+     "guid":"{E15E15DF-03A7-4174-A20B-4B8A6191FA9A}",
+     "id":11805,
+     "name":"Preruseni4 B1 13",
+     "created":true
+    },
+    {
+     "guid":"{9A942A89-7FC7-4a68-A6D5-77D4DBE569EC}",
+     "id":11806,
+     "name":"Preruseni4 B1 14",
+     "created":true
+    },
+    {
+     "guid":"{E75148B9-3C38-496c-A529-33ECC81177C0}",
+     "id":11807,
+     "name":"Preruseni4 B1 15",
+     "created":true
+    },
+    {
+     "guid":"{CFDF311B-1ED7-431a-886B-A0C65CE505F9}",
+     "id":11808,
+     "name":"Preruseni4 B1 16",
+     "created":true
+    },
+    {
+     "guid":"{463A6D82-7251-4f39-802E-F4996EDC93BC}",
+     "id":11809,
+     "name":"Preruseni4 B1 17",
+     "created":true
+    },
+    {
+     "guid":"{E179789F-7891-4206-A665-C8567A1640CA}",
+     "id":11810,
+     "name":"Preruseni4 B1 18",
+     "created":true
+    },
+    {
+     "guid":"{F7B98D85-BDD0-4810-A910-01C8A2E57C74}",
+     "id":11811,
+     "name":"Preruseni4 B1 19",
+     "created":true
+    }
+   ],
+   "guid":"{8B613F28-1D5C-4085-B7E3-A969D00EEE6A}",
+   "id":11793
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-11 22:49:34",
+ "risk":{
+  "riskLevel":"LOW",
+  "riskReasons":[],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "create_or_update_elements":1
+   },
+   "targets":[],
+   "packages":[
+    "FBT-B1"
+   ],
+   "diagrams":[],
+   "paths":[]
+  },
+  "metrics":{
+   "writeOps":19,
+   "createOps":19,
+   "updatedExisting":0,
+   "deleteTargets":0,
+   "affectedElements":0,
+   "affectedPackages":1,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":4,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "payloadHash":"4d0c63efb54aa84b8ab0bd05499d7f20ad4c05c399c10f02b4e42d1fca0ca0a9",
+  "hashMs":6,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":false
+  }
+ },
+ "baseline":{
+  "decision":"none",
+  "reason":"cisty create",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":false,
+  "packages":[],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":0,
+  "elapsedMs":1,
+  "action":"none",
+  "lines":[
+   "Bez zalohy - davka jen vytvari (undo = smazani dle razitek)."
+  ]
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":11,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{EE635309-C509-4d81-AC62-3BB885FD016F}"
+ },
+ "ownSession":{
+  "added":19
+ }
+}

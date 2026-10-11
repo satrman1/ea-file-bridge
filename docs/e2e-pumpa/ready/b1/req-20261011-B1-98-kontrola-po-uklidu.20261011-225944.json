@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-98-kontrola-po-uklidu",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_package WHERE Name = 'FBT-B1'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object WHERE Name LIKE '% B1%' OR Name LIKE 'Preruseni%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_document WHERE DocType = 'Baseline' AND Version LIKE 'FB-AUTO%'"
+  }
+ ]
+}

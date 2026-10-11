@@ -1,0 +1,172 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-09-datovy-model",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Kniha B1"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Vypujcka B1"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Clen B1"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Pobocka B1"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$0[0]",
+   "attributes": [
+    {
+     "name": "id",
+     "type": "int"
+    },
+    {
+     "name": "nazev",
+     "type": "string"
+    },
+    {
+     "name": "popis",
+     "type": "string"
+    },
+    {
+     "name": "stav",
+     "type": "string"
+    },
+    {
+     "name": "vytvoreno",
+     "type": "datetime"
+    },
+    {
+     "name": "zmeneno",
+     "type": "datetime"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$0[1]",
+   "attributes": [
+    {
+     "name": "id",
+     "type": "int"
+    },
+    {
+     "name": "nazev",
+     "type": "string"
+    },
+    {
+     "name": "popis",
+     "type": "string"
+    },
+    {
+     "name": "stav",
+     "type": "string"
+    },
+    {
+     "name": "vytvoreno",
+     "type": "datetime"
+    },
+    {
+     "name": "zmeneno",
+     "type": "datetime"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$0[2]",
+   "attributes": [
+    {
+     "name": "id",
+     "type": "int"
+    },
+    {
+     "name": "nazev",
+     "type": "string"
+    },
+    {
+     "name": "popis",
+     "type": "string"
+    },
+    {
+     "name": "stav",
+     "type": "string"
+    },
+    {
+     "name": "vytvoreno",
+     "type": "datetime"
+    },
+    {
+     "name": "zmeneno",
+     "type": "datetime"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$0[3]",
+   "attributes": [
+    {
+     "name": "id",
+     "type": "int"
+    },
+    {
+     "name": "nazev",
+     "type": "string"
+    },
+    {
+     "name": "popis",
+     "type": "string"
+    },
+    {
+     "name": "stav",
+     "type": "string"
+    },
+    {
+     "name": "vytvoreno",
+     "type": "datetime"
+    },
+    {
+     "name": "zmeneno",
+     "type": "datetime"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$0[1]",
+     "target": "$0[0]",
+     "type": "Association"
+    },
+    {
+     "source": "$0[1]",
+     "target": "$0[2]",
+     "type": "Association"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[3]",
+     "type": "Association"
+    }
+   ]
+  }
+ ]
+}

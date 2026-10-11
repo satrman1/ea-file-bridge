@@ -1,0 +1,29 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-03-preklep",
+ "status":"error",
+ "results":[
+  {
+   "op":"get_element_information",
+   "status":"skipped"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-11 22:37:52",
+ "code":"E_UNKNOWN_OP",
+ "message":"Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: ops[0].op: neznama operace 'get_element_information' - mysleno get_elements_information / get_packages_information / get_connectors_information?",
+ "problems":[
+  {
+   "op":0,
+   "path":"ops[0].op",
+   "code":"E_UNKNOWN_OP",
+   "message":"neznama operace 'get_element_information' - mysleno get_elements_information / get_packages_information / get_connectors_information?",
+   "suggestions":[
+    "get_elements_information",
+    "get_packages_information",
+    "get_connectors_information"
+   ]
+  }
+ ]
+}

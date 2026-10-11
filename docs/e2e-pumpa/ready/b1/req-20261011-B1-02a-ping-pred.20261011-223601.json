@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-02a-ping-pred",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "ping",
+   "echo": "B1"
+  }
+ ]
+}

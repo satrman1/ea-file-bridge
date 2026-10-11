@@ -1,0 +1,35 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-02a-ping-pred",
+ "status":"done",
+ "results":[
+  {
+   "op":"ping",
+   "status":"ok",
+   "echo":"B1",
+   "eaVersion":"1715",
+   "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+   "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+   "time":"2026-10-11 22:36:01",
+   "whitelist":[
+    {
+     "guid":"{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+     "name":"#FB-TEST",
+     "path":"Example Model.Model Based Add-Ins.EA Addins.#FB-TEST"
+    }
+   ],
+   "access":{
+    "securityEnabled":false,
+    "login":"",
+    "access":"write",
+    "groups":[],
+    "reason":"EA security je vypnuta - write ficury povoleny (FB_AccessGroups se neuplatnuje)"
+   }
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "audit":{
+  "aiLogGuid":"{EEE66E0B-BDC1-4d9e-9FF9-A44E49F465F7}"
+ }
+}

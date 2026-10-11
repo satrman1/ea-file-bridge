@@ -1,0 +1,28 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-11e-preruseni",
+ "status":"error",
+ "results":[
+  {
+   "op":"query",
+   "status":"skipped"
+  },
+  {
+   "op":"query",
+   "status":"skipped"
+  },
+  {
+   "op":"create_or_update_elements",
+   "status":"skipped"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "code":"E_INTERRUPTED",
+ "message":"Davka 20261011-B1-11e-preruseni byla minule prerusena uprostred zpracovani (res ve stavu processing od 2026-10-11 22:56:15 - pumpa/EA skoncila driv, nez dobehla). Nic z ni se TED neprovedlo: zkontroluj v Output tabu (AI Bridge) a v modelu, co z ni uz vzniklo, a posli OPRAVNOU davku s novym id (ne tutez znovu).",
+ "interrupted":{
+  "since":"2026-10-11 22:56:15",
+  "previousResMovedTo":"responses\\superseded\\"
+ },
+ "since":"2026-10-11 22:58:25"
+}

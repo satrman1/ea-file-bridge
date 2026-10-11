@@ -1,0 +1,38 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-08-na-vlastni-diagram",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Actor",
+     "name": "Knihovnik B1"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "{C7ECF3DE-E62B-4fd6-99B3-F2E07FC5E872}",
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 40,
+     "y": 220
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$0[0]",
+     "target": "{BDB2991A-42C5-4f4f-A15C-13EC91963806}",
+     "type": "Association"
+    }
+   ]
+  }
+ ]
+}

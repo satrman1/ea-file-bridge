@@ -1,0 +1,43 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"20261011-B1-98-kontrola-po-uklidu",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"0"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"0"
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "n":"6"
+    }
+   ]
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-11 22:59:44",
+ "audit":{
+  "aiLogGuid":"{C5452387-1691-422b-8B8C-BF9492C36FA8}"
+ }
+}

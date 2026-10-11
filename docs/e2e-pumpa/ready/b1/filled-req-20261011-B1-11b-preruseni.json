@@ -1,0 +1,171 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-11b-preruseni",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_object a JOIN t_object b ON a.Object_Type = b.Object_Type"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 01"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 02"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 03"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 04"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 05"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 06"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 07"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 08"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 09"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 10"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 11"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 12"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 13"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 14"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 15"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 16"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 17"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 18"
+    },
+    {
+     "package": "{90FD373E-D643-49a8-90A2-7E104FBB3846}",
+     "type": "Class",
+     "name": "Preruseni2 B1 19"
+    }
+   ]
+  }
+ ]
+}
