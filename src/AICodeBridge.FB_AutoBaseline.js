@@ -7,9 +7,14 @@
 // REUSE je bezstavove vuci modelu (cte se GetBaselines + parser jmena):
 //   LOW       existuje FB-AUTO teze package od TEHOZ uzivatele a TEZE session
 //             (token) -> nova se nedela (20 davek = 1 zaloha);
-//   ELEVATED  existuje FB-AUTO teze package mladsi nez cfg.freshWithinMin
-//             (cas ZE JMENA, ne z atributu date - ten neexistuje) -> pouzije
-//             se; jinak cerstva. Plati i session reuse NEPLATI (W2a).
+//   ELEVATED  od 2026-10-11 (N-E2E-7, rozhodnuti Milose = a, Z261004b-3):
+//             STEJNE jako LOW - FB-AUTO teze package od tehoz uzivatele a
+//             teze session se pouzije bez ohledu na stari ("reuse session");
+//             cfg.freshWithinMin zustava jen jako STROP pro zalohu z jine
+//             session / bez tokenu (cas ZE JMENA, ne z atributu date).
+//             Duvod: pri "dni prace" 11. 10. vznikly 2 zalohy tehoz balicku
+//             za 18 min a kriterium T6-24 "nove FB-AUTO <= dotcene balicky"
+//             neslo splnit. Driv: jen freshWithinMin (session reuse neplatil).
 //   isSession session baseline pri startu: reuse jako LOW (restart pumpy
 //             v teze session nevyrobi dalsi zalohu cele vetve).
 // Token = VYHRADNE FB_SessionToken (nikdy klientske op.session).
@@ -63,17 +68,20 @@ try {
     for (var i = 0; i < have.length; i++) {
         var p = this.FB_BaselineName("parse", have[i].version, prefix);
         if (p == null) { continue; }
-        var hit = false;
-        if (("" + klass) == "ELEVATED" && isSession !== true) {
+        var hit = false, why = "";
+        if (p.login == login && p.token == tok) {
+            hit = true; why = "reuse session"; // LOW i ELEVATED (N-E2E-7)
+        } else if (("" + klass) == "ELEVATED" && isSession !== true) {
+            // zaloha jine session / jineho uzivatele: jen kdyz je cerstva
             hit = (p.ms <= now + 60000) && ((now - p.ms) < freshMin * 60000);
-        } else {
-            hit = (p.login == login && p.token == tok);
+            why = "reuse freshWithinMin";
         }
-        if (hit && (best == null || p.ms > best.ms)) { best = { ms: p.ms, guid: have[i].guid, name: have[i].version }; }
+        if (hit && (best == null || p.ms > best.ms || (p.ms == best.ms && why == "reuse session"))) {
+            best = { ms: p.ms, guid: have[i].guid, name: have[i].version, why: why };
+        }
     }
     if (best != null) {
-        return res("reused", best.guid, best.name,
-            (("" + klass) == "ELEVATED" && isSession !== true) ? "reuse freshWithinMin" : "reuse session");
+        return res("reused", best.guid, best.name, best.why);
     }
 } catch (eR) {
     // cteni seznamu selhalo -> reuse nelze overit; porid cerstvou (bezpecny smer)

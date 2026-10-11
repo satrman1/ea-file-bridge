@@ -36,13 +36,68 @@
 //    dvojteckou), aby res-*.json precetl Copilot Read cely; obsah beze zmeny.
 //    payloadHash se pocita ze SUROVYCH bajtu req souboru (vyse), z res textu
 //    se nic nepocita - odsazeni nema na nonce/hash mechaniku vliv.
+// v0.16 (balik B1 - smycka agent <-> pumpa, Z261004b-3, revize usability pumpy
+//    2026-10-04 + KONCEPCE potvrzovaci okna; vse jen v rezimu CESTY, ne v
+//    potvrzenem behu ani v textovem rezimu):
+//  - P1 ODPOVED JAKO STAVOVY ZAZNAM (FB-PU-03/-09/-11): pri prvnim pruchodu
+//    nad souborem FB_Main sam zapise res-<jmeno> = {status "processing",
+//    since}; konecny vysledek ho prepise (adaptery beze zmeny). Zapisova
+//    davka s vlastnim res ve stavu processing = byla prerusena ->
+//    E_INTERRUPTED, nic se neprovede (cteci se smi opakovat). Zapisova davka,
+//    ke ktere uz existuje konecny res se stejnym id -> stary res do
+//    responses\superseded\, E_DUPLICATE_ID. Kazdy res nese `since`.
+//  - P2 PREDBEZNA KONTROLA (FB_Precheck; FB-PU-23/-28, N-K8-7, pravidlo 1):
+//    faze "shape" PRED kontrolou pristupu, faze "targets" PO ni (E_ADDIN_ACCESS
+//    ma prednost; sem pozdeji blacklist - Z261004b-10). Chyba agenta =
+//    jedna chyba s problems[], zadne okno, zadna zaloha, zadny audit (hak
+//    pre.audit pro budouci E_BLACKLIST). Chyby odkazu $N pri exekuci = E_ARGS
+//    s napovedou (ne E_EXCEPTION); priznak W8 jen po skutecne vyjimce EA/COM.
+//  - P3 CEKAJICI DAVKA (FB-PU-15/-16/-17, pravidlo 6): tentyz soubor znovu
+//    se stejnym obsahem (otisk) = vrati se STAVAJICI res cekajici davky beze
+//    zmeny (pumpa okno nabidne znovu), novy exemplar do rejected\; stejne
+//    jmeno s jinym obsahem = stavajici res + warning + sekce duplicate (res je
+//    nosic nonce - chyba misto nej by potvrzeni znicila, FB-PU-16); stejny
+//    obsah pod jinym id = E_DUPLICATE_ID s id cekajici davky
+//    (FB_PendingIndex). Expirace = FB_PendingSweep / FB_ConfirmPending.
+//  - Pravidlo 3 (ownSessionLow): pod pumpou si executor pamatuje GUIDy prvku
+//    a diagramu, ktere v teto session zalozil (this._fbOwnGuids - jen pamet
+//    procesu pumpy, nikdy soubor ani tag); FB_RiskGate je nepocita za cizi.
+//  - FB-PU-06: pod pumpou se identita repozitare ze startu session
+//    (FB_SessionStart -> this._fbSessionRepo) porovnava s aktualni - jiny
+//    projekt v EA = E_REPO "restartuj pumpu", i u cteni.
+//  - FB-PU-35: FB_ResolveBaseDir pod pumpou = slozka pumpy; zapisova sonda
+//    1x za session -> warning v res.
+//  - Dohledani cilu davky na jednom miste: FB_TargetCache (mezipamet jednoho
+//    volani sdilena P2, Risk Gate i zalohou).
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var self = this;
+// mezipamet cilu JEDNOHO volani (FB_TargetCache): vynulovat, aby se stav
+// nepropasoval mezi davkami pod pumpou (EA runtime ho stejne nedrzi)
+this._fbTargetCache = { el: {}, pkg: {}, dgm: {}, queries: 0 };
 function pad2m(x) { return (x < 10 ? "0" : "") + x; }
 function nowTextM() {
     var d = new Date();
     return d.getFullYear() + "-" + pad2m(d.getMonth() + 1) + "-" + pad2m(d.getDate())
         + " " + pad2m(d.getHours()) + ":" + pad2m(d.getMinutes()) + ":" + pad2m(d.getSeconds());
+}
+function stampM() {
+    var d = new Date();
+    return "" + d.getFullYear() + pad2m(d.getMonth() + 1) + pad2m(d.getDate()) + "-" + pad2m(d.getHours()) + pad2m(d.getMinutes()) + pad2m(d.getSeconds());
+}
+function readTextM(fp) {
+    var st = self.FB_ComObj("ADODB.Stream");
+    st.Type = 2; st.Charset = "utf-8"; st.Open();
+    st.LoadFromFile(fp);
+    var s0 = "" + st.ReadText(-1);
+    st.Close();
+    return s0.replace(/^\uFEFF/, "");
+}
+function writeTextM(fp, text) {
+    var stw = self.FB_ComObj("ADODB.Stream");
+    stw.Type = 2; stw.Charset = "utf-8"; stw.Open();
+    stw.WriteText("" + text);
+    stw.SaveToFile(fp, 2);
+    stw.Close();
 }
 // --- kontrakt I5: cesta k souboru (preferovane) vs. text (legacy) ---
 var reqPath = "", reqText = "", rawHash = "", rawLen = -1, hashMsPre = -1, rawSource = "";
@@ -110,6 +165,29 @@ var reqId = "" + ((req && req.id) || ("noid-" + (new Date()).getTime()));
 resp.id = reqId;
 resp.repository = "" + this.FB_RepoId(Repository);
 resp.connection = "" + Repository.ConnectionString;
+// confirm kontext (nastavuje VYHRADNE FB_ConfirmPending po overeni nonce
+// + hashe proti res souboru; in-call stav, nikdy neprezije volani)
+var ctx = this._fbConfirmCtx || null;
+var confirmedRun = (ctx != null && reqPath != "" && ("" + ctx.path) == reqPath.toLowerCase());
+// --- FB-PU-06: pod pumpou drzi FB_SessionStart identitu repozitare ze startu
+// session (this._fbSessionRepo); jiny projekt otevreny v teze EA = chyba i u
+// cteni (cteci davka bez `repo` by jinak tise cetla jiny model). Kontrola
+// bezi JEN kdyz je identita ulozena (schranka a GUI fallback pamet nedrzi).
+if (typeof this._fbSessionRepo == "string" && this._fbSessionRepo != "" && this._fbSessionRepo != resp.repository) {
+    resp.code = "E_REPO";
+    resp.message = "EA ma otevreny jiny projekt (" + resp.repository + ") nez pri startu pumpy (" + this._fbSessionRepo
+        + ") - restartuj pumpu. Nic nebylo provedeno.";
+    resp.sessionRepo = "" + this._fbSessionRepo;
+    this.Log(Repository, "FB " + reqId + " -> E_REPO (jiny projekt nez pri startu pumpy: " + this._fbSessionRepo + " -> " + resp.repository + ")");
+    return this.FB_JsonStringify(resp, 1);
+}
+// zastupny text v poli repo (P2, pravidlo 1) - presnejsi hlaska nez E_REPO
+if (req && typeof req.repo == "string" && (/^\{?GUID-/i.test(req.repo) || /<[^<>]{0,80}>/.test(req.repo))) {
+    resp.code = "E_ARGS";
+    resp.problems = [{ op: -1, path: "repo", code: "E_ARGS", message: "zastupny text '" + req.repo + "' v poli repo - dosad identitu repozitare z pingu (" + resp.repository + ")" }];
+    resp.message = "Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. repo: " + resp.problems[0].message;
+    return this.FB_JsonStringify(resp, 1);
+}
 // Deklarace ciloveho repozitare (povinna v copilot-instructions): pri neshode
 // se NIC neprovede (ani audit). Kryje "davka pro TEST zpracovana v PROD".
 if (req.repo) {
@@ -224,6 +302,170 @@ function opAllowed(name) {
     }
     return false;
 }
+// --- odvozeni slozek z cesty souboru (…\requests\req-X.json | …\requests\pending\req-X.json) ---
+var fsoD = null, reqName = "", reqDirM = "", baseDirM = "", resDirM = "", pendDirM = "", resPathM = "", resNameM = "";
+if (reqPath != "") {
+    try {
+        fsoD = this.FB_ComObj("Scripting.FileSystemObject");
+        reqName = "" + fsoD.GetFileName(reqPath);
+        reqDirM = "" + fsoD.GetParentFolderName(reqPath);
+        if (/\\pending$/i.test(reqDirM)) { reqDirM = "" + fsoD.GetParentFolderName(reqDirM); }
+        baseDirM = "" + fsoD.GetParentFolderName(reqDirM);
+        resDirM = baseDirM + "\\responses";
+        pendDirM = reqDirM + "\\pending";
+        resNameM = /^req/i.test(reqName) ? reqName.replace(/^req/i, "res") : ("res-" + reqName);
+        resPathM = resDirM + "\\" + resNameM;
+    } catch (eDir) { fsoD = null; }
+}
+// zapisova davka pro P1 = aspon jedna ZNAMA zapisova operace (neznama op davku
+// stejne zastavi predbezna kontrola, nic se neprovede - duplicita id tam nehrozi)
+var isWriteBatch = false;
+for (var wb = 0; wb < req.ops.length; wb++) {
+    var wbn = "" + (req.ops[wb] && req.ops[wb].op ? req.ops[wb].op : "?");
+    if (REG[wbn] && REG[wbn].w) { isWriteBatch = true; break; }
+}
+function skipAll(st) {
+    resp.results = [];
+    for (var sk = 0; sk < req.ops.length; sk++) { resp.results.push({ op: "" + (req.ops[sk] && req.ops[sk].op ? req.ops[sk].op : "?"), status: st || "skipped" }); }
+}
+function moveAside(dir, suffix) {
+    // novy exemplar souboru pryc z requests\ (watcher by ho jinak bral dokola)
+    if (!fsoD.FolderExists(dir)) { fsoD.CreateFolder(dir); }
+    var tgtA = dir + "\\" + reqName.replace(/\.json$/i, "") + "." + stampM() + (suffix || "") + ".json";
+    fsoD.MoveFile(reqPath, tgtA);
+    return tgtA;
+}
+// --- FB-PU-35: zapisova sonda slozky vymeny (1x za session, FB_ResolveBaseDir) ---
+try {
+    this.FB_ResolveBaseDir(Repository);
+    if (this._fbBaseDirProbe && this._fbBaseDirProbe.ok === false && !this._fbBaseDirProbe.reported) {
+        if (!resp.warnings) { resp.warnings = []; }
+        resp.warnings.push("Slozka vymeny " + this._fbBaseDirProbe.path + " neni zapisovatelna (" + this._fbBaseDirProbe.why
+            + ") - stavove soubory, journal a obrazky se neulozi; nastav FB_Config.baseDir nebo prava slozky.");
+        this._fbBaseDirProbe.reported = true;
+    }
+} catch (eBdp) { }
+// ===================== P1 + P3: stavovy zaznam davky a cekajici davka =====================
+// Jen pri PRVNIM pruchodu nad souborem - ne v potvrzenem behu (soubor lezi
+// v pending\ a res je nosic nonce), ne v textovem rezimu (neni soubor).
+var sinceM = nowTextM();
+if (reqPath != "" && !confirmedRun && fsoD != null && !/\\pending$/i.test("" + fsoD.GetParentFolderName(reqPath))) {
+    try {
+        if (!fsoD.FolderExists(resDirM)) { fsoD.CreateFolder(resDirM); }
+        if (!fsoD.FolderExists(pendDirM)) { fsoD.CreateFolder(pendDirM); }
+    } catch (eMk1) { }
+    // (1) tentyz soubor uz ceka v pending\ -> P3 (pravidlo 6 bod 1)
+    var pendSame = pendDirM + "\\" + reqName;
+    if (fsoD.FileExists(pendSame)) {
+        var pendHash = "";
+        try {
+            var pb = this.FB_FileBytes(pendSame);
+            pendHash = "" + this.FB_Sha256(pb === null ? readTextM(pendSame) : pb);
+        } catch (ePh) { pendHash = ""; }
+        var oldRes = null, oldResText = "";
+        try { if (fsoD.FileExists(resPathM)) { oldResText = readTextM(resPathM); oldRes = this.FB_JsonParse(oldResText); } } catch (eOr) { oldRes = null; }
+        var movedTo = "";
+        try { movedTo = moveAside(reqDirM + "\\rejected", ".duplicate"); } catch (eMa) { movedTo = "(presun selhal: " + eMa.message + ")"; }
+        if (oldRes == null || ("" + oldRes.status) != "confirm_required" || !oldRes.confirm || !oldRes.confirm.nonce) {
+            resp.code = "E_RISK_CONFIRM";
+            resp.message = "Soubor " + reqName + " uz ceka v requests\\pending\\, ale jeho res soubor chybi nebo neni ve stavu confirm_required - potvrzeni neni mozne. Rucne: soubor z pending\\ odstranit (nebo vratit do requests\\) a davku poslat znovu s novym id. Novy exemplar odlozen: " + movedTo;
+            this.Log(Repository, "FB " + reqId + " -> E_RISK_CONFIRM (soubor ceka v pending bez platneho res)");
+            return this.FB_JsonStringify(resp, 1);
+        }
+        if (pendHash != "" && rawHash != "" && pendHash == rawHash) {
+            // stejny obsah = agent (nebo clovek) posila znovu tutez davku: plati
+            // puvodni potvrzeni se STEJNYM nonce; res se vraci BEZE ZMENY ->
+            // pumpa okno nabidne znovu bez restartu (FB-PU-15/-16)
+            this.Log(Repository, "FB " + reqId + " -> cekajici davka poslana znovu (stejny obsah) - vracim stavajici res, okno se nabidne znovu; exemplar: " + movedTo);
+            return oldResText;
+        }
+        // stejne jmeno, JINY obsah: chyba pro agenta, ale res je nosic nonce
+        // cekajici davky -> vraci se stavajici res + warning + sekce duplicate
+        // (chyba misto nej by zniciila potvrzeni - presne FB-PU-16)
+        if (!oldRes.warnings) { oldRes.warnings = []; }
+        oldRes.warnings.push("DUPLICITA ID: pod timto id (" + reqName + ") uz ceka na potvrzeni JINA davka (jiny obsah) - novy exemplar NEBYL prijat (odlozen do rejected\\: " + movedTo + "). Novou davku posli s NOVYM id. Okno se tyka cekajici davky, ne te nove.");
+        oldRes.duplicate = { kind: "same-id-other-content", pendingId: "" + (oldRes.id || ""), newExemplar: movedTo, newHash: rawHash, pendingHash: pendHash };
+        this.Log(Repository, "FB " + reqId + " -> DUPLICITA ID: pod " + reqName + " ceka jina davka (jiny obsah); novy exemplar odlozen");
+        return this.FB_JsonStringify(oldRes, 1);
+    }
+    // (1b) stejny obsah pod JINYM id uz ceka (pravidlo 6 bod 2, FB-PU-17)
+    if (isWriteBatch && rawHash != "") {
+        var dupEntry = null;
+        try { dupEntry = this.FB_PendingIndex(Repository, pendDirM, "find", { name: reqName, hash: rawHash }); } catch (eDi) { dupEntry = null; }
+        if (dupEntry != null) {
+            resp.code = "E_DUPLICATE_ID";
+            resp.message = "Tataz davka (stejny obsah) uz ceka na potvrzeni pod id '" + dupEntry.id + "' (" + dupEntry.name + ", od " + (dupEntry.since || "?")
+                + ") - novou kopii neposilej. Pockej na rozhodnuti cloveka v okne; kdyz okno zmizelo, posli znovu TENTYZ soubor (stejne jmeno), ne novy. Nic nebylo provedeno.";
+            resp.duplicate = { kind: "same-content-pending", pendingId: "" + dupEntry.id, pendingFile: "" + dupEntry.name, since: "" + (dupEntry.since || "") };
+            skipAll("skipped");
+            resp.since = sinceM;
+            this.Log(Repository, "FB " + reqId + " -> E_DUPLICATE_ID (stejny obsah ceka pod " + dupEntry.id + ")");
+            return this.FB_JsonStringify(resp, 1);
+        }
+    }
+    // (2)+(3) existujici res-<jmeno>: processing (prerusena) / konecny (duplicitni id)
+    var prevRes = null;
+    try { if (fsoD.FileExists(resPathM)) { prevRes = this.FB_JsonParse(readTextM(resPathM)); } } catch (ePr) { prevRes = null; }
+    if (prevRes != null && isWriteBatch) {
+        var prevId = "" + (prevRes.id || ""), prevSt = "" + (prevRes.status || "");
+        var supDir = resDirM + "\\superseded";
+        try {
+            if (!fsoD.FolderExists(supDir)) { fsoD.CreateFolder(supDir); }
+            fsoD.MoveFile(resPathM, supDir + "\\" + resNameM.replace(/\.json$/i, "") + "." + stampM() + ".json");
+        } catch (eSup) { }
+        if (prevSt == "processing" && prevId == reqId) {
+            resp.code = "E_INTERRUPTED";
+            resp.message = "Davka " + reqId + " byla minule prerusena uprostred zpracovani (res ve stavu processing od " + (prevRes.since || "?")
+                + " - pumpa/EA skoncila driv, nez dobehla). Nic z ni se TED neprovedlo: zkontroluj v Output tabu (AI Bridge) a v modelu, co z ni uz vzniklo, a posli OPRAVNOU davku s novym id (ne tutez znovu).";
+            resp.interrupted = { since: "" + (prevRes.since || ""), previousResMovedTo: "responses\\superseded\\" };
+            skipAll("skipped");
+            resp.since = sinceM;
+            this.Log(Repository, "FB " + reqId + " -> E_INTERRUPTED (res processing od " + (prevRes.since || "?") + ")");
+            return this.FB_JsonStringify(resp, 1);
+        }
+        if (prevSt != "processing" && prevId == reqId) {
+            resp.code = "E_DUPLICATE_ID";
+            resp.message = "Id '" + reqId + "' uz bylo pouzito (predchozi vysledek: " + prevSt + (prevRes.code ? " " + prevRes.code : "") + ", od " + (prevRes.since || "?")
+                + "); stary res presunut do responses\\superseded\\. Nic nebylo provedeno - posli davku s NOVYM id. Chces-li navazat na predchozi vysledek, pouzij GUIDy z nej (superseded\\), ne opakovani davky.";
+            resp.duplicate = { kind: "same-id-final", previousStatus: prevSt, previousCode: "" + (prevRes.code || ""), previousResMovedTo: "responses\\superseded\\" };
+            skipAll("skipped");
+            resp.since = sinceM;
+            this.Log(Repository, "FB " + reqId + " -> E_DUPLICATE_ID (id uz pouzito, predchozi " + prevSt + ")");
+            return this.FB_JsonStringify(resp, 1);
+        }
+    }
+    // (4) stavovy zaznam: res = processing (konecny vysledek ho prepise)
+    try {
+        writeTextM(resPathM, this.FB_JsonStringify({ protocol: "eafb/0.2", id: reqId, status: "processing", since: sinceM, repository: resp.repository, file: reqName }, 1));
+    } catch (eWp) {
+        if (!resp.warnings) { resp.warnings = []; }
+        resp.warnings.push("Stavovy zaznam res (processing) se nepodarilo zapsat: " + eWp.message);
+    }
+}
+if (confirmedRun && ctx && ctx.since) { sinceM = "" + ctx.since; } // stari cekajici davky bezi od puvodniho vzniku
+resp.since = sinceM;
+// ===================== P2 faze 1: tvar davky (pred kontrolou pristupu) =====================
+function emitPrecheck(pre) {
+    resp.status = "error";
+    resp.code = pre.code;
+    resp.message = pre.message;
+    resp.problems = pre.problems;
+    skipAll("skipped");
+    if (pre.audit) {
+        // hak pro kody, ktere se auditu (E_BLACKLIST, Z261004b-10); ostatni P2 chyby ne
+        try {
+            var agP = self.FB_Audit(Repository, reqId, "error " + pre.code + ": " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + pre.message, "" + reqText);
+            resp.audit = { aiLogGuid: agP };
+        } catch (eAp) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + eAp.message }; }
+    }
+    self.Log(Repository, "FB " + reqId + " -> " + pre.code + " (predbezna kontrola: " + pre.problems.length + " problemu; " + pre.problems[0].path + ": " + pre.problems[0].message + ")");
+    return self.FB_JsonStringify(resp, 1);
+}
+var pre1 = null;
+try { pre1 = this.FB_Precheck(Repository, req, REG, "shape", resp.repository); }
+catch (ePre1) { pre1 = { ok: true, problems: [], warning: "FB_Precheck selhal: " + ePre1.message }; }
+if (pre1 && pre1.ok === false) { return emitPrecheck(pre1); }
+if (pre1 && pre1.warning) { if (!resp.warnings) { resp.warnings = []; } resp.warnings.push(pre1.warning + " - predbezna kontrola preskocena, plati fail-closed Risk Gate"); }
 // --- reseni "$N" referenci: "$2" -> results[2].guid, "$2.id" -> results[2].id,
 //     "$2[1]" -> results[2].items[1].guid, "$2[1].id" -> .id ---
 var results = resp.results;
@@ -238,13 +480,27 @@ function refValue(m) {
     }
     return (m[3] == "id") ? r.id : r.guid;
 }
+// napoveda k chybe odkazu (FB-PU-28): rekne agentovi, CO s tim
+function refHint(m, v) {
+    var idx = parseInt(m[1], 10);
+    if (idx >= results.length) { return "odkaz " + v + " miri na vysledek, ktery (zatim) neexistuje - $N smi odkazovat jen na drivejsi operaci teze davky"; }
+    var r = results[idx];
+    var rop = "" + (r.op || "?");
+    if (r.status != "ok") { return "odkaz " + v + ": operace ops[" + idx + "] (" + rop + ") skoncila " + (r.status || "?") + (r.code ? " " + r.code : "") + " - nema vysledek, na ktery by slo odkazat"; }
+    if (typeof m[2] != "undefined" && m[2] !== "" && m[2] !== null) {
+        var n = (r.items && r.items.length) ? r.items.length : 0;
+        return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") ma " + n + " polozek items - index [" + m[2] + "] je mimo rozsah" + (n > 0 ? " (povolene 0.." + (n - 1) + ")" : "");
+    }
+    if (r.items && r.items.length > 0) { return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") nema guid na urovni operace, ma items[] (" + r.items.length + ") - pouzij " + v.replace(/\.(id|guid)$/, "") + "[0]" + (m[3] ? "." + m[3] : ""); }
+    return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") nenese " + (m[3] == "id" ? "id" : "guid") + " (cteci operace vraci seznam, zapisova guid) - zkontroluj, na co odkazujes";
+}
 function resolveRefs(v) {
     if (v === null || typeof v == "undefined") { return v; }
     if (typeof v == "string") {
         var m = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/.exec(v);
         if (m) {
             var rv = refValue(m);
-            if (rv === null || typeof rv == "undefined") { throw new Error("Referenci " + v + " nelze rozresolvovat (vysledek neexistuje)."); }
+            if (rv === null || typeof rv == "undefined") { throw new Error("Odkaz " + v + " nelze rozresolvovat: " + refHint(m, v) + "."); }
             return rv;
         }
         return v;
@@ -295,11 +551,14 @@ if (writesInBatch > 0) {
         this.Log(Repository, "FB " + reqId + " -> E_ADDIN_ACCESS (" + (acc ? acc.login : "?") + ": " + (acc ? acc.reason : "?") + ")");
         return this.FB_JsonStringify(resp, 1);
     }
+    // ===================== P2 faze 2: cile (po kontrole pristupu) =====================
+    // cil zadany GUIDem existuje (pravidlo 1; FB_TargetCache = tatez mezipamet
+    // pro Risk Gate). Sem Z261004b-10 doplni blacklist (auditovany) a cesty.
+    var pre2 = null;
+    try { pre2 = this.FB_Precheck(Repository, req, REG, "targets", resp.repository); }
+    catch (ePre2) { pre2 = { ok: true, problems: [] }; }
+    if (pre2 && pre2.ok === false) { return emitPrecheck(pre2); }
 }
-// confirm kontext (nastavuje VYHRADNE FB_ConfirmPending po overeni nonce
-// + hashe proti res souboru; in-call stav, nikdy neprezije volani)
-var ctx = this._fbConfirmCtx || null;
-var confirmedRun = (ctx != null && reqPath != "" && ("" + ctx.path) == reqPath.toLowerCase());
 if (writesInBatch > 0) {
     // W8 pres soubor (par. 1a/5): EA runtime nedrzi this._fb* mezi invokacemi
     // -> flag "prvni zapis po E_EXCEPTION" cte i ze state souboru
@@ -508,6 +767,8 @@ function emitConfirmRequired() {
                 }
                 fsoP.MoveFile(reqPath, tgt);
                 resp.confirm = { pendingPath: tgt };
+                // index cekajicich davek (P3: stejny obsah pod jinym id, expirace)
+                try { self.FB_PendingIndex(Repository, pendDir, "add", { name: "" + fsoP.GetFileName(reqPath), hash: "" + risk.payloadHash, id: reqId, since: sinceM }); } catch (ePi) { }
             } else {
                 resp.confirm = { pendingPath: reqPath }; // uz ceka (re-klasifikace)
             }
@@ -591,7 +852,7 @@ if (writesInBatch > 0 && blPlan != null && blDec != null && blDec.action == "cre
     resp.baseline.elapsedMs = new Date().getTime() - blT0;
 }
 // --- provedeni davky (stop-on-error) ---
-var okc = 0, errc = 0, failed = false;
+var okc = 0, errc = 0, failed = false, comExc = false;
 for (var i = 0; i < req.ops.length; i++) {
     var op = req.ops[i];
     var name = "" + (op && op.op ? op.op : "?");
@@ -607,19 +868,31 @@ for (var i = 0; i < req.ops.length; i++) {
         r = { op: name, status: "error", code: "E_OP_FORBIDDEN",
             message: "Operace '" + name + "' neni povolena whitelistem operaci (FB_OpsAllowed) pro repozitar " + resp.repository + "." };
     } else {
-        try {
-            resolveRefs(op);
-            r = this[reg.fn](Repository, op, reqId);
-            if (!r) { r = { op: name, status: "error", code: "E_EXCEPTION", message: "Operace nevratila vysledek." }; }
-            if (!r.op) { r.op = name; }
-        } catch (e2) {
-            // interpretace znamych EA chyb (odepreny zapis = EA security /
-            // zamek) na citelny kod+hlasku; jinak generic E_EXCEPTION
-            var interp = null;
-            try { interp = this.FB_InterpretError(e2.message); } catch (eIn) { interp = null; }
-            r = interp
-                ? { op: name, status: "error", code: interp.code, message: interp.message }
-                : { op: name, status: "error", code: "E_EXCEPTION", message: "" + e2.message };
+        var refsOk = true;
+        try { resolveRefs(op); }
+        catch (eRef) {
+            // chyba odkazu $N = chyba agenta (FB-PU-28): E_ARGS s napovedou, ne
+            // E_EXCEPTION (ten by navic zvedl priznak W8 a dalsi davka by sla oknem)
+            refsOk = false;
+            r = { op: name, status: "error", code: "E_ARGS", message: "" + eRef.message };
+        }
+        if (refsOk) {
+            try {
+                r = this[reg.fn](Repository, op, reqId);
+                if (!r) { r = { op: name, status: "error", code: "E_EXCEPTION", message: "Operace nevratila vysledek." }; }
+                if (!r.op) { r.op = name; }
+            } catch (e2) {
+                // interpretace znamych EA chyb (odepreny zapis = EA security /
+                // zamek) na citelny kod+hlasku; jinak generic E_EXCEPTION
+                var interp = null;
+                try { interp = this.FB_InterpretError(e2.message); } catch (eIn) { interp = null; }
+                if (interp) {
+                    r = { op: name, status: "error", code: interp.code, message: interp.message };
+                } else {
+                    r = { op: name, status: "error", code: "E_EXCEPTION", message: "" + e2.message };
+                    comExc = true; // skutecna vyjimka z EA/COM -> W8 (FB-PU-28: jen tady)
+                }
+            }
         }
     }
     resp.results.push(r);
@@ -662,13 +935,35 @@ try {
 // zapisova davka po E_EXCEPTION jde ELEVATED (cte FB_RiskGate). Ctecí davka
 // flag NEmaze (kontrolni cteni po zotaveni z modalu ho musi prezit).
 try {
-    var anyExc = false;
-    for (var xi = 0; xi < resp.results.length; xi++) {
-        if (resp.results[xi] && resp.results[xi].code == "E_EXCEPTION") { anyExc = true; break; }
-    }
-    if (anyExc) { this._fbPrevExc = true; try { this.FB_StateFile(Repository, "w8", "1"); } catch (eW8a) { } }
+    // FB-PU-28: priznak jen po SKUTECNE vyjimce z EA/COM (comExc), ne po
+    // chybe odkazu $N ani po E_ARGS/E_NOT_FOUND handleru
+    if (comExc) { this._fbPrevExc = true; try { this.FB_StateFile(Repository, "w8", "1"); } catch (eW8a) { } }
     else if (writesInBatch > 0) { this._fbPrevExc = false; try { this.FB_StateFile(Repository, "w8", null); } catch (eW8b) { } }
 } catch (eW8) { }
+// --- pravidlo 3 (KONCEPCE, ownSessionLow): GUIDy prvku/diagramu/balicku
+// ZALOZENYCH touto session - jen v pameti procesu pumpy (typeof WScript),
+// nikdy soubor ani tag v modelu (agent by ho mohl prepsat); po restartu
+// pumpy je vse znovu "cizi" (chyba vede k oknu navic, ne k tichemu zapisu).
+// EA runtime (schranka, GUI fallback) this._fb* mezi vyvolanimi nedrzi -
+// tam zustava dnesni chovani (par. 1a/5), zapis do pameti je neskodny.
+try {
+    if (typeof WScript != "undefined" && writesInBatch > 0) {
+        if (!this._fbOwnGuids) { this._fbOwnGuids = {}; }
+        var ownAdd = 0;
+        for (var og = 0; og < resp.results.length; og++) {
+            var ogr = resp.results[og];
+            if (!ogr || ogr.status != "ok") { continue; }
+            if (ogr.op == "create_element" && ogr.guid) { this._fbOwnGuids[("" + ogr.guid).toUpperCase()] = 1; ownAdd++; }
+            if (ogr.items && Object.prototype.toString.call(ogr.items) == "[object Array]") {
+                for (var oi = 0; oi < ogr.items.length; oi++) {
+                    var oit = ogr.items[oi];
+                    if (oit && oit.created === true && oit.guid) { this._fbOwnGuids[("" + oit.guid).toUpperCase()] = 1; ownAdd++; }
+                }
+            }
+        }
+        if (ownAdd > 0) { resp.ownSession = { added: ownAdd }; }
+    }
+} catch (eOwn) { }
 this.Log(Repository, "FB " + reqId + " -> " + summary);
 // --- Baseline politika par. 6.3: UKLID automatickych baselines - hak v
 // executoru (plati pro vsechny kanaly stejne), PO dokonceni zapisove davky,

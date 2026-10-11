@@ -25,6 +25,13 @@
 //  6. presuny po exekuci dela tato operace: done/error -> processed\,
 //     E_RISK_BLOCKED (re-klasifikace) -> rejected\.
 // Zadny in-memory stav mezi volanimi -> prezije restart EA i pumpy.
+// v0.16 (balik B1, Z261004b-3; KONCEPCE pravidlo 6 bod 4, FB-PU-17): PRED
+//  overenim nonce se davka proveri na stari (FB_PendingSweep nad timto
+//  souborem): starsi nez confirmMaxAgeMin = E_RISK_EXPIRED, rejected\, audit
+//  - plati pro potvrzeni i zamitnuti. Kazdy presun z pending\ odebira
+//  polozku z indexu cekajicich davek (FB_PendingIndex); confirm kontext nese
+//  `since` cekajici davky, aby nove confirm_required po re-klasifikaci
+//  pocitalo stari od puvodniho vzniku.
 var self = this;
 function refuse(code, msg, id) {
     return self.FB_JsonStringify({ protocol: "eafb/0.2", id: ("" + (id || "")),
@@ -62,6 +69,7 @@ function nowText() {
 function moveTo(dir) {
     if (!fso.FolderExists(dir)) { fso.CreateFolder(dir); }
     fso.MoveFile(p, dir + "\\" + name.replace(/\.json$/i, "") + "." + stamp() + ".json");
+    try { self.FB_PendingIndex(Repository, pendDir, "remove", { name: name }); } catch (eIx) { }
 }
 function readText(fp) {
     var st = self.FB_ComObj("ADODB.Stream");
@@ -82,6 +90,14 @@ if (resObj == null || ("" + resObj.status) != "confirm_required" || !resObj.conf
 }
 var reqId = "" + (resObj.id || "");
 var chan = ("" + (channel || "")) || "nezname";
+// --- expirace (pravidlo 6 bod 4): starsi nez confirmMaxAgeMin -> E_RISK_EXPIRED ---
+try {
+    var sw = this.FB_PendingSweep(Repository, pendDir, p);
+    if (sw && sw.expired && sw.expired.length > 0) {
+        this.Log(Repository, "FB " + reqId + " -> E_RISK_EXPIRED pri pokusu o " + (approve === true || approve === "true" || approve === 1 || approve === "1" ? "potvrzeni" : "zamitnuti") + " (kanal " + chan + ")");
+        return "" + sw.expired[0].response;
+    }
+} catch (eSw) { }
 var risk = resObj.risk || null;
 var isApprove = (approve === true || approve === "true" || approve === 1 || approve === "1");
 // --- zamitnuti (Zrusit): audit + rejected, zadne overovani hashe netreba ---
@@ -150,6 +166,7 @@ this._fbConfirmCtx = {
     path: p.toLowerCase(),
     channel: chan,
     timestamp: nowText(),
+    since: ("" + (resObj.since || "")),
     prevMetrics: (risk ? risk.metrics : null),
     prevLevel: (risk ? "" + risk.riskLevel : "")
 };

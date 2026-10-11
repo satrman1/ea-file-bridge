@@ -14,7 +14,9 @@ var SRC = path.join(__dirname, "..", "src");
 
 // ---------------------------------------------------------------- test runner
 var passed = 0, failed = 0, failures = [];
+var TRACE = !!process.env.HARNESS_TRACE; // HARNESS_TRACE=1 node test/harness.js -> vypis jmen testu (hledani zacykleni)
 function t(name, fn) {
+    if (TRACE) { console.log("  > " + name); }
     try {
         fn();
         passed++;
@@ -2620,6 +2622,14 @@ function blRepo(opts) {
             var n = M.el.filter(function (e) { return ids.indexOf(e[1]) >= 0; }).length;
             return [{ c: (opts.countZero ? 0 : n * (opts.mult || 1)) }];
         } },
+        { re: /COUNT\(\*\) AS c FROM t_diagram/i, rows: function (sql) {
+            sqlLog.push(sql);
+            if (opts.diagramCountFails) { return []; }
+            var idsD = inList(sql, "Package_ID");
+            var nD = M.dg.filter(function (d) { return idsD.indexOf(d[1]) >= 0; }).length
+                + (opts.diagramsIn || []).filter(function (pid) { return idsD.indexOf(pid) >= 0; }).length;
+            return [{ c: nD }];
+        } },
         { re: /^WITH/i, rows: function (sql) { sqlLog.push(sql); return [{ packages: 3, elements: 42 }]; } },
         { re: /FROM t_package WHERE Parent_ID IN/i, rows: function (sql) {
             sqlLog.push(sql);
@@ -3082,13 +3092,13 @@ t("BL-3 T6-13: ELEVATED davka ZAMITNUTA v dialogu -> 0 baselines", function () {
     var r2 = confirmFile(repo, r, "t613", false);
     eq(r2.code, "E_RISK_REJECTED"); eq(repo._createCalls, 0); eq(repo._countBaselines(), 0);
 });
-t("BL-3 T6-14: ELEVATED potvrzena -> baseline az PO potvrzeni; v okne freshWithinMin reuse, mimo okno cerstva", function () {
+t("BL-3 T6-14 (N-E2E-7, 2026-10-11): ELEVATED potvrzena -> baseline az PO potvrzeni; FB-AUTO TEZE session se pouzije bez ohledu na stari (reuse session); z jine session jen v okne freshWithinMin", function () {
     blReset(); var repo = blRepo({ login: "jnovak" });
     var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [] }; };
     try {
         var tok = B.FB_SessionToken.call(B, repo, null).token;
-        // FB-AUTO tehoz uzivatele a session, ale 40 min stara -> ELEVATED ji NEpouzije
-        repo._addBaseline("{PK-14}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", tok, new Date().getTime() - 40 * 60000, false), 40);
+        // FB-AUTO JINE session (token s99990101-9), 40 min stara -> ELEVATED ji NEpouzije (mimo freshWithinMin)
+        repo._addBaseline("{PK-14}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", "s99990101-9", new Date().getTime() - 40 * 60000, false), 40);
         var r = runFile(repo, DEL_C, "t614");
         eq(repo._createCalls, 0, "pred potvrzenim nic");
         var atOp = -1; B.FB_OpDelete = function () { atOp = repo._createCalls; return { op: "delete_from_model", status: "ok", items: [] }; };
@@ -3096,10 +3106,36 @@ t("BL-3 T6-14: ELEVATED potvrzena -> baseline az PO potvrzeni; v okne freshWithi
         eq(atOp, 1, "v okamziku prvni zapisove operace uz baseline existuje (a vznikla az po potvrzeni)");
         eq(r2.baseline.decision, "created"); eq(autoNames(repo, "{PK-14}").length, 2);
         ok(typeof r2.baseline.elapsedMs == "number");
-        // druha ELEVATED davka hned potom -> reuse freshWithinMin
+        // druha ELEVATED davka hned potom -> reuse (tataz session ma prednost pred freshWithinMin)
         var r3 = runFile(repo, DEL_C, "t614b");
         var r4 = confirmFile(repo, r3, "t614b", true);
-        eq(r4.baseline.decision, "reused"); eq(r4.baseline.reason, "reuse freshWithinMin"); eq(autoNames(repo, "{PK-14}").length, 2);
+        eq(r4.baseline.decision, "reused"); eq(r4.baseline.reason, "reuse session"); eq(autoNames(repo, "{PK-14}").length, 2);
+    } finally { B.FB_OpDelete = oD; }
+});
+t("BL-3 N-E2E-7: ELEVATED po > 15 min v TEZE session = reused (reuse session), zadna nova FB-AUTO; freshWithinMin zustava stropem jen pro zalohu jine session", function () {
+    blReset(); var repo = blRepo({ login: "jnovak" });
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [] }; };
+    try {
+        var tok = B.FB_SessionToken.call(B, repo, null).token;
+        // tataz session, 40 min stara (den prace 11. 10.: R2 11:42 -> R8 12:01 vyrobilo druhou zalohu)
+        repo._addBaseline("{PK-14}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", tok, new Date().getTime() - 40 * 60000, false), 40);
+        var r = runFile(repo, DEL_C, "t6e7");
+        var r2 = confirmFile(repo, r, "t6e7", true);
+        eq(r2.baseline.decision, "reused"); eq(r2.baseline.reason, "reuse session");
+        eq(autoNames(repo, "{PK-14}").length, 1, "zadna nova FB-AUTO nad tymz balickem v teze session");
+        // jina session, 10 min stara -> reuse freshWithinMin (strop plati dal)
+        blReset(); var repoB = blRepo({ login: "jnovak" });
+        B.FB_SessionToken.call(B, repoB, null);
+        repoB._addBaseline("{PK-14}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", "s99990101-9", new Date().getTime() - 10 * 60000, false), 10);
+        var rb = runFile(repoB, DEL_C, "t6e7b");
+        var rb2 = confirmFile(repoB, rb, "t6e7b", true);
+        eq(rb2.baseline.decision, "reused"); eq(rb2.baseline.reason, "reuse freshWithinMin");
+        // LOW vetev beze zmeny: tataz session -> reuse session (regrese T6-6)
+        blReset(); var repoC = blRepo({ login: "jnovak" });
+        var tokC = B.FB_SessionToken.call(B, repoC, null).token;
+        repoC._addBaseline("{PK-13}", B.FB_BaselineName.call(B, "format", "FB-AUTO ", "jnovak", tokC, new Date().getTime() - 40 * 60000, false), 40);
+        var rc = runText(repoC, UPD_A1, "t6e7c");
+        eq(rc.baseline.decision, "reused"); eq(rc.baseline.reason, "reuse session");
     } finally { B.FB_OpDelete = oD; }
 });
 t("BL-3 T6-15: CreateBaseline vraci false / hazi / FB_CheckWrite odmitne -> E_NO_BASELINE terminalne, bez confirm, nic zapsano", function () {
@@ -3667,6 +3703,8 @@ t("FB-PU-01 pravidlo (PROTOKOL-EAFB kap. 11): parametr baseline pribyly po v0.14
 t("tools/diff-signatures.py: v0.14 -> HEAD vypise jen operace se zmenenym seznamem parametru (FB_RiskNote, FB_RiskAuditTags) a vraci exit 1; --json strojove", function () {
     var cp = require("child_process");
     var root = path.join(__dirname, "..");
+    // na mountu Cowork trva git ~80 s na beh -> HARNESS_SKIP_DIFFSIG=1 test preskoci (nastroj se pak pousti zvlast)
+    if (process.env.HARNESS_SKIP_DIFFSIG) { console.log("  (preskoceno: HARNESS_SKIP_DIFFSIG - spust python tools/diff-signatures.py v0.14 HEAD zvlast)"); return; }
     var tagOk = cp.spawnSync("git", ["-c", "core.quotepath=off", "rev-parse", "-q", "--verify", "v0.14^{commit}"], { cwd: root, env: Object.assign({}, process.env, { GIT_OPTIONAL_LOCKS: "0" }) });
     if (tagOk.error || tagOk.status !== 0) { console.log("  (preskoceno: git nebo tag v0.14 v tomto klonu neni - diff-signatures je nastroj pro vydani doma)"); return; }
     var run = null, pyExe = "";
@@ -3693,6 +3731,529 @@ t("tools/diff-signatures.py: v0.14 -> HEAD vypise jen operace se zmenenym seznam
     var txt = cp.spawnSync(pyExe, [path.join(root, "tools", "diff-signatures.py"), "v0.14", "HEAD"], { cwd: root, encoding: "utf8", env: Object.assign({}, process.env, { GIT_OPTIONAL_LOCKS: "0" }) });
     contains(txt.stdout, "FB_RiskNote: (risk) -> (risk, baseline)");
     contains(txt.stdout, "Zmenene signatury existujicich operaci: 2");
+});
+
+// ===========================================================================
+// BALIK B1 - SMYCKA AGENT <-> PUMPA (Z261004b-3, 2026-10-11): P1 stavovy
+// zaznam, P2 predbezna kontrola, P3 cekajici davka, pravidla 3/6/7 KONCEPCE,
+// FB-PU-06/-35, N-E2E-3/-7, simulace V1/V3/S1/S5 z revize kap. 7.2,
+// invarianty pravidla 8.
+// ===========================================================================
+var B1_BASE = "C:\\HARNESS\\EA-File-Bridge";
+var B1_REQ = B1_BASE + "\\requests", B1_PEND = B1_REQ + "\\pending", B1_RES = B1_BASE + "\\responses";
+function b1Reset() { blReset(); delete B._fbAccessCache; delete B._fbPrevExc; delete B._fbOwnGuids; delete B._fbSessionRepo; delete B._fbBaseDirProbe; delete B._fbTargetCache; }
+function b1Files(prefix) { var out = []; for (var k in memFs.files) { if (k.indexOf(prefix) === 0) { out.push(k.substring(prefix.length)); } } return out.sort(); }
+// simulace pumpy v0.5 nad jednou davkou: zapis req, FB_Main(cesta), zapis res, presun jako pump.wsf
+function pumpRun(repo, ops, id, text) {
+    delete B._fbAccessCache;
+    var name = "req-" + id + ".json", p = B1_REQ + "\\" + name;
+    memFs.files[p] = (typeof text == "string") ? text : JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops });
+    var out = asEaRuntime(function () { return "" + B.FB_Main.call(B, repo, p); });
+    memFs.files[B1_RES + "\\res-" + id + ".json"] = out;
+    var rejected = /"code":"(E_PARSE|E_RISK_BLOCKED|E_RISK_CONFIRM|E_NO_BASELINE)"/.test(out);
+    if (out.indexOf("\"status\":\"confirm_required\"") < 0 && typeof memFs.files[p] != "undefined") {
+        memFs.files[B1_REQ + "\\" + (rejected ? "rejected" : "processed") + "\\" + name.replace(/\.json$/, "") + ".stamp.json"] = memFs.files[p];
+        delete memFs.files[p];
+    }
+    return JSON.parse(out);
+}
+function pumpConfirm(repo, resp, id, approve) {
+    var out = asEaRuntime(function () { return "" + B.FB_ConfirmPending.call(B, repo, resp.confirm.pendingPath, resp.confirm.nonce, resp.confirm.payloadHash, "pumpa", approve); });
+    memFs.files[B1_RES + "\\res-" + id + ".json"] = out;
+    return JSON.parse(out);
+}
+function withPump(fn) {
+    global.WScript = { ScriptFullName: B1_BASE + "\\pump.wsf" };
+    try { return fn(); } finally { delete global.WScript; }
+}
+var B1_CREATE = [{ op: "create_or_update_elements", elements: [{ name: "B1-N", type: "Class", "package": "{PK-11}" }] }];
+var B1_READ = [{ op: "ping", echo: "b1" }];
+
+// --- P1: stavovy zaznam ---
+t("B1 P1: prvni pruchod nad souborem zapise res processing se since (pred vysledkem); konecny res nese since", function () {
+    b1Reset(); var repo = blRepo();
+    var seen = null;
+    var oE = B.FB_OpElements;
+    B.FB_OpElements = function () { seen = JSON.parse(memFs.files[B1_RES + "\\res-p1a.json"]); return { op: "create_or_update_elements", status: "ok", items: [{ guid: mkGuid(), id: 1, created: true }] }; };
+    try { var r = pumpRun(repo, B1_CREATE, "p1a"); } finally { B.FB_OpElements = oE; }
+    ok(seen != null, "res existoval v okamziku exekuce");
+    eq(seen.status, "processing"); eq(seen.id, "p1a"); ok(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(seen.since), "since je cas");
+    eq(r.status, "done"); eq(r.since, seen.since, "konecny res nese tyz since");
+    eq(JSON.parse(memFs.files[B1_RES + "\\res-p1a.json"]).status, "done", "processing zaznam po konecnem vysledku nevisi (pumpa prepise)");
+});
+t("B1 P1 E_INTERRUPTED (FB-PU-11): zapisova davka s vlastnim res processing = prerusena -> nic se neprovede, stary res do superseded", function () {
+    b1Reset(); var repo = blRepo();
+    memFs.files[B1_RES + "\\res-p1b.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "p1b", status: "processing", since: "2026-10-11 09:00:00" });
+    var called = 0; var oE = B.FB_OpElements; B.FB_OpElements = function () { called++; return { op: "x", status: "ok", items: [] }; };
+    try { var r = pumpRun(repo, B1_CREATE, "p1b"); } finally { B.FB_OpElements = oE; }
+    eq(r.status, "error"); eq(r.code, "E_INTERRUPTED"); eq(called, 0, "nic se neprovedlo");
+    contains(r.message, "prerusena"); contains(r.message, "OPRAVNOU davku");
+    eq(r.results.length, 1); eq(r.results[0].status, "skipped");
+    eq(b1Files(B1_RES + "\\superseded\\").length, 1, "stary res v superseded");
+    ok(!r.confirm, "zadne okno");
+});
+t("B1 P1: cteci davka s res processing se smi opakovat (res se prepise, zadna chyba)", function () {
+    b1Reset(); var repo = blRepo();
+    memFs.files[B1_RES + "\\res-p1c.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "p1c", status: "processing", since: "2026-10-11 09:00:00" });
+    var r = pumpRun(repo, B1_READ, "p1c");
+    eq(r.status, "done"); eq(r.results[0].op, "ping");
+});
+t("B1 P1 E_DUPLICATE_ID (FB-PU-09, simulace V3): stejne id podruhe u zapisove davky -> druha E_DUPLICATE_ID, prvek vznikne JEDNOU, stary res v superseded", function () {
+    b1Reset(); var repo = blRepo();
+    var created = 0; var oE = B.FB_OpElements; B.FB_OpElements = function () { created++; return { op: "create_or_update_elements", status: "ok", items: [{ guid: mkGuid(), id: 7, created: true }] }; };
+    try {
+        var r1 = pumpRun(repo, B1_CREATE, "v3");
+        var r2 = pumpRun(repo, B1_CREATE, "v3");
+    } finally { B.FB_OpElements = oE; }
+    eq(r1.status, "done"); eq(r2.status, "error"); eq(r2.code, "E_DUPLICATE_ID");
+    eq(created, 1, "V3: dva prvky uz nevznikaji");
+    eq(r2.duplicate.kind, "same-id-final"); eq(r2.duplicate.previousStatus, "done");
+    contains(r2.message, "NOVYM id");
+    eq(b1Files(B1_RES + "\\superseded\\").length, 1);
+    ok(!r2.confirm, "zadne okno");
+});
+t("B1 P1: cteci davka se stejnym id se smi opakovat; stejne JMENO souboru s jinym id = jen supersede, davka probehne", function () {
+    b1Reset(); var repo = blRepo();
+    var a = pumpRun(repo, B1_READ, "p1d"); var b = pumpRun(repo, B1_READ, "p1d");
+    eq(a.status, "done"); eq(b.status, "done");
+    // soubor req-p1e.json s id "jine" po dokoncene davce id p1e
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { return { op: "x", status: "ok", items: [] }; };
+    try {
+        var c = pumpRun(repo, B1_CREATE, "p1e");
+        var d = pumpRun(repo, null, "p1e", JSON.stringify({ protocol: "eafb/0.2", id: "jine-id", repo: "EAEXAMPLE.QEA", ops: B1_CREATE }));
+    } finally { B.FB_OpElements = oE; }
+    eq(c.status, "done"); eq(d.status, "done", JSON.stringify(d).substring(0, 200)); eq(d.id, "jine-id");
+    eq(b1Files(B1_RES + "\\superseded\\").length, 1, "stary res pod tymz jmenem je v superseded");
+});
+t("B1 P1: textovy rezim (legacy) ani potvrzeny beh stavovy zaznam nepisi", function () {
+    b1Reset(); var repo = blRepo();
+    var r = runText(repo, B1_READ, "p1f");
+    eq(r.status, "done"); eq(b1Files(B1_RES + "\\").length, 0, "zadny res od FB_Main v textovem rezimu");
+});
+
+// --- P2: predbezna kontrola ---
+t("B1 P2 / V1 (FB-PU-23): preklep v CTECI operaci -> E_UNKNOWN_OP s nejblizsimi nazvy, ZADNE okno, nic v pending, zadna zaloha, zadny audit", function () {
+    b1Reset(); var repo = blRepo();
+    var r = pumpRun(repo, [{ op: "get_element_information", elements: ["{EL-101}"] }], "v1");
+    eq(r.status, "error"); eq(r.code, "E_UNKNOWN_OP");
+    ok(r.problems && r.problems.length == 1, "jeden problem"); eq(r.problems[0].code, "E_UNKNOWN_OP");
+    ok(r.problems[0].suggestions.indexOf("get_elements_information") >= 0, "nejblizsi nazev: " + r.problems[0].suggestions.join(","));
+    ok(!r.confirm && !r.risk, "zadne okno, zadny risk gate");
+    eq(b1Files(B1_PEND + "\\").length, 0, "nic v pending");
+    eq(repo._countBaselines(), 0, "zadna zaloha");
+    ok(!r.audit, "zadny audit (nic se nestalo)");
+    eq(r.results[0].status, "skipped");
+    ok(b1Files(B1_REQ + "\\processed\\").length == 1, "pumpa v0.5 soubor odlozi do processed");
+});
+t("B1 P2: vsechny problemy davky v jedne odpovedi (problems[]), ne jen prvni; kod podle priority UNKNOWN > ARGS", function () {
+    b1Reset(); var repo = blRepo();
+    var r = pumpRun(repo, [
+        { op: "create_or_update_elements", elements: [] },
+        { op: "create_or_update_attributes", attributes: [{ name: "a" }] },
+        { op: "find_elemnts_by_name", name: "x" }
+    ], "p2a");
+    eq(r.code, "E_UNKNOWN_OP");
+    eq(r.problems.length, 3, JSON.stringify(r.problems));
+    contains(r.problems[0].message, "prazdny"); contains(r.problems[1].message, "element"); eq(r.problems[2].code, "E_UNKNOWN_OP");
+    eq(r.results.length, 3);
+});
+t("B1 P2 / N-K8-7 + FB-PU-23: nenahrazeny zastupny text (GUID-..., {GUID-, <...>) v identifikacnim poli -> E_ARGS bez okna; notes s <b> se NEKONTROLUJI", function () {
+    b1Reset(); var repo = blRepo();
+    var r = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "X", type: "Class", "package": "GUID-A3-Z-ACK-A3a", notes: "<b>tucne</b> <i>ok</i>" }] }], "nk87");
+    eq(r.status, "error"); eq(r.code, "E_ARGS"); eq(r.problems.length, 1, JSON.stringify(r.problems));
+    contains(r.problems[0].path, "package"); contains(r.problems[0].message, "zastupny text");
+    ok(!r.confirm, "zadne okno (driv popup 'Neresolvovatelny package')");
+    var r2 = pumpRun(repo, [{ op: "delete_from_model", targets: [{ type: "Element", guid: "{GUID-prvku}" }] }], "nk87b");
+    eq(r2.code, "E_ARGS"); contains(r2.problems[0].message, "zastupny text"); ok(!r2.confirm);
+    var r3 = pumpRun(repo, [{ op: "create_or_update_attributes", element: "<GUID elementu>", attributes: [{ name: "a" }] }], "nk87c");
+    eq(r3.code, "E_ARGS"); contains(r3.problems[0].path, "element");
+    // repo placeholder
+    var r4 = pumpRun(repo, null, "nk87d", JSON.stringify({ protocol: "eafb/0.2", id: "nk87d", repo: "<REPO>", ops: B1_READ }));
+    eq(r4.code, "E_ARGS"); eq(r4.problems[0].path, "repo");
+});
+t("B1 P2: $N smi jen dozadu - dopredny odkaz a odkaz na sebe = E_ARGS pred exekuci", function () {
+    b1Reset(); var repo = blRepo();
+    var r = pumpRun(repo, [{ op: "place_elements_on_diagram", diagram: "$1", elementPlacements: [{ element: "$0" }] },
+                           { op: "create_or_update_diagram", diagrams: [{ name: "D", type: "Logical", "package": "{PK-11}" }] }], "p2n");
+    eq(r.code, "E_ARGS"); eq(r.problems.length, 2, JSON.stringify(r.problems));
+    contains(r.problems[0].message, "dopredu"); contains(r.problems[1].message, "vlastni operaci");
+});
+t("B1 P2 faze 2: cil zadany GUIDem u upravy/mazani v modelu neexistuje -> E_ARGS bez okna; existujici GUID projde; cteci operace se neoveruji", function () {
+    b1Reset(); var repo = blRepo();
+    var r = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ guid: "{EL-999}", notes: "x" }] },
+                           { op: "delete_from_model", targets: [{ type: "Package", guid: "{PK-999}" }] }], "p2g");
+    eq(r.code, "E_ARGS"); eq(r.problems.length, 2, JSON.stringify(r.problems));
+    contains(r.problems[0].message, "neexistuje"); contains(r.problems[1].path, "targets[0]");
+    ok(!r.confirm, "zadne okno");
+    var sqlEl = repo._sqlLog.length;
+    var r2 = pumpRun(repo, [{ op: "get_elements_information", elements: ["{EL-999}"] }], "p2g2");
+    ok(r2.code != "E_ARGS", "cteci davka: GUID se predem neoveruje (" + r2.code + ")");
+    // existujici GUID: predbezna kontrola projde, Risk Gate nedotazuje znovu (mezipamet FB_TargetCache)
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { return { op: "x", status: "ok", items: [] }; };
+    try { var r3 = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ guid: "{EL-103}", notes: "x" }] }], "p2g3"); } finally { B.FB_OpElements = oE; }
+    eq(r3.status, "done", JSON.stringify(r3).substring(0, 300));
+    var q = repo._sqlLog.filter(function (x) { return /FROM t_object WHERE ea_guid = '\{EL-103\}'/.test(x); });
+    ok(q.length <= 1, "cil {EL-103} se v davce dotazoval nejvys jednou, nalezeno " + q.length);
+});
+t("B1 P2: E_OP_FORBIDDEN az PO kontrole pristupu (E_ADDIN_ACCESS ma prednost); u povoleneho repa se zakazana operace odmitne pred exekuci, bez okna", function () {
+    b1Reset(); var repo = blRepo();
+    withPolicy(B.FB_RiskPolicy, function () {
+        var oA = B.FB_OpsAllowed; B.FB_OpsAllowed = function () { return [{ repo: "EAEXAMPLE.QEA", allow: ["*"], deny: ["delete_from_model"] }]; };
+        try {
+            var r = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "n", type: "Class", "package": "{PK-11}" }] }, { op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }], "p2f");
+            eq(r.code, "E_OP_FORBIDDEN"); eq(r.problems[0].path, "ops[1].op"); ok(!r.confirm, "zadne okno");
+            eq(r.results[0].status, "skipped", "ani prvni operace se neprovedla");
+        } finally { B.FB_OpsAllowed = oA; }
+    });
+});
+t("B1 P2 / FB-PU-28: chyba odkazu $N pri exekuci = E_ARGS s napovedou (ne E_EXCEPTION) a priznak W8 se NEnastavi", function () {
+    b1Reset(); var repo = blRepo();
+    // LOW davka: $0 na create vetev (vlastni, bez okna), ale vysledek ma guid jen v items[] -> chyba odkazu az pri exekuci
+    var oP = B.FB_OpPackage; B.FB_OpPackage = function () { return { op: "create_or_update_package", status: "ok", items: [{ guid: mkGuid(), id: 55, created: true }] }; };
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { return { op: "x", status: "ok", items: [] }; };
+    try {
+        var r = pumpRun(repo, [{ op: "create_or_update_package", parent: "{PK-11}", name: "P" }, { op: "create_or_update_elements", elements: [{ name: "n", type: "Class", "package": "$0" }] }], "p28");
+    } finally { B.FB_OpPackage = oP; B.FB_OpElements = oE; }
+    eq(r.results[1].code, "E_ARGS", JSON.stringify(r.results[1]));
+    contains(r.results[1].message, "$0[0]");
+    ok(B._fbPrevExc !== true, "W8 se po chybe odkazu nenastavuje");
+    eq(B.FB_StateFile.call(B, repo, "w8"), "", "ani ve state souboru");
+});
+t("B1 FB-PU-28: skutecna vyjimka z EA/COM priznak W8 nastavi (regrese) a dalsi zapis jde oknem", function () {
+    b1Reset(); var repo = blRepo();
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { throw new Error("mock: COM spadl"); };
+    try { var r = pumpRun(repo, B1_CREATE, "w8a"); } finally { B.FB_OpElements = oE; }
+    eq(r.results[0].code, "E_EXCEPTION"); eq(B._fbPrevExc, true);
+    var r2 = pumpRun(repo, B1_CREATE, "w8b");
+    eq(r2.status, "confirm_required"); ok(r2.risk.riskReasons.join(" ").indexOf("W8") >= 0);
+});
+
+// --- P3: cekajici davka ---
+function pendDelete(repo, id) { return pumpRun(repo, [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }], id); }
+t("B1 P3 / S1 (FB-PU-15/-16): okno vyprsi -> agent posle TENTYZ soubor znovu -> vraci se STAVAJICI res (stejny nonce), exemplar do rejected, potvrzeni funguje bez restartu", function () {
+    b1Reset(); var repo = blRepo();
+    var r1 = pendDelete(repo, "s1");
+    eq(r1.status, "confirm_required");
+    var idx = B.FB_PendingIndex.call(B, repo, B1_PEND, "list");
+    eq(idx.length, 1); eq(idx[0].id, "s1"); eq(idx[0].hash, r1.confirm.payloadHash); ok(idx[0].since != "", "index nese since");
+    var r2 = pendDelete(repo, "s1"); // tentyz soubor, stejny obsah (okno vyprselo, agent posila znovu)
+    eq(r2.status, "confirm_required"); eq(r2.confirm.nonce, r1.confirm.nonce, "puvodni nonce plati");
+    eq(JSON.stringify(r2), JSON.stringify(r1), "res beze zmeny");
+    eq(b1Files(B1_REQ + "\\rejected\\").length, 1, "novy exemplar odlozen");
+    ok(/duplicate/.test(b1Files(B1_REQ + "\\rejected\\")[0]));
+    eq(b1Files(B1_PEND + "\\").filter(function (f) { return /\.json$/.test(f); }).length, 1, "v pending porad jedna davka");
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [{ deleted: true }] }; };
+    try { var r3 = pumpConfirm(repo, r2, "s1", true); } finally { B.FB_OpDelete = oD; }
+    eq(r3.status, "done", JSON.stringify(r3).substring(0, 300));
+    eq(B.FB_PendingIndex.call(B, repo, B1_PEND, "list").length, 0, "index po potvrzeni prazdny");
+});
+t("B1 P3 (pravidlo 6 bod 1): stejne jmeno souboru, JINY obsah -> stavajici res zustava nosicem nonce + warning DUPLICITA ID + sekce duplicate; exemplar odlozen", function () {
+    b1Reset(); var repo = blRepo();
+    var r1 = pendDelete(repo, "s2");
+    var r2 = pumpRun(repo, [{ op: "delete_from_model", targets: [{ type: "Element", id: 105 }] }], "s2");
+    eq(r2.status, "confirm_required"); eq(r2.confirm.nonce, r1.confirm.nonce, "nonce cekajici davky preziva");
+    ok(r2.warnings && /DUPLICITA ID/.test(r2.warnings.join(" ")), "warning pro agenta");
+    eq(r2.duplicate.kind, "same-id-other-content"); eq(r2.duplicate.pendingId, "s2");
+    contains(r2.warnings.join(" "), "NOVYM id");
+    eq(b1Files(B1_REQ + "\\rejected\\").length, 1);
+    // cekajici davku jde porad potvrdit (res na disku = to, co pumpa zapsala = r2)
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [{ deleted: true }] }; };
+    try { var r3 = pumpConfirm(repo, r2, "s2", true); } finally { B.FB_OpDelete = oD; }
+    eq(r3.status, "done", JSON.stringify(r3).substring(0, 300));
+});
+t("B1 P3 (pravidlo 6 bod 2, FB-PU-17): stejny obsah pod JINYM id -> E_DUPLICATE_ID s id cekajici davky, nic se nezaradi", function () {
+    b1Reset(); var repo = blRepo();
+    var ops = [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }];
+    var text = JSON.stringify({ protocol: "eafb/0.2", repo: "EAEXAMPLE.QEA", ops: ops, id: "s3a" });
+    var r1 = pumpRun(repo, null, "s3a", text);
+    eq(r1.status, "confirm_required");
+    // jiny soubor (jine jmeno), identicke bajty obsahu
+    var r2 = pumpRun(repo, null, "s3b", text);
+    eq(r2.status, "error"); eq(r2.code, "E_DUPLICATE_ID"); eq(r2.duplicate.kind, "same-content-pending"); eq(r2.duplicate.pendingId, "s3a");
+    eq(b1Files(B1_PEND + "\\").filter(function (f) { return /\.json$/.test(f); }).length, 1, "v pending jen jedna");
+    ok(!r2.confirm, "zadne druhe okno");
+});
+t("B1 P3 (pravidlo 6 bod 4, FB-PU-17 / S5): cekajici davka starsi nez confirmMaxAgeMin -> E_RISK_EXPIRED pri potvrzeni i zamitnuti, rejected, audit; mladsi se potvrdi", function () {
+    b1Reset(); var repo = blRepo();
+    var r1 = pendDelete(repo, "s5");
+    // zestarnuti: since v res i v indexu o 9 h zpet
+    var old = new Date(new Date().getTime() - 9 * 3600000);
+    function fmt(d) { function p(x) { return (x < 10 ? "0" : "") + x; } return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()); }
+    var resObj = JSON.parse(memFs.files[B1_RES + "\\res-s5.json"]); resObj.since = fmt(old); memFs.files[B1_RES + "\\res-s5.json"] = JSON.stringify(resObj);
+    var executed = 0; var oD = B.FB_OpDelete; B.FB_OpDelete = function () { executed++; return { op: "delete_from_model", status: "ok", items: [{ deleted: true }] }; };
+    try { var r2 = pumpConfirm(repo, r1, "s5", true); } finally { B.FB_OpDelete = oD; }
+    eq(r2.status, "rejected"); eq(r2.code, "E_RISK_EXPIRED"); eq(executed, 0, "S5: zatuchla davka se neprovede");
+    ok(r2.risk.confirm.expired === true && r2.risk.confirm.confirmedByUser === false);
+    ok(r2.audit && typeof r2.audit.aiLogGuid == "string", "audit volan (mock bez #AI-LOG vraci prazdny GUID + warning)");
+    eq(b1Files(B1_PEND + "\\").filter(function (f) { return /\.json$/.test(f); }).length, 0, "pending prazdny");
+    eq(b1Files(B1_REQ + "\\rejected\\").length, 1);
+    contains(r2.message, "NOVYM id");
+    // mladsi davka (7 h) projde
+    var r3 = pendDelete(repo, "s5b");
+    var ro = JSON.parse(memFs.files[B1_RES + "\\res-s5b.json"]); ro.since = fmt(new Date(new Date().getTime() - 7 * 3600000)); memFs.files[B1_RES + "\\res-s5b.json"] = JSON.stringify(ro);
+    B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [{ deleted: true }] }; };
+    try { var r4 = pumpConfirm(repo, r3, "s5b", true); } finally { B.FB_OpDelete = oD; }
+    eq(r4.status, "done", JSON.stringify(r4).substring(0, 200));
+});
+t("B1 P3: FB_PendingSweep (nabidka po startu pumpy) - expirovane presune do rejected s auditem a prepise res, mlade necha; limit z politiky (480) / vychozi", function () {
+    b1Reset(); var repo = blRepo();
+    var a = pendDelete(repo, "sw1"), b = pendDelete(repo, "sw2");
+    var now = new Date().getTime();
+    var sw0 = B.FB_PendingSweep.call(B, repo, B1_PEND, "", now);
+    eq(sw0.maxAgeMin, 480); eq(sw0.checked, 2); eq(sw0.expired.length, 0); eq(sw0.kept.length, 2);
+    var sw1 = B.FB_PendingSweep.call(B, repo, B1_PEND, "", now + 481 * 60000);
+    eq(sw1.expired.length, 2); eq(sw1.kept.length, 0);
+    contains(sw1.text, "VYPRSELA req-sw1.json"); contains(sw1.text, "req-sw2.json");
+    eq(JSON.parse(memFs.files[B1_RES + "\\res-sw1.json"]).code, "E_RISK_EXPIRED", "res prepsan");
+    eq(B.FB_PendingIndex.call(B, repo, B1_PEND, "list").length, 0);
+    eq(b1Files(B1_REQ + "\\rejected\\").length, 2);
+    // politika s jinym limitem
+    var p0s = B.FB_RiskPolicy.call(B)[0];
+    withPolicy(function () { var q = {}; for (var k in p0s) { q[k] = p0s[k]; } q.confirmMaxAgeMin = 30; return [q]; }, function () {
+        b1Reset(); var repoB = blRepo(); pendDelete(repoB, "sw3");
+        var swB = B.FB_PendingSweep.call(B, repoB, B1_PEND, "", new Date().getTime() + 31 * 60000);
+        eq(swB.maxAgeMin, 30); eq(swB.expired.length, 1);
+    });
+});
+t("B1 P3: index cekajicich davek - polozka bez souboru vypadne pri cteni; add/remove/find", function () {
+    b1Reset(); var repo = blRepo();
+    memFs.files[B1_PEND + "\\req-a.json"] = "{}";
+    B.FB_PendingIndex.call(B, repo, B1_PEND, "add", { name: "req-a.json", hash: "h1", id: "a", since: "2026-10-11 10:00:00" });
+    B.FB_PendingIndex.call(B, repo, B1_PEND, "add", { name: "req-b.json", hash: "h2", id: "b", since: "" });
+    var l = B.FB_PendingIndex.call(B, repo, B1_PEND, "list");
+    eq(l.length, 1, "req-b.json na disku neni -> vypadne"); eq(l[0].id, "a");
+    eq(B.FB_PendingIndex.call(B, repo, B1_PEND, "find", { name: "req-x.json", hash: "h1" }).id, "a");
+    eq(B.FB_PendingIndex.call(B, repo, B1_PEND, "find", { name: "req-a.json", hash: "h1" }), null, "tyz soubor neni duplicita sam sebe");
+    eq(B.FB_PendingIndex.call(B, repo, B1_PEND, "remove", { name: "req-a.json" }).length, 0);
+});
+
+// --- pravidlo 3: vlastni prace teze session (ownSessionLow) ---
+t("B1 pravidlo 3: pod pumpou si FB_Main pamatuje GUIDy zalozenych prvku/diagramu (jen pamet, zadny soubor ani tag); mimo pumpu ne", function () {
+    b1Reset(); var repo = blRepo();
+    var oD = B.FB_OpDiagram; B.FB_OpDiagram = function () { return { op: "create_or_update_diagram", status: "ok", items: [{ guid: "{DG-201}", id: 201, created: true }, { guid: "{DG-OLD}", id: 1, created: false }] }; };
+    try {
+        var filesBefore = b1Files(B1_BASE + "\\").length;
+        withPump(function () { var r = pumpRun(repo, [{ op: "create_or_update_diagram", diagrams: [{ name: "D", type: "Logical", "package": "{PK-12}" }] }], "own1"); eq(r.status, "done"); eq(r.ownSession.added, 1); });
+        ok(B._fbOwnGuids && B._fbOwnGuids["{DG-201}"] === 1, "vlastni diagram zapamatovan");
+        ok(!B._fbOwnGuids["{DG-OLD}"], "updatovany (created:false) ne");
+        for (var k in memFs.files) { ok(!/\{DG-201\}/.test(memFs.files[k]) || /res-own1/.test(k), "zadny soubor se seznamem vlastnich GUIDu: " + k); }
+        b1Reset();
+        var r2 = pumpRun(blRepo(), [{ op: "create_or_update_diagram", diagrams: [{ name: "D", type: "Logical", "package": "{PK-12}" }] }], "own2");
+        ok(!B._fbOwnGuids, "bez pumpy (EA runtime) se nic nepamatuje");
+    } finally { B.FB_OpDiagram = oD; }
+});
+t("B1 pravidlo 3: umisteni prvku na VLASTNI diagram teze session = bez okna (foreignDiagrams 0); cizi diagram = okno jako dnes; bez klice ownSessionLow = okno", function () {
+    b1Reset(); var repo = blRepo();
+    var oP = B.FB_OpPlaceElements; B.FB_OpPlaceElements = function () { return { op: "place_elements_on_diagram", status: "ok", items: [] }; };
+    try {
+        withPump(function () {
+            B._fbOwnGuids = { "{DG-201}": 1 };
+            var r = pumpRun(repo, [{ op: "place_elements_on_diagram", diagram: "{DG-201}", elementPlacements: [{ element: 102 }] }], "own3");
+            eq(r.status, "done", JSON.stringify(r).substring(0, 300)); eq(r.risk.riskLevel, "LOW"); eq(r.risk.metrics.affectedDiagrams, 0);
+            B._fbOwnGuids = {};
+            var r2 = pumpRun(repo, [{ op: "place_elements_on_diagram", diagram: "{DG-201}", elementPlacements: [{ element: 102 }] }], "own4");
+            eq(r2.status, "confirm_required"); ok(/foreignDiagrams/.test(r2.risk.riskReasons.join(" ")));
+            // bez klice v politice: vlastni diagram je porad cizi (dnesni chovani)
+            B._fbOwnGuids = { "{DG-201}": 1 };
+            var p0o = B.FB_RiskPolicy.call(B)[0];
+            withPolicy(function () { var q = {}; for (var k in p0o) { if (k != "ownSessionLow") { q[k] = p0o[k]; } } return [q]; }, function () {
+                var r3 = pumpRun(repo, [{ op: "place_elements_on_diagram", diagram: "{DG-201}", elementPlacements: [{ element: 102 }] }], "own5");
+                eq(r3.status, "confirm_required", "bez ownSessionLow = okno");
+            });
+        });
+    } finally { B.FB_OpPlaceElements = oP; }
+});
+t("B1 pravidlo 3 (vc. kap. 7 bod 5 - requirements): scenare/constraints/requirements nad VLASTNIM prvkem teze session = LOW; nad cizim = okno; $N na create teze davky = vlastni", function () {
+    b1Reset(); var repo = blRepo();
+    var stub = function (n) { return function () { var g = mkGuid(); return { op: n, status: "ok", guid: g, items: [{ guid: g, id: ++guidSeq, created: true }] }; }; };
+    var keep = {}; ["FB_OpScenarios", "FB_OpConstraints", "FB_OpRequirements", "FB_OpElements"].forEach(function (k) { keep[k] = B[k]; B[k] = stub(k); });
+    try {
+        withPump(function () {
+            B._fbOwnGuids = { "{EL-103}": 1 };
+            ["create_or_update_scenarios", "create_or_update_constraints", "create_or_update_requirements"].forEach(function (opn, ix) {
+                var key = opn.replace("create_or_update_", "");
+                var o = { op: opn, element: "{EL-103}" }; o[key] = [{ name: "x" }];
+                var r = pumpRun(repo, [o], "own6" + ix);
+                eq(r.status, "done", opn + ": " + JSON.stringify(r).substring(0, 300)); eq(r.risk.riskLevel, "LOW", opn + " nad vlastnim prvkem bez okna");
+                var o2 = { op: opn, element: "{EL-101}" }; o2[key] = [{ name: "x" }];
+                var r2 = pumpRun(repo, [o2], "own7" + ix);
+                eq(r2.status, "confirm_required", opn + " nad cizim prvkem = okno");
+            });
+            var r3 = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "UC", type: "UseCase", "package": "{PK-11}" }] },
+                                   { op: "create_or_update_scenarios", element: "$0", scenarios: [{ name: "Basic" }] }], "own8");
+            eq(r3.status, "done", JSON.stringify(r3).substring(0, 300)); eq(r3.risk.riskLevel, "LOW");
+        });
+    } finally { for (var k in keep) { B[k] = keep[k]; } }
+});
+t("B1 pravidlo 3: FB_SessionStart (novy beh pumpy) seznam vlastnich prvku vynuluje", function () {
+    b1Reset(); var repo = blRepo();
+    withPump(function () { B._fbOwnGuids = { "{DG-201}": 1 }; B.FB_SessionStart.call(B, repo); });
+    eq(Object.keys(B._fbOwnGuids).length, 0);
+});
+
+// --- pravidlo 7: ping nese riskPolicy ---
+t("B1 pravidlo 7: ping vraci riskPolicy (tridy, prahy, confirmMaxAgeMin, ownSessionLow); chat ACK ho strucne vypise, bez GUIDu a nonce", function () {
+    b1Reset(); var repo = blRepo();
+    var r = runText(repo, [{ op: "ping" }], "p7");
+    ok(r.results && r.results[0], "ping probehl: " + JSON.stringify(r).substring(0, 300));
+    var rp = r.results[0].riskPolicy;
+    ok(rp && rp.available === true, "riskPolicy pro dev repo");
+    ok(rp.confirmAlways.indexOf("delete_from_model") >= 0 && rp.confirmAlways.indexOf("move_elements") >= 0);
+    eq(rp.elevate.writeOps, 20); eq(rp.block.writeOps, 500); eq(rp.confirmMaxAgeMin, 480); eq(rp.ownSessionLow, true);
+    var ack = chat(r);
+    contains(ack, "okno: prahy zapisu >20"); contains(ack, "480 min"); contains(ack, "vlastni prvky session bez okna: ano");
+    ok(ack.indexOf("nonce") < 0);
+    var r2 = JSON.parse(B.FB_Main.call(B, mkRepo({ connectionString: "C:\\HARNESS\\CIZI.QEA" }), JSON.stringify({ protocol: "eafb/0.2", id: "p7b", ops: [{ op: "ping" }] })));
+    eq(r2.status, "done", JSON.stringify(r2).substring(0, 200));
+    eq(r2.results[0].riskPolicy.available, false); contains(chat(r2), "politika pro repozitar chybi");
+});
+
+// --- FB-PU-06: identita repa ze startu session ---
+t("B1 FB-PU-06: pod pumpou drzi FB_SessionStart identitu repa; jiny projekt v EA = E_REPO 'restartuj pumpu' i u cteni; mimo pumpu se nic nekontroluje", function () {
+    b1Reset();
+    withPump(function () {
+        var repoA = blRepo();
+        B.FB_SessionStart.call(B, repoA);
+        eq(B._fbSessionRepo, "" + B.FB_RepoId.call(B, repoA));
+        var ok1 = runText(repoA, B1_READ, "pu6a"); eq(ok1.status, "done");
+        var repoB = mkRepo({ connectionString: "C:\\HARNESS\\JINY-PROJEKT.QEA" });
+        var r = runText(repoB, B1_READ, "pu6b");
+        eq(r.status, "error"); eq(r.code, "E_REPO"); contains(r.message, "restartuj pumpu"); eq(r.sessionRepo, "" + B.FB_RepoId.call(B, repoA));
+    });
+    b1Reset();
+    B.FB_SessionStart.call(B, blRepo());
+    ok(typeof B._fbSessionRepo == "undefined", "EA runtime: identita se neuklada");
+    eq(JSON.parse(B.FB_Main.call(B, mkRepo({ connectionString: "C:\\HARNESS\\JINY-PROJEKT.QEA" }), JSON.stringify({ protocol: "eafb/0.2", id: "pu6c", ops: B1_READ }))).status, "done");
+});
+
+// --- FB-PU-35: baseDir pod pumpou ---
+t("B1 FB-PU-35: pod pumpou je baseDir slozka pumpy bez ohledu na FB_Config; zapisova sonda 1x za session; selhani = warning v res", function () {
+    b1Reset(); var repo = blRepo();
+    var oC = B.FB_Config; B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", baseDir: "C:\\JINE\\REPO" }]; };
+    try {
+        eq(B.FB_ResolveBaseDir.call(B, repo), "C:\\JINE\\REPO", "EA runtime: explicitni FB_Config");
+        ok(memFs.folders["C:\\JINE\\REPO\\requests\\pending"] === 1, "explicitni cesta zalozena po urovnich");
+        b1Reset();
+        withPump(function () {
+            eq(B.FB_ResolveBaseDir.call(B, repo), B1_BASE, "pumpa: slozka pumpy");
+            ok(B._fbBaseDirProbe && B._fbBaseDirProbe.ok === true && B._fbBaseDirProbe.path == B1_BASE, "sonda probehla");
+            ok(typeof memFs.files[B1_BASE + "\\.write-probe.tmp"] == "undefined", "testovaci soubor uklizen");
+            var n0 = Object.keys(memFs.files).length;
+            B.FB_ResolveBaseDir.call(B, repo); B.FB_ResolveBaseDir.call(B, repo);
+            eq(Object.keys(memFs.files).length, n0, "sonda jen jednou");
+            // selhani sondy -> warning v prvni odpovedi, jen jednou
+            B._fbBaseDirProbe = { path: B1_BASE, ok: false, why: "Permission denied", reported: false };
+            var r = pumpRun(repo, B1_READ, "pu35");
+            ok(r.warnings && /neni zapisovatelna/.test(r.warnings.join(" ")), "warning: " + JSON.stringify(r.warnings));
+            var r2 = pumpRun(repo, B1_READ, "pu35b");
+            ok(!r2.warnings || !/neni zapisovatelna/.test(r2.warnings.join(" ")), "podruhe uz ne");
+        });
+    } finally { B.FB_Config = oC; }
+});
+
+// --- N-E2E-3: sonda pocita diagramy ---
+t("B1 N-E2E-3 (T6-33 bez prvku): balicek s 0 prvky a >= 1 diagramem = pod prahem (ok, diagrams N); 0 prvku a 0 diagramu = unknown; selhani dotazu na diagramy = unknown", function () {
+    b1Reset();
+    var cfg = B.FB_BaselineConfig.call(B, mkRepo()).cfg;
+    var r1 = B.FB_SubtreeCount.call(B, blRepo({ diagramsIn: [19] }), 19, cfg, 2000);
+    eq(r1.status, "ok", r1.why); eq(r1.elements, 0); eq(r1.diagrams, 1); contains(r1.why, "diagram");
+    var r2 = B.FB_SubtreeCount.call(B, blRepo(), 19, cfg, 2000);
+    eq(r2.status, "unknown"); contains(r2.why, "0 diagramu");
+    var r3 = B.FB_SubtreeCount.call(B, blRepo({ diagramCountFails: true }), 19, cfg, 2000);
+    eq(r3.status, "unknown"); contains(r3.why, "diagramy");
+    var r4 = B.FB_SubtreeCount.call(B, blRepo(), 12, cfg, 2000);
+    eq(r4.status, "ok"); eq(r4.elements, 2); eq(r4.diagrams, 0, "diagramy se pocitaji jen kdyz je 0 prvku (zadny dotaz navic)");
+});
+
+// --- invarianty pravidla 8 KONCEPCE (kazdy bod ma test, ktery pri zmene zcervena) ---
+t("B1 pravidlo 8/1: cteni NIKDY neotevira okno (ani souborem, ani s W8, ani v cizim repu)", function () {
+    b1Reset(); var repo = blRepo();
+    B._fbPrevExc = true;
+    var r = pumpRun(repo, [{ op: "ping" }, { op: "find_elements_by_name", name: "ElA" }, { op: "query", sql: "SELECT 1" }], "inv1");
+    ok(r.status != "confirm_required" && !r.confirm, "cteci davka bez okna: " + r.status);
+    ok(typeof r.risk == "undefined", "cteni nejde pres Risk Gate");
+    eq(b1Files(B1_PEND + "\\").length, 0);
+});
+t("B1 pravidlo 8/2: BLOCKED NIKDY neotevira okno (E_RISK_BLOCKED, nic v pending, audit ano)", function () {
+    b1Reset(); var repo = blRepo();
+    var tg = []; for (var i = 0; i < 101; i++) { tg.push({ type: "Element", id: 104 }); }
+    var r = pumpRun(repo, [{ op: "delete_from_model", targets: tg }], "inv2");
+    eq(r.status, "error"); eq(r.code, "E_RISK_BLOCKED"); ok(!r.confirm); eq(b1Files(B1_PEND + "\\").length, 0);
+    ok(r.audit && typeof r.audit.aiLogGuid == "string", "audit volan");
+    var r2 = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "FB_RiskPolicy", type: "Class", "package": "{PK-11}" }] }], "inv2b");
+    eq(r2.code, "E_RISK_BLOCKED", "zasah do konfigurace bridge (B4) = BLOCKED bez okna"); ok(!r2.confirm);
+});
+t("B1 pravidlo 8/3: mazani, presun, klon a prepis existujiciho obsahu se ptaji VZDY - i pod pumpou s ownSessionLow a vlastnimi cili", function () {
+    b1Reset(); var repo = blRepo();
+    withPump(function () {
+        B._fbOwnGuids = { "{EL-104}": 1, "{PK-14}": 1, "{DG-201}": 1, "{EL-101}": 1 };
+        var cases = [
+            [{ op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-104}" }] }],
+            [{ op: "delete_taggedvalue_from_model", targets: [{ type: "Element", id: 104, name: "t" }] }],
+            [{ op: "remove_elements_from_diagram", diagram: "{DG-201}", elementIDs: [102] }],
+            [{ op: "move_elements", "package": "{PK-14}", elements: [101] }],
+            [{ op: "clone_package", "package": "{PK-14}", name: "k" }],
+            [{ op: "clone_elements", elements: [104], "package": "{PK-14}" }],
+            [{ op: "import_element_linked_documents", documents: [{ element: "{EL-101}", rtf_b64: "AA==" }] }],
+            [{ op: "create_or_update_messages", diagram: "{DG-201}", rebuild: true, messages: [{ source: 101, target: 102, seqNo: 1 }] }],
+            [{ op: "create_or_update_operations", element: "{EL-101}", operations: [{ name: "o", parameters: [{ name: "p" }] }] }],
+            [{ op: "create_or_update_elements", elements: [{ guid: "{EL-101}", type: "Component" }] }]
+        ];
+        cases.forEach(function (ops, ix) {
+            B._fbOwnGuids = { "{EL-104}": 1, "{PK-14}": 1, "{DG-201}": 1, "{EL-101}": 1 };
+            var r = pumpRun(repo, ops, "inv3-" + ix);
+            eq(r.status, "confirm_required", ops[0].op + " musi chtit okno: " + JSON.stringify(r).substring(0, 300));
+        });
+    });
+});
+t("B1 pravidlo 8/4: prahy politiky se do kalibrace NEMENI (20/10/1/0/0 elevate, 100/500/100/5 block)", function () {
+    var pa = B.FB_RiskPolicy.call(B);
+    pa.forEach(function (p) {
+        eq(JSON.stringify(p.elevate), JSON.stringify({ deleteTargets: 0, writeOps: 20, updatedExisting: 10, affectedPackages: 1, foreignDiagrams: 0, moveOps: 0 }), p.repo + " elevate");
+        eq(JSON.stringify(p.block), JSON.stringify({ deleteTargets: 100, writeOps: 500, updatedExisting: 100, affectedPackages: 5 }), p.repo + " block");
+        eq(p.confirmMaxAgeMin, 480, p.repo + " confirmMaxAgeMin = 8 h (KONCEPCE kap. 7 bod 2)");
+    });
+});
+t("B1 pravidlo 8/5: potvrzeni vazane na nonce + otisk - cizi nonce, chybejici hash i zmeneny obsah se odmitnou, davka se neprovede", function () {
+    b1Reset(); var repo = blRepo();
+    var r1 = pendDelete(repo, "inv5");
+    var executed = 0; var oD = B.FB_OpDelete; B.FB_OpDelete = function () { executed++; return { op: "delete_from_model", status: "ok", items: [] }; };
+    try {
+        var bad = JSON.parse(asEaRuntime(function () { return B.FB_ConfirmPending.call(B, repo, r1.confirm.pendingPath, "cizi-nonce", r1.confirm.payloadHash, "pumpa", true); }));
+        eq(bad.code, "E_RISK_CONFIRM");
+        var bad2 = JSON.parse(asEaRuntime(function () { return B.FB_ConfirmPending.call(B, repo, r1.confirm.pendingPath, r1.confirm.nonce, "", "pumpa", true); }));
+        eq(bad2.code, "E_RISK_CONFIRM");
+        memFs.files[r1.confirm.pendingPath] = memFs.files[r1.confirm.pendingPath] + " ";
+        var bad3 = pumpConfirm(repo, r1, "inv5", true);
+        eq(bad3.code, "E_RISK_INTEGRITY");
+        eq(executed, 0, "nic se neprovedlo");
+    } finally { B.FB_OpDelete = oD; }
+});
+t("B1 pravidlo 8/6: nejistota, kterou nejde zjistit predem, se porad pta (matchByName nad prahem, $N na cteni, neznamy objem klonu)", function () {
+    b1Reset(); var repo = blRepo();
+    var oF = B.FB_OpFindElements; B.FB_OpFindElements = function () { return { op: "find_elements_by_name", status: "ok", items: [{ guid: "{EL-101}", id: 101 }] }; };
+    try {
+        var r = pumpRun(repo, [{ op: "find_elements_by_name", name: "ElA" }, { op: "create_or_update_attributes", element: "$0[0]", attributes: [{ name: "a" }] }], "inv6");
+        eq(r.status, "confirm_required", "$N na vysledek cteni = existujici/nejisty cil -> okno"); 
+    } finally { B.FB_OpFindElements = oF; }
+});
+t("B1 pravidlo 8/7: politiku meni jen clovek - deploy_src je doma ELEVATED, v bankovni sablone BLOCKED; bezna davka do konfigurace bridge = BLOCKED", function () {
+    var src = srcOf("FB_RiskPolicy");
+    ok(/"deploy_src":\s*"ELEVATED"/.test(src), "dev: deploy_src ELEVATED");
+    ok(/"deploy_src": "BLOCKED"/.test(src), "bankovni sablona v komentari: deploy_src BLOCKED");
+    ok(/ownSessionLow: false/.test(src) && /ownSessionLow: true/.test(src), "dev true, bankovni sablona false (KONCEPCE kap. 4)");
+    b1Reset(); var repo = blRepo();
+    var r = pumpRun(repo, [{ op: "deploy_src" }], "inv7");
+    eq(r.status, "confirm_required", "deploy_src doma = okno");
+});
+t("B1 pravidlo 8: kodove kotvy pumpy a adapteru pro nove kody - E_INTERRUPTED/E_DUPLICATE_ID/E_UNKNOWN_OP/E_ARGS jdou do processed (pumpa v0.5), E_RISK_EXPIRED je status rejected", function () {
+    var pump = fs.readFileSync(path.join(__dirname, "..", "pump.wsf"), "utf8");
+    ok(pump.indexOf("E_INTERRUPTED") < 0 && pump.indexOf("E_DUPLICATE_ID") < 0, "pump.wsf se v B1 nemeni (Z261004b-5); nove kody nejsou v jeho rejected seznamu -> processed");
+    b1Reset(); var repo = blRepo();
+    var r = pendDelete(repo, "k8");
+    var ro = JSON.parse(memFs.files[B1_RES + "\\res-k8.json"]); ro.since = "2000-01-01 00:00:00"; memFs.files[B1_RES + "\\res-k8.json"] = JSON.stringify(ro);
+    var e = pumpConfirm(repo, r, "k8", false);
+    eq(e.status, "rejected"); eq(e.code, "E_RISK_EXPIRED");
 });
 
 // ------------------------------------------------------------------ vysledek

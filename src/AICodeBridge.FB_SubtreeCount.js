@@ -1,6 +1,13 @@
 // AICodeBridge.FB_SubtreeCount(Repository, pkgId, cfg, budgetLeftMs)
 // BASELINE POLITIKA - SONDA velikosti podstromu package (zadani v1.2 par.
-// 4.3). Vraci { elements, packages, ms, status: "ok"|"unknown", why, method }.
+// 4.3). Vraci { elements, packages, diagrams, ms, status: "ok"|"unknown", why, method }.
+// 2026-10-11 (N-E2E-3, Z261004b-3): sonda pocita i DIAGRAMY (t_diagram).
+// Balicek s 0 prvky a >= 1 diagramem je "pod prahem" (elements 0, diagrams
+// N, status ok) - zaloha diagram kryje; driv sel naslepo jako "0 prvku =
+// velikost neznama" a kazda davka nad balickem jen s diagramy (T6-33,
+// sekvencni diagram) sla navadenou cestou s rucni baseline. Odchylka 7
+// PROTOKOL-EAFB par. 6j tak plati jen pro SKUTECNE prazdnou package
+// (0 prvku a 0 diagramu = porad unknown, B6 falesna nula).
 // SHADOW: cislo se jen MERI a vykazuje; o nicem nerozhoduje, dokud politika
 // nema thresholdsShadow: false (po kalibraci T6-C v bance).
 //
@@ -27,8 +34,22 @@ var perPkg = (cfg && typeof cfg.probeBudgetMs == "number") ? cfg.probeBudgetMs :
 var budget = perPkg;
 if (typeof budgetLeftMs == "number" && budgetLeftMs < budget) { budget = budgetLeftMs; }
 var MAX_DEPTH = 40, MAX_PACKAGES = 5000, CHUNK = 200;
+var diagramsSeen = -1;
 function done(status, why, el, pkc, method) {
-    return { elements: el, packages: pkc, ms: (new Date().getTime() - t0), status: status, why: why, method: method };
+    return { elements: el, packages: pkc, diagrams: (diagramsSeen < 0 ? 0 : diagramsSeen), ms: (new Date().getTime() - t0), status: status, why: why, method: method };
+}
+// diagramy v podstromu (N-E2E-3); null = dotaz selhal
+function countDiagrams(pkgIds) {
+    var tot = 0;
+    for (var d = 0; d < pkgIds.length; d += CHUNK) {
+        var part = pkgIds.slice(d, d + CHUNK);
+        var rd = rows("SELECT COUNT(*) AS c FROM t_diagram WHERE Package_ID IN (" + part.join(",") + ")");
+        if (rd == null || rd.length != 1) { return null; }
+        var cd = parseInt(rd[0].c, 10);
+        if (isNaN(cd)) { return null; }
+        tot += cd;
+    }
+    return tot;
 }
 function over() { return (new Date().getTime() - t0) > budget; }
 function rows(sql) {
@@ -52,8 +73,11 @@ if (cfg && cfg.useCte === true) {
         if (rc == null || rc.length != 1) { return done("unknown", "CTE dotaz nevratil radek (selhani / nepodporovany dialekt)", 0, 0, "cte"); }
         var cp = parseInt(rc[0].packages, 10), ce = parseInt(rc[0].elements, 10);
         if (isNaN(cp) || isNaN(ce) || cp < 1) { return done("unknown", "CTE dotaz vratil necitelny vysledek", 0, 0, "cte"); }
-        if (ce == 0) { return done("unknown", "podstrom ma 0 prvku - prazdna package nebo falesna nula (B6)", 0, cp, "cte"); }
-        return done("ok", "", ce, cp, "cte");
+        if (ce == 0) {
+            // N-E2E-3: 0 prvku, ale >= 1 diagram = pod prahem (podstrom pro diagramy z CTE neni k dispozici -> iterativni cesta nize)
+        } else {
+            return done("ok", "", ce, cp, "cte");
+        }
     }
     // dialekt bez CTE -> iterativni cesta
 }
@@ -93,5 +117,12 @@ for (var b = 0; b < all.length; b += CHUNK) {
     total += cn;
     if (over()) { return done("unknown", "rozpocet sondy vycerpan (" + budget + " ms) pri pocitani", total, all.length, "iter"); }
 }
-if (total == 0) { return done("unknown", "podstrom ma 0 prvku - prazdna package nebo falesna nula (B6)", 0, all.length, "iter"); }
+if (total == 0) {
+    // N-E2E-3: balicek jen s diagramy neni prazdny
+    var dcnt = countDiagrams(all);
+    if (dcnt == null) { return done("unknown", "podstrom ma 0 prvku a dotaz na diagramy selhal (B6)", 0, all.length, "iter"); }
+    diagramsSeen = dcnt;
+    if (dcnt > 0) { return done("ok", "0 prvku, " + dcnt + " diagram(u) - zaloha kryje diagramy", 0, all.length, "iter"); }
+    return done("unknown", "podstrom ma 0 prvku a 0 diagramu - prazdna package nebo falesna nula (B6)", 0, all.length, "iter");
+}
 return done("ok", "", total, all.length, "iter");

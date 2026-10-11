@@ -44,6 +44,16 @@
 //    ELEVATED z politiky.
 // SQL vyhradne nad standardnimi sloupci t_object/t_package/t_diagram
 // (zadna sonda neznamych sloupcu - lekce par. 6a/3).
+// v0.16 (balik B1, Z261004b-3):
+//  - resolvery jdou pres FB_TargetCache (mezipamet jednoho volani FB_Main
+//    sdilena s predbeznou kontrolou P2 - jeden cil = jeden dotaz na davku);
+//  - PRAVIDLO 3 KONCEPCE (klic politiky ownSessionLow, chybi = false): prvek
+//    nebo diagram ZALOZENY touto session pumpy (this._fbOwnGuids, plni
+//    FB_Main; jen pamet procesu pumpy) neni cizi - vlastni diagram se
+//    nepocita do foreignDiagrams, scenare/constraints/requirements nad
+//    vlastnim prvkem jsou LOW, pokud nic jineho neeskaluje (prahy, mazani,
+//    W8...). $N na create vetev teze davky je vlastni i bez klice (B3).
+//    Prahy se NEMENI (pravidlo 8).
 var self = this;
 var t0 = new Date().getTime();
 var reasons = [], reasonSeen = {};
@@ -87,6 +97,10 @@ if (polValid) {
     }
 }
 if (!polValid) { elevate("Politika nevalidni (" + polWhy + ") - fail-closed W9: zadny auto-write"); }
+// --- pravidlo 3: vlastni prvky/diagramy teto session (jen s platnou politikou a klicem) ---
+var ownLow = (polValid && pol.ownSessionLow === true);
+var ownSet = (ownLow && self._fbOwnGuids && typeof self._fbOwnGuids == "object") ? self._fbOwnGuids : null;
+function isOwn(guid) { return ownSet != null && !!guid && ownSet[("" + guid).toUpperCase()] === 1; }
 // --- Baseline politika par. 5 (W14): CHYBEJICI sekce `baseline` = validni
 // (defaulty, T6-31: LOW zustane LOW); PRITOMNA nekonzistentni = ELEVATED.
 // Zamerne NEshazuje polValid - tridy a prahy (vcetne BLOCKED) plati dal;
@@ -135,72 +149,22 @@ function guardResolved(res, ctx) {
     }
 }
 
-// --- resolvery (cache, jen standardni sloupce) ---
-var elCache = {}, pkgCache = {}, dgmCache = {};
-function esc(s) { return ("" + s).replace(/'/g, "''"); }
-function rows(sql) { return self.FB_XmlRows(Repository.SQLQuery(sql)); }
-function resolveElement(ref) {
-    var key = "e:" + ref;
-    if (typeof elCache[key] != "undefined") { return elCache[key]; }
+// --- resolvery: FB_TargetCache (mezipamet jednoho volani FB_Main, sdilena s P2;
+// jen standardni sloupce). Rozpocet gate se kontroluje PRED dotazem; cil uz
+// dohledany predbeznou kontrolou se nedotazuje znovu. ---
+function resolveVia(kind, ref) {
+    var t = ("" + ref).replace(/^\s+|\s+$/g, "");
+    var C = self._fbTargetCache;
+    var bucket = (C && typeof C == "object") ? ((kind == "package") ? C.pkg : ((kind == "diagram") ? C.dgm : C.el)) : null;
+    if (bucket && typeof bucket[t] != "undefined") { return bucket[t]; }
     if (checkBudget()) { return "BUDGET"; }
-    var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr = null, r = null;
-    try {
-        if (t.charAt(0) == "{") {
-            rr = rows("SELECT Object_ID, ea_guid, Package_ID, Object_Type, Name FROM t_object WHERE ea_guid = '" + esc(t) + "'");
-        } else if (/^[0-9]+$/.test(t)) {
-            rr = rows("SELECT Object_ID, ea_guid, Package_ID, Object_Type, Name FROM t_object WHERE Object_ID = " + parseInt(t, 10));
-        } else {
-            rr = rows("SELECT Object_ID, ea_guid, Package_ID, Object_Type, Name FROM t_object WHERE Name = '" + esc(t) + "'");
-        }
-    } catch (eq) { rr = null; }
-    if (rr != null && rr.length > 0) {
-        r = { guid: "" + rr[0].ea_guid, id: parseInt(rr[0].Object_ID, 10),
-              pkgId: parseInt(rr[0].Package_ID, 10), type: "" + rr[0].Object_Type, name: "" + rr[0].Name };
-    }
-    elCache[key] = r;
+    var r = null;
+    try { r = self.FB_TargetCache(Repository, kind, t); } catch (eTc) { r = null; }
     return r;
 }
-function resolvePackage(ref) {
-    var key = "p:" + ref;
-    if (typeof pkgCache[key] != "undefined") { return pkgCache[key]; }
-    if (checkBudget()) { return "BUDGET"; }
-    var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr = null, r = null;
-    try {
-        if (t.charAt(0) == "{") {
-            rr = rows("SELECT Package_ID, ea_guid, Name FROM t_package WHERE ea_guid = '" + esc(t) + "'");
-        } else if (/^[0-9]+$/.test(t)) {
-            rr = rows("SELECT Package_ID, ea_guid, Name FROM t_package WHERE Package_ID = " + parseInt(t, 10));
-        } else {
-            rr = rows("SELECT Package_ID, ea_guid, Name FROM t_package WHERE Name = '" + esc(t) + "'");
-        }
-    } catch (eq2) { rr = null; }
-    if (rr != null && rr.length > 0) {
-        r = { guid: "" + rr[0].ea_guid, id: parseInt(rr[0].Package_ID, 10), name: "" + rr[0].Name };
-    }
-    pkgCache[key] = r;
-    return r;
-}
-function resolveDiagram(ref) {
-    var key = "d:" + ref;
-    if (typeof dgmCache[key] != "undefined") { return dgmCache[key]; }
-    if (checkBudget()) { return "BUDGET"; }
-    var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr = null, r = null;
-    try {
-        if (t.charAt(0) == "{") {
-            rr = rows("SELECT Diagram_ID, ea_guid, Package_ID, Name FROM t_diagram WHERE ea_guid = '" + esc(t) + "'");
-        } else if (/^[0-9]+$/.test(t)) {
-            rr = rows("SELECT Diagram_ID, ea_guid, Package_ID, Name FROM t_diagram WHERE Diagram_ID = " + parseInt(t, 10));
-        } else {
-            rr = rows("SELECT Diagram_ID, ea_guid, Package_ID, Name FROM t_diagram WHERE Name = '" + esc(t) + "'");
-        }
-    } catch (eq3) { rr = null; }
-    if (rr != null && rr.length > 0) {
-        r = { guid: "" + rr[0].ea_guid, id: parseInt(rr[0].Diagram_ID, 10),
-              pkgId: parseInt(rr[0].Package_ID, 10), name: "" + rr[0].Name };
-    }
-    dgmCache[key] = r;
-    return r;
-}
+function resolveElement(ref) { return resolveVia("element", ref); }
+function resolvePackage(ref) { return resolveVia("package", ref); }
+function resolveDiagram(ref) { return resolveVia("diagram", ref); }
 
 // --- metriky ---
 var writeOps = 0, createOps = 0, updatedExisting = 0, deleteTargets = 0, moveOps = 0;
@@ -315,7 +279,9 @@ function touchElement(ref, ctx, countUpdate, addPackages) {
     pushName(tgtNames, "e", res.name);
     if (addPackages && res.pkgId > 0) { addPkg("p" + res.pkgId); }
     if (countUpdate) { updatedExisting++; }
-    return { own: false, res: res };
+    // pravidlo 3: prvek zalozeny touto session pumpy = vlastni (metriky
+    // updatedExisting/affected se pocitaji dal - prahy beze zmeny)
+    return { own: isOwn(res.guid), res: res, ownSession: isOwn(res.guid) };
 }
 function touchPackage(ref, ctx, countUpdate) {
     if (ref === null || typeof ref == "undefined" || ("" + ref) == "") {
@@ -362,10 +328,16 @@ function touchDiagram(ref, ctx) {
         addForeignDgm("?:" + ref);
         return { own: false };
     }
+    if (isOwn(res.guid)) {
+        // pravidlo 3: diagram zalozeny touto session pumpy neni cizi
+        pushName(dgmNames, "d", res.name);
+        if (res.pkgId > 0) { addPkg("p" + res.pkgId); }
+        return { own: true, res: res, ownSession: true };
+    }
     addForeignDgm(res.guid);
     pushName(dgmNames, "d", res.name);
     if (res.pkgId > 0) { addPkg("p" + res.pkgId); }
-    return { own: false };
+    return { own: false, res: res };
 }
 
 // --- W8: prvni zapisova davka po vyjimce/zotaveni predchozi davky ---
@@ -389,10 +361,19 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
     }
     if (!rg.w) { continue; } // cteci operace mimo gate
     opCounts[name] = (opCounts[name] ? opCounts[name] + 1 : 1); // souhrn UI
+    // pravidlo 3: u scenarios/constraints/requirements se trida ELEVATED
+    // uplatni az podle cile (vlastni prvek teze session = bez eskalace)
+    var ownClassDefer = false;
     if (polValid) {
         var klass = pol.classes[name];
         if (klass == "BLOCKED") { block("Operace '" + name + "' je politikou klasifikovana BLOCKED"); }
-        else if (klass == "ELEVATED") { elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED"); }
+        else if (klass == "ELEVATED") {
+            if (ownSet != null && (name == "create_or_update_scenarios" || name == "create_or_update_constraints" || name == "create_or_update_requirements")) {
+                ownClassDefer = true;
+            } else {
+                elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED");
+            }
+        }
     }
     var j, lst;
     if (name == "create_element") {
@@ -611,7 +592,14 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         lst = (name == "create_or_update_scenarios" ? o.scenarios
               : (name == "create_or_update_constraints" ? o.constraints : o.requirements)) || [];
         writeOps += (lst.length > 0 ? lst.length : 1);
-        touchElement(o.element, name + ".element", true, true);
+        var tsc = touchElement(o.element, name + ".element", true, true);
+        if (ownClassDefer) {
+            if (tsc && tsc.own) {
+                addReason("Operace '" + name + "' nad prvkem zalozenym touto session - bez okna (pravidlo 3, ownSessionLow)");
+            } else {
+                elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED (cizi prvek - prepis existujiciho obsahu)");
+            }
+        }
     } else if (name == "apply_classifier_stereotypes") {
         writeOps++;
         touchDiagram(o.diagram, "classifierStereotypes.diagram");

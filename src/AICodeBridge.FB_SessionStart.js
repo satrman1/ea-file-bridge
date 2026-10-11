@@ -21,6 +21,14 @@ var wl = [];
 try { wl = this.FB_Whitelist(); } catch (eWl) { wl = []; }
 var ridRaw = "" + this.FB_RepoId(Repository);
 var rid = ridRaw.toUpperCase();
+// FB-PU-06 (v0.16, Z261004b-3): pod pumpou si executor pamatuje identitu
+// repozitare ze startu session; FB_Main ji porovnava s aktualni a pri zmene
+// projektu v EA vraci E_REPO "restartuj pumpu" (i u cteni). Jen pamet
+// procesu pumpy (typeof WScript) - EA runtime this._fb* nedrzi (par. 1a/5).
+if (typeof WScript != "undefined") {
+    this._fbSessionRepo = ridRaw;
+    this._fbOwnGuids = {}; // pravidlo 3: nova session = zadne vlastni prvky
+}
 var cfg = null;
 try { cfg = this.FB_BaselineConfig(Repository).cfg; } catch (eCfg) { cfg = null; }
 var mode = (cfg && cfg.sessionBaseline == "auto") ? "auto" : "off";

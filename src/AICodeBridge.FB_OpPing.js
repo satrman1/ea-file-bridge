@@ -39,6 +39,34 @@ try {
         r.whitelist.push(item);
     }
 } catch (eWl) { r.whitelistError = "" + eWl.message; }
+// --- riskPolicy (KONCEPCE potvrzovaci okna pravidlo 7, Z261004b-3): agent si
+// na zacatku prace precte tridy operaci a prahy a predem rekne cloveku,
+// ktera davka bude chtit potvrzeni. Jen hodnoty politiky (zadne GUIDy).
+r.riskPolicy = { available: false };
+try {
+    var pa = this.FB_RiskPolicy();
+    var ridP = ("" + r.repository).toUpperCase();
+    for (var pi = 0; pi < pa.length; pi++) {
+        if (ridP.indexOf(("" + pa[pi].repo).toUpperCase()) < 0) { continue; }
+        var pol = pa[pi];
+        var always = [], blocked = [], low = [];
+        for (var ck in (pol.classes || {})) {
+            var cv = "" + pol.classes[ck];
+            if (cv == "ELEVATED") { always.push(ck); } else if (cv == "BLOCKED") { blocked.push(ck); } else if (cv == "LOW") { low.push(ck); }
+        }
+        always.sort(); blocked.sort(); low.sort();
+        r.riskPolicy = { available: true,
+            classes: pol.classes || {},
+            confirmAlways: always, blocked: blocked, low: low,
+            elevate: pol.elevate || {}, block: pol.block || {},
+            confirmMaxAgeMin: (typeof pol.confirmMaxAgeMin == "number") ? pol.confirmMaxAgeMin : 480,
+            ownSessionLow: (pol.ownSessionLow === true),
+            note: "okno vzdy = confirmAlways; okno pri prekroceni prahu elevate (napr. writeOps > " + ((pol.elevate && typeof pol.elevate.writeOps == "number") ? pol.elevate.writeOps : "?")
+                + "); blocked = odmitnuto bez okna; cekajici davka vyprsi po confirmMaxAgeMin; ownSessionLow = vlastni prvky/diagramy teto session pumpy bez okna" };
+        break;
+    }
+    if (!r.riskPolicy.available) { r.riskPolicy.note = "repozitar nema polozku ve FB_RiskPolicy - kazdy zapis vyzaduje potvrzeni (fail-closed W9)"; }
+} catch (eRp) { r.riskPolicy = { available: false, note: "FB_RiskPolicy nelze precist: " + eRp.message }; }
 // --- access: plny navrat FB_UserAccess do res; pri chybe fail-closed read
 try { r.access = this.FB_UserAccess(Repository); }
 catch (eAc) {

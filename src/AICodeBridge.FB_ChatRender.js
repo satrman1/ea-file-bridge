@@ -269,6 +269,25 @@ function segPing(rr, idx, level) {
         // prazdny whitelist = explicitni veta, ne prazdne pole (par. 4.5)
         s2 += " | whitelist: PRAZDNY - repozitar nema zadny povoleny cil zapisu (bez zmeny FB_Whitelist zapis neprojde)";
     }
+    // riskPolicy (pravidlo 7 KONCEPCE, Z261004b-3): strucne prahy a okna,
+    // aby agent predem rekl cloveku, ktera davka bude chtit potvrzeni
+    var rp = rr.riskPolicy;
+    if (rp && rp.available) {
+        var e1 = rp.elevate || {};
+        var thr = [];
+        if (typeof e1.writeOps == "number") { thr.push("zapisu >" + e1.writeOps); }
+        if (typeof e1.updatedExisting == "number") { thr.push("zmenenych >" + e1.updatedExisting); }
+        if (typeof e1.affectedPackages == "number") { thr.push("balicku >" + e1.affectedPackages); }
+        if (typeof e1.deleteTargets == "number") { thr.push("mazani >" + e1.deleteTargets); }
+        if (typeof e1.foreignDiagrams == "number") { thr.push("cizich diagramu >" + e1.foreignDiagrams); }
+        s2 += " | okno: prahy " + (thr.length ? thr.join(", ") : "?")
+            + "; vzdy " + ((rp.confirmAlways && rp.confirmAlways.length) ? (level >= 3 ? rp.confirmAlways.join(", ") : rp.confirmAlways.length + " operaci (delete/move/clone/rebuild)") : "-")
+            + (rp.blocked && rp.blocked.length ? "; zakazano " + rp.blocked.join(", ") : "")
+            + "; cekajici davka vyprsi po " + rp.confirmMaxAgeMin + " min"
+            + "; vlastni prvky session bez okna: " + (rp.ownSessionLow ? "ano" : "ne");
+    } else if (rp) {
+        s2 += " | okno: politika pro repozitar chybi - kazdy zapis vyzaduje potvrzeni";
+    }
     // connection se do ACK nedava - identita je v repository (par. 4.5)
     return s2;
 }

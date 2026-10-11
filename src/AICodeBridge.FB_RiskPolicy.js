@@ -33,6 +33,23 @@
 //   hashMaxChars  strop delky requestu pro payloadHash (W5): nad strop se
 //             hash nepocita a davka jde ELEVATED (fail-closed)
 //
+//   KONCEPCE potvrzovaci okna (IT-ANALYSIS/KONCEPCE-potvrzovaci-okna-ea-file-
+//   bridge.md kap. 4, schvaleno Milosem 4. 10. 2026; implementace Z261004b-3)
+//   - VOLITELNE klice vzorem moveOps (chybi = vychozi hodnota, politika
+//   zustava validni):
+//   ownSessionLow    true = prvek/diagram ZALOZENY touto session pumpy neni
+//             "cizi": umisteni na vlastni diagram se nepocita do
+//             foreignDiagrams, scenare/constraints/requirements vlastniho
+//             prvku jsou LOW (pravidlo 3). Chybi = false (dnesni chovani).
+//             Plati jen pod pumpou (pamet procesu); banka si zapne sama,
+//             az to overi.
+//   confirmMaxAgeMin  limit stari cekajici davky v minutach; starsi davka =
+//             E_RISK_EXPIRED (pravidlo 6 bod 4). Chybi = 480 (8 h, kap. 7
+//             bod 2).
+//   rebuildLowWithBaseline  faze 2 (pravidlo 2 duvod 4 / pravidlo 9) -
+//             REZERVOVANY, zatim se NECTE (az po zivem behu Baseline
+//             politiky a tydnu v bance). Chybi = false.
+//
 //   baseline  BASELINE POLITIKA (zadani Baseline politika v1.2 par. 5) -
 //             VOLITELNA sekce; cte a validuje ji VYHRADNE FB_BaselineConfig:
 //             CHYBEJICI sekce = politika zustava validni (bezpecne defaulty
@@ -123,10 +140,12 @@ var DEV_BASELINE = { subtreeMax: 5000, maxBaselineElements: 10000, // shadow
 return [
     { repo: "EAEXAMPLE.QEA",
       classes: DEV_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK,
-      budgetMs: 8000, hashMaxChars: 2000000, baseline: DEV_BASELINE },
+      budgetMs: 8000, hashMaxChars: 2000000, baseline: DEV_BASELINE,
+      ownSessionLow: true, confirmMaxAgeMin: 480 },
     { repo: "EA17_Yoga_QEA2.qeax",
       classes: DEV_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK,
-      budgetMs: 8000, hashMaxChars: 2000000, baseline: DEV_BASELINE }
+      budgetMs: 8000, hashMaxChars: 2000000, baseline: DEV_BASELINE,
+      ownSessionLow: true, confirmMaxAgeMin: 480 }
     // Banka (PROD politika - doplni clovek v bance; sablona dle par. 4):
     // { repo: "<TEST-DB>",
     //   classes: { ...jako vyse..., "deploy_src": "BLOCKED",
@@ -139,5 +158,7 @@ return [
     //              affectedPackages: 5 },
     //   budgetMs: 8000, hashMaxChars: 2000000,
     //   baseline: { ...jako DEV_BASELINE..., requireRecoveryForUpdates: true,
-    //               sessionBaseline: "off" } }   // bankovni sablona par. 5
+    //               sessionBaseline: "off" },    // bankovni sablona par. 5
+    //   ownSessionLow: false,       // KONCEPCE kap. 4: v bance az po overeni
+    //   confirmMaxAgeMin: 480 }     // 8 h (KONCEPCE kap. 7 bod 2)
 ];
