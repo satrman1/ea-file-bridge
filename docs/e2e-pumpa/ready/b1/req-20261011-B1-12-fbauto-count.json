@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-12-fbauto-count",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT ElementID, Version, DocDate FROM t_document WHERE DocType = 'Baseline' AND Version LIKE 'FB-AUTO%' ORDER BY DocDate"
+  }
+ ]
+}

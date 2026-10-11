@@ -1,0 +1,13 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-03-preklep",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "get_element_information",
+   "elements": [
+    "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+   ]
+  }
+ ]
+}

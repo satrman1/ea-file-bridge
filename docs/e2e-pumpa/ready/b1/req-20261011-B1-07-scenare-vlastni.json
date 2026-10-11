@@ -1,0 +1,59 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-07-scenare-vlastni",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "__UC1__",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "kind": "actor",
+       "text": "Ctenar vybere knihu"
+      },
+      {
+       "kind": "system",
+       "text": "System overi dostupnost"
+      },
+      {
+       "kind": "actor",
+       "text": "Ctenar potvrdi vypujcku"
+      },
+      {
+       "kind": "system",
+       "text": "System zaeviduje vypujcku"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "__UC1__",
+   "constraints": [
+    {
+     "name": "Ctenar je prihlasen",
+     "type": "Pre-condition"
+    },
+    {
+     "name": "Vypujcka je zaevidovana",
+     "type": "Post-condition"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "__UC1__",
+   "requirements": [
+    {
+     "name": "BRU-B1-1 Vypujcka max 5 knih",
+     "type": "Functional"
+    }
+   ]
+  }
+ ]
+}

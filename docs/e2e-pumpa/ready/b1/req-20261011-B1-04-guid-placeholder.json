@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-04-guid-placeholder",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "GUID-FBTEST",
+     "type": "Class",
+     "name": "B1 placeholder",
+     "notes": "<b>notes se nekontroluji</b>"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B1-11-preruseni",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 01"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 02"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 03"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 04"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 05"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 06"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 07"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 08"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 09"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 10"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 11"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 12"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 13"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 14"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 15"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 16"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 17"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 18"
+    },
+    {
+     "package": "__PKG__",
+     "type": "Class",
+     "name": "Preruseni B1 19"
+    }
+   ]
+  }
+ ]
+}
