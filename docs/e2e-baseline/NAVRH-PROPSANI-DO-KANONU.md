@@ -2,6 +2,8 @@
 
 2026-09-20 · vlákno Z260907-6 · **NÁVRH — neaplikováno.**
 
+> **2026-10-11 (Z261004b-2):** živý běh proběhl (`VYSLEDKY-2026-10-11.md`, 29/33 ✅). Podmínka „po Z260907-7" je splněna → **doma lze aplikovat** po opravném zápřahu k nálezům N-E2E-3/7 (mění chování sondy a reuse, texty níže se nemění). Do bankovního kánonu až s nasazením v0.15.
+
 ## Proč to není rovnou zapsané
 
 Dávka `zaprah-vlaken-2026-09-07.md` (Z260907-6) chtěla upravit `docs/copilot-instructions-eafb.md`, `docs/github-copilot-instructions.md` a `IT-ANALYSIS/Skilly/_shared/emr-zapis-pravidla.md`. Stav se mezitím změnil:

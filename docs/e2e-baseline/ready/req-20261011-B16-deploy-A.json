@@ -1,0 +1,6 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B16-deploy-A",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [ { "op": "deploy_src", "only": ["FB_Whitelist", "FB_RiskPolicy"] } ]
+}

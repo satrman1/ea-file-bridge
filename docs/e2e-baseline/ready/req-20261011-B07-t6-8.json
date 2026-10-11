@@ -1,0 +1,20 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B07-t6-8",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{C5121986-89C9-49f2-9E77-3952A218F68E}",
+     "notes": "Da zmeneno T6-8"
+    },
+    {
+     "guid": "{A06D8301-03CC-419c-B866-19957AD09D7E}",
+     "notes": "D1a zmeneno T6-8"
+    }
+   ]
+  }
+ ]
+}

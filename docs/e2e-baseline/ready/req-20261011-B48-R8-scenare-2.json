@@ -1,0 +1,27 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B48-R8-scenare-2",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{3A3F1092-7B43-454c-A10D-B4C875517433}",
+   "scenarios": [
+    {
+     "name": "Alternate - kniha nedostupna",
+     "type": "Alternate",
+     "steps": [
+      {
+       "kind": "system",
+       "text": "System oznami, ze kniha je vypujcena"
+      },
+      {
+       "kind": "actor",
+       "text": "Ctenar zada rezervaci"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B47-R7b-update-notes",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{CE9C667A-9A95-453f-9211-289C9946FA0C}",
+     "package": "{8A61DBE2-C966-4aae-ABC9-04A40BBB4713}",
+     "type": "Class",
+     "name": "Kniha",
+     "notes": "Kniha v katalogu knihovny (doplneno R7b)."
+    },
+    {
+     "guid": "{3A3F1092-7B43-454c-A10D-B4C875517433}",
+     "package": "{8A61DBE2-C966-4aae-ABC9-04A40BBB4713}",
+     "type": "UseCase",
+     "name": "UC-R1 Vypujc knihu",
+     "notes": "Ctenar si vypujci knihu (doplneno R7b)."
+    }
+   ]
+  }
+ ]
+}

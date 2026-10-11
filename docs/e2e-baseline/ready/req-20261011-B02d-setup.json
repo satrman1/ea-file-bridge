@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B02d-setup",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-CL1", "notes": "Testovaci balicek Z261004b-2 - fixtures uklidu (T6-17..19). Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-CL2", "notes": "Testovaci balicek Z261004b-2 - fixtures uklidu (T6-20). Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-CL3", "notes": "Testovaci balicek Z261004b-2 - fixtures uklidu (T6-21). Smazat na konci behu." },
+  { "op": "create_or_update_elements", "elements": [
+    { "package": "$0", "type": "Class", "name": "CL1a", "notes": "fixture" },
+    { "package": "$1", "type": "Class", "name": "CL2a", "notes": "fixture" },
+    { "package": "$2", "type": "Class", "name": "CL3a", "notes": "fixture" },
+    { "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "type": "Class", "name": "FBT-BL-T10", "notes": "T10 puvodni - prvek primo v #FB-TEST (T6-10/11/26). Smazat na konci behu." }
+  ] }
+ ]
+}

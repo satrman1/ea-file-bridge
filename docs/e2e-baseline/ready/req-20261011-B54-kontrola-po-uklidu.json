@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B54-kontrola-po-uklidu",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT p.Name FROM t_package p WHERE p.Name LIKE 'FBT-BL%' OR p.Name = 'FBT-ROOT'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Name FROM t_object o WHERE o.Name LIKE 'FBT-BL%' OR o.Name LIKE 'S-schranka%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS n FROM t_document d WHERE d.DocType = 'Baseline' AND d.Version LIKE 'FB-AUTO%'"
+  }
+ ]
+}

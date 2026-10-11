@@ -1,0 +1,13 @@
+﻿=== fixtures-baselines.wsf (Z261004b-2) === 20261011-113107
+Pripojeno: C:\Users\milos\Box\03.EAP\MCP-AI\EAExample.qea
+(a) Repository.RepositoryType() = 'SL3'  (kod FB_SubtreeCount ceka 'SL3' pro SQLite)
+Balicek CL1 = FBT-BL-CL1 (id 1111), baselines: 6
+Balicek CL2 = FBT-BL-CL2 (id 1112), baselines: 8
+Balicek CL3 = FBT-BL-CL3 (id 1113), baselines: 0
+Faze 2: CL3 43x 20 dnu (2026-09-21 11:00:00 + i s)
+  prvni CreateBaseline('FB-AUTO - s20260921-1 2026-09-21 11:00:00') vratil: true (typeof boolean)
+  CL3: pozadovano 43, baselines 0 -> 43 (35120 ms)
+(b) CreateBaseline navratove hodnoty: true (boolean) x43
+Stav CL1: 6 baselines
+Stav CL2: 8 baselines
+Stav CL3: 43 baselines

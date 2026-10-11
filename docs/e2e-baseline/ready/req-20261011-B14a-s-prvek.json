@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B14a-s-prvek",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{DFF8E4E6-A40B-4ce1-BA02-B85EF11AC66E}",
+     "type": "Class",
+     "name": "S-note",
+     "notes": "prvek do balicku diagramu, aby sonda nehlasila 0 prvku (nalez N-E2E-3)"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B18b-root-po",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS c FROM t_document WHERE DocType = 'Baseline' AND ElementID = '{8274372A-A0D7-4998-A78B-063B9C76CD36}'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS c FROM t_package WHERE Name = 'FBT-ROOT'"
+  }
+ ]
+}

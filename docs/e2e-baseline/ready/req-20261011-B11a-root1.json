@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B11a-root1",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.ea_guid, o.Name, o.Object_Type FROM t_object o WHERE o.Package_ID = 1098 ORDER BY o.Object_ID"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B45a-R6-operace-preklep",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_operations",
+   "element": "{CE9C667A-9A95-453f-9211-289C9946FA0C}",
+   "operations": [
+    {
+     "name": "vypujcKnhu",
+     "returnType": "boolean",
+     "notes": "preklep"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B28-t6-31",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{2FEADF98-90E2-4749-9AED-A938A30F6538}",
+     "type": "Class",
+     "name": "A4",
+     "notes": "A4 - T6-31 (politika bez sekce baseline)"
+    }
+   ]
+  }
+ ]
+}

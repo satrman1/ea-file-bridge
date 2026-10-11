@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B10-t6-14",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Element",
+     "guid": "{65922AB7-BAD5-4165-BF87-7CA2B7CB986C}"
+    }
+   ]
+  }
+ ]
+}

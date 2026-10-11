@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B28b-t6-31-update",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{43ACA7F4-1C0E-48e4-BD38-6350A495F6AF}",
+     "notes": "C1 zmeneno T6-31 (bez sekce baseline - jak se chova update?)"
+    }
+   ]
+  }
+ ]
+}

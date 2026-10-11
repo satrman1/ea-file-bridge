@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B34-t6-21-hak",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{2FEADF98-90E2-4749-9AED-A938A30F6538}",
+     "type": "Class",
+     "name": "A6",
+     "notes": "A6 - spoustec haku uklidu (T6-21)"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B22-t6-26",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+     "type": "Class",
+     "name": "FBT-BL-T10",
+     "matchByName": true,
+     "notes": "T10 zmeneno T6-26 pres matchByName"
+    }
+   ]
+  }
+ ]
+}

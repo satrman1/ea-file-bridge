@@ -1,0 +1,30 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B15-c-dedup",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{2FEADF98-90E2-4749-9AED-A938A30F6538}",
+     "type": "Class",
+     "name": "A-dedup",
+     "dedupKey": "fbt-bl-dedup-1",
+     "notes": "dedupKey test (c)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{EE49E0B0-5413-4def-8132-923C505E0DCE}",
+     "target": "{C4165F36-2FE9-432b-80F1-C12755308A14}",
+     "type": "Association",
+     "dedupKey": "fbt-bl-conn-1"
+    }
+   ]
+  }
+ ]
+}

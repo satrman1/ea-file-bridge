@@ -1,0 +1,22 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B12-t6-27",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "find_elements_by_name",
+   "name": "A2",
+   "exactMatch": true,
+   "scope": "{2FEADF98-90E2-4749-9AED-A938A30F6538}"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "$0[0]",
+     "notes": "A2 zmeneno pres $N (T6-27)"
+    }
+   ]
+  }
+ ]
+}

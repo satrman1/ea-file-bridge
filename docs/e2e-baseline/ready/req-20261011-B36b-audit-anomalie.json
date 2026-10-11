@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B36b-audit-anomalie",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name LIKE 'FB uklid-baselines-20261011-113%' ORDER BY o.Object_ID DESC"
+  }
+ ]
+}

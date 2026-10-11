@@ -1,0 +1,16 @@
+﻿=== fixtures-baselines.wsf (Z261004b-2) === 20261011-114029
+Pripojeno: C:\Users\milos\Box\03.EAP\MCP-AI\EAExample.qea
+(a) Repository.RepositoryType() = 'SL3'  (kod FB_SubtreeCount ceka 'SL3' pro SQLite)
+Balicek CL1 = FBT-BL-CL1 (id 1111), baselines: 6
+Balicek CL2 = FBT-BL-CL2 (id 1112), baselines: 8
+Balicek CL3 = FBT-BL-CL3 (id 1113), baselines: 253
+  prvni DeleteBaseline('{78D57C7C-C4E2-4c46-B595-76668A32989F}' = FB-AUTO - s20260921-1 2026-09-21 10:00:04) vratil: true (typeof boolean)
+  CL1: smazano 6, zbyva 0 (26 ms)
+  prvni DeleteBaseline('{EB89B655-006E-4f14-A105-9D64C8A20872}' = FB-AUTO - s20261004-1 2026-10-04 10:00:01) vratil: true (typeof boolean)
+  CL2: smazano 8, zbyva 0 (12 ms)
+  prvni DeleteBaseline('{A37EC0E4-F202-4b4d-9347-8E8E8C8FB9DE}' = FB-AUTO - s20260921-1 2026-09-21 11:00:00) vratil: true (typeof boolean)
+  CL3: smazano 253, zbyva 0 (327 ms)
+(b) DeleteBaseline navratove hodnoty: true (boolean) x267; vyjimek 0
+Stav CL1: 0 baselines
+Stav CL2: 0 baselines
+Stav CL3: 0 baselines

@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B39-pred-R",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Name, o.Object_Type, o.CreatedDate, o.ea_guid, p.Name AS Pkg FROM t_object o JOIN t_package p ON p.Package_ID = o.Package_ID WHERE o.Object_Type IN ('UseCase','Class') AND o.CreatedDate < '2026-10-11' AND p.Name LIKE 'FBT%' ORDER BY o.CreatedDate"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Name, o.Object_Type, o.CreatedDate FROM t_object o WHERE o.Package_ID = (SELECT Package_ID FROM t_package WHERE Name = '#FB-TEST') ORDER BY o.CreatedDate DESC"
+  },
+  {
+   "op": "get_baselines",
+   "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
+  }
+ ]
+}

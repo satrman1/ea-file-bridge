@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-S2-schranka",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{2FEADF98-90E2-4749-9AED-A938A30F6538}",
+     "type": "Class",
+     "name": "S-schranka-2",
+     "notes": "T6-32 schranka"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B20c-kontrola",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.ea_guid = '{5762A4FA-2E12-4025-AF73-A0A3CB96681D}'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Name FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name LIKE 'FB 20261011-B2%' ORDER BY o.Object_ID"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Name, p.Property, p.Value FROM t_objectproperties p INNER JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.Object_Type = 'Artifact' AND o.Name LIKE 'FB 20261011-B2%' AND p.Property LIKE 'ai.baseline%' ORDER BY o.Object_ID"
+  }
+ ]
+}

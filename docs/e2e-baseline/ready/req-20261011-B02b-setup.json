@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B02b-setup",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-D", "notes": "Testovaci balicek Z261004b-2 (rodic D1). Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "$0", "name": "FBT-BL-D1", "notes": "Testovaci podbalicek Z261004b-2 (potomek D). Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-E", "notes": "Testovaci balicek Z261004b-2. Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-F", "notes": "Testovaci balicek Z261004b-2. Smazat na konci behu." },
+  { "op": "create_or_update_elements", "elements": [
+    { "package": "$0", "type": "Class", "name": "Da", "notes": "Da puvodni" },
+    { "package": "$1", "type": "Class", "name": "D1a", "notes": "D1a puvodni" },
+    { "package": "$2", "type": "Class", "name": "E1", "notes": "E1 puvodni" },
+    { "package": "$3", "type": "Class", "name": "F1", "notes": "F1 puvodni" }
+  ] }
+ ]
+}

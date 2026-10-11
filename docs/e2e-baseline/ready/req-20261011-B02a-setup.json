@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B02a-setup",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-A", "notes": "Testovaci balicek Z261004b-2 (Baseline politika zive). Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-B", "notes": "Testovaci balicek Z261004b-2. Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-C", "notes": "Testovaci balicek Z261004b-2. Smazat na konci behu." },
+  { "op": "create_or_update_package", "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", "name": "FBT-BL-M", "notes": "Testovaci balicek Z261004b-2 - zamerne PRAZDNY. Smazat na konci behu." },
+  { "op": "create_or_update_elements", "elements": [
+    { "package": "$0", "type": "Class", "name": "A1", "notes": "A1 puvodni" },
+    { "package": "$0", "type": "Class", "name": "A2", "notes": "A2 puvodni" },
+    { "package": "$1", "type": "Class", "name": "B1", "notes": "B1 puvodni" },
+    { "package": "$1", "type": "Class", "name": "B2", "notes": "B2 puvodni" },
+    { "package": "$2", "type": "Class", "name": "C1", "notes": "C1 puvodni" }
+  ] }
+ ]
+}

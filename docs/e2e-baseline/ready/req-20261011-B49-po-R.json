@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B49-po-R",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT d.ElementID, d.Version, d.DocDate FROM t_document d WHERE d.DocType = 'Baseline' AND d.Version LIKE 'FB-AUTO%' AND d.DocDate >= '2026-10-11 11:40' ORDER BY d.DocDate"
+  },
+  {
+   "op": "get_baselines",
+   "package": "{8A61DBE2-C966-4aae-ABC9-04A40BBB4713}"
+  }
+ ]
+}

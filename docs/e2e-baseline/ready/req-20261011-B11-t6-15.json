@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B11-t6-15",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{7A95B5FD-BD2E-4963-BD38-BFC3497BED44}",
+     "notes": "ROOT1 zmeneno T6-15 (NESMI se zapsat)"
+    }
+   ]
+  }
+ ]
+}

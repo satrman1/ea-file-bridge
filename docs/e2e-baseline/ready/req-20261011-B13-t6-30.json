@@ -1,0 +1,13 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B13-t6-30",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_baseline",
+   "package": "{2FEADF98-90E2-4749-9AED-A938A30F6538}",
+   "name": "FB-AUTO test T6-30",
+   "notes": "T6-30 - musi skoncit E_ARGS"
+  }
+ ]
+}

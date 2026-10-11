@@ -1,0 +1,23 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B46-R7-cizi-uc",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{2977915E-8B35-47cb-956D-B39A78469D47}",
+   "scenarios": [
+    {
+     "name": "Alternate - kniha nedostupna",
+     "type": "Alternate",
+     "steps": [
+      {
+       "kind": "system",
+       "text": "System oznami nedostupnost"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

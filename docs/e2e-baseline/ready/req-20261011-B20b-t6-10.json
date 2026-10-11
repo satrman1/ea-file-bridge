@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B20b-t6-10",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{5762A4FA-2E12-4025-AF73-A0A3CB96681D}",
+     "notes": "T10 zmeneno T6-10b (nad prahem, S rucni baseline)"
+    }
+   ]
+  }
+ ]
+}

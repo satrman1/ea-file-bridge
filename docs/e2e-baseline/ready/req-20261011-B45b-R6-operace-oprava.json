@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B45b-R6-operace-oprava",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_operations",
+   "element": "{CE9C667A-9A95-453f-9211-289C9946FA0C}",
+   "operations": [
+    {
+     "guid": "{B8E185B7-FC4B-46a2-8A77-76D82102DDE9}",
+     "name": "vypujcKnihu",
+     "returnType": "boolean",
+     "notes": "opraveno"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B26-t6-25",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{6F211E6A-C452-4947-A5E8-38E8E6556098}",
+     "notes": "B2 zmeneno T6-25 (budgetMs 1)"
+    }
+   ]
+  }
+ ]
+}

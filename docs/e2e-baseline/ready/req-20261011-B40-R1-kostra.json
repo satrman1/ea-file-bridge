@@ -1,0 +1,89 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B40-R1-kostra",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}",
+   "name": "FBT-BL-R",
+   "notes": "T6-24 regrese den prace dev skillu (Z261004b-2). Smazat na konci behu."
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$0",
+     "type": "Actor",
+     "name": "Ctenar",
+     "notes": "aktor"
+    },
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC-R1 Vypujc knihu",
+     "notes": "use case 1"
+    },
+    {
+     "package": "$0",
+     "type": "UseCase",
+     "name": "UC-R2 Vrat knihu",
+     "notes": "use case 2"
+    },
+    {
+     "package": "$0",
+     "type": "Class",
+     "name": "Pomocny prvek",
+     "notes": "pomocny prvek ke smazani (R5)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$0",
+     "type": "Use Case",
+     "name": "UC prehled R",
+     "notes": "survey diagram"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$2[0]",
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 40,
+     "y": 80
+    },
+    {
+     "element": "$1[1]",
+     "x": 300,
+     "y": 40
+    },
+    {
+     "element": "$1[2]",
+     "x": 300,
+     "y": 160
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$1[0]",
+     "target": "$1[1]",
+     "type": "Association"
+    },
+    {
+     "source": "$1[0]",
+     "target": "$1[2]",
+     "type": "Association"
+    }
+   ]
+  }
+ ]
+}

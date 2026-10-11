@@ -1,0 +1,40 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B08-t6-9-13",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{EE49E0B0-5413-4def-8132-923C505E0DCE}",
+     "notes": "A1 zmeneno T6-9"
+    },
+    {
+     "guid": "{C1E299FF-141F-4728-B487-E1581D247A3D}",
+     "notes": "B1 zmeneno T6-9"
+    },
+    {
+     "guid": "{43ACA7F4-1C0E-48e4-BD38-6350A495F6AF}",
+     "notes": "C1 zmeneno T6-9"
+    },
+    {
+     "guid": "{65922AB7-BAD5-4165-BF87-7CA2B7CB986C}",
+     "notes": "E1 zmeneno T6-9"
+    },
+    {
+     "guid": "{1F364614-251B-4760-A464-B2D87A43FF95}",
+     "notes": "F1 zmeneno T6-9"
+    },
+    {
+     "guid": "{521005F6-9D40-4452-9E9A-89C0E91CC587}",
+     "notes": "G1 zmeneno T6-9"
+    },
+    {
+     "guid": "{363C18B4-03E3-41d4-B590-809F0471DEA6}",
+     "notes": "H1 zmeneno T6-9"
+    }
+   ]
+  }
+ ]
+}

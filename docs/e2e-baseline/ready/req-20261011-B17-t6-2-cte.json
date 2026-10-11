@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B17-t6-2-cte",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "guid": "{C4165F36-2FE9-432b-80F1-C12755308A14}",
+     "notes": "A2 zmeneno varianta A (useCte true, sessionBaseline off)"
+    }
+   ]
+  }
+ ]
+}

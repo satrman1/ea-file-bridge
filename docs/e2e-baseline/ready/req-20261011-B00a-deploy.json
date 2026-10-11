@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B00a-deploy",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "deploy_src" }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B53-uklid-3",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Package",
+     "guid": "{EED392C6-1B0A-4608-B1F1-54F471F22D68}"
+    },
+    {
+     "type": "Package",
+     "guid": "{A89405C2-04A6-4c3d-B8AB-F9F3152DDFC3}"
+    },
+    {
+     "type": "Package",
+     "guid": "{167138C8-E4CE-4d64-B06A-9C8A4D1F99DD}"
+    },
+    {
+     "type": "Package",
+     "guid": "{0E0D287B-4A05-48be-A17A-513BDCEE6F5B}"
+    },
+    {
+     "type": "Package",
+     "guid": "{8A61DBE2-C966-4aae-ABC9-04A40BBB4713}"
+    },
+    {
+     "type": "Element",
+     "guid": "{5762A4FA-2E12-4025-AF73-A0A3CB96681D}"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<job id="EAFBFixturesBaselines">
+<script language="VBScript">
+<![CDATA[
+' COM attach na bezici EA - stejny vzor jako pump.wsf (VBScript umi GetObject(, "EA.App"), JScript ne).
+Function AttachEA()
+    On Error Resume Next
+    Set AttachEA = GetObject(, "EA.App")
+    If Err.Number <> 0 Then
+        Err.Clear
+        Set AttachEA = Nothing
+    End If
+End Function
+]]>
+</script>
+<script language="JScript">
+<![CDATA[
+// ============================================================================
+// FIXTURES BASELINES pro zivy beh uklidu T6-17..T6-22 (Z261004b-2, 2026-10-11)
+// docs/e2e-baseline/PROTOKOL-E2E-BASELINE.md kap. 3; vzor spike-deletebaseline.wsf
+//
+// Proc WSF a ne davka: prefix "FB-AUTO " je rezervovany (create_baseline = E_ARGS,
+// T6-30) a datum v nazvu musi byt 20 dnu zpet. Skript bezi v runtime pumpy
+// (WSH JScript), nic nenasazuje, nemeni src/, zapisuje JEN baselines nad
+// testovacimi balicky FBT-BL-CL1..3 a nic jineho nikdy nemaze.
+//
+// Jmena presne podle src/AICodeBridge.FB_BaselineName.js:
+//   FB-AUTO <login> s<RRRRMMDD>-<n> <RRRR-MM-DD hh:mm:ss>   (login "-" = security vypnuta)
+//
+// Faze (volba na konzoli):
+//   1  CL1: 6x FB-AUTO 20 dnu stare (s20260921-1 2026-09-21 10:00:01..06)
+//           + 3 NE-kandidati: "FB 2026-09-01 10:00:00", "AI-pre-s1-b1", "Pred refaktorem"
+//      CL2: 8x FB-AUTO 7 dnu stare (s20261004-1 2026-10-04 10:00:01..08)
+//   2  CL3: 43x FB-AUTO 20 dnu stare (2026-09-21 11:00:00 + i s)        -> 40 kandidatu
+//   3  CL3: +210x FB-AUTO 20 dnu stare (2026-09-21 12:00:00 + i s)      -> 250 kandidatu (anomalie)
+//   4  SMAZAT vsechny baselines nad CL1, CL2, CL3 (jen tyto tri balicky) - DeleteBaseline
+//   r  jen vypis (RepositoryType + pocty baselines per balicek)
+// Vypisuje: Repository.RepositoryType() (bod (a) zadani), navratove hodnoty
+// CreateBaseline / DeleteBaseline (bod (b)). Log: vysledky\FIXTURES-<cas>.txt.
+// Start: dvojklik (prehodi se do cscript). Pumpa muze bezet, ale nesmi zrovna
+// zpracovavat davku.
+// ============================================================================
+if (WScript.FullName.toLowerCase().indexOf("wscript.exe") >= 0) {
+    var sh0 = new ActiveXObject("WScript.Shell");
+    sh0.Run("cscript //nologo \"" + WScript.ScriptFullName + "\"");
+    WScript.Quit(0);
+}
+var PK = {
+    CL1: "{A89405C2-04A6-4c3d-B8AB-F9F3152DDFC3}",
+    CL2: "{167138C8-E4CE-4d64-B06A-9C8A4D1F99DD}",
+    CL3: "{0E0D287B-4A05-48be-A17A-513BDCEE6F5B}"
+};
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+var BASE = fso.GetParentFolderName(WScript.ScriptFullName);
+var lines = [];
+function echo(s) { WScript.Echo(s); lines.push("" + s); }
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+function ts() { var d = new Date(); return "" + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + "-" + pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds()); }
+function save() {
+    try {
+        var dir = BASE + "\\vysledky";
+        if (!fso.FolderExists(dir)) { fso.CreateFolder(dir); }
+        var p = dir + "\\FIXTURES-" + ts() + ".txt";
+        var st = new ActiveXObject("ADODB.Stream");
+        st.Type = 2; st.Charset = "utf-8"; st.Open();
+        st.WriteText(lines.join("\r\n") + "\r\n");
+        st.SaveToFile(p, 2); st.Close();
+        WScript.Echo("Log ulozen: " + p);
+    } catch (e) { WScript.Echo("Ulozeni logu selhalo: " + e.message); }
+}
+function finish(code) {
+    save();
+    WScript.Echo("");
+    WScript.Echo("Stiskni Enter pro zavreni.");
+    try { WScript.StdIn.ReadLine(); } catch (e) { }
+    WScript.Quit(code);
+}
+function ask(q) { WScript.Echo(q); var a = ""; try { a = WScript.StdIn.ReadLine(); } catch (e) { a = ""; } return ("" + a).replace(/^\s+|\s+$/g, ""); }
+function listBaselines(pi, guid) {
+    var xml = "" + pi.GetBaselines(pi.GUIDtoXML(guid), "");
+    var items = [];
+    var re = /<baseline\s+([^>]*)\/?>/gi, m;
+    function attr(s, n) { var am = new RegExp(n + '="([^"]*)"', "i").exec(s); return am ? am[1] : ""; }
+    while ((m = re.exec(xml)) != null) { items.push({ guid: attr(m[1], "guid"), version: attr(m[1], "version") }); }
+    return items;
+}
+function fmtName(token, y, mo, d, h, mi, s) {
+    return "FB-AUTO - " + token + " " + y + "-" + pad2(mo) + "-" + pad2(d) + " " + pad2(h) + ":" + pad2(mi) + ":" + pad2(s);
+}
+var retStats = {};
+function createOne(pi, pkgXml, name, note) {
+    var r;
+    try { r = pi.CreateBaseline(pkgXml, name, note); }
+    catch (e) { echo("  VYJIMKA CreateBaseline '" + name + "': " + e.message); return false; }
+    var key = "" + r + " (" + (typeof r) + ")";
+    retStats[key] = (retStats[key] || 0) + 1;
+    return r;
+}
+function createSeries(pi, pkgKey, count, token, y, mo, d, h, mi, s0, note) {
+    var pkgXml = pi.GUIDtoXML(PK[pkgKey]);
+    var before = listBaselines(pi, PK[pkgKey]).length;
+    var t0 = new Date().getTime();
+    var first = null;
+    for (var i = 0; i < count; i++) {
+        var sec = s0 + i, min = mi, hr = h;
+        while (sec >= 60) { sec -= 60; min++; }
+        while (min >= 60) { min -= 60; hr++; }
+        var nm = fmtName(token, y, mo, d, hr, min, sec);
+        var r = createOne(pi, pkgXml, nm, note);
+        if (first === null) { first = r; echo("  prvni CreateBaseline('" + nm + "') vratil: " + r + " (typeof " + (typeof r) + ")"); }
+    }
+    var after = listBaselines(pi, PK[pkgKey]).length;
+    echo("  " + pkgKey + ": pozadovano " + count + ", baselines " + before + " -> " + after + " (" + (new Date().getTime() - t0) + " ms)");
+}
+
+echo("=== fixtures-baselines.wsf (Z261004b-2) === " + ts());
+var ea = AttachEA();
+if (ea == null) { echo("STOP: bezici EA nenalezena (GetObject EA.App)."); finish(2); }
+var rep = ea.Repository;
+var cs = "";
+try { cs = "" + rep.ConnectionString; } catch (e0) { echo("STOP: EA bez otevreneho projektu (" + e0.message + ")."); finish(2); }
+echo("Pripojeno: " + cs);
+if (cs.toUpperCase().indexOf("EAEXAMPLE") < 0) { echo("STOP: pripojeny repozitar NENI EAExample - skript se pousti jen doma."); finish(3); }
+// bod (a): RepositoryType pro .qea
+try { echo("(a) Repository.RepositoryType() = '" + rep.RepositoryType() + "'  (kod FB_SubtreeCount ceka 'SL3' pro SQLite)"); }
+catch (eRT) { echo("(a) Repository.RepositoryType() VYJIMKA: " + eRT.message); }
+var pi = rep.GetProjectInterface();
+for (var k in PK) {
+    var pkg = null;
+    try { pkg = rep.GetPackageByGuid(PK[k]); } catch (e1) { pkg = null; }
+    if (pkg == null) { echo("STOP: balicek " + k + " " + PK[k] + " nenalezen (zalozit davkou B02d)."); finish(3); }
+    echo("Balicek " + k + " = " + pkg.Name + " (id " + pkg.PackageID + "), baselines: " + listBaselines(pi, PK[k]).length);
+}
+
+var phase = ask("Faze? (1 = CL1 6+3 a CL2 8 | 2 = CL3 43 | 3 = CL3 +210 | 4 = SMAZAT vse nad CL1-3 | r = jen vypis)").toLowerCase();
+var NOTE = "fixture uklidu Z261004b-2 (T6-17..T6-21) - smazat fazi 4 skriptu fixtures-baselines.wsf";
+if (phase == "1") {
+    echo("Faze 1: CL1 6x 20 dnu (s20260921-1 2026-09-21 10:00:01..06)");
+    createSeries(pi, "CL1", 6, "s20260921-1", 2026, 9, 21, 10, 0, 1, NOTE);
+    var x1 = pi.GUIDtoXML(PK.CL1);
+    echo("  ne-kandidati: FB 2026-09-01 10:00:00 -> " + createOne(pi, x1, "FB 2026-09-01 10:00:00", NOTE + " (legacy tvar)"));
+    echo("  ne-kandidati: AI-pre-s1-b1 -> " + createOne(pi, x1, "AI-pre-s1-b1", NOTE + " (explicitni AI-pre)"));
+    echo("  ne-kandidati: Pred refaktorem -> " + createOne(pi, x1, "Pred refaktorem", NOTE + " (rucni jmeno)"));
+    echo("  CL1 baselines celkem: " + listBaselines(pi, PK.CL1).length + " (ocekavano 9)");
+    echo("Faze 1: CL2 8x 7 dnu (s20261004-1 2026-10-04 10:00:01..08)");
+    createSeries(pi, "CL2", 8, "s20261004-1", 2026, 10, 4, 10, 0, 1, NOTE);
+} else if (phase == "2") {
+    echo("Faze 2: CL3 43x 20 dnu (2026-09-21 11:00:00 + i s)");
+    createSeries(pi, "CL3", 43, "s20260921-1", 2026, 9, 21, 11, 0, 0, NOTE);
+} else if (phase == "3") {
+    echo("Faze 3: CL3 +210x 20 dnu (2026-09-21 12:00:00 + i s)");
+    createSeries(pi, "CL3", 210, "s20260921-1", 2026, 9, 21, 12, 0, 0, NOTE);
+} else if (phase == "4") {
+    var ok = ask("Opravdu SMAZAT vsechny baselines nad FBT-BL-CL1, CL2, CL3? (a = ano)").toLowerCase();
+    if (ok != "a") { echo("Zruseno."); finish(0); }
+    var delStats = {}, delTotal = 0, delFail = 0;
+    for (var k2 in PK) {
+        var its = listBaselines(pi, PK[k2]);
+        var t1 = new Date().getTime();
+        for (var j = 0; j < its.length; j++) {
+            var rd;
+            try { rd = pi.DeleteBaseline(its[j].guid); } catch (eD) { delFail++; echo("  VYJIMKA DeleteBaseline " + its[j].guid + ": " + eD.message); continue; }
+            var kd = "" + rd + " (" + (typeof rd) + ")";
+            delStats[kd] = (delStats[kd] || 0) + 1;
+            if (j == 0) { echo("  prvni DeleteBaseline('" + its[j].guid + "' = " + its[j].version + ") vratil: " + rd + " (typeof " + (typeof rd) + ")"); }
+            delTotal++;
+        }
+        echo("  " + k2 + ": smazano " + its.length + ", zbyva " + listBaselines(pi, PK[k2]).length + " (" + (new Date().getTime() - t1) + " ms)");
+    }
+    echo("(b) DeleteBaseline navratove hodnoty: " + (function () { var a = []; for (var q in delStats) { a.push(q + " x" + delStats[q]); } return a.join(", "); })() + "; vyjimek " + delFail);
+} else if (phase == "r") {
+    echo("Jen vypis.");
+} else {
+    echo("Neznama faze '" + phase + "'."); finish(1);
+}
+if (phase == "1" || phase == "2" || phase == "3") {
+    echo("(b) CreateBaseline navratove hodnoty: " + (function () { var a = []; for (var q in retStats) { a.push(q + " x" + retStats[q]); } return a.join(", "); })());
+}
+for (var k3 in PK) { echo("Stav " + k3 + ": " + listBaselines(pi, PK[k3]).length + " baselines"); }
+finish(0);
+]]>
+</script>
+</job>

@@ -1,0 +1,49 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B41-R2-scenare",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{3A3F1092-7B43-454c-A10D-B4C875517433}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "kind": "actor",
+       "text": "Ctenar vybere knihu"
+      },
+      {
+       "kind": "system",
+       "text": "System overi dostupnost"
+      },
+      {
+       "kind": "actor",
+       "text": "Ctenar potvrdi vypujcku"
+      },
+      {
+       "kind": "system",
+       "text": "System zaeviduje vypujcku"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "{3A3F1092-7B43-454c-A10D-B4C875517433}",
+   "constraints": [
+    {
+     "name": "Ctenar je prihlasen",
+     "type": "Pre-condition"
+    },
+    {
+     "name": "Vypujcka je zaevidovana",
+     "type": "Post-condition"
+    }
+   ]
+  }
+ ]
+}

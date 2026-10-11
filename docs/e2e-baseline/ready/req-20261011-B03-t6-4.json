@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B03-t6-4",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{2FEADF98-90E2-4749-9AED-A938A30F6538}",
+     "type": "Class",
+     "name": "A3",
+     "notes": "A3 - T6-4 cisty create"
+    }
+   ]
+  }
+ ]
+}

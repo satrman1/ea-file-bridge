@@ -1,0 +1,12 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B01-t6-1-cteni",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "get_baselines", "package": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}" },
+  { "op": "get_selected_context" },
+  { "op": "query", "sql": "SELECT p.Package_ID, p.ea_guid, p.Name, p.Parent_ID FROM t_package p WHERE p.Parent_ID IN (SELECT Package_ID FROM t_package WHERE ea_guid = '{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}') OR p.ea_guid = '{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}' OR p.Name = 'FBT-ROOT' ORDER BY p.Package_ID" },
+  { "op": "query", "sql": "SELECT COUNT(*) AS cnt FROM t_object o WHERE o.Object_Type <> 'Package' AND o.Package_ID IN (SELECT Package_ID FROM t_package WHERE ea_guid = '{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}')" },
+  { "op": "query", "sql": "SELECT d.DocID, d.DocName, d.Version, d.DocDate FROM t_document d WHERE d.DocType = 'Baseline' AND d.Version LIKE 'FB%' ORDER BY d.DocDate DESC" }
+ ]
+}

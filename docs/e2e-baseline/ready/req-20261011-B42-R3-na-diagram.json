@@ -1,0 +1,39 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B42-R3-na-diagram",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{8A61DBE2-C966-4aae-ABC9-04A40BBB4713}",
+     "type": "Actor",
+     "name": "Knihovnik",
+     "notes": "druhy aktor"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "{1B5D384F-35B5-4ba8-B90E-90DA4B9DA09B}",
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 40,
+     "y": 220
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$0[0]",
+     "target": "{AF2499D2-8C8E-4e44-AC4B-9F788ADD0A26}",
+     "type": "Association"
+    }
+   ]
+  }
+ ]
+}

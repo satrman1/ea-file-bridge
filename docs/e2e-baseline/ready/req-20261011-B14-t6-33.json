@@ -1,0 +1,27 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B14-t6-33",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "create_or_update_messages",
+   "diagram": "{89AD75EE-F7EA-4378-B0F8-B62E46688AD9}",
+   "rebuild": true,
+   "messages": [
+    {
+     "source": "{3BAA70AF-BB69-4d26-8D74-C1740C7453DB}",
+     "target": "{FCE15280-D739-413c-9F92-94B5E6E88FB5}",
+     "name": "zprava1",
+     "seqNo": 1
+    },
+    {
+     "source": "{FCE15280-D739-413c-9F92-94B5E6E88FB5}",
+     "target": "{3BAA70AF-BB69-4d26-8D74-C1740C7453DB}",
+     "name": "odpoved1",
+     "isReturn": true,
+     "seqNo": 2
+    }
+   ]
+  }
+ ]
+}

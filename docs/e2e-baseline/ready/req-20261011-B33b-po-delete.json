@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "20261011-B33b-po-delete",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  {
+   "op": "get_baselines",
+   "package": "{A89405C2-04A6-4c3d-B8AB-F9F3152DDFC3}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.DocID, d.Version, d.DocDate FROM t_document d WHERE d.DocType = 'Baseline' AND d.ElementID = '{A89405C2-04A6-4c3d-B8AB-F9F3152DDFC3}' ORDER BY d.Version"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name LIKE 'FB uklid-baselines-%' ORDER BY o.Object_ID"
+  }
+ ]
+}
