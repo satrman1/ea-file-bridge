@@ -15,6 +15,14 @@
 // repozitare ze startu session; FB_Main ji porovnava s aktualni a pri zmene
 // projektu v EA vraci E_REPO "restartuj pumpu" (i u cteni). Jen pamet
 // procesu pumpy (typeof WScript) - EA runtime this._fb* nedrzi (par. 1a/5).
+// FB-PU-02 (pumpa v0.6, Z261004b-5): hlaseni nese otisk kodu v modelu
+// (FB_CodeInfo - tagged values fb.code.*, zapisuje bootstrap/deploy_src) a pod
+// pumpou i verzi a otisk SOUBORU pumpy (WScript.ScriptFullName): verze z
+// hlavicky "pumpa vX.Y" se porovna s PUMP_REQUIRED - starsi pumpa = POZOR
+// "pumpa je starsi nez kod v modelu" (typicky vendorovana kopie ve workspace
+// po zmene pumpy bez refreshe). Otisk = sha256 souboru pumpy (stejna hodnota
+// jako PUMP-VERSION workspace, docs\WORKSPACE-METODIKY.md kap. 2).
+var PUMP_REQUIRED = "0.6"; // nejnizsi verze pumpy, se kterou tento kod pocita (requests\processing\, stavovy soubor)
 var self = this;
 var ridRaw = "" + this.FB_RepoId(Repository);
 if (typeof WScript != "undefined") {
@@ -38,6 +46,32 @@ if (st == null) {
     if (st.warnings.length > 0) { parts.push("Upozorneni: " + st.warnings.join(" | ")); }
 }
 for (var cw = 0; cw < cfgWarn.length; cw++) { parts.push(cfgWarn[cw]); }
+// --- otisk kodu v modelu + verze/otisk pumpy (FB-PU-02) ---
+try { parts.push("" + this.FB_CodeInfo(Repository).text); } catch (eCi) { parts.push("Otisk kodu: nelze precist (" + eCi.message + ")"); }
+if (typeof WScript != "undefined") {
+    try {
+        var pumpPath = "" + WScript.ScriptFullName;
+        var pumpBytes = this.FB_FileBytes(pumpPath);
+        var pumpText = "";
+        if (pumpBytes === null) {
+            var stP = this.FB_ComObj("ADODB.Stream");
+            stP.Type = 2; stP.Charset = "utf-8"; stP.Open(); stP.LoadFromFile(pumpPath);
+            pumpText = "" + stP.ReadText(-1); stP.Close();
+        } else { pumpText = this.FB_Utf8Decode(pumpBytes); }
+        var pumpHash = "" + this.FB_Sha256(pumpBytes === null ? pumpText : pumpBytes);
+        var vm = /pumpa v(\d+)\.(\d+)/.exec(pumpText);
+        var pumpVer = vm ? (vm[1] + "." + vm[2]) : "";
+        this._fbPumpInfo = { version: pumpVer, fingerprint: pumpHash, path: pumpPath };
+        var rq = PUMP_REQUIRED.split("."), hv = pumpVer.split(".");
+        var older = (pumpVer == "") || (parseInt(hv[0], 10) < parseInt(rq[0], 10)) || (parseInt(hv[0], 10) == parseInt(rq[0], 10) && parseInt(hv[1], 10) < parseInt(rq[1], 10));
+        if (older) {
+            parts.push("POZOR: pumpa " + (pumpVer == "" ? "(verze v hlavicce nenalezena)" : "v" + pumpVer) + " je starsi nez kod v modelu (potrebuje pumpu v" + PUMP_REQUIRED + "+): " + pumpPath
+                + " - vymen ji za aktualni (spravce: tools\\refresh-workspace.py), stavovy soubor a processing\\ tahle pumpa neumi");
+        } else {
+            parts.push("Pumpa v" + pumpVer + ", otisk " + pumpHash.substring(0, 12) + " (" + pumpPath + ")");
+        }
+    } catch (ePu) { parts.push("Verzi pumpy nelze zjistit: " + ePu.message); }
+}
 parts.push("Session baseline se nedela (sessionBaseline off). Zalohy se poridi automaticky az pred prvnim zapisem - vzdy nad konkretnim balickem, ne nad celou vetvi.");
 var out = parts.join(" | ");
 this.Log(Repository, out);

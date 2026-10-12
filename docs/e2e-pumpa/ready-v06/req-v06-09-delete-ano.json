@@ -1,0 +1,1 @@
+{"protocol":"eafb/0.2","id":"v06-09-delete-ano","repo":"EAEXAMPLE.QEA","ops":[{"op":"delete_from_model","targets":[{"type":"Element","guid":"{2E855BB9-DC23-4a83-B62A-840F2840B64A}"}]}]}

@@ -16,7 +16,7 @@ End Function
 <script language="JScript">
 <![CDATA[
 // ============================================================================
-// EA File Bridge - pumpa v0.5 (eafb/0.2)
+// EA File Bridge - pumpa v0.6 (eafb/0.2)
 // Hloupy nosic: watcher + COM attach + code loader z modelu + souborove IO.
 // Zadna business logika - tela operaci ziji v elementu AICodeBridge v modelu
 // (jediny kanon kodu, verzovany baselinami, citelny kazdym ctenarem modelu).
@@ -30,28 +30,68 @@ End Function
 //    souhrn na konzoli a zobrazi POPUP Ano/Ne/Storno s timeoutem. Vedoma
 //    odchylka od zadani ("Enter na konzoli"): StdIn.ReadLine nema timeout -
 //    nezodpovezene potvrzeni by navzdy zastavilo watcher vcetne LOW davek.
-//    Popup po timeoutu necha davku cekat a pumpa jede dal; lokalnost ukonu
-//    (klik u stroje) je stejna jako Enter.
 //  - Klik se predava FB_ConfirmPending (kanal "pumpa"); presuny pending
 //    souboru dela executor, pumpa jen prepisuje res-*.json.
-//  - Po startu se cekajici davky v pending\ znovu nabidnou (bezstavovost:
-//    potvrzeni prezije restart pumpy i EA).
-//  - rejected\ nove i pro E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky).
-//  - 2026-09-20 (Baseline politika par. 7): rejected\ i pro E_NO_BASELINE;
-//  - 2026-10-12 (cil zapisu, Z261004b-10): rejected\ i pro E_BLACKLIST a E_SCOPE_CONFIG;
-//    konzole rozlisuje "chybi rucni baseline" od re-klasifikace metrik.
+//  - Po startu se cekajici davky v pending\ znovu nabidnou (bezstavovost).
+//  - rejected\ i pro E_RISK_CONFIRM, E_NO_BASELINE (2026-09-20), E_BLACKLIST
+//    a E_SCOPE_CONFIG (2026-10-12, cil zapisu).
 // v0.13 (lekce E2E VS Code 2026-09-07, N5): jedina instance - zamek
-//    requests\.pump.lock drzeny po dobu behu; druhy start vypise
-//    "Pumpa uz bezi" a skonci (exit 2). Viz komentar u zamku nize.
+//    requests\.pump.lock drzeny po dobu behu; druhy start skonci (exit 2).
+// v0.6 (balik D revize usability pumpy 2026-10-04 + KONCEPCE potvrzovacich
+//    oken pravidla 5 a 6, Z261004b-5, 2026-10-12):
+//  - STAVOVY SOUBOR responses\pump-status.json (FB-PU-03): faze idle /
+//    waiting_ea / processing / waiting_confirm (+ stopped), aktualni soubor,
+//    od kdy, tep ~10 s, aliveUntil (do kdy se pumpa zarucene ozve - behem
+//    FB_Main a okna tep neobnovuje, smycka je jedno vlakno), verze a otisk
+//    pumpy. Agent (kit) i schranka/GUI fallback (FB_PumpAlive) z nej poznaji,
+//    ze pumpa bezi a na co ceka.
+//  - ZAMEK PRO UZIVATELE %LOCALAPPDATA%\EA-File-Bridge\pump.lock (FB-PU-07)
+//    s cestou bezici pumpy: druha pumpa z JINE slozky (vendorovana kopie ve
+//    workspace) se nespusti.
+//  - KONZOLE (FB-PU-04/-05): jeden vysledkovy radek na davku podle status a
+//    poctu ("OK 3/3 req-x.json", "CHYBA op[1] E_... req-x.json", "CEKA NA TEBE
+//    (okno potvrzeni) req-x.json"); banner = verze + otisk; rada "spust
+//    bootstrap, nebo se obrat na spravce" misto inject.
+//  - SOUBORY (FB-PU-10/-11/-13/-14): zpracovava se jen req-*.json, ostatni se
+//    ohlasi (jednou) a nechaji lezet; pred provedenim se soubor presune do
+//    requests\processing\ - co tam lezi pri startu, je nedokoncena davka ->
+//    ohlasi se, NEprovede (res E_INTERRUPTED, soubor do rejected\); potvrzeny
+//    beh ma marker processing\<jmeno>.confirmed (prerusena potvrzena davka se
+//    po startu uz nenabidne); vlastni odpovedi pumpy pres FB_JsonStringify,
+//    id z davky, protokol eafb/0.2; radkovy log responses\pump-RRRR-MM-DD.log
+//    (PUMP_LOG).
+//  - OKNO (pravidlo 5, FB-PU-18, FB-UI-08): vychozi tlacitko Storno (+512) -
+//    Enter nic neprovede; ikona upozorneni (48) u mazani, presunu, klonu a
+//    prepisu, jinak otaznik (32); veta o casovem limitu; JEDNA legenda
+//    tlacitek (z FB_ConfirmSummary - pumpa uz zadnou nepridava); faze
+//    waiting_confirm ve stavovem souboru; stari cekajici davky v okne.
+//  - CEKAJICI DAVKY (pravidlo 6, FB-PU-15/-17): okno se vrati bez restartu,
+//    kdyz agent posle tentyz soubor znovu (FB_Main vrati stavajici res);
+//    pri startu FB_PendingSweep (expirovane -> rejected\ + audit, pumpa je
+//    jen vypise), neexpirovane nejstarsi prvni s casem cekani.
+//  - Po "Potvrzeno, ale cerstva rucni baseline stale chybi" (N-E2E-4) uz pumpa
+//    okno NEopakuje: davka zustane v pending\, konzole rekne, co udelat
+//    (Ctrl+Alt+B nad balickem, jmeno bez FB-AUTO); okno se vrati az pri
+//    dalsim pruchodu (tentyz soubor znovu / restart pumpy).
+//  - Po reloadu kodu (deploy_src) se znovu vola FB_SessionStart (pamet
+//    session - identita repa, vlastni prvky - jinak po reloadu zmizi).
+//  - Ztrata EA se pozna v kazdem pruchodu smycky (eaAlive), ne az pri dalsi
+//    davce: stav waiting_ea + okamzity re-attach po restartu EA.
+//  - FAIL-CLOSED pri starem kodu v modelu: pumpa v0.6 predava FB_Main cestu
+//    z requests\processing\ - starsi FB_Main (bez v0.18) by odvodil slozky
+//    spatne (res do requests\responses, pending do processing\pending). Kdyz
+//    v modelu chybi FB_PumpAlive (= kod < v0.18), pumpa davky NEBERE a radi
+//    nasadit kod (deploy_src starou pumpou v0.5 / bootstrap) a restartovat.
 //
 // Start: dvojklik (sam se prehodi do cscript konzole).
 // Konec: zavrit okno konzole (nebo Ctrl+C).
 // Slozky (vznikaji samy vedle pumpy):
 //   requests\            <- sem pise AI (Copilot) davky req-*.json
+//   requests\processing\ <- davka prave provadena (jedna; po startu = prerusena)
 //   requests\pending\    <- ELEVATED davky cekajici na potvrzeni cloveka
 //   requests\processed\  <- archiv zpracovanych (s timestampem)
-//   requests\rejected\   <- nevalidni/odmitnute/zamitnute davky
-//   responses\           <- odpovedi res-*.json (u cekajicich vc. nonce)
+//   requests\rejected\   <- nevalidni/odmitnute/zamitnute/prerusene davky
+//   responses\           <- odpovedi res-*.json, pump-status.json, pump-*.log
 // ============================================================================
 
 // --- prepnuti wscript -> cscript (konzole misto vyskakovacich okenek) ---
@@ -61,6 +101,7 @@ if (WScript.FullName.toLowerCase().indexOf("wscript.exe") >= 0) {
     WScript.Quit(0);
 }
 
+var PUMP_VERSION = "v0.6";
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 var BASE = fso.GetParentFolderName(WScript.ScriptFullName);
 var DIR_REQ  = BASE + "\\requests";
@@ -68,9 +109,18 @@ var DIR_RES  = BASE + "\\responses";
 var DIR_PROC = DIR_REQ + "\\processed";
 var DIR_REJ  = DIR_REQ + "\\rejected";
 var DIR_PEND = DIR_REQ + "\\pending";
+var DIR_PROG = DIR_REQ + "\\processing";
 var ADDIN_NAME = "AICodeBridge";
 var POLL_MS = 1000;
-var CONFIRM_TIMEOUT_S = 300; // popup potvrzeni; timeout = davka dal ceka
+var HEARTBEAT_MS = 10000;        // tep stavoveho souboru v klidu
+var ALIVE_IDLE_S = 30;           // aliveUntil v klidu = tep + 30 s
+var ALIVE_PROCESSING_S = 1800;   // aliveUntil behem FB_Main (dlouhy dotaz v bance = minuty)
+var CONFIRM_TIMEOUT_S = 300;     // popup potvrzeni; timeout = davka dal ceka
+var PUMP_LOG = true;             // radkovy log responses\pump-RRRR-MM-DD.log (false = vypnout)
+var STATUS_PATH = DIR_RES + "\\pump-status.json";
+var PUMP_HASH = "";              // otisk souboru pumpy (sha256) - doplni se po attachi (FB_Sha256 z modelu)
+var PUMP_START = "";
+var PUMP_ID = Math.floor(Math.random() * 1e9);
 
 // --- Session shim: kod z modelu smi volat Session.Output / Session.Prompt ---
 var Session = {
@@ -84,12 +134,27 @@ function ts() {
     return "" + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate())
         + "-" + pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
 }
-function echo(s) {
-    var d = new Date();
-    WScript.Echo(pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds()) + "  " + s);
+function nowText(d) {
+    d = d || new Date();
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate())
+        + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
 }
-
+function dayText(d) { d = d || new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
 function ensureDir(p) { if (!fso.FolderExists(p)) { fso.CreateFolder(p); } }
+function appendLog(line) {
+    if (!PUMP_LOG) { return; }
+    try {
+        ensureDir(DIR_RES);
+        var lf = fso.OpenTextFile(DIR_RES + "\\pump-" + dayText() + ".log", 8, true, 0); // 8 = append, ANSI
+        lf.WriteLine(line);
+        lf.Close();
+    } catch (eLg) { }
+}
+function echo(s) {
+    var line = nowText().substring(11) + "  " + s;
+    WScript.Echo(line);
+    appendLog(nowText() + "  " + s);
+}
 
 function readUtf8(path) {
     var st = new ActiveXObject("ADODB.Stream");
@@ -97,7 +162,7 @@ function readUtf8(path) {
     st.LoadFromFile(path);
     var s = st.ReadText(-1);
     st.Close();
-    return s;
+    return ("" + s).replace(/^\uFEFF/, "");
 }
 function writeUtf8(path, text) {
     var st = new ActiveXObject("ADODB.Stream");
@@ -107,12 +172,59 @@ function writeUtf8(path, text) {
     st.Close();
 }
 
+// --- stavovy soubor responses\pump-status.json (FB-PU-03) ---
+// Vlastni mini serializer (bridge jeste nemusi byt nacteny - faze waiting_ea).
+function jsonStr(v) {
+    if (v === null || typeof v == "undefined") { return "null"; }
+    if (typeof v == "number" || typeof v == "boolean") { return "" + v; }
+    if (typeof v == "string") {
+        return "\"" + v.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\r/g, "\\r").replace(/\n/g, "\\n").replace(/\t/g, "\\t") + "\"";
+    }
+    if (Object.prototype.toString.call(v) == "[object Array]") {
+        var a = [];
+        for (var i = 0; i < v.length; i++) { a.push(jsonStr(v[i])); }
+        return "[" + a.join(",") + "]";
+    }
+    var o = [];
+    for (var k in v) { if (typeof v[k] != "function") { o.push("\"" + k + "\":" + jsonStr(v[k])); } }
+    return "{" + o.join(",") + "}";
+}
+var STATUS = { phase: "waiting_ea", file: "", since: nowText(), repository: "", lastResult: "", ignored: [] };
+var lastBeat = 0;
+function writeStatus(phase, file, aliveS) {
+    var now = new Date();
+    if ((phase && phase != STATUS.phase) || ((file || "") != STATUS.file)) { STATUS.since = nowText(now); }
+    if (phase) { STATUS.phase = phase; }
+    STATUS.file = file || "";
+    var secs = (typeof aliveS == "number") ? aliveS : ALIVE_IDLE_S;
+    var st = {
+        protocol: "eafb/0.2",
+        pump: { version: PUMP_VERSION, fingerprint: PUMP_HASH, path: "" + WScript.ScriptFullName, started: PUMP_START, id: PUMP_ID },
+        phase: STATUS.phase, file: STATUS.file, since: STATUS.since,
+        heartbeat: nowText(now), aliveUntil: nowText(new Date(now.getTime() + secs * 1000)),
+        repository: STATUS.repository, pendingCount: countPending(), lastResult: STATUS.lastResult, ignored: STATUS.ignored,
+        confirmTimeoutS: CONFIRM_TIMEOUT_S,
+        note: "faze idle/waiting_ea/processing/waiting_confirm/stopped; pumpa nebezi, kdyz aliveUntil minul (behem FB_Main a okna tep neobnovuje)"
+    };
+    try { ensureDir(DIR_RES); writeUtf8(STATUS_PATH, jsonStr(st)); } catch (eSt) { }
+    lastBeat = now.getTime();
+}
+function heartbeat() { if (new Date().getTime() - lastBeat >= HEARTBEAT_MS) { writeStatus(STATUS.phase, STATUS.file); } }
+function countPending() {
+    var n = 0;
+    try {
+        var en = new Enumerator(fso.GetFolder(DIR_PEND).Files);
+        for (; !en.atEnd(); en.moveNext()) { if (/^req-.*\.json$/i.test("" + en.item().Name)) { n++; } }
+    } catch (eC) { }
+    return n;
+}
+
 // --- code loader: nacte tela operaci AICodeBridge z modelu a zkompiluje ---
 function loadBridge(repo) {
     var xml = "" + repo.SQLQuery(
         "SELECT Object_ID FROM t_object WHERE Name = '" + ADDIN_NAME + "' AND Stereotype = 'JavascriptAddin'");
     var m = /<Object_ID>(\d+)<\/Object_ID>/.exec(xml);
-    if (!m) { throw new Error("Element '" + ADDIN_NAME + "' (JavascriptAddin) v modelu nenalezen."); }
+    if (!m) { throw new Error("Element '" + ADDIN_NAME + "' (JavascriptAddin) v modelu nenalezen - spust bootstrap (scripts\\ITAN-Bootstrap File Bridge.js v EA Scripting), nebo se obrat na spravce."); }
     var el = repo.GetElementByID(parseInt(m[1], 10));
     var bridge = {};
     var count = 0;
@@ -136,35 +248,101 @@ function loadBridge(repo) {
             bridge["" + meth.Name] = Function.apply(null, args);
             count++;
         } catch (e) {
-            echo("WARN: operace " + meth.Name + " se nezkompilovala: " + e.message);
+            echo("WARN: operace " + meth.Name + " se nezkompilovala: " + e.message + " (kod v modelu je vadny - nasad znovu bootstrapem / deploy_src, nebo se obrat na spravce)");
         }
     }
     echo("Code loader: " + count + " operaci nacteno z modelu (elementID " + el.ElementID + ").");
     if (!bridge.FB_Main) {
-        echo("POZOR: operace FB_Main v modelu chybi - spust ITAN-Inject Addin Code v EA Scripting.");
+        echo("POZOR: operace FB_Main v modelu chybi - spust bootstrap (scripts\\ITAN-Bootstrap File Bridge.js v EA Scripting), nebo se obrat na spravce.");
     }
     return bridge;
 }
 
-// --- jmeno response souboru: req-X.json -> res-X.json ---
+// --- otisk souboru pumpy (sha256) - FB_Sha256 + FB_FileBytes z modelu ---
+function pumpFingerprint(bridge) {
+    try {
+        if (!bridge || !bridge.FB_Sha256 || !bridge.FB_FileBytes) { return ""; }
+        var b = bridge.FB_FileBytes("" + WScript.ScriptFullName);
+        if (b === null) { b = readUtf8("" + WScript.ScriptFullName); }
+        return "" + bridge.FB_Sha256(b);
+    } catch (eH) { return ""; }
+}
+
+// --- jmena souboru: req-X.json -> res-X.json; jen req-*.json se zpracovava ---
 function responseName(reqName) {
     if (/^req/i.test(reqName)) { return reqName.replace(/^req/i, "res"); }
     return "res-" + reqName;
 }
+function isReqName(name) { return /^req-.+\.json$/i.test("" + name); }
 
-function errorResponse(code, message) {
-    return "{\"protocol\":\"eafb/0.1\",\"id\":\"\",\"status\":\"error\",\"code\":\""
-        + code + "\",\"message\":\"" + message + "\",\"results\":[]}";
+// --- vlastni odpoved pumpy (FB-PU-13): pres FB_JsonStringify, id z davky, eafb/0.2 ---
+function batchId(path) {
+    try {
+        var m = /"id"\s*:\s*"([^"\\]{0,200})"/.exec(readUtf8(path));
+        return m ? m[1] : "";
+    } catch (eI) { return ""; }
+}
+function errorResponse(bridge, code, message, id, extra) {
+    var o = { protocol: "eafb/0.2", id: "" + (id || ""), status: "error", code: "" + code, message: "" + message, since: nowText(), results: [], madeBy: "pumpa " + PUMP_VERSION };
+    if (extra) { for (var k in extra) { o[k] = extra[k]; } }
+    try { if (bridge && bridge.FB_JsonStringify) { return "" + bridge.FB_JsonStringify(o, 1); } } catch (eJ) { }
+    return jsonStr(o);
 }
 
-// --- potvrzovaci cyklus (confirm_required): konzolovy souhrn + popup ---
+// --- jeden vysledkovy radek na davku (FB-PU-04) ---
+function parseRes(bridge, text) {
+    try { if (bridge && bridge.FB_JsonParse) { return bridge.FB_JsonParse(text); } } catch (eP) { }
+    return null;
+}
+function clip(s, n) { s = "" + s; return (s.length > n) ? s.substring(0, n) + "..." : s; }
+function resultLine(bridge, name, respText) {
+    var r = parseRes(bridge, respText);
+    if (r == null) { return "CHYBA " + name + " - odpoved nejde precist (viz " + responseName(name) + ")"; }
+    var st = "" + (r.status || "?");
+    var res = r.results || [], okc = 0, total = res.length, firstErr = -1;
+    for (var i = 0; i < res.length; i++) {
+        var s1 = "" + ((res[i] && res[i].status) || "");
+        if (s1 == "ok") { okc++; }
+        if (firstErr < 0 && (s1 == "error" || s1 == "partial")) { firstErr = i; }
+    }
+    var warn = (r.warnings && r.warnings.length) ? " | varovani: " + r.warnings.length : "";
+    if (st == "confirm_required") { return "CEKA NA TEBE (okno potvrzeni) " + name; }
+    if (st == "done") { return "OK " + okc + "/" + total + " " + name + warn; }
+    if (st == "processing") { return "ZPRACOVAVA SE " + name + " (od " + (r.since || "?") + ")"; }
+    if (st == "rejected") { return "ZAMITNUTO " + (r.code || "") + " " + name + " - " + clip(r.message || "", 160); }
+    if (firstErr >= 0 && total > 0) {
+        var e = res[firstErr];
+        return "CHYBA op[" + firstErr + "] " + (e.code || e.status || "?") + " " + name + " (ok " + okc + "/" + total + ") - " + clip(e.message || r.message || "", 160) + warn;
+    }
+    return "CHYBA " + (r.code || st) + " " + name + " - " + clip(r.message || "", 160) + warn;
+}
+function announce(bridge, name, respText) {
+    var line = resultLine(bridge, name, respText);
+    STATUS.lastResult = line;
+    echo(line);
+    return line;
+}
+
+// --- okno potvrzeni (pravidlo 5): vychozi Storno, ikona podle obsahu ---
+function confirmIcon(r) {
+    // ikona upozorneni (48) u mazani, presunu, klonu, prepisu a kaskad; jinak otaznik (32)
+    try {
+        var ops = (r.risk && r.risk.summary && r.risk.summary.ops) || {};
+        for (var k in ops) {
+            if (/^(delete_|remove_|move_|clone_|import_element_linked|apply_classifier)/i.test(k)) { return 48; }
+        }
+        if (r.risk && r.risk.cascades && r.risk.cascades.length > 0) { return 48; }
+        var rs = (r.risk && r.risk.riskReasons) || [];
+        for (var i = 0; i < rs.length; i++) { if (/rebuild|prepis|prepsan|smaz|mazan|presun|klon/i.test("" + rs[i])) { return 48; } }
+    } catch (eI) { }
+    return 32;
+}
 // Vraci true = po davce prenacist kod z modelu (deploy_src potvrzeny clovekem).
-function promptConfirm(repo, bridge, pendPath, respText) {
+function promptConfirm(repo, bridge, pendPath, respText, ageInfo) {
     var needReload = false;
     var name = "" + fso.GetFileName(pendPath);
     for (var round = 0; round < 3; round++) {
-        var r = null;
-        try { r = bridge.FB_JsonParse(respText); } catch (ePr) { r = null; }
+        var r = parseRes(bridge, respText);
         if (r == null || ("" + r.status) != "confirm_required") { return needReload; }
         if (!r.confirm || !r.confirm.nonce) {
             echo("CEKA " + name + " - potvrzeni neni mozne: " + ((r.confirm && r.confirm.note) || "bez nonce"));
@@ -172,63 +350,148 @@ function promptConfirm(repo, bridge, pendPath, respText) {
         }
         var sum = "";
         try { sum = "" + bridge.FB_ConfirmSummary(r); } catch (eSm) { sum = "(souhrn nedostupny: " + eSm.message + ")"; }
-        echo("--- CEKA NA POTVRZENI (Risk Gate ELEVATED) ---");
+        var title = "EA File Bridge - potvrzeni davky " + r.id;
+        var age = "";
+        if (ageInfo && ageInfo.since) { age = "Ceka od " + ageInfo.since + (ageInfo.ageMin >= 0 ? " (" + ageInfo.ageMin + " min)" : "") + "\n"; }
+        else if (r.since) { age = "Ceka od " + r.since + "\n"; }
+        echo("--- CEKA NA TEBE: okno \"" + title + "\" (Ano = provest, Ne = zamitnout, Storno/timeout " + CONFIRM_TIMEOUT_S + " s = nechat cekat; Enter = Storno) ---");
         var lines = sum.split("\n");
         for (var li = 0; li < lines.length; li++) { echo("  " + lines[li]); }
-        echo("--- Ano = provest, Ne = zamitnout, Storno/timeout (" + CONFIRM_TIMEOUT_S + " s) = nechat cekat ---");
+        writeStatus("waiting_confirm", name, CONFIRM_TIMEOUT_S + ALIVE_IDLE_S);
         var sh = new ActiveXObject("WScript.Shell");
-        var btn = sh.Popup("CEKA NA POTVRZENI (Risk Gate ELEVATED)\n\n" + sum
-            + "\n\nAno = provest, Ne = zamitnout (rejected), Storno = nechat cekat v pending\\.",
-            CONFIRM_TIMEOUT_S, "EA File Bridge - potvrzeni davky " + r.id, 3 + 32 + 4096);
+        // typ: 3 (Ano/Ne/Storno) + ikona (48 upozorneni / 32 otaznik) + 512 (vychozi = Storno) + 4096 (vzdy navrchu)
+        var btn = sh.Popup(sum + "\n\n" + age
+            + "Kdyz nerozhodnes do " + Math.round(CONFIRM_TIMEOUT_S / 60) + " minut, davka pocka a okno se vrati, az ji agent posle znovu nebo az pumpu spustis znovu.",
+            CONFIRM_TIMEOUT_S, title, 3 + confirmIcon(r) + 512 + 4096);
+        writeStatus("processing", name, ALIVE_PROCESSING_S);
         if (btn != 6 && btn != 7) {
-            echo("Bez rozhodnuti (timeout/storno) - " + name + " ceka v pending\\; restart pumpy ji znovu nabidne.");
+            var why = (btn == -1) ? "timeout " + CONFIRM_TIMEOUT_S + " s" : "Storno";
+            echo("CEKA " + name + " (" + why + ") - davka ceka v pending\\; okno se vrati, az ji agent posle znovu nebo po restartu pumpy.");
+            STATUS.lastResult = "CEKA " + name + " (" + why + ")";
             return needReload;
         }
         var out = "";
+        var marker = DIR_PROG + "\\" + name + ".confirmed";
         try {
+            if (btn == 6) { try { ensureDir(DIR_PROG); writeUtf8(marker, "potvrzeno " + nowText() + " " + pendPath); } catch (eMk) { } }
             out = "" + bridge.FB_ConfirmPending(repo, pendPath, r.confirm.nonce, r.confirm.payloadHash, "pumpa", (btn == 6));
         } catch (eCf) {
             echo("ERROR potvrzeni " + name + ": " + eCf.message);
+            try { if (fso.FileExists(marker)) { fso.DeleteFile(marker); } } catch (eMd0) { }
             return needReload;
         }
+        try { if (fso.FileExists(marker)) { fso.DeleteFile(marker); } } catch (eMd) { }
         writeUtf8(DIR_RES + "\\" + responseName(name), out);
         if (out.indexOf("\"reloadCode\":true") >= 0) { needReload = true; }
         if (out.indexOf("\"status\":\"confirm_required\"") >= 0) {
-            // Baseline politika (navadena cesta): potvrzeno, ale cerstva rucni
-            // baseline chybi -> executor davku NEprovedl a zada nove potvrzeni
-            if (out.indexOf("rucni baseline stale chybi") >= 0) { echo("NEPROVEDENO: chybi cerstva rucni baseline (viz dialog) - udelej ji v EA a potvrd znovu, nebo davku zamitni."); }
-            else { echo("Re-klasifikace: metriky se zmenily - nove potvrzeni s novym nonce."); }
+            if (out.indexOf("rucni baseline stale chybi") >= 0) {
+                // N-E2E-4: potvrzeno, ale cerstva rucni baseline chybi -> davka
+                // NEprovedena; okno se uz NEopakuje (clovek potrebuje odejit do EA)
+                echo("NEPROVEDENO " + name + ": chybi cerstva rucni baseline. Udelej ji v EA (Ctrl+Alt+B nad balickem cile -> New Baseline, jmeno bez FB-AUTO), pak at agent posle tentyz soubor znovu (nebo restartuj pumpu) - okno se vrati. Davka ceka v pending\\.");
+                STATUS.lastResult = "NEPROVEDENO " + name + " (chybi rucni baseline) - ceka v pending\\";
+                return needReload;
+            }
+            echo("Re-klasifikace " + name + ": metriky se zmenily - nove potvrzeni s novym nonce.");
             respText = out;
             continue;
         }
-        if (out.indexOf("\"code\":\"E_RISK_REJECTED\"") >= 0) { echo("ZAMITNUTO " + name + " -> rejected\\"); }
-        else if (out.indexOf("\"code\":\"E_RISK_INTEGRITY\"") >= 0) { echo("E_RISK_INTEGRITY " + name + " (payload zmenen) -> rejected\\"); }
-        else if (out.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0) { echo("E_NO_BASELINE " + name + " (zalohu nelze poridit, nic neprovedeno) -> rejected\\"); }
-        else if (out.indexOf("\"status\":\"done\"") >= 0) { echo("POTVRZENO a provedeno " + name + " -> processed\\"); }
-        else { echo("POTVRZENO " + name + ", vysledek s chybou - viz " + responseName(name)); }
+        announce(bridge, name, out);
         return needReload;
     }
     echo("CEKA " + name + " - opakovana re-klasifikace, necham v pending\\.");
     return needReload;
 }
 
-// --- po startu znovu nabidnout davky cekajici v pending\ (bezstavovost) ---
+// --- po startu: expirace + znovu nabidnout cekajici davky (pravidlo 6) ---
 function offerPendingOnStart(repo, bridge) {
     var needReload = false;
+    var kept = [], keptByName = {};
+    if (bridge.FB_PendingSweep) {
+        try {
+            var sw = bridge.FB_PendingSweep(repo, DIR_PEND, "");
+            for (var ei = 0; ei < sw.expired.length; ei++) {
+                var ex = sw.expired[ei];
+                echo("VYPRSELA " + ex.name + " (id " + ex.id + ", cekala od " + ex.since + ", " + ex.ageMin + " min > " + sw.maxAgeMin + " min) -> rejected\\, audit zapsan, agent dostane E_RISK_EXPIRED");
+            }
+            for (var ki = 0; ki < sw.kept.length; ki++) { kept.push(sw.kept[ki]); keptByName[("" + sw.kept[ki].name).toLowerCase()] = 1; }
+            for (var ni = 0; ni < (sw.notes || []).length; ni++) { echo("pending\\: " + sw.notes[ni]); }
+        } catch (eSw) { echo("WARN: kontrola stari cekajicich davek selhala: " + eSw.message); }
+    }
+    // soubory v pending\, ktere index nezna (res ze starsi verze) - nabidnout jako dnes
     try {
         var en = new Enumerator(fso.GetFolder(DIR_PEND).Files);
         for (; !en.atEnd(); en.moveNext()) {
             var f = en.item();
-            if (!/\.json$/i.test("" + f.Name)) { continue; }
-            var resPath = DIR_RES + "\\" + responseName("" + f.Name);
-            if (!fso.FileExists(resPath)) {
-                echo("CEKA " + f.Name + " v pending\\ bez res souboru - nelze potvrdit, vyres rucne.");
+            if (!isReqName("" + f.Name) || keptByName[("" + f.Name).toLowerCase()] === 1) { continue; }
+            var sinceF = "";
+            try { sinceF = nowText(new Date(f.DateLastModified)); } catch (eD) { sinceF = ""; }
+            kept.push({ name: "" + f.Name, id: "", since: sinceF, ageMin: -1 });
+        }
+    } catch (eEn) { echo("WARN: kontrola pending\\ selhala: " + eEn.message); }
+    // nejstarsi prvni
+    kept.sort(function (a, b) { var x = "" + (a.since || ""), y = "" + (b.since || ""); return (x < y) ? -1 : ((x > y) ? 1 : 0); });
+    if (kept.length > 0) { echo("Cekajicich davek v pending\\: " + kept.length + " (nabizim nejstarsi prvni)"); }
+    for (var i = 0; i < kept.length; i++) {
+        var k = kept[i];
+        var pendPath = DIR_PEND + "\\" + k.name;
+        if (!fso.FileExists(pendPath)) { continue; }
+        var resPath = DIR_RES + "\\" + responseName(k.name);
+        if (!fso.FileExists(resPath)) {
+            echo("CEKA " + k.name + " v pending\\ bez res souboru - nelze potvrdit (nonce chybi); soubor odstran z pending\\ nebo ho vrat do requests\\.");
+            continue;
+        }
+        // prerusena POTVRZENA davka (marker z predchoziho behu) - uz nenabizet
+        var marker = DIR_PROG + "\\" + k.name + ".confirmed";
+        if (fso.FileExists(marker)) {
+            echo("PRERUSENA " + k.name + ": potvrzena davka byla prerusena uprostred provadeni (pumpa zavrena / EA spadlo) - NEprovadim znovu; zkontroluj Output tab a audit, agent at posle opravnou davku s novym id. -> rejected\\");
+            try {
+                var bid = batchId(pendPath);
+                writeUtf8(resPath, errorResponse(bridge, "E_INTERRUPTED",
+                    "Potvrzena davka byla prerusena uprostred provadeni (pumpa zavrena nebo EA spadlo); cast zapisu mohla probehnout. Nic dalsiho nebylo provedeno. Zkontroluj Output tab 'AI Bridge' a audit a posli opravnou davku s NOVYM id.",
+                    bid, { interrupted: { confirmed: true, markedAt: readUtf8(marker) } }));
+                fso.MoveFile(pendPath, DIR_REJ + "\\" + k.name.replace(/\.json$/i, "") + "." + ts() + ".interrupted.json");
+                fso.DeleteFile(marker);
+                if (bridge.FB_PendingIndex) { try { bridge.FB_PendingIndex(repo, DIR_PEND, "remove", { name: k.name }); } catch (eIx) { } }
+                if (bridge.Log) { try { bridge.Log(repo, "FB " + bid + " -> E_INTERRUPTED (potvrzena davka " + k.name + " prerusena uprostred provadeni, pumpa " + PUMP_VERSION + ")"); } catch (eL1) { } }
+            } catch (eMv) { echo("ERROR presunu prerusene davky " + k.name + ": " + eMv.message); }
+            continue;
+        }
+        if (promptConfirm(repo, bridge, pendPath, readUtf8(resPath), k)) { needReload = true; }
+    }
+    return needReload;
+}
+
+// --- po startu: nedokoncene davky v requests\processing\ (FB-PU-11) ---
+function recoverProcessing(repo, bridge) {
+    try {
+        var en = new Enumerator(fso.GetFolder(DIR_PROG).Files);
+        var list = [];
+        for (; !en.atEnd(); en.moveNext()) { list.push({ name: "" + en.item().Name, path: "" + en.item().Path }); }
+        for (var i = 0; i < list.length; i++) {
+            var f = list[i];
+            if (!isReqName(f.name)) {
+                if (/\.confirmed$/i.test(f.name)) { continue; } // marker potvrzeneho behu - resi offerPendingOnStart
+                echo("processing\\: cizi soubor " + f.name + " - nechavam lezet.");
                 continue;
             }
-            if (promptConfirm(repo, bridge, "" + f.Path, readUtf8(resPath))) { needReload = true; }
+            var resPath = DIR_RES + "\\" + responseName(f.name);
+            var r = fso.FileExists(resPath) ? parseRes(bridge, readUtf8(resPath)) : null;
+            var stamp = f.name.replace(/\.json$/i, "") + "." + ts();
+            if (r != null && ("" + r.status) != "processing" && ("" + r.status) != "confirm_required") {
+                // executor dobehl, pumpa uz nestihla presun -> dokoncit presun podle vysledku
+                echo("DOKONCENA " + f.name + " (res uz existoval: " + r.status + (r.code ? " " + r.code : "") + ") -> processed\\");
+                fso.MoveFile(f.path, DIR_PROC + "\\" + stamp + ".json");
+                continue;
+            }
+            echo("PRERUSENA " + f.name + ": davka byla prerusena uprostred zpracovani (pumpa zavrena / EA spadlo) - NEprovadim znovu; zkontroluj Output tab 'AI Bridge', agent at posle opravnou davku s novym id. -> rejected\\");
+            var bid2 = batchId(f.path);
+            writeUtf8(resPath, errorResponse(bridge, "E_INTERRUPTED",
+                "Davka byla prerusena uprostred zpracovani (pumpa zavrena nebo EA spadlo); cast zapisu mohla probehnout. Nic dalsiho nebylo provedeno. Zkontroluj Output tab 'AI Bridge' a audit a posli opravnou davku s NOVYM id.",
+                bid2, { interrupted: { since: (r && r.since) ? "" + r.since : "", file: "requests\\processing\\" + f.name } }));
+            fso.MoveFile(f.path, DIR_REJ + "\\" + stamp + ".interrupted.json");
+            if (bridge.Log) { try { bridge.Log(repo, "FB " + bid2 + " -> E_INTERRUPTED (" + f.name + " prerusena uprostred zpracovani, pumpa " + PUMP_VERSION + ")"); } catch (eL2) { } }
         }
-    } catch (eOP) { echo("WARN: kontrola pending\\ selhala: " + eOP.message); }
-    return needReload;
+    } catch (eRp) { echo("WARN: kontrola processing\\ selhala: " + eRp.message); }
 }
 
 // --- zpracovani jedne davky; vraci true = po davce prenacist kod z modelu ---
@@ -242,17 +505,25 @@ function processFile(repo, bridge, file) {
     var size2 = fso.GetFile(path).Size;
     if (size1 != size2) { echo("Soubor " + name + " se jeste zapisuje, pockam."); return false; }
 
+    // FB-PU-11: pred provedenim do requests\processing\ (co tam lezi pri startu = nedokoncene)
+    ensureDir(DIR_PROG);
+    var progPath = DIR_PROG + "\\" + name;
+    try {
+        if (fso.FileExists(progPath)) { fso.DeleteFile(progPath); }
+        fso.MoveFile(path, progPath);
+    } catch (eMv) { echo("ERROR: soubor " + name + " nejde presunout do processing\\ (" + eMv.message + ") - zkusim pristi pruchod."); return false; }
     echo("Zpracovavam " + name + " ...");
+    writeStatus("processing", name, ALIVE_PROCESSING_S);
     var respText, rejected = false;
 
     if (!bridge.FB_Main) {
-        respText = errorResponse("E_NO_EXECUTOR",
-            "Executor v modelu chybi (FB_Main). Spust ITAN-Inject Addin Code v EA Scripting.");
+        respText = errorResponse(bridge, "E_NO_EXECUTOR",
+            "Executor v modelu chybi (FB_Main). Spust bootstrap (scripts\\ITAN-Bootstrap File Bridge.js v EA Scripting), nebo se obrat na spravce.", batchId(progPath));
         rejected = true;
     } else {
         // kontrakt I5 (v0.5): executor dostava CESTU - hash surovych bajtu
         // a parse probehnou nad jednim ctenim souboru uvnitr FB_Main
-        respText = "" + bridge.FB_Main(repo, path);
+        respText = "" + bridge.FB_Main(repo, progPath);
         // rejected: E_PARSE (nevalidni JSON) + E_RISK_BLOCKED (BLOCKED davka)
         // + E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky, B1)
         // + E_NO_BASELINE (Baseline politika par. 7: pre-image nelze poridit -
@@ -272,17 +543,31 @@ function processFile(repo, bridge, file) {
     // confirm_required: executor presunul soubor do pending\ - zadny presun
     // zde; nabidnout potvrzeni (popup) a skoncit
     if (respText.indexOf("\"status\":\"confirm_required\"") >= 0) {
-        echo("CEKA NA POTVRZENI " + name + " -> requests\\pending\\");
-        return promptConfirm(repo, bridge, DIR_PEND + "\\" + name, respText);
+        announce(bridge, name, respText);
+        return promptConfirm(repo, bridge, DIR_PEND + "\\" + name, respText, null);
     }
 
-    if (fso.FileExists(path)) {
+    if (fso.FileExists(progPath)) {
         var stamped = name.replace(/\.json$/i, "") + "." + ts() + ".json";
-        fso.MoveFile(path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
+        fso.MoveFile(progPath, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
     }
-    echo((rejected ? "ODMITNUTO " : "Hotovo ") + name + " -> " + responseName(name));
+    announce(bridge, name, respText);
     // v0.4: deploy_src oznamuje novy kod v modelu -> prenacist (bez restartu)
     return (respText.indexOf("\"reloadCode\":true") >= 0);
+}
+
+// --- cizi soubory primo v requests\ (FB-PU-10): ohlasit jednou, nechat lezet ---
+var ignoredSeen = {};
+function noteIgnored(name) {
+    if (ignoredSeen[name] === 1) { return; }
+    ignoredSeen[name] = 1;
+    STATUS.ignored.push(name);
+    echo("IGNORUJI " + name + " - zpracovavam jen soubory req-*.json (pojmenuj davku req-<id>.json).");
+}
+function forgetIgnored(present) {
+    var keep = [];
+    for (var i = 0; i < STATUS.ignored.length; i++) { if (present[STATUS.ignored[i]] === 1) { keep.push(STATUS.ignored[i]); } else { delete ignoredSeen[STATUS.ignored[i]]; } }
+    STATUS.ignored = keep;
 }
 
 function eaAlive(ea) {
@@ -290,8 +575,20 @@ function eaAlive(ea) {
     catch (e) { return false; }
 }
 
+function reloadCode(ea, why) {
+    echo(why + " -> prenacitam kod z modelu ...");
+    try {
+        bridge = loadBridge(ea.Repository);
+        PUMP_HASH = pumpFingerprint(bridge);
+        // pamet session (identita repa, vlastni prvky) zije v objektu operaci -
+        // po reloadu by zmizela -> FB_SessionStart znovu
+        if (bridge.FB_SessionStart) { try { echo("" + bridge.FB_SessionStart(ea.Repository)); } catch (eS) { echo("WARN: start session po reloadu selhal: " + eS.message); } }
+        checkCodeVersion(bridge);
+    } catch (eRC) { echo("WARN: reload kodu selhal: " + eRC.message + " - pumpa jede dal se starym kodem."); }
+}
+
 // ============================ hlavni smycka =================================
-ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ); ensureDir(DIR_PEND);
+ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ); ensureDir(DIR_PEND); ensureDir(DIR_PROG);
 
 // --- v0.13: JEDINA INSTANCE PUMPY (nalez N5, E2E VS Code 2026-09-07: dve
 // bezici pumpy vzaly tutez davku a package vznikla 2x). Zamek = soubor
@@ -303,92 +600,156 @@ ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ);
 // pri KAZDEM konci procesu (Ctrl+C, zavreni okna, pad cscriptu) ho jadro
 // zavre a sdileni se uvolni - osirely soubor .pump.lock po tvrdem padu
 // tedy dalsi start NEBLOKUJE (jen se prepise). Pad EA neni pad pumpy
-// (re-attach smycka bezi dal, zamek se drzi). Promenna lockFile musi
-// zustat globalni - kdyby ji JScript uvolnil, TextStream by se zavrel
+// (re-attach smycka bezi dal, zamek se drzi). Promenne lockFile/userLock musi
+// zustat globalni - kdyby je JScript uvolnil, TextStream by se zavrel
 // a zamek by zmizel. Rucni Close neni potreba (konec = konec procesu).
 // Zive overeni: docs\e2e-vscode\OVERENI-S-OPRAVY-2026-09-08.md (V2).
+// v0.6 (FB-PU-07): DRUHY zamek pro UZIVATELE %LOCALAPPDATA%\EA-File-Bridge\
+// pump.lock se stejnou semantikou - pumpa z jine slozky (vendorovana kopie
+// ve workspace) se nespusti; v souboru je cesta bezici pumpy.
 var LOCK_PATH = DIR_REQ + "\\.pump.lock";
 var lockFile = null;
 try {
     lockFile = fso.OpenTextFile(LOCK_PATH, 2, true); // 2 = ForWriting, true = create
-    lockFile.Write("pumpa start=" + ts() + " id=" + Math.floor(Math.random() * 1e9) + "\r\n");
+    lockFile.Write("pumpa " + PUMP_VERSION + " start=" + ts() + " id=" + PUMP_ID + "\r\n");
 } catch (eLock) {
     echo("Pumpa uz bezi (zamek requests\\.pump.lock) - zavri toto okno.");
     WScript.Sleep(8000);
     WScript.Quit(2);
 }
+var userLock = null, USER_LOCK_PATH = "";
+try {
+    var shL = new ActiveXObject("WScript.Shell");
+    var lad = "" + shL.ExpandEnvironmentStrings("%LOCALAPPDATA%");
+    if (lad != "" && lad.indexOf("%") < 0) {
+        ensureDir(lad + "\\EA-File-Bridge");
+        USER_LOCK_PATH = lad + "\\EA-File-Bridge\\pump.lock";
+        try {
+            userLock = fso.OpenTextFile(USER_LOCK_PATH, 2, true);
+            userLock.Write("" + WScript.ScriptFullName + "\r\npumpa " + PUMP_VERSION + " start=" + ts() + " id=" + PUMP_ID + "\r\n");
+        } catch (eUL) {
+            var other = "";
+            try { var rf = fso.OpenTextFile(USER_LOCK_PATH, 1, false); other = "" + rf.ReadLine(); rf.Close(); } catch (eRL) { other = "(cestu nejde precist)"; }
+            echo("Pumpa uz bezi z JINE slozky: " + other + " (zamek " + USER_LOCK_PATH + ") - nad jednim uzivatelem smi bezet jen jedna pumpa. Zavri tu druhou, nebo toto okno.");
+            WScript.Sleep(10000);
+            WScript.Quit(2);
+        }
+    }
+} catch (eULo) { echo("WARN: zamek pro uzivatele (%LOCALAPPDATA%\\EA-File-Bridge\\pump.lock) nejde zalozit: " + eULo.message + " - jedu jen se zamkem slozky."); }
 
-echo("=== EA File Bridge pumpa v0.5 (eafb/0.2, confirm okruh) ===");
-echo("Slozka requestu: " + DIR_REQ + " (pending\\ = davky cekajici na potvrzeni)");
+PUMP_START = nowText();
+echo("=== EA File Bridge pumpa " + PUMP_VERSION + " (eafb/0.2) ===");
+echo("Slozka requestu: " + DIR_REQ + " (processing\\ = prave provadena, pending\\ = ceka na potvrzeni)");
+echo("Stav: " + STATUS_PATH + " | log: " + (PUMP_LOG ? DIR_RES + "\\pump-RRRR-MM-DD.log" : "vypnut") + (USER_LOCK_PATH ? " | zamek uzivatele: " + USER_LOCK_PATH : ""));
+writeStatus("waiting_ea", "");
 
-var ea = null, bridge = null;
+var ea = null, bridge = null, codeOk = false, codeOldSaid = false;
+function checkCodeVersion(bridge) {
+    // kod v modelu musi znat processing\ (FB_Main v0.18+) - poznavaci znameni = FB_PumpAlive
+    codeOk = !!(bridge && bridge.FB_PumpAlive && bridge.FB_CodeInfo);
+    if (!codeOk && !codeOldSaid) {
+        codeOldSaid = true;
+        echo("STOP: kod v modelu je STARSI nez pumpa " + PUMP_VERSION + " (chybi operace FB_PumpAlive/FB_CodeInfo, FB_Main nezna requests\\processing\\) - davky NEZPRACOVAVAM. Nasad novy kod: doma deploy_src starou pumpou (v0.5) nebo bootstrap v EA Scripting (scripts\\ITAN-Bootstrap File Bridge.js), v bance bootstrap; pak pumpu restartuj.");
+        STATUS.lastResult = "STOP: kod v modelu starsi nez pumpa " + PUMP_VERSION + " - nasad kod a restartuj pumpu";
+    }
+    if (codeOk) { codeOldSaid = false; }
+    return codeOk;
+}
 
 while (true) {
+    // EA zavrene/restartovane se pozna hned (ne az pri dalsi davce): stav
+    // waiting_ea pro agenta (FB-PU-03) a okamzity re-attach (zive 12. 10.:
+    // po restartu EA pumpa hlasila idle, dokud neprisla davka)
+    if (ea != null && !eaAlive(ea)) {
+        echo("Spojeni s EA ztraceno (EA zavreno nebo restartovano). Cekam na nove pripojeni; rozpracovana davka zustava v processing\\ a po pripojeni se ohlasi jako prerusena.");
+        ea = null; bridge = null; codeOk = false;
+        writeStatus("waiting_ea", "");
+    }
     // (re)attach na EA
     if (ea == null) {
         ea = AttachEA();
         if (ea == null || !eaAlive(ea)) {
             ea = null;
+            if (STATUS.phase != "waiting_ea") { writeStatus("waiting_ea", ""); }
             echo("Cekam na bezici EA s otevrenym projektem ...");
+            heartbeat();
             WScript.Sleep(3000);
             continue;
         }
         echo("Pripojeno na EA: " + ea.Repository.ConnectionString);
         try {
             bridge = loadBridge(ea.Repository);
+            PUMP_HASH = pumpFingerprint(bridge);
+            echo("Pumpa " + PUMP_VERSION + ", otisk " + (PUMP_HASH ? PUMP_HASH.substring(0, 12) : "(nespocitan)") + " (sha256 pump.wsf; stejna hodnota je v PUMP-VERSION workspace)");
             if (bridge.FB_SessionStart) {
                 try { echo("" + bridge.FB_SessionStart(ea.Repository)); }
-                catch (eB) { echo("WARN: session baseline selhal: " + eB.message); }
+                catch (eB) { echo("WARN: start session selhal: " + eB.message); }
             }
-            // bezstavovost confirm okruhu: davky cekajici v pending\ znovu nabidnout
-            if (bridge.FB_ConfirmPending && offerPendingOnStart(ea.Repository, bridge)) {
-                echo("deploy_src (potvrzeny) -> prenacitam kod z modelu ...");
-                try { bridge = loadBridge(ea.Repository); }
-                catch (eRC0) { echo("WARN: reload kodu selhal: " + eRC0.message); }
+            try { if (bridge.FB_RepoId) { STATUS.repository = "" + bridge.FB_RepoId(ea.Repository); } } catch (eRi) { }
+            writeStatus("idle", "");
+            if (checkCodeVersion(bridge)) {
+                // FB-PU-11: nedokoncene davky z minuleho behu - ohlasit, neprovest
+                recoverProcessing(ea.Repository, bridge);
+                // bezstavovost confirm okruhu: davky cekajici v pending\ znovu nabidnout
+                if (bridge.FB_ConfirmPending && offerPendingOnStart(ea.Repository, bridge)) {
+                    reloadCode(ea, "deploy_src (potvrzeny)");
+                }
             }
+            writeStatus("idle", "");
         } catch (eL) {
             echo("CHYBA code loaderu: " + eL.message + " - zkusim znovu za 5 s.");
             ea = null; bridge = null;
+            writeStatus("waiting_ea", "");
             WScript.Sleep(5000);
             continue;
         }
     }
 
-    // pruchod requests\*.json (jen soubory primo ve slozce - pending\,
-    // processed\ a rejected\ jsou podslozky, watcher je strukturalne preskakuje)
+    // stary kod v modelu -> davky nebrat (fail-closed), jen tep a cekani
+    if (!codeOk) { heartbeat(); WScript.Sleep(POLL_MS); continue; }
+
+    // pruchod requests\req-*.json (jen soubory primo ve slozce - processing\,
+    // pending\, processed\ a rejected\ jsou podslozky, watcher je strukturalne preskakuje)
     try {
         var en = new Enumerator(fso.GetFolder(DIR_REQ).Files);
+        var present = {};
         for (; !en.atEnd(); en.moveNext()) {
             var f = en.item();
-            if (!/\.json$/i.test("" + f.Name)) { continue; }
+            var fn = "" + f.Name;
+            if (!isReqName(fn)) {
+                if (!/^\.pump\.lock$/i.test(fn)) { present[fn] = 1; noteIgnored(fn); }
+                continue;
+            }
             try {
-                if (processFile(ea.Repository, bridge, f)) {
-                    echo("deploy_src -> prenacitam kod z modelu ...");
-                    try { bridge = loadBridge(ea.Repository); }
-                    catch (eRC) { echo("WARN: reload kodu selhal: " + eRC.message + " - pumpa jede dal se starym kodem."); }
-                }
+                if (processFile(ea.Repository, bridge, f)) { reloadCode(ea, "deploy_src"); }
             } catch (eF) {
-                if (!eaAlive(ea)) { throw eF; } // EA spadlo -> ven na re-attach, soubor zustava
+                if (!eaAlive(ea)) { throw eF; } // EA spadlo -> ven na re-attach, soubor zustava v processing\
                 // jina chyba: odpovez chybou a odloz do rejected
-                echo("ERROR u " + f.Name + ": " + eF.message);
+                echo("ERROR u " + fn + ": " + eF.message);
                 try {
-                    writeUtf8(DIR_RES + "\\" + responseName("" + f.Name),
-                        errorResponse("E_EXCEPTION", ("" + eF.message).replace(/[\\"]/g, " ")));
-                    if (fso.FileExists("" + f.Path)) {
-                        fso.MoveFile("" + f.Path, DIR_REJ + "\\" + ("" + f.Name).replace(/\.json$/i, "") + "." + ts() + ".json");
+                    var src = fso.FileExists(DIR_PROG + "\\" + fn) ? DIR_PROG + "\\" + fn : "" + f.Path;
+                    writeUtf8(DIR_RES + "\\" + responseName(fn),
+                        errorResponse(bridge, "E_EXCEPTION", "Pumpa: vyjimka pri zpracovani davky: " + eF.message, batchId(src)));
+                    if (fso.FileExists(src)) {
+                        fso.MoveFile(src, DIR_REJ + "\\" + fn.replace(/\.json$/i, "") + "." + ts() + ".json");
                     }
+                    STATUS.lastResult = "CHYBA E_EXCEPTION " + fn;
                 } catch (eM) { echo("ERROR presunu: " + eM.message); }
             }
+            writeStatus("idle", "");
         }
+        forgetIgnored(present);
     } catch (eLoop) {
         if (ea != null && !eaAlive(ea)) {
-            echo("Spojeni s EA ztraceno (EA zavreno?). Cekam na nove pripojeni; rozpracovany request zustava ve fronte.");
+            echo("Spojeni s EA ztraceno (EA zavreno?). Cekam na nove pripojeni; rozpracovana davka zustava v processing\\ a po pripojeni se ohlasi jako prerusena.");
             ea = null; bridge = null;
+            writeStatus("waiting_ea", "");
         } else {
             echo("ERROR smycky: " + eLoop.message);
         }
     }
 
+    heartbeat();
     WScript.Sleep(POLL_MS);
 }
 ]]>

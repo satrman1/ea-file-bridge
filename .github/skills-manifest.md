@@ -4,7 +4,7 @@
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-10-12 + sha1 e9418360cd64bd8c1442ed7951a1744e4055153f |
+| Verze kanonu | 2026-10-12 + sha1 bdd1ba9a6cd2d44fe18a1844aa7e55da4fda29a1 |
 | Profil | doma |
 | Sada | full |
 | Terminál | off |
@@ -68,7 +68,7 @@
 | skills/eafb-bridge/SKILL.md | f1f45679da9905ad312ab27a8be001c346e1e2a0678e4a1a198fd6e380fbf964 |
 | skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | 10f9a1eb47a0bb8950144d47ea89efada96bf00034e868f411c218028bc42e0b |
 | skills/eafb-bridge/references/EAFB-Operace-Registr.md | afd0c1a3833a0dc68658a236591cd27e39e6f8f108d2c6969e77213f904c875f |
-| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | f37a468b120579a57806490e8b214d581dc5cb6575d0f0774e19ea1fa6d46950 |
+| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | bb4aa2cd1f932ba576fc4e051e87de466702afe16751440aa14ab867ea8cedcf |
 | skills/emr-konvence/SKILL.md | 38d57317cb3e09a2526f602016bd9160f8d02eece23b69f1a13aa07d93461280 |
 | skills/emr-konvence/references/emr-bridge-protokol.md | 995fcc95bad10a997cb28be5e6feb79f796da6b44271bf6a033759f8e8f1479f |
 | skills/emr-konvence/references/emr-zapis-pravidla.md | f46e220151afb9d705c6921b9d1d74649edf51571b291f774652a8be5445358d |

@@ -294,6 +294,9 @@ function segPing(rr, idx, level) {
     } else if (rp) {
         s2 += " | okno: politika pro repozitar chybi - kazdy zapis vyzaduje potvrzeni";
     }
+    // otisk kodu v modelu + pumpa (FB-PU-02, pumpa v0.6, Z261004b-5)
+    if (rr.codeInfo && typeof rr.codeInfo == "object") { s2 += " | kod: " + (rr.codeInfo.found ? rr.codeInfo.short + " (" + (rr.codeInfo.deployedAt || "?") + " " + (rr.codeInfo.deployedBy || "?") + ")" : "bez otisku"); }
+    if (rr.pump && rr.pump.version) { s2 += " | pumpa v" + rr.pump.version + " " + (rr.pump.short || ""); }
     // connection se do ACK nedava - identita je v repository (par. 4.5)
     return s2;
 }

@@ -34,6 +34,14 @@
 //      v modelu -> vypis vsech (ElementID, stereotyp, package) jako VAROVANI;
 //      bere se ten se stereotypem JavascriptAddin. Dva se stereotypem = STOP
 //      (nelze rozhodnout, kam nalevat kod) - uklid rucne, pak znovu.
+//   8. (od 2026-10-12, FB-PU-02, pumpa v0.6 / Z261004b-5) OTISK NASAZENEHO
+//      KODU: sha256 nad ne-konfiguracnimi soubory src\ (algoritmus
+//      src\AICodeBridge.FB_CodeFingerprint.js - skript ho zkompiluje ze
+//      souboru spolu s FB_Sha256, aby byl otisk stejny jako z deploy_src)
+//      se zapise jako tagged values prvku AICodeBridge: fb.code.fingerprint,
+//      fb.code.files, fb.code.deployedAt, fb.code.deployedBy = bootstrap.
+//      Cte ho ping, About AI Bridge a hlaseni startu session (FB_CodeInfo);
+//      spravce porovna s tools\code-fingerprint.py nad pracovni kopii.
 //
 // PRED SPUSTENIM:
 //   - v Project Browseru OZNAC package, kam ma element patrit (jen pri
@@ -290,6 +298,7 @@ function main() {
     var folder = fso.GetFolder(SRC_DIR);
     var files = new Enumerator(folder.Files);
     var names = [];
+    var fpFiles = []; // bod 8: otisk nasazeneho kodu
     for (; !files.atEnd(); files.moveNext()) {
         var fn = "" + files.item().Name;
         var mm = new RegExp("^" + ADDIN_NAME + "\\.([A-Za-z0-9_]+)\\.js$").exec(fn);
@@ -300,6 +309,7 @@ function main() {
         var name = names[j];
         var path = SRC_DIR + ADDIN_NAME + "." + name + ".js";
         var code = readUtf8(path);
+        fpFiles.push({ name: name, text: code });
         var m = have[name];
         var isEa = (name.indexOf("EA_") == 0);
         var sg = isEa ? signalGuidFor(name) : "";
@@ -352,6 +362,35 @@ function main() {
         Session.Output("OK  " + name + " (" + code.length + " znaku)");
     }
     el.Methods.Refresh();
+
+    // bod 8 (FB-PU-02): otisk nasazeneho kodu -> tagged values fb.code.* na prvku
+    // AICodeBridge; FB_Sha256 + FB_CodeFingerprint se zkompiluji ze souboru
+    // src\ (stejny kod, ktery se prave nalil do modelu)
+    try {
+        var fpLib = {};
+        var shaCode = readUtf8(SRC_DIR + ADDIN_NAME + ".FB_Sha256.js").replace(/^\uFEFF/, "");
+        var fpCode = readUtf8(SRC_DIR + ADDIN_NAME + ".FB_CodeFingerprint.js").replace(/^\uFEFF/, "");
+        fpLib.FB_Sha256 = new Function("input", shaCode);
+        fpLib.FB_CodeFingerprint = new Function("files", fpCode);
+        var fp = fpLib.FB_CodeFingerprint(fpFiles);
+        var dN = new Date();
+        var p2 = function (x) { return (x < 10 ? "0" : "") + x; };
+        var fpAt = dN.getFullYear() + "-" + p2(dN.getMonth() + 1) + "-" + p2(dN.getDate()) + " " + p2(dN.getHours()) + ":" + p2(dN.getMinutes()) + ":" + p2(dN.getSeconds());
+        var setTag = function (tagName, value) {
+            for (var ti = 0; ti < el.TaggedValues.Count; ti++) {
+                var tv = el.TaggedValues.GetAt(ti);
+                if (("" + tv.Name) == tagName) { tv.Value = value; tv.Update(); el.TaggedValues.Refresh(); return; }
+            }
+            var ntv = el.TaggedValues.AddNew(tagName, value);
+            ntv.Update();
+            el.TaggedValues.Refresh();
+        };
+        setTag("fb.code.fingerprint", fp.fingerprint);
+        setTag("fb.code.files", "" + fp.files);
+        setTag("fb.code.deployedAt", fpAt);
+        setTag("fb.code.deployedBy", "bootstrap");
+        Session.Output("Otisk kodu v modelu: " + fp.short + " (" + fp.files + " souboru bez konfigurace, sha256 " + fp.fingerprint + ") - tagged values fb.code.* na prvku " + ADDIN_NAME + "; totez vraci ping a About AI Bridge.");
+    } catch (eFp) { Session.Output("POZOR: otisk kodu (fb.code.*) se nepodarilo zapsat: " + eFp.message); }
 
     Session.Output("Hotovo: " + created + " operaci zalozeno, " + coded + " nahran kod (souboru v src: " + names.length + ")."
         + " Parametry: " + parSynced + " operaci srovnano podle hlavicky (radky PX)."

@@ -74,6 +74,18 @@ try {
     }
     if (!r.riskPolicy.available) { r.riskPolicy.note = "repozitar nema polozku ve FB_RiskPolicy - kazdy zapis vyzaduje potvrzeni (fail-closed W9)"; }
 } catch (eRp) { r.riskPolicy = { available: false, note: "FB_RiskPolicy nelze precist: " + eRp.message }; }
+// --- otisk kodu v modelu + pumpa (FB-PU-02, pumpa v0.6, Z261004b-5): agent i
+// spravce vidi, jaky kod v modelu bezi (codeInfo - pole code je vyhrazene chybam; short = prvnich 12 znaku sha256 nad
+// ne-konfiguracnimi soubory src\, zapisuje bootstrap/deploy_src) a pod pumpou
+// verzi + otisk souboru pumpy (FB_SessionStart -> this._fbPumpInfo).
+try {
+    var ciP = this.FB_CodeInfo(Repository);
+    r.codeInfo = { found: ciP.found, fingerprint: ciP.fingerprint, short: ciP.short, files: ciP.files, deployedAt: ciP.deployedAt, deployedBy: ciP.deployedBy, text: ciP.text };
+} catch (eCi) { r.codeInfo = { found: false, text: "Otisk kodu: nelze precist (" + eCi.message + ")" }; }
+if (this._fbPumpInfo && typeof WScript != "undefined") {
+    r.pump = { version: "" + this._fbPumpInfo.version, fingerprint: "" + this._fbPumpInfo.fingerprint, short: ("" + this._fbPumpInfo.fingerprint).substring(0, 12), path: "" + this._fbPumpInfo.path,
+        status: "responses\\pump-status.json (faze, soubor, tep, aliveUntil - kit: pumpa nebezi, kdyz aliveUntil minul)" };
+}
 // --- access: plny navrat FB_UserAccess do res; pri chybe fail-closed read
 try { r.access = this.FB_UserAccess(Repository); }
 catch (eAc) {

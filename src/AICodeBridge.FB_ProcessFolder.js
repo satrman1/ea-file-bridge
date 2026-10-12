@@ -34,6 +34,16 @@ var DIR_REJ = DIR_REQ + "\\rejected";
 var DIR_PEND = DIR_REQ + "\\pending";
 function ensureDir(p) { if (!fso.FolderExists(p)) { fso.CreateFolder(p); } }
 ensureDir(DIR_REQ); ensureDir(DIR_RES); ensureDir(DIR_PROC); ensureDir(DIR_REJ); ensureDir(DIR_PEND);
+// --- FB-PU-07 (pumpa v0.6, Z261004b-5): nad touz slozkou nesmi bezet pumpa -
+// pozna se z tepu v responses\pump-status.json (FB_PumpAlive), nikdy pokusem
+// otevrit zamek (COM chyba v EA runtime obchazi try/catch, PROTOKOL kap. 1a).
+try {
+    var paliveChk = this.FB_PumpAlive(Repository, cfg.baseDir);
+    if (paliveChk.running) {
+        try { this.Log(Repository, "FB -> " + paliveChk.text); } catch (eLpa) { }
+        return paliveChk.text;
+    }
+} catch (ePa) { }
 function pad2(n) { return (n < 10 ? "0" : "") + n; }
 function ts() {
     var d = new Date();

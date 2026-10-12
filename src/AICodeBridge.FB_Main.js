@@ -84,6 +84,14 @@
 //    this._fbOpProgress.items; pri vyjimce (E_PERMISSION / E_LOCKED / jina)
 //    je FB_Main pripoji k vysledku (items, partial: true) a QC + vypis zmen
 //    bezi i pri okc == 0.
+// v0.18 (balik D - pumpa v0.6, Z261004b-5):
+//  - requests\processing\ (FB-PU-11): pumpa v0.6 presune soubor PRED provedenim
+//    do requests\processing\ a FB_Main dostava cestu odtud. Slozka requests\
+//    (reqDirM) i pending\ se proto odvozuji s vyjimkou pro \processing stejne
+//    jako pro \pending; confirm_required presouva do requests\pending\, nikdy
+//    do processing\pending\.
+//  - Log i u predcasnych navratu (FB-PU-04): E_PARSE, E_REPO (deklarace repo),
+//    E_ARGS (zastupny text v repo), prazdne ops - Output tab ma kazdou davku.
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var self = this;
 // mezipamet cilu JEDNOHO volani (FB_TargetCache): vynulovat, aby se stav
@@ -134,6 +142,7 @@ if (inTrim.charAt(0) == "{") {
     if (!okPath) {
         resp.code = "E_PARSE";
         resp.message = "Vstup neni validni JSON ani cesta k existujicimu souboru.";
+        try { this.Log(Repository, "FB ? -> E_PARSE (vstup neni JSON ani cesta k souboru)"); } catch (eLg0) { }
         return this.FB_JsonStringify(resp, 1);
     }
     reqPath = inTrim;
@@ -170,6 +179,7 @@ if (inTrim.charAt(0) == "{") {
     } catch (eRaw) {
         resp.code = "E_PARSE";
         resp.message = "Req soubor nejde precist: " + eRaw.message;
+        try { this.Log(Repository, "FB ? -> E_PARSE (req soubor nejde precist: " + eRaw.message + ")"); } catch (eLg1) { }
         return this.FB_JsonStringify(resp, 1);
     }
 }
@@ -179,6 +189,7 @@ try {
 } catch (e) {
     resp.code = "E_PARSE";
     resp.message = "Request neni validni JSON.";
+    try { this.Log(Repository, "FB ? -> E_PARSE (request neni validni JSON" + (reqPath != "" ? ": " + reqPath : "") + ")"); } catch (eLg2) { }
     return this.FB_JsonStringify(resp, 1);
 }
 var reqId = "" + ((req && req.id) || ("noid-" + (new Date()).getTime()));
@@ -206,6 +217,7 @@ if (req && typeof req.repo == "string" && (/^\{?GUID-/i.test(req.repo) || /<[^<>
     resp.code = "E_ARGS";
     resp.problems = [{ op: -1, path: "repo", code: "E_ARGS", message: "zastupny text '" + req.repo + "' v poli repo - dosad identitu repozitare z pingu (" + resp.repository + ")" }];
     resp.message = "Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. repo: " + resp.problems[0].message;
+    this.Log(Repository, "FB " + reqId + " -> E_ARGS (zastupny text v poli repo: " + req.repo + ")");
     return this.FB_JsonStringify(resp, 1);
 }
 // Deklarace ciloveho repozitare (povinna v copilot-instructions): pri neshode
@@ -215,12 +227,14 @@ if (req.repo) {
     if (cs.indexOf(("" + req.repo).toUpperCase()) < 0) {
         resp.code = "E_REPO";
         resp.message = "Davka je urcena pro repozitar '" + req.repo + "', pripojeny je jiny. Nic nebylo provedeno.";
+        this.Log(Repository, "FB " + reqId + " -> E_REPO (davka pro '" + req.repo + "', pripojeny " + resp.repository + ")");
         return this.FB_JsonStringify(resp, 1);
     }
 }
 if (!req.ops || Object.prototype.toString.call(req.ops) != "[object Array]" || req.ops.length == 0) {
     resp.code = "E_PARSE";
     resp.message = "Request nema neprazdne pole ops.";
+    this.Log(Repository, "FB " + reqId + " -> E_PARSE (request nema neprazdne pole ops)");
     return this.FB_JsonStringify(resp, 1);
 }
 // --- B1 (par. 6.2): potvrzovaci parametry NEJSOU prijatelne z obsahu davky
@@ -329,7 +343,7 @@ if (reqPath != "") {
         fsoD = this.FB_ComObj("Scripting.FileSystemObject");
         reqName = "" + fsoD.GetFileName(reqPath);
         reqDirM = "" + fsoD.GetParentFolderName(reqPath);
-        if (/\\pending$/i.test(reqDirM)) { reqDirM = "" + fsoD.GetParentFolderName(reqDirM); }
+        if (/\\(pending|processing)$/i.test(reqDirM)) { reqDirM = "" + fsoD.GetParentFolderName(reqDirM); } // v0.18: pumpa v0.6 predava cestu z requests\processing\
         baseDirM = "" + fsoD.GetParentFolderName(reqDirM);
         resDirM = baseDirM + "\\responses";
         pendDirM = reqDirM + "\\pending";
@@ -788,6 +802,8 @@ function emitConfirmRequired() {
             pendDir = "" + fsoP.GetParentFolderName(reqPath);
             var inPending = /\\requests\\pending$/i.test(pendDir);
             if (!inPending) {
+                // v0.18: soubor z requests\processing\ (pumpa v0.6) ceka v requests\pending\, ne v processing\pending\
+                if (/\\processing$/i.test(pendDir)) { pendDir = "" + fsoP.GetParentFolderName(pendDir); }
                 pendDir = pendDir + "\\pending";
                 if (!fsoP.FolderExists(pendDir)) { fsoP.CreateFolder(pendDir); }
                 var tgt = pendDir + "\\" + fsoP.GetFileName(reqPath);

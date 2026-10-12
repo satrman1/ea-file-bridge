@@ -62,13 +62,28 @@ function MockFso() {
     this.BuildPath = function (a, b) { return norm(a) + "\\" + b; };
     this.GetFolder = function (p) {
         var prefix = norm(p);
+        if (prefix.charAt(prefix.length - 1) != "\\") { prefix += "\\"; } // v0.6 sim pumpy: GetFolder(requests) nesmi videt requests\pending\x
         var out = [];
         for (var k in memFs.files) {
             if (k.indexOf(prefix) === 0 && k.substring(prefix.length).indexOf("\\") < 0) {
-                out.push({ Name: k.substring(prefix.length), Path: k });
+                out.push({ Name: k.substring(prefix.length), Path: k, Size: ("" + memFs.files[k]).length, DateLastModified: new Date(2026, 9, 12, 8, 0, 0) });
             }
         }
         return { Files: out };
+    };
+    // v0.6 (sim pumpy): GetFile (Size) + OpenTextFile (zamky, log, dir /b listing)
+    this.GetFile = function (p) { var k = norm(p); if (typeof memFs.files[k] == "undefined") { throw new Error("mock: soubor neexistuje: " + p); } return { Name: k.substring(k.lastIndexOf("\\") + 1), Path: k, Size: ("" + memFs.files[k]).length, DateLastModified: new Date(2026, 9, 12, 8, 0, 0) }; };
+    this.OpenTextFile = function (p, mode, create) {
+        var k = norm(p);
+        if (mode == 1) {
+            if (typeof memFs.files[k] == "undefined") { throw new Error("mock: soubor neexistuje: " + p); }
+            var lines = ("" + memFs.files[k]).split(/\r?\n/), li = 0;
+            return { ReadLine: function () { return lines[li++]; }, ReadAll: function () { return memFs.files[k]; }, Close: function () { },
+                get AtEndOfStream() { return li >= lines.length; } };
+        }
+        if (typeof memFs.files[k] == "undefined") { if (!create) { throw new Error("mock: soubor neexistuje: " + p); } memFs.files[k] = ""; }
+        if (mode == 2) { memFs.files[k] = ""; }
+        return { Write: function (t) { memFs.files[k] += "" + t; }, WriteLine: function (t) { memFs.files[k] += "" + t + "\r\n"; }, Close: function () { } };
     };
 }
 // WSH Enumerator (JScript) - iterace nad kolekci/polem
@@ -2184,7 +2199,8 @@ function bootMethod(n) {
 function bootElement(id, params) {
     // params = { operace: [parametry] } -> existujici operace "z modelu"
     var e = { Name: "AICodeBridge", ElementID: id, ElementGUID: "{ADDIN-" + id + "}", StereotypeEx: "", Notes: "",
-        Methods: bootColl(bootMethod), Update: function () { return true; } };
+        Methods: bootColl(bootMethod), Update: function () { return true; },
+        TaggedValues: bootColl(function (n, v) { return { Name: n, Value: v, Update: function () { return true; } }; }) }; // v0.6: fb.code.* (bootstrap bod 8)
     for (var k in (params || {})) {
         var m = e.Methods.AddNew(k, "String");
         params[k].forEach(function (pn, i) { var p = m.Parameters.AddNew(pn, "String"); p.Position = i; });
@@ -4412,7 +4428,7 @@ t("B1 pravidlo 8/7: politiku meni jen clovek - deploy_src je doma ELEVATED, v ba
 });
 t("B1 pravidlo 8: kodove kotvy pumpy a adapteru pro nove kody - E_INTERRUPTED/E_DUPLICATE_ID/E_UNKNOWN_OP/E_ARGS jdou do processed (pumpa v0.5), E_RISK_EXPIRED je status rejected", function () {
     var pump = fs.readFileSync(path.join(__dirname, "..", "pump.wsf"), "utf8");
-    ok(pump.indexOf("E_INTERRUPTED") < 0 && pump.indexOf("E_DUPLICATE_ID") < 0, "pump.wsf se v B1 nemeni (Z261004b-5); nove kody nejsou v jeho rejected seznamu -> processed");
+    ok(!/rejected = \([\s\S]{0,700}E_(INTERRUPTED|DUPLICATE_ID)/.test(pump), "nove kody B1 nejsou v rejected seznamu pumpy -> processed (pumpa v0.6 pise E_INTERRUPTED jen sama pro prerusene davky z processing\\)");
     b1Reset(); var repo = blRepo();
     var r = pendDelete(repo, "k8");
     var ro = JSON.parse(memFs.files[B1_RES + "\\res-k8.json"]); ro.since = "2000-01-01 00:00:00"; memFs.files[B1_RES + "\\res-k8.json"] = JSON.stringify(ro);
@@ -5072,6 +5088,422 @@ t("CZ-28 FB-CZ-28: E_BLACKLIST rika, ve ktere chranene vetvi cil lezi (plna cest
     contains(m, "Model.FBT-CHRANENE.Podbalicek.PodPrvek"); contains(m, "'Model.FBT-CHRANENE'"); contains(m, "test blacklistu"); contains(m, "jiny cil");
     eq(r.problems[0].branch.path, "Model.FBT-CHRANENE"); eq(r.problems[0].branch.note, "test blacklistu");
 });
+// ===========================================================================
+// BALIK D - PUMPA v0.6 (Z261004b-5, 2026-10-12): simulace pump.wsf nad mocky
+// (vzor IT-ANALYSIS/audity/sim-revize-pumpy-2026-10-04/agent-risk/pumpsim.js:
+// funkce promptConfirm / offerPendingOnStart / recoverProcessing / processFile
+// / resultLine se berou DOSLOVA ze zdroje pump.wsf - rez mezi "function pad2"
+// a "function eaAlive"; prostredi WScript / fso / Popup / Enumerator = mock)
+// + src casti: FB_CodeFingerprint, FB_CodeInfo, FB_PumpAlive, FB_Main
+// (processing\, Log u predcasnych navratu), FB_SessionStart (verze pumpy),
+// deploy_src + bootstrap (tagged values fb.code.*), ping/About/chat ACK,
+// schranka + GUI fallback (bezici pumpa).
+// ===========================================================================
+var P6_BASE = B1_BASE, P6_REQ = B1_REQ, P6_PEND = B1_PEND, P6_RES = B1_RES, P6_PROG = B1_REQ + "\\processing", P6_REJ = B1_REQ + "\\rejected", P6_PROC = B1_REQ + "\\processed";
+var P6_PUMP = P6_BASE + "\\pump.wsf";
+var pumpSrc = fs.readFileSync(path.join(SRC, "..", "pump.wsf"), "utf8");
+function pumpSim(opts) {
+    // vraci { api, console, popups, answer(), tick(), start(), status(), res(), files() }
+    opts = opts || {};
+    var a = pumpSrc.indexOf("function pad2(n)"), b = pumpSrc.indexOf("function eaAlive(ea)");
+    ok(a > 0 && b > a, "rez pump.wsf (pad2 .. eaAlive) nenalezen");
+    var body = pumpSrc.substring(a, b);
+    var consoleLog = [], popups = [], popupAnswers = [];
+    var W = { ScriptFullName: P6_PUMP, Echo: function (s) { consoleLog.push("" + s); }, Sleep: function () { }, Quit: function () { } };
+    function AX(progId) {
+        var p = ("" + progId).toLowerCase();
+        if (p.indexOf("wscript.shell") >= 0) {
+            return { Popup: function (text, timeout, title, type) {
+                var ans = popupAnswers.length ? popupAnswers.shift() : -1; // -1 = timeout
+                var stAt = null; try { stAt = JSON.parse(memFs.files[P6_RES + "\\pump-status.json"]); } catch (eSa) { stAt = null; }
+                popups.push({ text: "" + text, timeout: timeout, title: "" + title, type: type, answer: ans, statusAtPopup: stAt });
+                return ans;
+            }, Run: function () { return 0; }, ExpandEnvironmentStrings: function (s) { return s; } };
+        }
+        return comFactory(progId);
+    }
+    var fsoS = new MockFso();
+    var names = ["WScript", "ActiveXObject", "fso", "Enumerator", "BASE", "DIR_REQ", "DIR_RES", "DIR_PROC", "DIR_REJ", "DIR_PEND", "DIR_PROG", "ADDIN_NAME",
+        "POLL_MS", "HEARTBEAT_MS", "ALIVE_IDLE_S", "ALIVE_PROCESSING_S", "CONFIRM_TIMEOUT_S", "PUMP_LOG", "STATUS_PATH", "PUMP_HASH", "PUMP_START", "PUMP_ID", "PUMP_VERSION", "bridge"];
+    var vals = [W, AX, fsoS, global.Enumerator, P6_BASE, P6_REQ, P6_RES, P6_PROC, P6_REJ, P6_PEND, P6_PROG, "AICodeBridge",
+        1000, 10000, 30, 1800, 300, (opts.log !== false), P6_RES + "\\pump-status.json", "abc123", "2026-10-12 08:00:00", 7, "v0.6", B];
+    var api = Function.apply(null, names.concat([body + "\nreturn { promptConfirm: promptConfirm, offerPendingOnStart: offerPendingOnStart, recoverProcessing: recoverProcessing, processFile: processFile, resultLine: resultLine, writeStatus: writeStatus, STATUS: STATUS, errorResponse: errorResponse, confirmIcon: confirmIcon, isReqName: isReqName, noteIgnored: noteIgnored, forgetIgnored: forgetIgnored, announce: announce };"])).apply(null, vals);
+    memFs.folders[P6_REQ] = 1; memFs.folders[P6_RES] = 1; memFs.folders[P6_PEND] = 1; memFs.folders[P6_PROG] = 1; memFs.folders[P6_REJ] = 1; memFs.folders[P6_PROC] = 1;
+    function underPump(fn) { global.WScript = W; try { return asEaRuntime(fn); } finally { delete global.WScript; } }
+    return {
+        api: api, popups: popups, console: consoleLog,
+        answer: function () { for (var i = 0; i < arguments.length; i++) { popupAnswers.push(arguments[i]); } },
+        put: function (id, ops, name) { memFs.files[P6_REQ + "\\" + (name || ("req-" + id + ".json"))] = JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops }); },
+        tick: function (repo) { // jeden pruchod requests\ jako hlavni smycka (jen req-*.json; ostatni = IGNORUJI)
+            var files = fsoS.GetFolder(P6_REQ).Files, present = {}, reload = false;
+            files.forEach(function (f) {
+                if (!api.isReqName(f.Name)) { if (f.Name != ".pump.lock") { present[f.Name] = 1; api.noteIgnored(f.Name); } return; }
+                underPump(function () { if (api.processFile(repo, B, f)) { reload = true; } });
+                api.writeStatus("idle", "");
+            });
+            api.forgetIgnored(present);
+            api.writeStatus(api.STATUS.phase, api.STATUS.file); // tep (heartbeat) na konci pruchodu
+            return reload;
+        },
+        start: function (repo) { return underPump(function () { api.recoverProcessing(repo, B); return api.offerPendingOnStart(repo, B); }); },
+        status: function () { var tx = memFs.files[P6_RES + "\\pump-status.json"]; return tx ? JSON.parse(tx) : null; },
+        res: function (id) { var tx = memFs.files[P6_RES + "\\res-" + id + ".json"]; return tx ? JSON.parse(tx) : null; },
+        files: function (prefix) { return b1Files(prefix); },
+        drain: function () { var c = consoleLog.slice(); consoleLog.length = 0; return c.map(function (l) { return l.replace(/^\d\d:\d\d:\d\d  /, ""); }); },
+        resultLines: function () { return consoleLog.filter(function (l) { return /^\d\d:\d\d:\d\d  (OK |CHYBA |CEKA NA TEBE |ZAMITNUTO |NEPROVEDENO |PRERUSENA |DOKONCENA |IGNORUJI )/.test(l); }).map(function (l) { return l.replace(/^\d\d:\d\d:\d\d  /, ""); }); }
+    };
+}
+var P6_DELETE = [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }];
+
+t("PUMPA v0.6 hlavicka: banner z PUMP_VERSION = hlavicka pump.wsf (WORKSPACE-METODIKY cesta 2), regex refresh-workspace sedi, zadna druha legenda tlacitek, popup +512 (vychozi Storno) a veta o limitu", function () {
+    ok(/EA File Bridge\s*-\s*pumpa\s+v0\.6\s*\(eafb\/0\.2\)/.test(pumpSrc), "hlavicka 'EA File Bridge - pumpa v0.6 (eafb/0.2)'");
+    contains(pumpSrc, 'var PUMP_VERSION = "v0.6";');
+    eq(pumpSrc.indexOf("Ano = provest, Ne = zamitnout (rejected), Storno = nechat cekat v pending"), -1, "druha legenda z pumpy smazana (FB-UI-08)");
+    contains(pumpSrc, "3 + confirmIcon(r) + 512 + 4096", "typ okna: Ano/Ne/Storno + ikona + vychozi Storno + navrchu");
+    contains(pumpSrc, "Kdyz nerozhodnes do ");
+    contains(pumpSrc, "spust bootstrap (scripts\\\\ITAN-Bootstrap File Bridge.js v EA Scripting), nebo se obrat na spravce");
+    eq(pumpSrc.indexOf("spust ITAN-Inject"), -1, "rada 'spust ITAN-Inject' pryc (FB-PU-05)");
+    eq(pumpSrc.indexOf('"eafb/0.1"'), -1, "vlastni odpovedi pumpy uz nejsou eafb/0.1 (FB-PU-13)");
+    contains(pumpSrc, "%LOCALAPPDATA%");
+    contains(pumpSrc, "pump-status.json");
+});
+t("PUMPA v0.6 stav (FB-PU-03): pump-status.json meni faze processing -> idle, nese soubor, since, heartbeat, aliveUntil, verzi a otisk; vysledek 'OK 1/1' = jeden radek na davku (FB-PU-04)", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    var phases = [];
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { phases.push(S.status().phase + "/" + S.status().file); return { op: "create_or_update_elements", status: "ok", items: [{ guid: mkGuid(), id: 1, created: true }] }; };
+    try { S.put("st1", B1_CREATE); S.tick(repo); } finally { B.FB_OpElements = oE; }
+    eq(phases.join(","), "processing/req-st1.json", "behem FB_Main je faze processing s nazvem souboru");
+    var st = S.status();
+    eq(st.phase, "idle"); eq(st.file, ""); eq(st.pump.version, "v0.6"); eq(st.pump.fingerprint, "abc123"); eq(st.protocol, "eafb/0.2");
+    ok(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(st.heartbeat), "heartbeat je cas"); ok(st.aliveUntil > st.heartbeat, "aliveUntil za heartbeatem");
+    eq(st.lastResult, "OK 1/1 req-st1.json");
+    var rl = S.resultLines();
+    eq(rl.length, 1, "jeden vysledkovy radek: " + rl.join(" | ")); eq(rl[0], "OK 1/1 req-st1.json");
+    eq(S.files(P6_PROC + "\\").length, 1, "soubor v processed"); eq(S.files(P6_PROG + "\\").length, 0, "processing\\ prazdne po davce");
+    eq(S.res("st1").status, "done");
+    ok(S.files(P6_RES + "\\pump-").length >= 1, "log responses\\pump-RRRR-MM-DD.log existuje (FB-PU-14)");
+});
+t("PUMPA v0.6 konzole (FB-PU-04): davka s chybou operace = 'CHYBA op[N] KOD', E_REPO = 'CHYBA E_REPO', confirm_required = 'CEKA NA TEBE (okno potvrzeni)'", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { return { op: "create_or_update_elements", status: "error", code: "E_NOT_FOUND", message: "cil nenalezen" }; };
+    try { S.put("c1", B1_CREATE); S.tick(repo); } finally { B.FB_OpElements = oE; }
+    var l1 = S.resultLines(); eq(l1.length, 1, l1.join("|")); ok(/^CHYBA op\[0\] E_NOT_FOUND req-c1\.json \(ok 0\/1\)/.test(l1[0]), l1[0]);
+    S.drain();
+    memFs.files[P6_REQ + "\\req-c2.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "c2", repo: "JINY-REPO", ops: [{ op: "ping" }] });
+    S.tick(repo);
+    var l2 = S.resultLines(); eq(l2.length, 1, l2.join("|")); ok(/^CHYBA E_REPO req-c2\.json - Davka je urcena pro repozitar 'JINY-REPO'/.test(l2[0]), l2[0]);
+    ok(repo._output.some(function (o) { return /FB c2 -> E_REPO/.test(o.text); }), "Log i u predcasneho navratu E_REPO (FB-PU-04): " + JSON.stringify(repo._output.slice(-2)));
+    S.drain();
+    S.put("c3", P6_DELETE); S.tick(repo); // ELEVATED -> okno; timeout
+    var l3 = S.resultLines(); eq(l3.length, 1, l3.join("|")); eq(l3[0], "CEKA NA TEBE (okno potvrzeni) req-c3.json");
+    eq(S.popups.length, 1); eq(S.popups[0].title, "EA File Bridge - potvrzeni davky c3");
+});
+t("PUMPA v0.6 okno (pravidlo 5, FB-PU-18): typ 3+48+512+4096 u mazani (ikona upozorneni, vychozi Storno), 3+32+512+4096 u zapisu nad prah; text ma vetu o limitu a jen JEDNU legendu; behem okna faze waiting_confirm; Storno = davka ceka, po Stornu okno znovu kdyz agent posle tentyz soubor (bez restartu)", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    var seenPhase = null;
+    var oP = B.FB_ConfirmSummary; B.FB_ConfirmSummary = function (r) { seenPhase = S.status().phase + "/" + S.status().file; return oP.call(B, r); };
+    try {
+        S.answer(2); // Storno
+        S.put("w1", P6_DELETE); S.tick(repo);
+    } finally { B.FB_ConfirmSummary = oP; }
+    eq(S.popups.length, 1);
+    eq(S.popups[0].type, 3 + 48 + 512 + 4096, "mazani: ikona upozorneni + vychozi Storno");
+    contains(S.popups[0].text, "Kdyz nerozhodnes do 5 minut, davka pocka a okno se vrati");
+    eq(S.popups[0].text.split("Ano = ").length - 1, 1, "jedna legenda tlacitek (z FB_ConfirmSummary): " + S.popups[0].text);
+    eq(S.popups[0].timeout, 300);
+    ok(S.files(P6_PEND + "\\").some(function (f) { return f == "req-w1.json"; }), "davka ceka v pending");
+    eq(S.status().phase, "idle", "po Stornu idle");
+    ok(S.console.some(function (l) { return /waiting_confirm|CEKA req-w1\.json \(Storno\)/.test(l); }), "konzole: CEKA (Storno)");
+    // status behem okna: waiting_confirm (zapsan pred Popup) - over z kopie, kterou si vzal mock Popup
+    ok(S.console.some(function (l) { return /^\d\d:\d\d:\d\d  CEKA req-w1\.json \(Storno\) - davka ceka v pending/.test(l); }), S.console.join("\n"));
+    // agent posle tentyz soubor znovu -> FB_Main vrati stavajici res -> okno znovu, bez restartu
+    S.put("w1", P6_DELETE); S.answer(2); S.tick(repo);
+    eq(S.popups.length, 2, "okno podruhe bez restartu");
+    eq(S.popups[1].title, S.popups[0].title);
+    // zapis nad prah (ne mazani) -> otaznik
+    var many = []; for (var i = 0; i < 25; i++) { many.push({ name: "N" + i, type: "Class", "package": "{PK-11}" }); }
+    S.answer(2); S.put("w2", [{ op: "create_or_update_elements", elements: many }]); S.tick(repo);
+    eq(S.popups.length, 3); eq(S.popups[2].type, 3 + 32 + 512 + 4096, "zapis nad prah: otaznik + vychozi Storno");
+});
+t("PUMPA v0.6 okno: faze waiting_confirm ve stavovem souboru (zapsano tesne pred Popup, aliveUntil = timeout + 30 s); Ne = rejected, vysledek jeden radek", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    S.answer(7); S.put("wc", P6_DELETE); S.tick(repo);
+    eq(S.popups.length, 1);
+    var sp = S.popups[0].statusAtPopup;
+    ok(sp != null && sp.phase == "waiting_confirm" && sp.file == "req-wc.json", "stav v okamziku okna: " + JSON.stringify(sp));
+    function ms(x) { var m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(x); return new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +m[6]).getTime(); }
+    eq((ms(sp.aliveUntil) - ms(sp.heartbeat)) / 1000, 330, "aliveUntil = tep + 300 + 30 s");
+    var st = S.status(); eq(st.phase, "idle");
+    ok(/ZAMITNUTO|CHYBA E_RISK_REJECTED/.test(st.lastResult), "Ne -> zamitnuto: " + st.lastResult);
+    ok(S.files(P6_REJ + "\\").length >= 1, "Ne = rejected");
+    var rl = S.resultLines(); eq(rl.length, 2, rl.join(" | "));
+});
+t("PUMPA v0.6 Ano (confirm): potvrzeni projde, marker processing\\<jmeno>.confirmed po behu zmizi, vysledek 'OK' jeden radek; deploy_src -> reloadCode (navrat true)", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { ok(memFs.files[P6_PROG + "\\req-y1.json.confirmed"], "marker potvrzeneho behu existuje behem provadeni"); return { op: "delete_from_model", status: "ok", items: [{ deleted: true }] }; };
+    try { S.answer(6); S.put("y1", P6_DELETE); S.tick(repo); } finally { B.FB_OpDelete = oD; }
+    eq(S.popups.length, 1); eq(S.res("y1").status, "done");
+    ok(!memFs.files[P6_PROG + "\\req-y1.json.confirmed"], "marker po behu smazan");
+    var rl = S.resultLines(); eq(rl.length, 2, rl.join(" | ")); eq(rl[0], "CEKA NA TEBE (okno potvrzeni) req-y1.json"); eq(rl[1], "OK 1/1 req-y1.json");
+});
+t("PUMPA v0.6 N-E2E-4: po 'Potvrzeno, ale cerstva rucni baseline stale chybi' uz pumpa okno NEopakuje - jedna veta na konzoli (Ctrl+Alt+B, bez FB-AUTO), davka zustava v pending", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    S.put("nb", P6_DELETE); S.answer(6, 6, 6);
+    var oCP = B.FB_ConfirmPending; B.FB_ConfirmPending = function (Repository, p, nonce, hash, chan, approve) {
+        var r = JSON.parse(memFs.files[P6_RES + "\\res-nb.json"]); r.message = "Potvrzeno, ale cerstva rucni baseline stale chybi - davka se NEPROVEDLA"; r.confirm.nonce = "NEW" + nonce; return JSON.stringify(r);
+    };
+    try { S.tick(repo); } finally { B.FB_ConfirmPending = oCP; }
+    eq(S.popups.length, 1, "okno jen jednou (v0.5 by se opakovalo az 3x)");
+    var nep = S.console.filter(function (l) { return /NEPROVEDENO req-nb\.json: chybi cerstva rucni baseline/.test(l); });
+    eq(nep.length, 1, S.console.join("\n")); contains(nep[0], "Ctrl+Alt+B"); contains(nep[0], "bez FB-AUTO"); contains(nep[0], "pending");
+    ok(S.files(P6_PEND + "\\").some(function (f) { return f == "req-nb.json"; }), "davka ceka v pending");
+    contains(S.status().lastResult, "NEPROVEDENO req-nb.json");
+});
+t("PUMPA v0.6 processing\\ (FB-PU-11): zavreni pumpy uprostred davky -> pri startu PRERUSENA, NEprovedeno, res E_INTERRUPTED (eafb/0.2, id z davky), soubor do rejected\\ .interrupted; dokoncena (res final) -> processed\\", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    memFs.files[P6_PROG + "\\req-ir1.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "ir1", repo: "EAEXAMPLE.QEA", ops: B1_CREATE });
+    memFs.files[P6_RES + "\\res-ir1.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "ir1", status: "processing", since: "2026-10-12 07:00:00" });
+    memFs.files[P6_PROG + "\\req-ir2.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "ir2", repo: "EAEXAMPLE.QEA", ops: B1_READ });
+    memFs.files[P6_RES + "\\res-ir2.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "ir2", status: "done", since: "2026-10-12 07:00:00", results: [{ op: "ping", status: "ok" }] });
+    memFs.files[P6_PROG + "\\req-ir3.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "ir3", repo: "EAEXAMPLE.QEA", ops: B1_CREATE }); // bez res
+    var called = 0; var oE = B.FB_OpElements; B.FB_OpElements = function () { called++; return { op: "x", status: "ok", items: [] }; };
+    try { S.start(repo); } finally { B.FB_OpElements = oE; }
+    eq(called, 0, "nic se neprovedlo");
+    var r1 = S.res("ir1"); eq(r1.status, "error"); eq(r1.code, "E_INTERRUPTED"); eq(r1.id, "ir1"); eq(r1.protocol, "eafb/0.2"); contains(r1.message, "NOVYM id"); eq(r1.interrupted.since, "2026-10-12 07:00:00");
+    var r3 = S.res("ir3"); eq(r3.code, "E_INTERRUPTED"); eq(r3.id, "ir3");
+    var rej = S.files(P6_REJ + "\\"); eq(rej.filter(function (f) { return /^req-ir[13]\..*\.interrupted\.json$/.test(f); }).length, 2, rej.join("|"));
+    ok(S.files(P6_PROC + "\\").some(function (f) { return /^req-ir2\./.test(f); }), "dokoncena do processed");
+    eq(S.files(P6_PROG + "\\").length, 0, "processing\\ prazdne");
+    var lines = S.resultLines(); eq(lines.filter(function (l) { return /^PRERUSENA req-ir[13]\.json/.test(l); }).length, 2, lines.join("|")); eq(lines.filter(function (l) { return /^DOKONCENA req-ir2\.json/.test(l); }).length, 1);
+    ok(repo._output.some(function (o) { return /E_INTERRUPTED/.test(o.text); }), "Output tab ma zaznam");
+    // FB_Main: soubor v processing\ ma requests\ jako slozku davky (pending = requests\pending, ne processing\pending)
+    S.put("pp", P6_DELETE); S.tick(repo);
+    eq(S.res("pp").status, "confirm_required"); eq(S.res("pp").confirm.pendingPath, P6_PEND + "\\req-pp.json", "pending pod requests\\, ne processing\\pending");
+    eq(S.files(P6_PROG + "\\").length, 0);
+});
+t("PUMPA v0.6 prerusena POTVRZENA davka: marker processing\\<jmeno>.confirmed + soubor v pending -> pri startu se uz NEnabidne, res E_INTERRUPTED, rejected, index bez ni", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    S.put("ic", P6_DELETE); S.tick(repo); // timeout -> ceka v pending
+    eq(S.popups.length, 1);
+    memFs.files[P6_PROG + "\\req-ic.json.confirmed"] = "potvrzeno 2026-10-12 07:00:00";
+    S.answer(6); S.start(repo);
+    eq(S.popups.length, 1, "zadne nove okno");
+    eq(S.res("ic").code, "E_INTERRUPTED"); eq(S.res("ic").interrupted.confirmed, true);
+    ok(!memFs.files[P6_PEND + "\\req-ic.json"], "pryc z pending"); ok(!memFs.files[P6_PROG + "\\req-ic.json.confirmed"], "marker smazan");
+    eq(B.FB_PendingIndex.call(B, repo, P6_PEND, "list").length, 0, "index prazdny");
+});
+t("PUMPA v0.6 soubory (FB-PU-10): jen req-*.json; jiny .json / txt = IGNORUJI jednou + ve stavu, nezpracovan, neprejmenovan; po odstraneni z requests\\ zmizi ze stavu", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    memFs.files[P6_REQ + "\\request-1.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "x", ops: [{ op: "ping" }] });
+    memFs.files[P6_REQ + "\\poznamka.txt"] = "ahoj";
+    memFs.files[P6_REQ + "\\.pump.lock"] = "lock";
+    S.put("ok1", B1_READ);
+    S.tick(repo); S.tick(repo); S.tick(repo);
+    var ign = S.console.filter(function (l) { return /IGNORUJI/.test(l); });
+    eq(ign.length, 2, "kazdy cizi soubor ohlasen jednou: " + ign.join("|"));
+    ok(memFs.files[P6_REQ + "\\request-1.json"], "cizi soubor zustal lezet"); ok(!memFs.files[P6_RES + "\\resuest-1.json"], "zadna odpoved resuest-1 (FB-PU-10)");
+    eq(S.res("ok1").status, "done");
+    var st = S.status(); eq(st.ignored.sort().join(","), "poznamka.txt,request-1.json");
+    delete memFs.files[P6_REQ + "\\poznamka.txt"]; S.tick(repo);
+    eq(S.status().ignored.join(","), "request-1.json");
+});
+t("PUMPA v0.6 vlastni odpoved (FB-PU-13): vyjimka executoru -> E_EXCEPTION pres FB_JsonStringify (eafb/0.2, id z davky, validni JSON i s koncem radku v hlasce); bez FB_Main -> E_NO_EXECUTOR s radou bootstrap", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    var txt = S.api.errorResponse(B, "E_EXCEPTION", "radek1\nradek2 \"uvozovky\" \\ zpetne", "idX");
+    var o = JSON.parse(txt); eq(o.protocol, "eafb/0.2"); eq(o.id, "idX"); eq(o.code, "E_EXCEPTION"); contains(o.message, "radek2"); eq(o.madeBy, "pumpa v0.6");
+    var noMain = {}; for (var k in B) { if (k != "FB_Main") { noMain[k] = B[k]; } }
+    S.put("ne1", B1_READ);
+    var f = new MockFso().GetFolder(P6_REQ).Files.filter(function (x) { return x.Name == "req-ne1.json"; })[0];
+    global.WScript = { ScriptFullName: P6_PUMP }; try { S.api.processFile(repo, noMain, f); } finally { delete global.WScript; }
+    var r = S.res("ne1"); eq(r.code, "E_NO_EXECUTOR"); eq(r.id, "ne1"); contains(r.message, "bootstrap"); ok(r.message.indexOf("ITAN-Inject") < 0);
+    ok(S.files(P6_REJ + "\\").length == 1, "bez executoru -> rejected");
+});
+t("PUMPA v0.6 cekajici davky po startu (pravidlo 6, FB-PU-15/-17): expirovane jen vypise (FB_PendingSweep je presunul), neexpirovane nejstarsi prvni, okno nese 'Ceka od ... (N min)'", function () {
+    b1Reset(); var repo = blRepo(); var S = pumpSim();
+    function fmt(d) { function p(x) { return (x < 10 ? "0" : "") + x; } return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()); }
+    var text = function (id) { return JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }], note: id }); };
+    memFs.files[P6_REQ + "\\req-pa.json"] = text("pa"); S.tick(repo); // timeout
+    memFs.files[P6_REQ + "\\req-pb.json"] = text("pb"); S.tick(repo);
+    memFs.files[P6_REQ + "\\req-pc.json"] = text("pc"); S.tick(repo);
+    eq(S.popups.length, 3);
+    // zestarnuti: pa 9 h (expiruje), pb 2 h, pc 1 h -> poradi pb, pc
+    function age(id, h) { var r = JSON.parse(memFs.files[P6_RES + "\\res-" + id + ".json"]); r.since = fmt(new Date(new Date().getTime() - h * 3600000)); memFs.files[P6_RES + "\\res-" + id + ".json"] = JSON.stringify(r); }
+    age("pa", 9); age("pb", 2); age("pc", 1);
+    S.popups.length = 0; S.drain();
+    S.answer(2, 2);
+    S.start(repo);
+    eq(S.popups.length, 2, "expirovana se nenabizi");
+    eq(S.popups[0].title, "EA File Bridge - potvrzeni davky pb"); eq(S.popups[1].title, "EA File Bridge - potvrzeni davky pc");
+    ok(/Ceka od \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \(1(19|20|21) min\)/.test(S.popups[0].text), "stari v okne: " + S.popups[0].text.split("\n").filter(function (l) { return /Ceka od/.test(l); }).join(""));
+    var c = S.console.join("\n");
+    ok(/VYPRSELA req-pa\.json \(id pa, cekala od .* min > 480 min\) -> rejected/.test(c), c);
+    ok(/Cekajicich davek v pending\\: 2/.test(c), c);
+    eq(S.res("pa").code, "E_RISK_EXPIRED");
+});
+t("PUMPA v0.6 zrcadlo v harnessu: pumpRun() razeni do rejected = tytez kody jako pump.wsf (BL-3 + E_BLACKLIST/E_SCOPE_CONFIG)", function () {
+    ok(/rejected = \(respText\.indexOf\("\\"code\\":\\"E_PARSE\\""\) >= 0\)[\s\S]{0,500}E_SCOPE_CONFIG/.test(pumpSrc), "vyraz rejected v pump.wsf");
+});
+
+// --- src: otisk kodu ---
+t("FB_CodeFingerprint (FB-PU-02): deterministicky, bez konfiguracnich souboru, nezavisly na CRLF/BOM/poradi; zmena kodu = jiny otisk; stejny vysledek jako tools/code-fingerprint.py (vektor)", function () {
+    var files = [
+        { name: "AICodeBridge.FB_Main.js", text: "// a\r\nreturn 1;\r\n" },
+        { name: "AICodeBridge.FB_Config.js", text: "// konfigurace\nreturn [];\n" },
+        { name: "FB_Sha256", text: "\uFEFF// b\nreturn 2;" }
+    ];
+    var r1 = B.FB_CodeFingerprint.call(B, files);
+    eq(r1.files, 2); eq(r1.excluded.join(","), "FB_Config"); eq(r1.short.length, 12); eq(r1.fingerprint.length, 64);
+    var r2 = B.FB_CodeFingerprint.call(B, [files[2], { name: "FB_Main", text: "// a\nreturn 1;\n\n" }, { name: "FB_WriteScope", text: "x" }]);
+    eq(r2.fingerprint, r1.fingerprint, "poradi, CRLF, BOM, konec souboru a konfigurace otisk nemeni");
+    var r3 = B.FB_CodeFingerprint.call(B, [files[0], { name: "FB_Sha256", text: "// b\nreturn 3;" }]);
+    ok(r3.fingerprint != r1.fingerprint, "zmena kodu = jiny otisk");
+    // vektor: sha256("FB_Main\n// a\nreturn 1;\n\nFB_Sha256\n// b\nreturn 2;\n\n")
+    eq(r1.fingerprint, require("crypto").createHash("sha256").update("FB_Main\n// a\nreturn 1;\n\nFB_Sha256\n// b\nreturn 2;\n\n", "utf8").digest("hex"), "algoritmus = tools/code-fingerprint.py");
+    ["FB_Config", "FB_WriteScope", "FB_OpsAllowed", "FB_RiskPolicy", "FB_AccessGroups", "FB_QcConfig", "FB_ScaffoldConfig"].forEach(function (c) {
+        eq(B.FB_CodeFingerprint.call(B, [{ name: c, text: "x" }, { name: "FB_A", text: "y" }]).excluded.join(","), c, c + " je konfigurace");
+    });
+});
+t("FB_CodeInfo (FB-PU-02): cte fb.code.* z t_objectproperties prvku AICodeBridge; bez tagu = found false s radou; ping nese code, chat ACK 'kod: <short>', About ukazuje otisk", function () {
+    var tags = { "fb.code.fingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "fb.code.files": "125", "fb.code.deployedAt": "2026-10-12 17:00:00", "fb.code.deployedBy": "deploy_src" };
+    function mkRepo(withTags) {
+        var repo = blRepo();
+        var oQ = repo.SQLQuery;
+        repo.SQLQuery = function (sql) {
+            if (/Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin'/.test(sql)) { return "<EADATA><Dataset_0><Data><Row><Object_ID>687</Object_ID></Row></Data></Dataset_0></EADATA>"; }
+            if (/t_objectproperties WHERE Object_ID = 687/.test(sql)) {
+                if (!withTags) { return "<EADATA><Dataset_0><Data></Data></Dataset_0></EADATA>"; }
+                var rows = ""; for (var k in tags) { rows += "<Row><Property>" + k + "</Property><Value>" + tags[k] + "</Value></Row>"; }
+                return "<EADATA><Dataset_0><Data>" + rows + "</Data></Dataset_0></EADATA>";
+            }
+            return oQ.call(repo, sql);
+        };
+        return repo;
+    }
+    var ci = B.FB_CodeInfo.call(B, mkRepo(true));
+    eq(ci.found, true); eq(ci.short, "0123456789ab"); eq(ci.files, 125); eq(ci.deployedBy, "deploy_src"); contains(ci.text, "Otisk kodu v modelu: 0123456789ab (125 souboru bez konfigurace, nasazeno 2026-10-12 17:00:00 deploy_src)");
+    var ci0 = B.FB_CodeInfo.call(B, mkRepo(false)); eq(ci0.found, false); contains(ci0.text, "neni"); contains(ci0.text, "bootstrap");
+    var pr = B.FB_OpPing.call(B, mkRepo(true), { op: "ping" });
+    eq(pr.codeInfo.short, "0123456789ab"); eq(pr.codeInfo.found, true);
+    var ack = "" + B.FB_ChatRender.call(B, { protocol: "eafb/0.2", id: "p", status: "done", results: [pr] });
+    contains(ack, "kod: 0123456789ab (2026-10-12 17:00:00 deploy_src)");
+    // About
+    var prompts = [];
+    var oSess = global.Session; global.Session = { Output: function () { }, Prompt: function (t) { prompts.push("" + t); return 1; } };
+    try { B.EA_MenuClick.call(B, mkRepo(true), "MainMenu", "-AI Bridge", "About AI Bridge"); } finally { global.Session = oSess; }
+    eq(prompts.length, 1); contains(prompts[0], "Otisk kodu v modelu: 0123456789ab"); contains(prompts[0], "pumpa (pump.wsf)");
+    // pod pumpou: ping nese pump (z FB_SessionStart)
+    B._fbPumpInfo = { version: "0.6", fingerprint: "ffff0000ffff0000", path: "C:\\x\\pump.wsf" };
+    global.WScript = { ScriptFullName: "C:\\x\\pump.wsf" };
+    try { var pr2 = B.FB_OpPing.call(B, mkRepo(true), { op: "ping" }); } finally { delete global.WScript; delete B._fbPumpInfo; }
+    eq(pr2.pump.version, "0.6"); eq(pr2.pump.short, "ffff0000ffff"); contains(pr2.pump.status, "pump-status.json");
+    var ack2 = "" + B.FB_ChatRender.call(B, { protocol: "eafb/0.2", id: "p", status: "done", results: [pr2] });
+    contains(ack2, "pumpa v0.6 ffff0000ffff");
+});
+t("deploy_src (FB-PU-02): plny deploy zapise tagged values fb.code.* (otisk nad vsemi soubory bez konfigurace, deployedBy deploy_src); castecny (only) otisk smaze a oznaci", function () {
+    blReset();
+    var tags = {};
+    var oS = B.SetTag; B.SetTag = function (e, n, v) { tags[n] = v; };
+    var oC = B.FB_Config; B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", baseDir: "C:\\HARNESS\\EA-File-Bridge", srcDir: "C:\\HARNSRC6" }]; };
+    memFs.folders["C:\\HARNSRC6"] = 1;
+    memFs.files["C:\\HARNSRC6\\AICodeBridge.FB_A.js"] = "// AICodeBridge.FB_A(Repository)\nreturn 1;\n";
+    memFs.files["C:\\HARNSRC6\\AICodeBridge.FB_B.js"] = "// AICodeBridge.FB_B(Repository, x)\nreturn 2;\n";
+    memFs.files["C:\\HARNSRC6\\AICodeBridge.FB_Config.js"] = "// AICodeBridge.FB_Config()\nreturn [];\n";
+    var repo = blRepo();
+    var oQ = repo.SQLQuery; repo.SQLQuery = function (sql) { if (/Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin'/.test(sql)) { return "<Row><Object_ID>687</Object_ID></Row>"; } return oQ.call(repo, sql); };
+    var el = bootElement(687, {});
+    var oG = repo.GetElementByID; repo.GetElementByID = function (id) { return id == 687 ? el : oG.call(repo, id); };
+    try {
+        var r = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src" }, "d1");
+        eq(r.status, "ok"); eq(r.count, 3);
+        var expect = B.FB_CodeFingerprint.call(B, [{ name: "FB_A", text: memFs.files["C:\\HARNSRC6\\AICodeBridge.FB_A.js"] }, { name: "FB_B", text: memFs.files["C:\\HARNSRC6\\AICodeBridge.FB_B.js"] }]);
+        eq(tags["fb.code.fingerprint"], expect.fingerprint); eq(tags["fb.code.files"], "2"); eq(tags["fb.code.deployedBy"], "deploy_src"); ok(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(tags["fb.code.deployedAt"]));
+        eq(r.code.short, expect.short); eq(r.code.excluded.join(","), "FB_Config");
+        var r2 = B.FB_OpDeploySrc.call(B, repo, { op: "deploy_src", only: ["FB_A"] }, "d2");
+        eq(r2.status, "ok"); eq(tags["fb.code.fingerprint"], ""); contains(tags["fb.code.deployedBy"], "castecny"); contains(r2.code.note, "castecny");
+    } finally { B.SetTag = oS; B.FB_Config = oC; }
+});
+t("ITAN-Bootstrap bod 8 (FB-PU-02): bootstrap zapise fb.code.* (otisk = FB_CodeFingerprint nad src\\ bez konfigurace, deployedBy bootstrap) a vypise 'Otisk kodu v modelu'", function () {
+    var el = bootElement(11037, {});
+    var tags = {};
+    el.TaggedValues = bootColl(function (n, v) { var tv = { Name: n, Value: v, Update: function () { tags[n] = tv.Value; return true; } }; return tv; });
+    var r = runBootstrap({ rows: [{ id: 11037, guid: "{ADDIN-11037}", stereo: "JavascriptAddin", pkg: "EA Addins", el: el }], signals: BOOT_SIGNALS });
+    var line = r.out.filter(function (l) { return /^Otisk kodu v modelu: /.test(l); })[0] || "";
+    ok(line != "", "radek Otisk: " + r.out.slice(-6).join("\n"));
+    var files = fs.readdirSync(SRC).filter(function (f) { return /^AICodeBridge\..+\.js$/.test(f); }).map(function (f) { return { name: f, text: fs.readFileSync(path.join(SRC, f), "utf8") }; });
+    var expect = B.FB_CodeFingerprint.call(B, files);
+    eq(tags["fb.code.fingerprint"], expect.fingerprint, "stejny otisk jako FB_CodeFingerprint nad src");
+    eq(tags["fb.code.files"], "" + expect.files); eq(tags["fb.code.deployedBy"], "bootstrap");
+    contains(line, expect.short); contains(line, "(" + expect.files + " souboru bez konfigurace");
+    // idempotence: druhy beh prepise tytez tagy (zadne duplicity)
+    runBootstrap({ rows: [{ id: 11037, guid: "{ADDIN-11037}", stereo: "JavascriptAddin", pkg: "EA Addins", el: el }], signals: BOOT_SIGNALS });
+    eq(el.TaggedValues._items.filter(function (t) { return t.Name == "fb.code.fingerprint"; }).length, 1, "tag jen jednou");
+});
+t("FB_SessionStart (FB-PU-02): pod pumpou hlasi verzi + otisk pumpy a otisk kodu; pumpa v0.5 = POZOR starsi nez kod v modelu; mimo pumpu jen otisk kodu", function () {
+    blReset(); var repo = blRepo();
+    memFs.files["C:\\P\\pump.wsf"] = "// EA File Bridge - pumpa v0.6 (eafb/0.2)\nvar x = 1;\n";
+    global.WScript = { ScriptFullName: "C:\\P\\pump.wsf" };
+    try {
+        var out = asEaRuntime(function () { return "" + B.FB_SessionStart.call(B, repo); });
+        contains(out, "Pumpa v0.6, otisk "); contains(out, "(C:\\P\\pump.wsf)"); ok(out.indexOf("POZOR: pumpa") < 0, out);
+        eq(B._fbPumpInfo.version, "0.6"); eq(B._fbPumpInfo.fingerprint.length, 64);
+        contains(out, "Otisk kodu");
+        memFs.files["C:\\P\\pump.wsf"] = "// EA File Bridge - pumpa v0.5 (eafb/0.2)\nvar x = 1;\n";
+        var out2 = asEaRuntime(function () { return "" + B.FB_SessionStart.call(B, repo); });
+        contains(out2, "POZOR: pumpa v0.5 je starsi nez kod v modelu (potrebuje pumpu v0.6+)"); contains(out2, "refresh-workspace");
+    } finally { delete global.WScript; delete B._fbPumpInfo; delete B._fbSessionRepo; delete B._fbOwnGuids; }
+    var out3 = "" + B.FB_SessionStart.call(B, repo);
+    ok(out3.indexOf("Pumpa v") < 0 && out3.indexOf("Otisk kodu") >= 0, out3);
+});
+// --- src: bezici pumpa (FB-PU-07) ---
+function p6Status(phase, aliveUntilMs, extra) {
+    function fmt(d) { function p(x) { return (x < 10 ? "0" : "") + x; } return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()); }
+    var o = { protocol: "eafb/0.2", pump: { version: "v0.6", fingerprint: "abc", path: "C:\\GIT\\ea-file-bridge\\pump.wsf", started: "2026-10-12 08:00:00" }, phase: phase, file: "req-x.json", since: "2026-10-12 08:01:00", heartbeat: fmt(new Date()), aliveUntil: fmt(new Date(aliveUntilMs)) };
+    for (var k in (extra || {})) { o[k] = extra[k]; }
+    memFs.files[B1_RES + "\\pump-status.json"] = JSON.stringify(o);
+}
+t("FB_PumpAlive (FB-PU-07): bezi = aliveUntil v budoucnu (idle i processing/waiting_confirm), nebezi = aliveUntil minul nebo faze stopped, neznamo = soubor chybi; text pro cloveka", function () {
+    blReset(); var repo = blRepo(); var now = new Date().getTime();
+    var a0 = B.FB_PumpAlive.call(B, repo, B1_BASE); eq(a0.known, false); eq(a0.running, false); contains(a0.text, "stavovy soubor");
+    p6Status("idle", now + 20000); var a1 = B.FB_PumpAlive.call(B, repo, B1_BASE); eq(a1.running, true); eq(a1.known, true); eq(a1.phase, "idle"); contains(a1.text, "BEZI PUMPA v0.6"); contains(a1.text, "poloz req-*.json do requests");
+    p6Status("waiting_confirm", now + 300000); eq(B.FB_PumpAlive.call(B, repo, B1_BASE).running, true);
+    p6Status("processing", now - 1000); var a3 = B.FB_PumpAlive.call(B, repo, B1_BASE); eq(a3.running, false); contains(a3.text, "Pumpa nebezi");
+    p6Status("stopped", now + 20000); eq(B.FB_PumpAlive.call(B, repo, B1_BASE).running, false);
+    memFs.files[B1_RES + "\\pump-status.json"] = "{nevalidni"; eq(B.FB_PumpAlive.call(B, repo, B1_BASE).running, false);
+    // baseDir z FB_ResolveBaseDir, kdyz chybi
+    p6Status("idle", now + 20000);
+    var oR = B.FB_ResolveBaseDir; B.FB_ResolveBaseDir = function () { return B1_BASE; };
+    try { eq(B.FB_PumpAlive.call(B, repo).running, true); } finally { B.FB_ResolveBaseDir = oR; }
+});
+t("schranka + GUI fallback (FB-PU-07): pri bezici pumpe (tep) nic nezpracuji a reknou, ze davky zpracovava pumpa; bez pumpy bezi jako dnes", function () {
+    blReset(); var repo = blRepo(); var now = new Date().getTime();
+    var oC = B.FB_Config; B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", baseDir: B1_BASE }]; };
+    var oSess = global.Session; global.Session = { Output: function () { }, Prompt: function () { return 1; } };
+    var called = 0; var oM = B.FB_Main; B.FB_Main = function () { called++; return JSON.stringify({ protocol: "eafb/0.2", id: "q", status: "done", results: [] }); };
+    try {
+        p6Status("idle", now + 20000);
+        mockClipboard.text = JSON.stringify({ protocol: "eafb/0.2", id: "q", ops: [{ op: "ping" }] });
+        var o1 = "" + B.FB_ClipboardImport.call(B, repo);
+        contains(o1, "BEZI PUMPA"); eq(called, 0, "schranka nic nezpracovala");
+        memFs.files[B1_REQ + "\\req-g1.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "g1", ops: [{ op: "ping" }] });
+        var o2 = "" + B.FB_ProcessFolder.call(B, repo);
+        contains(o2, "BEZI PUMPA"); eq(called, 0, "GUI fallback nic nezpracoval"); ok(memFs.files[B1_REQ + "\\req-g1.json"], "soubor zustal pumpe");
+        p6Status("idle", now - 60000); // pumpa mrtva
+        var o3 = "" + B.FB_ProcessFolder.call(B, repo);
+        ok(o3.indexOf("BEZI PUMPA") < 0, o3); eq(called, 1, "bez pumpy GUI fallback zpracuje");
+    } finally { B.FB_Config = oC; global.Session = oSess; B.FB_Main = oM; }
+});
+t("FB_Main v0.18 (FB-PU-04): Log i u predcasnych navratu - E_PARSE (nevalidni JSON), E_ARGS (zastupny text v repo), prazdne ops", function () {
+    b1Reset(); var repo = blRepo();
+    var before = repo._output.length;
+    var r1 = pumpRun(repo, null, "lg1", "{nevalidni"); eq(r1.code, "E_PARSE");
+    var r2 = pumpRun(repo, null, "lg2", JSON.stringify({ protocol: "eafb/0.2", id: "lg2", repo: "<REPO>", ops: [{ op: "ping" }] })); eq(r2.code, "E_ARGS");
+    var r3 = pumpRun(repo, null, "lg3", JSON.stringify({ protocol: "eafb/0.2", id: "lg3", repo: "EAEXAMPLE.QEA", ops: [] })); eq(r3.code, "E_PARSE");
+    var logs = repo._output.slice(before).map(function (o) { return o.text; });
+    ok(logs.some(function (l) { return /FB \? -> E_PARSE \(request neni validni JSON/.test(l); }), logs.join("\n"));
+    ok(logs.some(function (l) { return /FB lg2 -> E_ARGS \(zastupny text v poli repo/.test(l); }), logs.join("\n"));
+    ok(logs.some(function (l) { return /FB lg3 -> E_PARSE \(request nema neprazdne pole ops\)/.test(l); }), logs.join("\n"));
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

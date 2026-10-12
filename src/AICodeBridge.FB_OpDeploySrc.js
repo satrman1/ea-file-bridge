@@ -98,6 +98,7 @@ function listSrc(dir) {
     return out2;
 }
 var srcFiles = listSrc(cfg.srcDir);
+var fpFiles = []; // FB-PU-02: otisk nasazeneho kodu (vsechny soubory slozky, bez konfigurace)
 for (var fi = 0; fi < srcFiles.length; fi++) {
     var f = srcFiles[fi];
     var fm = /^AICodeBridge\.([A-Za-z0-9_]+)\.js$/.exec("" + f.name);
@@ -105,6 +106,7 @@ for (var fi = 0; fi < srcFiles.length; fi++) {
     var opName = fm[1];
     if (only != null && only[opName] != 1) { skipped.push(opName); continue; }
     var code = readUtf8("" + f.path);
+    fpFiles.push({ name: opName, text: code });
     var meth = have[opName];
     if (!meth) {
         // zalozit operaci; signatura z hlavicky "// AICodeBridge.Nazev(a, b)"
@@ -177,6 +179,28 @@ for (var fi = 0; fi < srcFiles.length; fi++) {
 el.Methods.Refresh();
 var res = { op: "deploy_src", status: "ok", updated: updated, created: createdOps,
     count: updated.length, reloadCode: true };
+// --- FB-PU-02 (pumpa v0.6, Z261004b-5): otisk nasazeneho kodu do modelu jako
+// tagged values prvku AICodeBridge (fb.code.*). Pri castecnem deploy (op.only)
+// je stav modelu smes -> otisk se zapise jako "neznamy (castecny deploy_src)",
+// aby ping/About nelhaly; plny deploy_src nebo bootstrap ho zase doplni.
+try {
+    var fpNow = new Date();
+    var p2 = function (x) { return (x < 10 ? "0" : "") + x; };
+    var fpAt = fpNow.getFullYear() + "-" + p2(fpNow.getMonth() + 1) + "-" + p2(fpNow.getDate()) + " " + p2(fpNow.getHours()) + ":" + p2(fpNow.getMinutes()) + ":" + p2(fpNow.getSeconds());
+    if (only == null) {
+        var fp = this.FB_CodeFingerprint(fpFiles);
+        this.SetTag(el, "fb.code.fingerprint", fp.fingerprint);
+        this.SetTag(el, "fb.code.files", "" + fp.files);
+        this.SetTag(el, "fb.code.deployedBy", "deploy_src");
+        res.code = { fingerprint: fp.fingerprint, short: fp.short, files: fp.files, excluded: fp.excluded };
+    } else {
+        this.SetTag(el, "fb.code.fingerprint", "");
+        this.SetTag(el, "fb.code.files", "0");
+        this.SetTag(el, "fb.code.deployedBy", "deploy_src (castecny: only " + updated.length + " operaci - otisk neznamy)");
+        res.code = { fingerprint: "", short: "", files: 0, note: "castecny deploy_src (only) - otisk v modelu smazan; plny deploy_src nebo bootstrap ho doplni" };
+    }
+    this.SetTag(el, "fb.code.deployedAt", fpAt);
+} catch (eFp) { warns.push("otisk kodu (fb.code.*) se nepodarilo zapsat: " + eFp.message); }
 if (paramsSynced.length > 0) { res.paramsSynced = paramsSynced; }
 if (receptions.length > 0) { res.receptions = receptions; }
 if (skipped.length > 0) { res.skipped = skipped; }

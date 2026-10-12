@@ -80,7 +80,7 @@ Pumpa chat ACK **nevytváří**; jediný záznam je soubor `res`. Je to **stavov
 
 | `res-<id>.json` | Význam | Co dělat |
 |---|---|---|
-| neexistuje | pumpa dávku **nepřevzala** (neběží, čeká na EA, stojí na okně jiné dávky) | neposílej znovu; po několika čteních řekni člověku větu **A** |
+| neexistuje | pumpa dávku **nepřevzala** (neběží, čeká na EA, stojí na okně jiné dávky) | neposílej znovu; podívej se do `responses\pump-status.json` (níže) a podle něj řekni větu **A**, **D** nebo počkej |
 | `status: "processing"` (`since` = od kdy) | pumpa na dávce **pracuje** (dlouhý dotaz, dialog EA) | čekat; po delší době věta **B** |
 | `status: "confirm_required"` | čeká na **člověka** v okně pumpy | čekat bez limitu, věta **C**; když člověk řekne, že okno zmizelo, zapiš **tentýž soubor** (stejné jméno i obsah) znovu — pumpa okno nabídne znovu bez restartu |
 | `done` / `error` / `rejected` | **výsledek** | číst `results[]`; GUIDy pro navazující dávku z výsledku (`guid`, `items[].guid`, `resolved[]`), ne opakováním dávky |
@@ -89,11 +89,13 @@ Pumpa chat ACK **nevytváří**; jediný záznam je soubor `res`. Je to **stavov
 
 Kde co hledat: `results[i].status` (`ok` / `error` / `skipped` / `pending`), chyba v `code` + `message` (+ `problems[]` u chyb dávky), `warnings[]` u operace i dávky, `resolved[]` (GUID a plná cesta cílů zadaných cestou/jménem), `items` + `partial: true` (co proběhlo před chybou), `cascades[]` u mazání, `baseline{}` u zápisu. Soubor čti celý; když ho nástroj uřízne, zopakuj dotaz kompaktněji (méně sloupců, menší `TOP N`), ne celou dávku. Do `responses\` ani `requests\pending\` **nikdy nezapisuj**.
 
+**Stav pumpy** — `responses\pump-status.json` (pumpa v0.6; čti ho dřív, než o pumpě cokoli tvrdíš): `phase` = `idle` (čeká na dávky) · `waiting_ea` (čeká na EA s otevřeným projektem → věta **D**) · `processing` + `file`, `since` (pracuje na dávce) · `waiting_confirm` + `file` (čeká na člověka v okně dávky `file`; tvoje dávka mezitím leží a počká — řekni to člověku) · `stopped`. `heartbeat` = tep (v klidu každých ~10 s), `aliveUntil` = do kdy se pumpa zaručeně ozve. **Pumpa neběží, když `aliveUntil` minul** (podle hodin stanice) nebo soubor chybí → věta **A**; nikdy to neodhaduj z ticha. Dále: `lastResult` (poslední řádek konzole, např. `OK 3/3 req-x.json`, `CHYBA op[1] E_… req-x.json`, `CEKA req-x.json (Storno)`), `pendingCount` (kolik dávek čeká v `pending\`), `ignored[]` (soubory v `requests\`, které nejsou `req-*.json` — pumpa je nezpracuje, dávku vždy pojmenuj `req-<id>.json`), `pump.version` / `pump.fingerprint` (verze a otisk pumpy; `ping` vrací navíc `codeInfo` = otisk kódu v modelu a pod pumpou blok `pump`). Dávku, kterou pumpa převzala a pak byla přerušena (zavřené okno pumpy, pád EA), pumpa po startu **neprovede znovu** — dostaneš `E_INTERRUPTED`; zkontroluj Output tab s člověkem a pošli opravnou dávku s novým id.
+
 **Hotové věty pro člověka** (`<id>` dosaď):
 
-- **A** „Pumpa neodpovídá. Spusť dvojklikem `pump.wsf` v kořeni tohoto workspace (jen jedno okno). Musí vypsat `Pripojeno na EA` a `Slozka requestu: <tento workspace>\requests`. Pak napiš ‚pokračuj' — dávku znovu neposílám."
+- **A** „Pumpa neběží (stav `pump-status.json`: <phase>, naposledy se ozvala <heartbeat>). Spusť dvojklikem `pump.wsf` v kořeni tohoto workspace (jen jedno okno — druhá pumpa se sama ukončí). Musí vypsat `Pripojeno na EA` a `Slozka requestu: <tento workspace>\requests`. Pak napiš ‚pokračuj' — dávku znovu neposílám."
 - **B** „Pumpa na dávce <id> pracuje. Až v jejím okně uvidíš výsledek, napiš ‚pokračuj'. Trvá-li to přes dvě minuty, podívej se, jestli EA nečeká na dialog."
-- **C** „Dávka <id> čeká na tvé potvrzení v okně pumpy (okno pumpy, ne EA). Okno zmizí po 5 minutách — pak mi napiš ‚okno zmizelo' a nabídnu ho znovu. Po kliknutí napiš ‚hotovo'."
+- **C** „Dávka <id> čeká na tvé potvrzení v okně pumpy (okno pumpy, ne EA; Enter = Storno, nic se neprovede). Okno zmizí po 5 minutách — pak mi napiš ‚okno zmizelo' a nabídnu ho znovu. Po kliknutí napiš ‚hotovo'."
 - **D** „Pumpa čeká na EA — otevři EA s projektem."
 - **E** „V dávce <id> mám chybu (<důvod>). V okně potvrzení dej Ne, pošlu opravenou."
 - **F** (po změně členství ve skupinách EA) „Zavři EA i pumpu a spusť obojí znovu."

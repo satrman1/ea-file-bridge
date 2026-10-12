@@ -78,11 +78,16 @@ else if (ItemName == "Nav spike (test navigace)") {
     catch (eNv) { outN = "CHYBA NavProbe (zachytitelna JS vetev): " + eNv.message; }
     Session.Prompt("Nav spike:\n\n" + outN, 0);
 }
-else if (ItemName == "About AI Bridge")
+else if (ItemName == "About AI Bridge") {
+    // FB-PU-02 (pumpa v0.6, Z261004b-5): About ukazuje otisk kodu v modelu
+    var aboutCode = "";
+    try { aboutCode = "" + this.FB_CodeInfo(Repository).text; } catch (eAb) { aboutCode = "Otisk kodu: nelze precist (" + eAb.message + ")"; }
     Session.Prompt("AI Code Bridge + EA File Bridge (eafb/0.2)\n"
+        + aboutCode + "\n"
         + "Executor: operace FB_* (kanon = ea-file-bridge/src, runtime = model).\n"
-        + "Rezimy: davka ze schranky | davky ze slozky | AI import (vratny).\n"
+        + "Rezimy: pumpa (pump.wsf) | davka ze schranky | davky ze slozky | AI import (vratny).\n"
         + "Zmeny se vypisuji do Output tabu 'AI Bridge' (cesta + operace).\n"
         + "Protokol: docs/PROTOKOL-EAFB.md v repu ea-file-bridge.", 0);
+}
 else
     Session.Output("Unhandled menu item: " + ItemName);
