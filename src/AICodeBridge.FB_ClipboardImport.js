@@ -74,11 +74,17 @@ function clipWrite(s) {
     } catch (eCW) { }
     try {
         var tmp = DIR_RES + "\\_clip.tmp";
+        // UTF-16LE BEZ BOM (zive 12. 10.: BOM z ADODB "unicode" skoncil ve schrance
+        // jako neviditelny prvni znak chat ACK) - stejny blok jako FB_ClipboardContext
         var st = self.FB_ComObj("ADODB.Stream");
         st.Type = 2; st.Charset = "unicode"; st.Open();
         st.WriteText(s);
-        st.SaveToFile(tmp, 2);
-        st.Close();
+        st.Position = 0; st.Type = 1; st.Position = 2;
+        var bin = self.FB_ComObj("ADODB.Stream");
+        bin.Type = 1; bin.Open();
+        st.CopyTo(bin);
+        bin.SaveToFile(tmp, 2);
+        bin.Close(); st.Close();
         var sh = self.FB_ComObj("WScript.Shell");
         sh.Run('cmd /c clip < "' + tmp + '"', 0, true);
         if (fso.FileExists(tmp)) { fso.DeleteFile(tmp); }

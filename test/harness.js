@@ -3396,6 +3396,14 @@ t("BL-3 E_NO_BASELINE: vsechny adaptery vcetne pump.wsf radi soubor do rejected;
     var ack = "" + B.FB_ChatRender.call(B, { id: "x", status: "error", code: "E_NO_BASELINE", message: "m", baseline: { reason: "nad prahem" }, results: [] });
     contains(ack, "E_NO_BASELINE"); contains(ack, "NEDEL");
 });
+t("CZ-20b schranka bez BOM: clip.exe fallback zapisuje UTF-16LE od pozice 2 v obou kanalech (kontext vyberu i chat ACK; zive 12. 10.)", function () {
+    ["AICodeBridge.FB_ClipboardContext.js", "AICodeBridge.FB_ClipboardImport.js"].forEach(function (f) {
+        var src = fs.readFileSync(path.join(SRC, f), "utf8");
+        contains(src, "st.Position = 0; st.Type = 1; st.Position = 2;", f + ": chybi preskoceni BOM");
+        contains(src, "bin.SaveToFile(tmp, 2)", f + ": ulozit se ma binarni kopie bez BOM");
+        ok(!/st\.SaveToFile\(tmp/.test(src), f + ": textovy stream s BOM se nesmi ukladat primo");
+    });
+});
 t("BL-3 T6-24 regrese: den dev skillu (scaffold + UC + vlastni diagram) -> zadny dialog navic, baselines <= dotcene packages", function () {
     blReset(); var repo = blRepo();
     var day = [

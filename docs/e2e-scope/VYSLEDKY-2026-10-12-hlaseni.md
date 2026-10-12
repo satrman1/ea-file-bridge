@@ -52,9 +52,9 @@ Neověřeno živě (kryje harness): `cascadeDelete: "block"` (CZ-10c — bankovn
 
 ## 4. Co zbývá / lidské kroky (Miloš)
 
-1. `git push` z PC (commit tohoto vlákna je lokálně na `main`; push z VM selhává).
+1. ~~`git push` z PC~~ — **hotovo 12. 10. 2026 12:38** (`origin/main` = `f04bb5f`). Navíc 12:50 commit 12:50 „fix(clipboard)": stejná oprava BOM i pro chat ACK ze schránky (`FB_ClipboardImport.clipWrite`, harness CZ-20b 520/520) — nepushnuto, půjde s dalším vláknem.
 2. **EAExample**: při příštím otevření nasadit `deploy_src` pumpou (kód tohoto vlákna tam není — má v0.17 z rána) + plný restart EA kvůli menu.
-3. Po dalším plném restartu EA (QEAX) jednou kliknout **Kontext vyberu do schranky** a zkontrolovat, že schránka nezačíná neviditelným znakem a věta nemá `E_BLACKLIST: E_BLACKLIST` (oprava kap. 3 bod 2 nasazena do modelu, v EA runtime neověřena).
+3. Po dalším plném restartu EA (QEAX) jednou kliknout **Kontext vyberu do schranky** a zkontrolovat, že schránka nezačíná neviditelným znakem a věta nemá `E_BLACKLIST: E_BLACKLIST` (oprava kap. 3 bod 2 nasazena do modelu, v EA runtime neověřena); zároveň ping schránkou — chat ACK už také nezačíná neviditelným znakem (oprava 12:50 je jen v repu, do modelu ji dostane až další `deploy_src`).
 4. Úklid fixtur (`FBT-CHRANENE` z `FB_WriteScope` + deploy, pak smazat; `FBT-VOLNE`, `FBT-ZAMCENE`, `ZAM-Prvek`) — až po kitu Z261004b-4.
 5. Kit agenta Z261004b-4: tabulky kap. 1 tady a ve `VYSLEDKY-2026-10-12-jadro.md`, `agentNotes` z pingu, kanon §12a/§12g/§6.
 
