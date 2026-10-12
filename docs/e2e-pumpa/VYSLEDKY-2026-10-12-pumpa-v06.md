@@ -83,5 +83,6 @@ Neověřeno živě: About AI Bridge (otisk kódu v dialogu — stejný `FB_CodeI
 
 ## 5. Co zbývá
 
-- **Miloš:** (a) restartovat pumpu (zavřít okno, dvojklik `pump.wsf`) — běží ještě verze před opravou re-attachu; (b) push `main` z VS Code; (c) smazat `C:\Users\milos\CLAUDE\_tmp-pumpa-test\` (kopie pumpy z testu zámku); (d) refresh workspace `ai-transfer` (není připojený v Cowork): `python C:\GIT\ea-file-bridge\tools\refresh-workspace.py --workspace C:\GIT\ai-transfer --check` → pak bez `--check` (volby podle `docs\WORKSPACE-METODIKY.md` kap. 4) a commit workspace.
+- **Hotovo 18:05–18:12 (Claude po připomínce Miloše — složku `ai-transfer` si připojil sám):** refresh workspace `C:\GIT\ai-transfer` (pumpa v0.6 `f88b5de722ed`, `PUMP-VERSION` → `d0a0762`, `.github\` 30 souborů, verify OK), commit `9ba8323`; testovací složka `CLAUDE\_tmp-pumpa-test\` smazána.
+- **Miloš:** (a) restartovat pumpu (zavřít okno, dvojklik `pump.wsf`) — běží ještě verze před opravou re-attachu (`946dd26e06b0`), v repu i ve workspace je `f88b5de722ed`; (b) push `ea-file-bridge` (`d0a0762`) a `ai-transfer` (`9ba8323`) z VS Code — z VM chybí přihlášení.
 - **Další vlákna:** -6 (texty okna FB-UI-08 — pumpa už žádnou legendu nepřidává, text je celý z `FB_ConfirmSummary`); -8 návody (tabulka hlášek konzole je zatím v `NAVOD-NASAZENI-KLIKACI.md` 6.1); „stisk klávesy" pro opětovnou nabídku čekající dávky nerealizován (cscript nemá neblokující vstup) — náhrada = tentýž soubor znovu / restart pumpy.
