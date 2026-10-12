@@ -1,0 +1,3 @@
+{"protocol":"eafb/0.2","id":"b2o-07-clip","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"delete_from_model","targets":[{"type":"Package","id":1122}]}
+]}

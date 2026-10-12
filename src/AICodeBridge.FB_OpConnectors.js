@@ -66,17 +66,18 @@ function applyEnd(end, spec, label) {
 for (var i = 0; i < op.connectors.length; i++) {
     var c = op.connectors[i];
     var conn = null, created = false, srcEl = null, tgtEl = null, matchedBy = "";
-    if (c.guid || c.connectorID) {
+    var cId = c.connectorID || c.id; // FB-PU-25: id z vysledku = klic upravy
+    if (c.guid || cId) {
         try {
             if (c.guid) { conn = Repository.GetConnectorByGuid("" + c.guid); }
-            else { conn = Repository.GetConnectorByID(parseInt(c.connectorID, 10)); }
+            else { conn = Repository.GetConnectorByID(parseInt(cId, 10)); }
         } catch (eG) { conn = null; }
-        if (conn == null) { return { op: "create_or_update_connectors", status: "error", code: "E_NOT_FOUND", message: "connectors[" + i + "]: konektor nenalezen.", items: items }; }
+        if (conn == null) { return { op: "create_or_update_connectors", status: "error", code: "E_NOT_FOUND", message: "connectors[" + i + "]: konektor " + (c.guid || cId) + " nenalezen.", items: items }; }
         srcEl = Repository.GetElementByID(conn.ClientID);
         tgtEl = Repository.GetElementByID(conn.SupplierID);
     } else {
         if (!c.source || !c.target || !c.type) {
-            return { op: "create_or_update_connectors", status: "error", code: "E_ARGS", message: "connectors[" + i + "]: create vyzaduje source, target, type.", items: items };
+            return { op: "create_or_update_connectors", status: "error", code: "E_ARGS", message: "connectors[" + i + "]: create vyzaduje source, target, type; pro upravu existujici vazby pouzij guid nebo connectorID (id z vysledku).", items: items };
         }
         srcEl = this.FB_ResolveEl(Repository, c.source);
         if (srcEl == null) { return this.FB_ResolveFail("create_or_update_connectors", "connectors[" + i + "]: source nenalezen (" + c.source + ").", items); }
@@ -205,6 +206,10 @@ for (var i = 0; i < op.connectors.length; i++) {
         return { op: "create_or_update_connectors", status: "error", code: "E_EXCEPTION",
             message: "connectors[" + i + "]: Connector.Update() selhal: " + conn.GetLastError(), items: items };
     }
+    // FB-PU-26: polozka do items hned po Update (konektor v modelu existuje)
+    var itC = { guid: "" + conn.ConnectorGUID, id: conn.ConnectorID, type: "" + conn.Type, created: created, index: i };
+    if (matchedBy != "") { itC.matchedBy = matchedBy; }
+    items.push(itC);
     applyEnd(conn.ClientEnd, c.sourceEnd, "connectors[" + i + "].sourceEnd");
     applyEnd(conn.SupplierEnd, c.targetEnd, "connectors[" + i + "].targetEnd");
     var w2 = this.FB_TagWrite(Repository, conn, c.taggedValues);
@@ -213,9 +218,6 @@ for (var i = 0; i < op.connectors.length; i++) {
     if (created && c.dedupKey) { this.SetTag(conn, "ai.dedup", "" + c.dedupKey); } // K4: klic prezije prejmenovani
     this.SetTag(conn, "ai.request", "" + reqId);
     if (created) { srcEl.Connectors.Refresh(); }
-    var itC = { guid: "" + conn.ConnectorGUID, id: conn.ConnectorID, type: "" + conn.Type, created: created };
-    if (matchedBy != "") { itC.matchedBy = matchedBy; }
-    items.push(itC);
 }
 var res = { op: "create_or_update_connectors", status: "ok", count: items.length, items: items };
 if (items.length > 0) { res.guid = items[0].guid; res.id = items[0].id; }

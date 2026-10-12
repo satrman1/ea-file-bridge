@@ -12,6 +12,22 @@
 // Kontrakt confirm okruhu (par. 6e) beze zmeny: ELEVATED -> EA dialog ->
 // FB_ConfirmPending kanal "gui"; potvrzovaci pole v obsahu davky odmita
 // executor sam (E_RISK_CONFIRM) + druha obrana zde (nematerializovat).
+// v0.20 (balik B2 operace, Z261004b-7; FB-PU-44 + FB-PU-45):
+//  (a) JSON se ze schranky VYRIZNE od prvni { po posledni } - markdownovy obal
+//      kodoveho bloku (```json ... ```) nebo veta kolem davky z M365 Copilota
+//      uz nekonci E_PARSE (Copilot pak "opravoval" JSON, ktery byl v poradku);
+//  (b) po zapisu chat verze do schranky se schranka PRECTE a porovna - dialog
+//      rika "je ve schrance" jen kdyz tam opravdu je (driv clip.exe mohl selhat
+//      a ve schrance zustala puvodni davka);
+//  (c) dedup pres soubor: existuje-li res-<id>.json s KONECNYM stavem (ne
+//      processing / confirm_required), davka se neprovede znovu - pamet
+//      procesu EA (W5) po restartu zanika, soubor ne (mechanika B1 /
+//      E_DUPLICATE_ID ve FB_Main; tady drivejsi a srozumitelnejsi hlaska);
+//  (d) req soubor se zapisuje UTF-8 BEZ BOM - otisk davky pocita EA runtime
+//      z textu a pumpa ze surovych bajtu; BOM z ADODB "utf-8" delal z davky ze
+//      schranky, kterou pak potvrdila pumpa, falesne "obsah se zmenil"
+//      (E_RISK_INTEGRITY). Druha obrana: FB_Main a FB_ConfirmPending BOM pred
+//      otiskem odrizne i u souboru odjinud (Notepad).
 var self = this;
 var fso = this.FB_ComObj("Scripting.FileSystemObject");
 // --- konfigurace slozek (stejna jako GUI fallback) ---
@@ -46,10 +62,21 @@ function ts() {
         + "-" + pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
 }
 function writeUtf8(path, text) {
+    // UTF-8 BEZ BOM (FB-PU-45): ADODB "utf-8" pise BOM EF BB BF -> preskocit 3 bajty
     var st = self.FB_ComObj("ADODB.Stream");
     st.Type = 2; st.Charset = "utf-8"; st.Open();
     st.WriteText(text);
-    st.SaveToFile(path, 2);
+    var noBom = false;
+    try {
+        st.Position = 0; st.Type = 1; st.Position = 3;
+        var bin = self.FB_ComObj("ADODB.Stream");
+        bin.Type = 1; bin.Open();
+        st.CopyTo(bin);
+        bin.SaveToFile(path, 2);
+        bin.Close();
+        noBom = true;
+    } catch (eNb) { noBom = false; }
+    if (!noBom) { try { st.Position = 0; st.Type = 2; st.Charset = "utf-8"; } catch (eRs) { } st.SaveToFile(path, 2); } // fallback s BOM (mock bez binarni cesty) - otisk ho odrizne FB_Main
     st.Close();
 }
 function readUtf8(path) {
@@ -98,7 +125,10 @@ function clipWrite(s) {
         var sh = self.FB_ComObj("WScript.Shell");
         sh.Run('cmd /c clip < "' + tmp + '"', 0, true);
         if (fso.FileExists(tmp)) { fso.DeleteFile(tmp); }
-        return true;
+        // FB-PU-44 (b): over, ze to ve schrance opravdu je (clip.exe mohl selhat tise)
+        var back = "";
+        try { back = clipRead(); } catch (eRb) { back = ""; }
+        return (back.replace(/\r\n/g, "\n").replace(/\s+$/, "") === s.replace(/\r\n/g, "\n").replace(/\s+$/, ""));
     } catch (eClip) { return false; }
 }
 // --- EA dialog Ano/Ne/Storno (kanal "gui"); fallback WScript.Shell.Popup ---
@@ -144,7 +174,20 @@ catch (eCR) {
     return "CHYBA cteni schranky (COM htmlfile v EA runtime): " + eCR.message
         + "\nPravdepodobne EA JS runtime nepodporuje clipboardData.getData. Ohlas - zvolime jinou cestu cteni schranky.";
 }
+// FB-PU-44 (a): vyriznout JSON od prvni { po posledni } (markdownovy obal, veta kolem)
+var clipRaw = clip, wrapNote = "";
+var cb0 = clip.indexOf("{"), cb1 = clip.lastIndexOf("}");
+if (cb0 >= 0 && cb1 > cb0) {
+    var before = clip.substring(0, cb0).replace(/^\s+|\s+$/g, ""), after = clip.substring(cb1 + 1).replace(/^\s+|\s+$/g, "");
+    if (before != "" || after != "") {
+        clip = clip.substring(cb0, cb1 + 1);
+        wrapNote = "Obal kolem JSON (" + (before.length + after.length) + " znaku" + (/^`{3}/.test(before) || /`{3}/.test(after) ? ", markdownovy blok" : "") + ") odriznut. ";
+    }
+}
 if (clip == "" || clip.indexOf("\"protocol\"") < 0 || !/"protocol"\s*:\s*"eafb\//.test(clip)) {
+    if (/[\u201E\u201C\u201D\u2018\u2019\u00AB\u00BB]/.test(clipRaw)) {
+        return "Schranka neobsahuje eafb davku - text ma typograficke uvozovky (\u201E \u201C \u201D) misto \" - zkopiruj davku z kodoveho bloku (Copy), ne z formatovaneho textu.";
+    }
     return "Schranka neobsahuje eafb davku. Zkopiruj (Copy) code blok s davkou v Copilotu a klikni znovu.";
 }
 // druha obrana (B1): davka s potvrzovacimi poli se NEmaterializuje
@@ -166,6 +209,18 @@ var reqPath = DIR_REQ + "\\" + reqName;
 if (fso.FileExists(reqPath) || fso.FileExists(DIR_PEND + "\\" + reqName)) {
     return "req-" + id2 + ".json uz je ve fronte nebo ceka v pending\\ - vyres ji nejdriv, nebo posli davku s jinym id.";
 }
+// FB-PU-44 (c): dedup pres KONECNY res-<id>.json (prezije restart EA; pamet W5 ne)
+try {
+    var resPrev = DIR_RES + "\\" + resName(reqName);
+    if (fso.FileExists(resPrev)) {
+        var prevObj = null;
+        try { prevObj = self.FB_JsonParse(readUtf8(resPrev)); } catch (ePrv) { prevObj = null; }
+        var prevSt = (prevObj && prevObj.status) ? ("" + prevObj.status) : "";
+        if (prevSt != "" && prevSt != "processing" && prevSt != "confirm_required") {
+            return "Davka " + id2 + " uz byla zpracovana (res-" + id2 + ".json: " + prevSt + (prevObj.code ? " " + prevObj.code : "") + ") - znovu se neprovede. Pro novou davku zmen id; chces-li navazat, pouzij GUIDy z res-" + id2 + ".json.";
+        }
+    }
+} catch (eDd) { }
 writeUtf8(reqPath, clip);
 self._fbClipSeen[dk] = 1;
 // zpracovani (kontrakt I5: FB_Main dostava CESTU - hash surovych bajtu)
@@ -196,7 +251,7 @@ try {
     chat = "" + this.FB_ChatRender(obj);
 } catch (eCh) { chat = "EAFB: chat rendering selhal (" + eCh.message + ") - plna odpoved v res-" + id2 + ".json"; }
 var putBack = clipWrite(chat);
-return "Davka " + id2 + " zpracovana.\n\n" + chat
+return "Davka " + id2 + " zpracovana. " + wrapNote + "\n\n" + chat
     + "\n\n" + (putBack
-        ? "Chat verze je ve schrance - prepni do Copilota a dej Ctrl+V."
-        : "(Vlozeni do schranky se nezdarilo - zkopiruj text vyse rucne; plna odpoved je v res-" + id2 + ".json.)");
+        ? "Chat verze je ve schrance (overeno zpetnym ctenim) - prepni do Copilota a dej Ctrl+V."
+        : "(Vlozeni do schranky se NEZDARILO - ve schrance je porad puvodni text; zkopiruj text vyse rucne, plna odpoved je v res-" + id2 + ".json.)");

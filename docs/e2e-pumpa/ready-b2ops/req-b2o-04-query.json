@@ -1,0 +1,6 @@
+{"protocol":"eafb/0.2","id":"b2o-04-query","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"query","sql":"SELECT Package_ID, Name FROM t_package","why":"bez WHERE nad malou tabulkou = varovani (a orez, je-li radku > 500)"},
+ {"op":"query","sql":"SELECT Object_ID, Name FROM t_object WHERE Object_ID > 0","why":"600+ radku -> truncated 500, rowCount skutecny"},
+ {"op":"query","sql":"SELECT Object_ID, Name FROM t_object WHERE Object_ID > 0","maxRows":50,"why":"maxRows 50"},
+ {"op":"query","sql":"SELECT Object_ID FROM t_object","why":"bez WHERE nad velkou tabulkou = E_SQL_UNBOUNDED (posledni, stop-on-error)"}
+]}

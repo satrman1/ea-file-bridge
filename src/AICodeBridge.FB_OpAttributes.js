@@ -25,13 +25,14 @@ this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.attributes.length; i++) {
     var a = op.attributes[i];
     var attr = null, created = false, j;
-    if (a.attributeID || a.guid) {
+    var aId = a.attributeID || a.id; // FB-PU-25: id z vysledku = klic upravy
+    if (aId || a.guid) {
         for (j = 0; j < el.Attributes.Count; j++) {
             var cand = el.Attributes.GetAt(j);
-            if ((a.attributeID && cand.AttributeID == parseInt(a.attributeID, 10))
+            if ((aId && cand.AttributeID == parseInt(aId, 10))
                 || (a.guid && ("" + cand.AttributeGUID).toUpperCase() == ("" + a.guid).toUpperCase())) { attr = cand; break; }
         }
-        if (attr == null) { return { op: "create_or_update_attributes", status: "error", code: "E_NOT_FOUND", message: "attributes[" + i + "]: atribut nenalezen.", items: items }; }
+        if (attr == null) { return { op: "create_or_update_attributes", status: "error", code: "E_NOT_FOUND", message: "attributes[" + i + "]: atribut " + (aId || a.guid) + " na tomto elementu nenalezen - pro upravu pouzij guid nebo attributeID (id z vysledku) atributu TOHOTO elementu.", items: items }; }
     } else if (a.name) {
         for (j = 0; j < el.Attributes.Count; j++) {
             if (("" + el.Attributes.GetAt(j).Name) == ("" + a.name)) { attr = el.Attributes.GetAt(j); break; }
@@ -43,6 +44,9 @@ for (var i = 0; i < op.attributes.length; i++) {
         if (!attr.Update()) { return { op: "create_or_update_attributes", status: "error", code: "E_EXCEPTION", message: "attributes[" + i + "]: Update selhal: " + attr.GetLastError(), items: items }; }
         created = true;
     }
+    // FB-PU-26: polozka do items hned, jak atribut existuje
+    var itA = { guid: "" + attr.AttributeGUID, id: attr.AttributeID, name: "" + attr.Name, created: created, index: i };
+    items.push(itA);
     if (!created && typeof a.name != "undefined") { attr.Name = "" + a.name; }
     if (typeof a.type != "undefined") { attr.Type = "" + a.type; }
     if (typeof a.classifierID != "undefined") { attr.ClassifierID = parseInt(a.classifierID, 10); }
@@ -63,7 +67,7 @@ for (var i = 0; i < op.attributes.length; i++) {
     }
     var w2 = this.FB_TagWrite(Repository, attr, a.taggedValues);
     for (var wj = 0; wj < w2.length; wj++) { warns.push("attributes[" + i + "]: " + w2[wj]); }
-    items.push({ guid: "" + attr.AttributeGUID, id: attr.AttributeID, name: "" + attr.Name, created: created });
+    itA.guid = "" + attr.AttributeGUID; itA.id = attr.AttributeID; itA.name = "" + attr.Name;
 }
 el.Attributes.Refresh();
 this.SetTag(el, "ai.request", "" + reqId); // razitko na vlastnika

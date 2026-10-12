@@ -25,6 +25,13 @@ function pathOf(row) {
 }
 var t = ("" + (ref === null || typeof ref == "undefined" ? "" : ref)).replace(/^\s+|\s+$/g, "");
 if (t == "") { return null; }
+// FB-PU-30 (Z261004b-7): GUID bez slozenych zavorek se doplni (driv se hledal
+// jako jmeno -> "nenalezen"); tvar {…} s cizimi znaky se odmitne PRED SQL
+if (/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(t)) { t = "{" + t + "}"; }
+if (t.charAt(0) == "{" && !/^\{[A-Za-z0-9-]+\}$/.test(t)) {
+    this._fbResolveErr = { code: "E_ARGS", message: "neplatny tvar GUID '" + t + "' - GUID je {8-4-4-4-12 hex} (napr. z pingu/find_*), bez mezer a cizich znaku", guids: [], candidates: [] };
+    return null;
+}
 var el = null;
 try {
     if (t.charAt(0) == "{") {

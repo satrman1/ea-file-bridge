@@ -1,0 +1,5 @@
+{"protocol":"eafb/0.2","id":"b2o-03-fields","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"create_or_update_elements","elements":[
+   {"id":11896,"name":"B2O Trida A","stereotype":"entity","nots":"preklep - ma se ignorovat s varovanim","notes":"upraveno pres id"},
+   {"id":11897,"name":"B2O Trida B","description":"pres id, bez duplicity"}]}
+]}

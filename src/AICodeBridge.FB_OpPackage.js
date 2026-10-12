@@ -17,7 +17,7 @@
 // je duvod, proc vysledek vzdy obsahuje guid+id k okamzite kontrole.
 var list = null;
 if (op && op.packages && Object.prototype.toString.call(op.packages) == "[object Array]") { list = op.packages; }
-else if (op && (op.name || op.guid || op.packageID)) { list = [op]; } // zkraceny zapis pro jediny package
+else if (op && (op.name || op.guid || op.packageID || op.id)) { list = [op]; } // zkraceny zapis pro jediny package
 if (!list || list.length == 0) {
     return { op: "create_or_update_package", status: "error", code: "E_ARGS", message: "Povinne: packages (pole) nebo primo name/parent." };
 }
@@ -26,9 +26,10 @@ this._fbOpProgress = { items: items }; // W3
 for (var i = 0; i < list.length; i++) {
     var p = list[i];
     var pkg = null, created = false, matchedBy = "";
-    if (p.guid || p.packageID) {
-        pkg = this.FB_ResolvePkg(Repository, p.guid || p.packageID);
-        if (pkg == null) { return this.FB_ResolveFail("create_or_update_package", "packages[" + i + "]: package nenalezen (" + (p.guid || p.packageID) + ").", items); }
+    var pKey = p.guid || p.packageID || p.id; // FB-PU-25: id z vysledku = klic upravy
+    if (pKey) {
+        pkg = this.FB_ResolvePkg(Repository, pKey);
+        if (pkg == null) { return this.FB_ResolveFail("create_or_update_package", "packages[" + i + "]: package nenalezen (" + pKey + ").", items); }
         var chkU = this.FB_CheckWrite(Repository, pkg);
         if (chkU != null) { return { op: "create_or_update_package", status: "error", code: chkU.code, message: "packages[" + i + "]: " + chkU.message, items: items }; }
         // ochrana uzlu korene (cil zapisu kap. 5.3 krok 4, B1, O5 = a): prejmenovani
@@ -39,7 +40,7 @@ for (var i = 0; i < list.length; i++) {
         }
     } else {
         if (!p.name || !p.parent) {
-            return { op: "create_or_update_package", status: "error", code: "E_ARGS", message: "packages[" + i + "]: create vyzaduje name a parent.", items: items };
+            return { op: "create_or_update_package", status: "error", code: "E_ARGS", message: "packages[" + i + "]: create vyzaduje name a parent; pro upravu existujiciho balicku pouzij guid nebo packageID (id z vysledku).", items: items };
         }
         var parent = this.FB_ResolvePkg(Repository, p.parent);
         if (parent == null) { return this.FB_ResolveFail("create_or_update_package", "packages[" + i + "]: parent nenalezen (" + ((p.parent && p.parent.path) ? "path " + p.parent.path.join(".") : p.parent) + ")", items); }
@@ -74,6 +75,10 @@ for (var i = 0; i < list.length; i++) {
             created = true;
         }
     }
+    // FB-PU-26: polozka do items hned, jak balicek existuje (vyjimka dal GUID neztrati)
+    var itP = { guid: "" + pkg.PackageGUID, id: pkg.PackageID, name: "" + pkg.Name, created: created, index: i };
+    if (matchedBy != "") { itP.matchedBy = matchedBy; }
+    items.push(itP);
     if (!created && typeof p.name != "undefined" && p.name !== null) { pkg.Name = "" + p.name; }
     if (p.notes_b64) { pkg.Notes = this.B64Decode(p.notes_b64); }
     else if (typeof p.notes != "undefined") { pkg.Notes = "" + p.notes; }
@@ -92,9 +97,7 @@ for (var i = 0; i < list.length; i++) {
     } else if (p.taggedValues) {
         warns.push("packages[" + i + "]: root package nema podkladovy element - TV nelze zapsat (limit EA).");
     }
-    var itP = { guid: "" + pkg.PackageGUID, id: pkg.PackageID, name: "" + pkg.Name, created: created };
-    if (matchedBy != "") { itP.matchedBy = matchedBy; }
-    items.push(itP);
+    itP.name = "" + pkg.Name;
 }
 var res = { op: "create_or_update_package", status: "ok", count: items.length, items: items };
 if (items.length > 0) { res.guid = items[0].guid; res.id = items[0].id; }

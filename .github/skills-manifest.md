@@ -4,7 +4,7 @@
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-10-12 + sha1 f4a5f4c7d04e2bc12b4b6e719669b500d4b9d814 |
+| Verze kanonu | 2026-10-12 + sha1 3d9611ad894d73f1c2d7b016e496758623f53646 |
 | Profil | doma |
 | Sada | full |
 | Terminál | off |
@@ -66,9 +66,9 @@
 | skills/ea-sql-expert/references/mermaid-rules.md | 66b1d0be2b464015d63a95524a8db888390dee8d1f148d53f360399a91bf176d |
 | skills/ea-sql-expert/references/sql-format-rules.md | e00ac0ce9a97ad459908f7d1efd0e2fae0913947e47a7af2f882937dd659ff3c |
 | skills/eafb-bridge/SKILL.md | f1f45679da9905ad312ab27a8be001c346e1e2a0678e4a1a198fd6e380fbf964 |
-| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | 68cf71507c838be39991809c332c1dfc72c3a34adebb8677e18399e25f46fafa |
-| skills/eafb-bridge/references/EAFB-Operace-Registr.md | afd0c1a3833a0dc68658a236591cd27e39e6f8f108d2c6969e77213f904c875f |
-| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | bb4aa2cd1f932ba576fc4e051e87de466702afe16751440aa14ab867ea8cedcf |
+| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | d48710290fe2166c11f476ffe142138697fa2344a3a93d7b7a78c2b5d12ab6e2 |
+| skills/eafb-bridge/references/EAFB-Operace-Registr.md | c5ee65d0ad5614a4ed707d604d5619c0fdcd14c17578fe20b6eb29c9bd3439f6 |
+| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | e1e20963e45e57e6de6c6397c672735eabc98450166525a19941181dbd2b62ce |
 | skills/emr-konvence/SKILL.md | 38d57317cb3e09a2526f602016bd9160f8d02eece23b69f1a13aa07d93461280 |
 | skills/emr-konvence/references/emr-bridge-protokol.md | 995fcc95bad10a997cb28be5e6feb79f796da6b44271bf6a033759f8e8f1479f |
 | skills/emr-konvence/references/emr-zapis-pravidla.md | f46e220151afb9d705c6921b9d1d74649edf51571b291f774652a8be5445358d |

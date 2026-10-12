@@ -109,6 +109,10 @@
 //    z FB_InterpretError; E_FILE zvedne W8 jako skutecna vyjimka.
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var self = this;
+// FB-PU-32 (Z261004b-7): identita repozitare se v tomto volani zjisti JEDNOU
+// (FB_RepoId si ji pamatuje, dokud finishM pamet nezahodi)
+this._fbRepoIdCache = null;
+this._fbRepoIdCacheOn = true;
 // Output tab: radky se pisou hned, zobrazeni tabu az jednou na konci davky
 this._fbOutputBatch = { shown: false, pending: false, show: true };
 try {
@@ -118,6 +122,7 @@ try {
 function finishM(obj) {
     // jediny vystup FB_Main: Output tab se ukaze jednou (FB-PU-34), mezipamet davky zanika
     try { self.FB_OutputFlush(Repository); } catch (eOf) { }
+    self._fbRepoIdCache = null; self._fbRepoIdCacheOn = false; // FB-PU-32: pamet identity jen po dobu volani
     return self.FB_JsonStringify(obj, 1);
 }
 // mezipamet cilu JEDNOHO volani (FB_TargetCache): vynulovat, aby se stav
@@ -174,6 +179,10 @@ if (inTrim.charAt(0) == "{") {
     reqPath = inTrim;
     try {
         var rawBytes = this.FB_FileBytes(reqPath);
+        // FB-PU-45 (Z261004b-7): BOM (EF BB BF) pred otiskem odriznout - EA runtime
+        // pocita otisk z textu bez BOM, pumpa ze surovych bajtu; davka ze schranky
+        // (nebo z Notepadu) s BOM potvrzena pumpou koncila falesnym E_RISK_INTEGRITY
+        if (rawBytes !== null && rawBytes.length >= 3 && rawBytes[0] == 239 && rawBytes[1] == 187 && rawBytes[2] == 191) { rawBytes = rawBytes.slice(3); }
         if (rawBytes === null) {
             // EA runtime (Mozilla JS): binarni cteni nedostupne (COM past
             // nodeTypedValue, viz FB_FileBytes) -> JEDNO textove cteni utf-8;
@@ -424,6 +433,7 @@ if (reqPath != "" && !confirmedRun && fsoD != null && !/\\pending$/i.test("" + f
         var pendHash = "";
         try {
             var pb = this.FB_FileBytes(pendSame);
+            if (pb !== null && pb.length >= 3 && pb[0] == 239 && pb[1] == 187 && pb[2] == 191) { pb = pb.slice(3); } // FB-PU-45
             pendHash = "" + this.FB_Sha256(pb === null ? readTextM(pendSame) : pb);
         } catch (ePh) { pendHash = ""; }
         var oldRes = null, oldResText = "";
@@ -441,6 +451,7 @@ if (reqPath != "" && !confirmedRun && fsoD != null && !/\\pending$/i.test("" + f
             // puvodni potvrzeni se STEJNYM nonce; res se vraci BEZE ZMENY ->
             // pumpa okno nabidne znovu bez restartu (FB-PU-15/-16)
             this.Log(Repository, "FB " + reqId + " -> cekajici davka poslana znovu (stejny obsah) - vracim stavajici res, okno se nabidne znovu; exemplar: " + movedTo);
+            self._fbRepoIdCache = null; self._fbRepoIdCacheOn = false;
             return oldResText;
         }
         // stejne jmeno, JINY obsah: chyba pro agenta, ale res je nosic nonce
@@ -528,6 +539,12 @@ function emitPrecheck(pre) {
 var pre1 = null;
 try { pre1 = this.FB_Precheck(Repository, req, REG, "shape", resp.repository); }
 catch (ePre1) { pre1 = { ok: true, problems: [], warning: "FB_Precheck selhal: " + ePre1.message }; }
+// FB-PU-24 (Z261004b-7): varovani kontroly poli (nezname pole, prijate aliasy)
+// jdou do odpovedi i pri chybe P2 - agent vidi oba druhy problemu najednou
+if (pre1 && pre1.warnings && pre1.warnings.length > 0) {
+    if (!resp.warnings) { resp.warnings = []; }
+    for (var fw = 0; fw < pre1.warnings.length; fw++) { resp.warnings.push(pre1.warnings[fw]); }
+}
 if (pre1 && pre1.ok === false) { return emitPrecheck(pre1); }
 if (pre1 && pre1.warning) { if (!resp.warnings) { resp.warnings = []; } resp.warnings.push(pre1.warning + " - predbezna kontrola preskocena, plati fail-closed Risk Gate"); }
 // --- reseni "$N" referenci: "$2" -> results[2].guid, "$2.id" -> results[2].id,
@@ -1023,6 +1040,7 @@ for (var i = 0; i < req.ops.length; i++) {
                 // odpoved vyjmenuje, co pred vyjimkou PROBEHLO (partial: true)
                 try {
                     var prog = this._fbOpProgress;
+                    if (prog && typeof prog.removed == "number" && prog.removed > 0) { r.removed = prog.removed; } // FB-PU-27: rebuild uz smazal
                     if (prog && prog.items && Object.prototype.toString.call(prog.items) == "[object Array]" && prog.items.length > 0) {
                         r.items = prog.items;
                         r.partial = true;
@@ -1030,8 +1048,53 @@ for (var i = 0; i < req.ops.length; i++) {
                         partialItems = true;
                     }
                 } catch (ePg) { }
+                // FB-PU-26 (Z261004b-7): druha sit - prvky s razitkem ai.request teto
+                // davky, ktere v items nejsou (vznikly tesne pred vyjimkou, nebo je
+                // operace do items nedava) -> r.stamped[]; opravna davka je nezaklada znovu
+                if (reg.w) {
+                    try {
+                        var stRows = this.FB_XmlRows(Repository.SQLQuery(
+                            "SELECT o.Object_ID, o.ea_guid, o.Name, o.Object_Type FROM t_object o"
+                            + " INNER JOIN t_objectproperties p ON p.Object_ID = o.Object_ID"
+                            + " WHERE p.Property = 'ai.request' AND p.Value = '" + ("" + reqId).replace(/'/g, "''") + "'"));
+                        var stamped = [];
+                        for (var sr = 0; sr < stRows.length && stamped.length < 200; sr++) {
+                            var sg = "" + stRows[sr].ea_guid, dupS = false;
+                            if (("" + stRows[sr].Object_Type) == "Artifact" && ("" + stRows[sr].Name).indexOf("FB ") == 0) { continue; } // audit zaznam
+                            for (var rr2 = 0; rr2 < resp.results.length && !dupS; rr2++) {
+                                var pr2 = resp.results[rr2];
+                                if (pr2 && pr2.guid == sg) { dupS = true; }
+                                if (pr2 && pr2.items) { for (var pi3 = 0; pi3 < pr2.items.length; pi3++) { if (pr2.items[pi3] && pr2.items[pi3].guid == sg) { dupS = true; break; } } }
+                            }
+                            if (!dupS && r.items) { for (var ri3 = 0; ri3 < r.items.length; ri3++) { if (r.items[ri3] && r.items[ri3].guid == sg) { dupS = true; break; } } }
+                            if (!dupS) { stamped.push({ guid: sg, id: parseInt(stRows[sr].Object_ID, 10), name: "" + stRows[sr].Name, type: "" + stRows[sr].Object_Type }); }
+                        }
+                        if (stamped.length > 0) {
+                            r.stamped = stamped;
+                            r.message = "" + r.message + " | v modelu je " + stamped.length + " dalsich prvku s razitkem teto davky (stamped[]) - pouzij jejich GUIDy, nezakladej je znovu";
+                            partialItems = true;
+                        }
+                    } catch (eSt) { }
+                }
             }
             this._fbOpProgress = null;
+        }
+    }
+    // FB-PU-27 (Z261004b-7): chyba zapisove operace, ktera uz neco zmenila (rebuild
+    // smazal, polozky vznikly) -> rekne, jak zpet: zaloha teto davky, nebo ze zadna neni
+    if (r && r.status != "ok" && reg && reg.w) {
+        var changedSth = (typeof r.removed == "number" && r.removed > 0) || r.partial === true || (r.stamped && r.stamped.length > 0);
+        if (!changedSth && r.items) { for (var ci2 = 0; ci2 < r.items.length; ci2++) { if (r.items[ci2] && (r.items[ci2].created === true || r.items[ci2].deleted === true)) { changedSth = true; break; } } }
+        if (changedSth) {
+            var recov = "";
+            try {
+                var bps = (resp.baseline && resp.baseline.packages) ? resp.baseline.packages : [];
+                var bnames = [];
+                for (var bq = 0; bq < bps.length; bq++) { if (bps[bq] && bps[bq].name) { bnames.push("'" + bps[bq].name + "' nad " + (bps[bq].path || bps[bq].name || bps[bq].guid)); } }
+                recov = (bnames.length > 0) ? ("obnova: baseline " + bnames.join("; ") + " (Baseline politika - Compare/Restore v EA)")
+                    : "obnova: tato davka automatickou zalohu nema (pod prahem / cteni) - pouzij posledni rucni baseline balicku, nebo zmeny vrat opravnou davkou";
+            } catch (eRc) { recov = ""; }
+            if (recov != "") { r.recovery = recov; }
         }
     }
     resp.results.push(r);

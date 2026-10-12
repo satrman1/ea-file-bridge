@@ -26,13 +26,14 @@ this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.operations.length; i++) {
     var o = op.operations[i];
     var m = null, created = false, j;
-    if (o.operationID || o.guid) {
+    var oId = o.operationID || o.id; // FB-PU-25: id z vysledku = klic upravy
+    if (oId || o.guid) {
         for (j = 0; j < el.Methods.Count; j++) {
             var cand = el.Methods.GetAt(j);
-            if ((o.operationID && cand.MethodID == parseInt(o.operationID, 10))
+            if ((oId && cand.MethodID == parseInt(oId, 10))
                 || (o.guid && ("" + cand.MethodGUID).toUpperCase() == ("" + o.guid).toUpperCase())) { m = cand; break; }
         }
-        if (m == null) { return { op: "create_or_update_operations", status: "error", code: "E_NOT_FOUND", message: "operations[" + i + "]: operace nenalezena.", items: items }; }
+        if (m == null) { return { op: "create_or_update_operations", status: "error", code: "E_NOT_FOUND", message: "operations[" + i + "]: operace " + (oId || o.guid) + " na tomto elementu nenalezena - pro upravu pouzij guid nebo operationID (id z vysledku) operace TOHOTO elementu.", items: items }; }
     } else if (o.name) {
         for (j = 0; j < el.Methods.Count; j++) {
             if (("" + el.Methods.GetAt(j).Name) == ("" + o.name)) { m = el.Methods.GetAt(j); break; }
@@ -44,6 +45,9 @@ for (var i = 0; i < op.operations.length; i++) {
         if (!m.Update()) { return { op: "create_or_update_operations", status: "error", code: "E_EXCEPTION", message: "operations[" + i + "]: Update selhal: " + m.GetLastError(), items: items }; }
         created = true;
     }
+    // FB-PU-26: polozka do items hned, jak operace existuje
+    var item = { guid: "" + m.MethodGUID, id: m.MethodID, name: "" + m.Name, created: created, index: i };
+    items.push(item);
     if (!created && typeof o.name != "undefined") { m.Name = "" + o.name; }
     if (typeof o.returnType != "undefined") { m.ReturnType = "" + o.returnType; }
     if (typeof o.returnClassifierID != "undefined") { m.ClassifierID = "" + parseInt(o.returnClassifierID, 10); }
@@ -81,9 +85,8 @@ for (var i = 0; i < op.operations.length; i++) {
     }
     var w2 = this.FB_TagWrite(Repository, m, o.taggedValues);
     for (var wj = 0; wj < w2.length; wj++) { warns.push("operations[" + i + "]: " + w2[wj]); }
-    var item = { guid: "" + m.MethodGUID, id: m.MethodID, name: "" + m.Name, created: created };
+    item.guid = "" + m.MethodGUID; item.id = m.MethodID; item.name = "" + m.Name;
     if (params.length > 0) { item.parameters = params; }
-    items.push(item);
 }
 el.Methods.Refresh();
 this.SetTag(el, "ai.request", "" + reqId); // razitko na vlastnika

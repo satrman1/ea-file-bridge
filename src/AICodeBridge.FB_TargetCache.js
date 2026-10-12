@@ -48,6 +48,9 @@ if (ref !== null && typeof ref == "object" && Object.prototype.toString.call(ref
 }
 var t = ("" + (ref === null || typeof ref == "undefined" ? "" : ref)).replace(/^\s+|\s+$/g, "");
 if (t == "") { return null; }
+// FB-PU-30: GUID bez zavorek = GUID (ne jmeno); tvar {…} s cizimi znaky = null bez SQL
+if (/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(t)) { t = "{" + t + "}"; }
+if (t.charAt(0) == "{" && !/^\{[A-Za-z0-9-]+\}$/.test(t)) { return null; }
 if (typeof bucket[t] != "undefined") { return bucket[t]; }
 var byName = !(t.charAt(0) == "{" || /^[0-9]+$/.test(t));
 var rr = null, r = null, cands = [];

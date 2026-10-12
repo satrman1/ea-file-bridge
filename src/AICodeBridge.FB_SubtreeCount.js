@@ -28,6 +28,15 @@
 //  - vycerpany rozpocet (cfg.probeBudgetMs na package, budgetLeftMs = zbytek
 //    probeBudgetTotalMs na davku), strop hloubky / poctu packages -> unknown.
 // Nikdy nevyhazuje. Early-exit (COUNT s TOP/LIMIT) zamerne NENI (I3).
+// v0.20 (FB-PU-33, Z261004b-7): (a) rozpocet se kontroluje PRED kazdym dalsim
+// dotazem, ne po nem - dokonceny COUNT (i posledni) se prijme vzdy; driv se
+// hotovy vysledek zahodil, kdyz cas vytekl az behem posledniho dotazu, a tataz
+// davka dopadla podle zateze DB pokazde jinak (popup s rucni baseline /
+// E_NO_BASELINE); (b) soucet 0 se UZNA jako skutecna nula, kdyz expanze
+// vratila kontrolni radek korene (kanarek = dotazy fungovaly) a COUNT i dotaz
+// na diagramy vratily radek - prazdny balicek je "pod prahem", ne "velikost
+// neznama (falesna nula)". Falesna nula (B6) zustava unknown jen tam, kde
+// dotaz radek NEVRATIL.
 var self = this;
 var t0 = new Date().getTime();
 var perPkg = (cfg && typeof cfg.probeBudgetMs == "number") ? cfg.probeBudgetMs : 500;
@@ -83,13 +92,14 @@ if (cfg && cfg.useCte === true) {
 }
 
 // --- primar: iterativni expanze ---
-var all = [root], seen = {}, level = [root], depth = 0;
+var all = [root], seen = {}, level = [root], depth = 0, canary = false;
 seen[root] = 1;
 while (level.length > 0) {
     if (over()) { return done("unknown", "rozpocet sondy vycerpan (" + budget + " ms) pri expanzi, uroven " + depth, 0, all.length, "iter"); }
     if (++depth > MAX_DEPTH) { return done("unknown", "strop hloubky " + MAX_DEPTH, 0, all.length, "iter"); }
     var next = [];
     for (var a = 0; a < level.length; a += CHUNK) {
+        if (a > 0 && over()) { return done("unknown", "rozpocet sondy vycerpan (" + budget + " ms) pri expanzi", 0, all.length, "iter"); } // pred dalsim dotazem, ne po hotovem
         var part = level.slice(a, a + CHUNK);
         // kanarek: koren se vraci vzdy -> 0 radku = dotaz selhal
         var rr = rows("SELECT Package_ID, Parent_ID FROM t_package WHERE Parent_ID IN (" + part.join(",") + ") OR Package_ID = " + root);
@@ -103,19 +113,20 @@ while (level.length > 0) {
             if (all.length > MAX_PACKAGES) { return done("unknown", "strop poctu packages " + MAX_PACKAGES, 0, all.length, "iter"); }
         }
         if (!sawRoot) { return done("unknown", "package " + root + " neexistuje (koren ve vysledku chybi)", 0, all.length, "iter"); }
-        if (over()) { return done("unknown", "rozpocet sondy vycerpan (" + budget + " ms) pri expanzi", 0, all.length, "iter"); }
+        canary = true;
     }
     level = next;
 }
 var total = 0;
 for (var b = 0; b < all.length; b += CHUNK) {
+    // FB-PU-33 (a): rozpocet se hlida PRED dalsim dotazem - dokonceny COUNT plati vzdy
+    if (over()) { return done("unknown", "rozpocet sondy vycerpan (" + budget + " ms) pred dalsim COUNT (" + b + " z " + all.length + " packages spocitano)", total, all.length, "iter"); }
     var ids = all.slice(b, b + CHUNK);
     var rcn = rows("SELECT COUNT(*) AS c FROM t_object WHERE Package_ID IN (" + ids.join(",") + ") AND Object_Type <> 'Package'");
     if (rcn == null || rcn.length != 1) { return done("unknown", "COUNT nevratil radek (selhani dotazu)", 0, all.length, "iter"); }
     var cn = parseInt(rcn[0].c, 10);
     if (isNaN(cn)) { return done("unknown", "COUNT vratil necitelnou hodnotu", 0, all.length, "iter"); }
     total += cn;
-    if (over()) { return done("unknown", "rozpocet sondy vycerpan (" + budget + " ms) pri pocitani", total, all.length, "iter"); }
 }
 if (total == 0) {
     // N-E2E-3: balicek jen s diagramy neni prazdny
@@ -123,7 +134,9 @@ if (total == 0) {
     if (dcnt == null) { return done("unknown", "podstrom ma 0 prvku a dotaz na diagramy selhal (B6)", 0, all.length, "iter"); }
     diagramsSeen = dcnt;
     if (dcnt > 0) { return done("ok", "0 prvku, " + dcnt + " diagram(u) - zaloha kryje diagramy", 0, all.length, "iter"); }
-    return done("unknown", "podstrom ma 0 prvku a 0 diagramu - prazdna package nebo falesna nula (B6)", 0, all.length, "iter");
+    // FB-PU-33 (b): nula s kanarkem = skutecne prazdny balicek (COUNT i diagramy vratily radek)
+    if (canary) { return done("ok", "prazdny balicek: 0 prvku, 0 diagramu (koren overen kontrolnim radkem, dotazy vratily radek)", 0, all.length, "iter"); }
+    return done("unknown", "podstrom ma 0 prvku a 0 diagramu bez kontrolniho radku korene - falesna nula (B6)", 0, all.length, "iter");
 }
 // v0.19 (Z261004b-6, FB-PU-20): na vyzadani (cfg.withDiagrams === true, Risk Gate
 // u mazani balicku) se diagramy spocitaji i u neprazdneho podstromu - okno rika

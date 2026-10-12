@@ -41,6 +41,8 @@ function has(o, k) { return o && typeof o[k] != "undefined" && o[k] !== null && 
 function nonEmptyArr(o, k) { return o && isArr(o[k]) && o[k].length > 0; }
 var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
 var guidRe = /^\{[^{}<>]{3,}\}$/; // tvar {…} = odkaz GUIDem (stejne kriterium jako resolvery: prvni znak '{'); zastupne {GUID-…} chyta placeholder() driv
+var bareGuidRe = /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/; // FB-PU-30: GUID bez zavorek
+var badBraceRe = /^\{(?![A-Za-z0-9-]+\}$)/; // zacina { ale uvnitr jsou cizi znaky / chybi }
 // identifikacni pole: klic -> druh cile (pro fazi 2); "" = jen kontrola zastupneho textu
 var ID_KEYS = { guid: "?", elementID: "element", packageID: "package", diagramID: "diagram", connectorID: "",
                 "package": "package", parent: "package", targetPackage: "package", scope: "package",
@@ -242,7 +244,7 @@ function checkNeed(i, name, o) {
 }
 // --- pruchod hodnotami: zastupny text v ID polich, $N dozadu, cile GUIDem ---
 var guidTargets = []; // { op, path, kind, guid }
-function walk(i, v, pth, key, inRefArr) {
+function walk(i, v, pth, key, inRefArr, parent, pkey) {
     if (v === null || typeof v == "undefined") { return; }
     if (typeof v == "string") {
         var m = refRe.exec(v);
@@ -258,8 +260,16 @@ function walk(i, v, pth, key, inRefArr) {
         if (typeof ID_KEYS[key] != "undefined") { kind = ID_KEYS[key]; }
         else if (inRefArr !== null && typeof inRefArr != "undefined") { kind = inRefArr; }
         if (kind !== null) {
+            // FB-PU-30: GUID bez zavorek -> doplnit primo v davce (resolvery i Risk Gate
+            // pak vidi {GUID}); {…} s cizimi znaky = E_ARGS pred jakymkoli SQL
+            if (bareGuidRe.test(v) && parent && typeof pkey != "undefined") {
+                v = "{" + v + "}";
+                try { parent[pkey] = v; } catch (eNb) { }
+            }
             if (placeholder(v)) {
                 prob(i, pth, "E_ARGS", "zastupny text '" + v + "' v identifikacnim poli - dosad skutecny GUID/ID (nebo $N na drivejsi operaci)");
+            } else if (badBraceRe.test(v) && ph == "shape") {
+                prob(i, pth, "E_ARGS", "neplatny tvar GUID '" + v + "' - GUID je {8-4-4-4-12 hex} bez mezer a cizich znaku (vezmi ho z pingu / find_* / vysledku)");
             } else if (guidRe.test(v) && kind != "") {
                 guidTargets.push({ op: i, path: pth, kind: kind, guid: v }); // "?" = druh podle pole (kindOfGuid)
             }
@@ -269,12 +279,12 @@ function walk(i, v, pth, key, inRefArr) {
     if (typeof v != "object") { return; }
     if (isArr(v)) {
         var ra = (typeof REF_ARRAYS[key] != "undefined") ? REF_ARRAYS[key] : null;
-        for (var a = 0; a < v.length; a++) { walk(i, v[a], pth + "[" + a + "]", key, ra); }
+        for (var a = 0; a < v.length; a++) { walk(i, v[a], pth + "[" + a + "]", key, ra, v, a); }
         return;
     }
     for (var k in v) {
         if (typeof v[k] == "function") { continue; }
-        walk(i, v[k], pth + "." + k, k, null);
+        walk(i, v[k], pth + "." + k, k, null, v, k);
     }
 }
 // GUID polozek: v elements[]/packages[]/diagrams[] je klic "guid" = druh dle pole
@@ -286,10 +296,20 @@ function kindOfGuid(pth) {
     return "";
 }
 // ===================== faze 1: tvar davky =====================
+var fieldWarnings = [];
 if (ph == "shape") {
     if (req && typeof req.repo == "string" && placeholder(req.repo)) {
         prob(-1, "repo", "E_ARGS", "zastupny text '" + req.repo + "' v poli repo - dosad identitu repozitare z pingu");
     }
+    // FB-PU-24/-25 (Z261004b-7): sdilena kontrola poli PRED kontrolou povinnych
+    // poli - aliasy (stereotype -> stereotypes, id -> elementID, ...) se prepisi
+    // primo v davce, nezname pole = varovani, taggedValues mimo pole a krok bez
+    // text = E_ARGS. Selhani kontroly davku nezastavi (jen varovani).
+    try {
+        var fc = this.FB_FieldCheck(req, reg);
+        if (fc && fc.problems) { for (var fp = 0; fp < fc.problems.length; fp++) { problems.push(fc.problems[fp]); } }
+        if (fc && fc.warnings) { fieldWarnings = fc.warnings; }
+    } catch (eFc) { fieldWarnings.push("kontrola poli (FB_FieldCheck) selhala: " + eFc.message + " - nezname pole se nekontrolovala"); }
     for (var i = 0; i < req.ops.length; i++) {
         var o = req.ops[i];
         if (!o || typeof o != "object" || isArr(o)) { prob(i, "ops[" + i + "]", "E_ARGS", "operace musi byt objekt { op: ... }"); continue; }
@@ -303,7 +323,7 @@ if (ph == "shape") {
         checkNeed(i, name, o);
         for (var k2 in o) {
             if (k2 == "op" || typeof o[k2] == "function") { continue; }
-            walk(i, o[k2], "ops[" + i + "]." + k2, k2, null);
+            walk(i, o[k2], "ops[" + i + "]." + k2, k2, null, o, k2);
         }
     }
 }
@@ -316,7 +336,7 @@ if (ph == "targets") {
         if (!reg[nm2] || !reg[nm2].w) { continue; } // cile se overuji jen u zapisovych operaci (cteni vrati E_NOT_FOUND bez okna)
         for (var k3 in o2) {
             if (k3 == "op" || typeof o2[k3] == "function") { continue; }
-            walk(i2, o2[k3], "ops[" + i2 + "]." + k3, k3, null);
+            walk(i2, o2[k3], "ops[" + i2 + "]." + k3, k3, null, o2, k3);
         }
         // guid polozek: druh podle pole, u delete podle type
         for (var g = 0; g < guidTargets.length; g++) {
@@ -363,7 +383,7 @@ if (ph == "targets") {
     if (scopeRes && scopeRes.cascades && scopeRes.cascades.length > 0) { cascadesOut = scopeRes.cascades; } // W2 b/c pri cascadeDelete allow -> okno
 }
 // ===================== vysledek =====================
-if (problems.length == 0) { return { ok: true, problems: [], resolved: resolvedOut, cascades: cascadesOut }; }
+if (problems.length == 0) { return { ok: true, problems: [], resolved: resolvedOut, cascades: cascadesOut, warnings: fieldWarnings }; }
 // kod davky = nejzavaznejsi z problemu (poradi: konfigurace > chranena cast >
 // neznama operace > zakazana operace > nejednoznacnost > nenalezeno > tvar)
 var ORDER = { "E_SCOPE_CONFIG": 7, "E_BLACKLIST": 6, "E_REPO": 6, "E_UNKNOWN_OP": 5, "E_OP_FORBIDDEN": 4, "E_AMBIGUOUS": 3, "E_NOT_FOUND": 2, "E_ARGS": 1 };
@@ -373,6 +393,6 @@ for (var p2 = 0; p2 < problems.length; p2++) {
     if (rank > best) { best = rank; code = problems[p2].code; }
     if (AUDIT_CODES[problems[p2].code] == 1) { audit = true; }
 }
-return { ok: false, code: code, audit: audit, problems: problems, resolved: resolvedOut,
+return { ok: false, code: code, audit: audit, problems: problems, resolved: resolvedOut, warnings: fieldWarnings,
     message: "Predbezna kontrola davky: " + problems.length + (problems.length == 1 ? " problem" : (problems.length < 5 ? " problemy" : " problemu"))
         + " - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: " + problems[0].path + ": " + firstMsg };

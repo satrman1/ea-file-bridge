@@ -10,12 +10,22 @@
 // !! Sonda DB_NAME() se pousti VYHRADNE na MS SQL (RepositoryType SQLSVR).
 // Na lokalnim .qea/SQLite se EA z SQLQuery s neznamou funkci nevrati
 // (pumpa se 14.8. pri startu zasekla) - proto se tam SQL vubec nespousti.
+// v0.20 (FB-PU-32, Z261004b-7): PAMET PO DOBU JEDNOHO VOLANI FB_Main -
+// this._fbRepoIdCache. FB_Main ji na zacatku vynuluje a na konci (finishM)
+// zahodi; mezi tim se identita zjisti jednou (driv 15-20x tentyz SELECT
+// DB_NAME() na davku - kazdy pomocnik se ptal znovu). Mimo FB_Main (menu,
+// start session, pumpa mezi davkami) pamet neni -> vzdy cerstvy dotaz,
+// takze zmena otevreneho projektu (FB-PU-06) se pozna.
+if (typeof this._fbRepoIdCache == "string" && this._fbRepoIdCache != "") { return this._fbRepoIdCache; }
+var ridOut = null;
 try {
     var rt = "";
     try { rt = ("" + Repository.RepositoryType()).toUpperCase(); } catch (eT) { rt = ""; }
     if (rt == "SQLSVR") {
         var rows = this.FB_XmlRows(Repository.SQLQuery("SELECT DB_NAME() AS db"));
-        if (rows && rows.length && rows[0].db) { return "" + rows[0].db; }
+        if (rows && rows.length && rows[0].db) { ridOut = "" + rows[0].db; }
     }
 } catch (e) { }
-return "" + Repository.ConnectionString;
+if (ridOut === null) { ridOut = "" + Repository.ConnectionString; }
+if (this._fbRepoIdCacheOn === true) { this._fbRepoIdCache = ridOut; }
+return ridOut;

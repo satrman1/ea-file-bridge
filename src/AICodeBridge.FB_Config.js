@@ -16,6 +16,10 @@
 //            B-V3, viz docs/e2e-iterace5/SPIKE-NAV.md).
 //   navProbe: true = ukaze menu polozku "Nav spike (test navigace)"
 //            (iterace 5 B-V3; jen dev repo, do PROD sablon NEpatri).
+//   gatekeeper: true = ukaze menu polozku "Zapnout AI import rezim (vratny)" a
+//            dovoli launcheru vratneho bezet (v0.20, FB-PU-43). Bez nej polozka
+//            v menu NENI a launcher odmitne - v bance se vratny nenasazuje
+//            (antivir), do bankovni sablony klic NEpatri.
 //   auditPkg: GUID package pro audit davek (FB_Audit; od 2026-09-09, nalez
 //            N-K8-3). Od rezimu blacklist (Z261004b-10, cil zapisu kap. 5.2/I5)
 //            POVINNY - chybejici = E_SCOPE_CONFIG pro vsechny zapisy (fallback
@@ -37,7 +41,7 @@
 //   navProbe: false - QEAX neni dev piskoviste, spike menu tam nepatri.
 //   auditPkg = #AI-LOG 686 pod Test Data (res-K3.json); model ma #AI-LOG 3x.
 return [
-    { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true,
+    { repo: "EAEXAMPLE.QEA", baseDir: "C:\\GIT\\ea-file-bridge", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: true, gatekeeper: true,
       auditPkg: "{8DF101C4-14A9-4b89-927E-833EA58D9F3C}" }, // #AI-LOG 1055 pod Model Based Add-Ins.EA Addins (zivy krok 9e, 2026-10-12)
     { repo: "EA17_Yoga_QEA2.qeax", srcDir: "C:\\GIT\\ea-file-bridge\\src\\", navProbe: false,
       auditPkg: "{AEEBE2C0-AD55-4912-903D-07CD047C7244}" }

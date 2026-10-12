@@ -63,13 +63,29 @@ if (rebuild) {
     }
     for (var vi = 0; vi < op.messages.length; vi++) {
         var vm = op.messages[vi];
-        if (vm && (vm.connectorID || vm.guid)) {
+        if (vm && (vm.connectorID || vm.guid || vm.id)) {
             return { op: "create_or_update_messages", status: "error", code: "E_ARGS",
                 message: "messages[" + vi + "]: v rebuild modu nesmi zprava nest guid/connectorID (cile se prave mazou) - posli kompletni sadu jako create." };
         }
         if (!vm || typeof vm.seqNo == "undefined") {
             return { op: "create_or_update_messages", status: "error", code: "E_ARGS",
                 message: "messages[" + vi + "]: rebuild mod vyzaduje explicitni seqNo u kazde zpravy (deterministicke poradi)." };
+        }
+    }
+    // FB-PU-27 (Z261004b-7): cile VSECH novych zprav (source, target, operation)
+    // se dohledaji PRED prvnim mazanim - driv rebuild smazal zpravy a teprve
+    // pak zjistil, ze lifeline neexistuje (v modelu zbyl prazdny diagram)
+    for (var pv = 0; pv < op.messages.length; pv++) {
+        var pm = op.messages[pv];
+        if (!pm || !pm.source || !pm.target) {
+            return { op: "create_or_update_messages", status: "error", code: "E_ARGS", message: "messages[" + pv + "]: rebuild vyzaduje source a target u kazde zpravy - nic nebylo smazano." };
+        }
+        if (this.FB_ResolveEl(Repository, pm.source) == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + pv + "]: source nenalezen (" + pm.source + ") - nic nebylo smazano (validace pred rebuildem).", []); }
+        if (this.FB_ResolveEl(Repository, pm.target) == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + pv + "]: target nenalezen (" + pm.target + ") - nic nebylo smazano (validace pred rebuildem).", []); }
+        if (pm.operation) {
+            var pvo = "" + pm.operation, pvm = null;
+            try { pvm = (pvo.charAt(0) == "{") ? Repository.GetMethodByGuid(pvo) : Repository.GetMethodByID(parseInt(pvo, 10)); } catch (ePvm) { pvm = null; }
+            if (pvm == null) { return { op: "create_or_update_messages", status: "error", code: "E_NOT_FOUND", message: "messages[" + pv + "]: operace nenalezena (" + pvo + ") - nic nebylo smazano (validace pred rebuildem)." }; }
         }
     }
     var delRows;
@@ -108,6 +124,7 @@ if (rebuild) {
                 dCliEl.Connectors.Refresh();
                 dFound = true;
                 removed++;
+                this._fbOpProgress.removed = removed; // FB-PU-27: pocet smazanych i pri vyjimce EA
                 break;
             }
         }
@@ -120,12 +137,13 @@ if (rebuild) {
 for (var i = 0; i < op.messages.length; i++) {
     var msg = op.messages[i];
     var conn = null, created = false, srcEl = null, tgtEl = null;
-    if (msg.connectorID || msg.guid) {
+    var mId = msg.connectorID || msg.id; // FB-PU-25: id z vysledku = klic upravy
+    if (mId || msg.guid) {
         try {
             if (msg.guid) { conn = Repository.GetConnectorByGuid("" + msg.guid); }
-            else { conn = Repository.GetConnectorByID(parseInt(msg.connectorID, 10)); }
+            else { conn = Repository.GetConnectorByID(parseInt(mId, 10)); }
         } catch (eG) { conn = null; }
-        if (conn == null) { return { op: "create_or_update_messages", status: "error", code: "E_NOT_FOUND", message: "messages[" + i + "]: zprava nenalezena.", items: items }; }
+        if (conn == null) { return { op: "create_or_update_messages", status: "error", code: "E_NOT_FOUND", message: "messages[" + i + "]: zprava " + (msg.guid || mId) + " nenalezena - pro upravu pouzij guid nebo connectorID (id z vysledku).", items: items }; }
         srcEl = Repository.GetElementByID(conn.ClientID);
         tgtEl = Repository.GetElementByID(conn.SupplierID);
     } else {
@@ -241,21 +259,24 @@ for (var i = 0; i < op.messages.length; i++) {
         try { conn.SequenceNo = parseInt(msg.seqNo, 10); } catch (eSeq) { warns.push("messages[" + i + "]: SequenceNo nelze zapsat (read-only)"); }
     }
     if (!conn.Update()) {
-        return { op: "create_or_update_messages", status: "error", code: "E_EXCEPTION",
+        var rU = { op: "create_or_update_messages", status: "error", code: "E_EXCEPTION",
             message: "messages[" + i + "]: Connector.Update() selhal: " + conn.GetLastError(), items: items };
+        if (rebuild) { rU.removed = removed; }
+        return rU;
     }
+    // FB-PU-26: polozka do items hned po Update (zprava v modelu existuje)
+    var item = { guid: "" + conn.ConnectorGUID, id: conn.ConnectorID, name: "" + conn.Name, created: created, index: i };
+    items.push(item);
     if (meth != null) { this.SetTag(conn, "operation_guid", "" + meth.MethodGUID); }
     if (created) { this.SetTag(conn, "ai.channel", "eafb"); }
     this.SetTag(conn, "ai.request", "" + reqId);
     if (created) { srcEl.Connectors.Refresh(); }
-    var item = { guid: "" + conn.ConnectorGUID, id: conn.ConnectorID, name: "" + conn.Name, created: created };
     // okamzity readback z t_connector (pozorovatelnost per zprava)
     try {
         var rows = this.FB_XmlRows(Repository.SQLQuery(
             "SELECT SeqNo, DiagramID, PDATA1, PDATA2, PDATA3, PDATA4 FROM t_connector WHERE Connector_ID = " + conn.ConnectorID));
         if (rows.length > 0) { item.pdata = rows[0]; }
     } catch (eRB) { }
-    items.push(item);
 }
 var res = { op: "create_or_update_messages", status: "ok", count: items.length, items: items };
 if (rebuild) { res.removed = removed; } // K3: vykaz smazanych zprav (vzor FB_OpScenarios)

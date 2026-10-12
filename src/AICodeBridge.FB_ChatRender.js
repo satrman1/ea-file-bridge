@@ -194,11 +194,13 @@ function segA(rr, idx, pj, level) {
 // jen pocet + ukazatel (radky jsou "doprovod" dle priority par. 4.4)
 function segB(rr, idx, level) {
     var rc = (typeof rr.rowCount == "number") ? rr.rowCount : -1;
+    // v0.20 (FB-PU-31): oriznuty vysledek - rowCount je skutecny pocet, v res je jen maxRows radku
+    var trunc = (rr.truncated === true) ? " (ORIZNUTO na " + ((rr.rows || []).length) + " radku, maxRows " + rr.maxRows + " - zuz dotaz)" : "";
     if (rc == 0) {
         return "\nop[" + idx + "] query: 0 radku - pozor, znamena jen 'dotaz nic nevratil', ne 'data neexistuji' (T4-3c).";
     }
     if (level < 3) {
-        return "\nop[" + idx + "] query: " + rc + " radku (plna odpoved v res-" + id + ".json)";
+        return "\nop[" + idx + "] query: " + rc + " radku" + trunc + " (plna odpoved v res-" + id + ".json)";
     }
     var rows = rr.rows || [];
     var shown = 0, buf = [];
@@ -209,7 +211,7 @@ function segB(rr, idx, level) {
         buf.push(rj);
         shown++;
     }
-    var o3 = "\nop[" + idx + "] query: " + rc + " radku";
+    var o3 = "\nop[" + idx + "] query: " + rc + " radku" + trunc;
     if (buf.length > 0) { o3 += ": " + buf.join("; "); }
     if (shown < rc) { o3 += " (zobrazeno prvnich " + shown + " - plna odpoved v res-" + id + ".json)"; }
     return o3;

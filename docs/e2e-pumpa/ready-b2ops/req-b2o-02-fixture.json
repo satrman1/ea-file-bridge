@@ -1,0 +1,6 @@
+{"protocol":"eafb/0.2","id":"b2o-02-fixture","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"create_or_update_package","packages":[{"name":"B2 Operace","parent":"{07475E42-13BC-4182-B01E-AB46EDA94BBE}","notes":"fixture Z261004b-7 - smazat davkou ze schranky"}]},
+ {"op":"create_or_update_elements","elements":[
+   {"name":"B2O Trida A","type":"Class","package":"$0"},
+   {"name":"B2O Trida B","type":"Class","package":"$0"}]}
+]}

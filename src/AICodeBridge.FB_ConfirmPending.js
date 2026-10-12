@@ -139,6 +139,9 @@ if (payloadHash === null || typeof payloadHash == "undefined" || ("" + payloadHa
 var bytes = null, freshHash = "";
 try {
     bytes = this.FB_FileBytes(p);
+    // FB-PU-45 (Z261004b-7): BOM pred otiskem odriznout (stejne jako FB_Main) -
+    // davka ze schranky (UTF-8 s BOM) potvrzena pumpou jinak konci E_RISK_INTEGRITY
+    if (bytes !== null && bytes.length >= 3 && bytes[0] == 239 && bytes[1] == 187 && bytes[2] == 191) { bytes = bytes.slice(3); }
     freshHash = "" + this.FB_Sha256(bytes === null ? readText(p) : bytes);
 } catch (eH) {
     return refuse("E_RISK_CONFIRM", "Pending soubor nejde precist/hashovat: " + eH.message, reqId);

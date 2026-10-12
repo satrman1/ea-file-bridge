@@ -39,10 +39,14 @@ for (var i = 0; i < op.elements.length; i++) {
     var e = op.elements[i];
     var el = null, created = false, matchedBy = "";
     // --- UPDATE cil ---
-    if (e.guid || e.elementID) {
-        el = this.FB_ResolveEl(Repository, e.guid || e.elementID);
+    // FB-PU-25 (Z261004b-7): `id` z vysledku drivejsi operace je klic upravy
+    // (FB_FieldCheck ho v P2 prepise na elementID; tady druha obrana pro
+    // textovy rezim a prime volani)
+    var eKey = e.guid || e.elementID || e.id;
+    if (eKey) {
+        el = this.FB_ResolveEl(Repository, eKey);
         if (el == null) {
-            return this.FB_ResolveFail("create_or_update_elements", "elements[" + i + "]: element nenalezen (" + (e.guid || e.elementID) + ")", items);
+            return this.FB_ResolveFail("create_or_update_elements", "elements[" + i + "]: element nenalezen (" + eKey + ")", items);
         }
         var chkU = this.FB_CheckWriteEl(Repository, el); // osa balicku + osa vlastniku (I14)
         if (chkU != null) { return { op: "create_or_update_elements", status: "error", code: chkU.code, message: "elements[" + i + "]: " + chkU.message, items: items }; }
@@ -51,7 +55,7 @@ for (var i = 0; i < op.elements.length; i++) {
         // --- CREATE (s OPT-IN idempotenci - audit B2: dedupKey K4, matchByName K1) ---
         if (!e.type) {
             return { op: "create_or_update_elements", status: "error", code: "E_ARGS",
-                message: "elements[" + i + "]: create vyzaduje type (a package nebo owningElement).", items: items };
+                message: "elements[" + i + "]: create vyzaduje type (a package nebo owningElement); pro upravu existujiciho prvku pouzij guid nebo elementID (id z vysledku).", items: items };
         }
         var nm = (typeof e.name == "undefined" || e.name === null) ? "" : ("" + e.name);
         // K4: dedupKey lookup (globalni TV ai.dedup - prezije prejmenovani i presun)
@@ -143,6 +147,12 @@ for (var i = 0; i < op.elements.length; i++) {
             }
         }
     }
+    // FB-PU-26 (Z261004b-7): polozka jde do items HNED, jak prvek v modelu
+    // existuje (vznikl nebo byl dohledan) - vyjimka EA pri zapisu vlastnosti
+    // (zamek, pravo) uz GUID neztrati; FB_Main ji pripoji k odpovedi (partial)
+    var itE = { guid: "" + el.ElementGUID, id: el.ElementID, name: "" + el.Name, created: created, index: i };
+    if (matchedBy != "") { itE.matchedBy = matchedBy; }
+    items.push(itE);
     // --- spolecne vlastnosti ---
     // ITERACE 6 (nalez N-2): `package` u UPDATU element NEPRESOUVA. Drive se
     // pole tise ignorovalo a odpoved hlasila ok (FALESNE OK bez warningu);
@@ -198,9 +208,7 @@ for (var i = 0; i < op.elements.length; i++) {
     if (created) { this.SetTag(el, "ai.channel", "eafb"); }
     if (created && e.dedupKey) { this.SetTag(el, "ai.dedup", "" + e.dedupKey); } // K4: klic prezije prejmenovani
     this.SetTag(el, "ai.request", "" + reqId);
-    var itE = { guid: "" + el.ElementGUID, id: el.ElementID, name: "" + el.Name, created: created };
-    if (matchedBy != "") { itE.matchedBy = matchedBy; }
-    items.push(itE);
+    itE.name = "" + el.Name; // jmeno po zapisu vlastnosti (create s name, update s prejmenovanim)
 }
 var res = { op: "create_or_update_elements", status: "ok", count: items.length, items: items };
 if (items.length > 0) { res.guid = items[0].guid; res.id = items[0].id; }

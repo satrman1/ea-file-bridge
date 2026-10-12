@@ -30,7 +30,18 @@ var ridU = rid.toUpperCase();
 for (var ci = 0; ci < cfgs.length; ci++) {
     if (ridU.indexOf(("" + cfgs[ci].repo).toUpperCase()) >= 0) { cfg = cfgs[ci]; break; }
 }
-if (cfg == null || !cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository) }; }
+// v0.20 (FB-PU-43, Z261004b-7): vratny bezi JEN v repozitari s FB_Config
+// gatekeeper: true (stejna podminka skryva polozku v menu - EA_GetMenuItems);
+// druha obrana pro pripad, ze menu polozku nabidlo stary kod. Pred spustenim
+// skryteho powershellu se clovek zepta Ano/Ne (promptYESNO = 2, Ano = 3).
+if (cfg == null || cfg.gatekeeper !== true) {
+    return "Vratny (AI import rezim) neni pro tento repozitar povolen - FB_Config nema u polozky repozitare gatekeeper: true."
+        + "\nRepo: " + rid + "\nV bance se vratny nenasazuje (skryty powershell hlidajici schranku = pro antivir vzor 'Dropper'); pouzij pumpu (pump.wsf) nebo davku ze schranky.";
+}
+var gkAsk = 0;
+try { gkAsk = Session.Prompt("Zapnout AI import rezim (vratny)?\n\nSpusti se SKRYTY proces powershell.exe, ktery hlida schranku a zpracovava davky, dokud rezim neukoncis.\nRepo: " + rid + "\n\nAno = spustit, Ne = nic nedelat", 2); } catch (eAsk) { gkAsk = 0; }
+if (gkAsk != 3) { return "AI import rezim nespusten (zvoleno Ne / dialog zavren)."; }
+if (!cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository), gatekeeper: true }; }
 // defaulty (W3 par. 1) + volitelny gk-config.json override
 var gk = { reapTimeoutMin: 10, reattachSec: 10, healthSec: 15, reapGraceSec: 30, stuckSec: 20, dlDir: "", debug: false };
 try {

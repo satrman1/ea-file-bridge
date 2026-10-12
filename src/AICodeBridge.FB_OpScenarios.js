@@ -63,12 +63,34 @@ var chk = this.FB_CheckWriteEl(Repository, el);
 if (chk != null) { return { op: "create_or_update_scenarios", status: "error", code: chk.code, message: chk.message }; }
 var items = [], warns = [];
 this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
+// --- FB-PU-27 (Z261004b-7): validace CELE sady PRED prvnim mazanim (vzor
+// FB_OpConstraints) - driv rebuild smazal scenare a teprve druhy scenar bez
+// name spadl na E_ARGS; v modelu zbyl jeden novy scenar ---
+for (var v = 0; v < op.scenarios.length; v++) {
+    var dv = op.scenarios[v];
+    if (!dv || typeof dv != "object") {
+        return { op: "create_or_update_scenarios", status: "error", code: "E_ARGS", message: "scenarios[" + v + "]: polozka musi byt objekt {name, type, steps} - nic nebylo smazano." };
+    }
+    if (!dv.name || ("" + dv.name).replace(/^\s+|\s+$/g, "") == "") {
+        return { op: "create_or_update_scenarios", status: "error", code: "E_ARGS", message: "scenarios[" + v + "]: chybi name - nic nebylo smazano (validace cele sady pred rebuildem)." };
+    }
+    if (typeof dv.steps != "undefined" && dv.steps !== null && Object.prototype.toString.call(dv.steps) != "[object Array]") {
+        return { op: "create_or_update_scenarios", status: "error", code: "E_ARGS", message: "scenarios[" + v + "]: steps musi byt pole kroku [{text, kind}] - nic nebylo smazano." };
+    }
+    var vsteps = dv.steps || [];
+    for (var vs = 0; vs < vsteps.length; vs++) {
+        if (!vsteps[vs] || typeof vsteps[vs] != "object" || typeof vsteps[vs].text == "undefined" || vsteps[vs].text === null || ("" + vsteps[vs].text).replace(/^\s+|\s+$/g, "") == "") {
+            return { op: "create_or_update_scenarios", status: "error", code: "E_ARGS", message: "scenarios[" + v + "].steps[" + vs + "]: krok musi byt objekt s neprazdnym text (kind actor|system) - nic nebylo smazano." };
+        }
+    }
+}
 // --- deterministicky rebuild: smazat vsechny existujici scenare ---
 var removed = 0;
 try {
     for (var di = el.Scenarios.Count - 1; di >= 0; di--) {
         el.Scenarios.DeleteAt(di, false);
         removed++;
+        this._fbOpProgress.removed = removed; // FB-PU-27: pocet smazanych i pri vyjimce EA
     }
     el.Scenarios.Refresh();
 } catch (eDel) {
@@ -79,17 +101,17 @@ var made = []; // { sc, def, stepTypes[], stepCount, idx, diag }
 for (var i = 0; i < op.scenarios.length; i++) {
     var def = op.scenarios[i];
     if (!def || !def.name) {
-        return { op: "create_or_update_scenarios", status: "error", code: "E_ARGS", message: "scenarios[" + i + "]: chybi name.", items: items };
+        return { op: "create_or_update_scenarios", status: "error", code: "E_ARGS", message: "scenarios[" + i + "]: chybi name.", items: items, removed: removed };
     }
     var typ = (typeof def.type != "undefined" && def.type !== null && ("" + def.type) != "") ? ("" + def.type) : "Basic Path";
     var sc;
     try {
         sc = el.Scenarios.AddNew("" + def.name, typ);
         if (!sc.Update()) {
-            return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "]: Scenario.Update() selhal: " + sc.GetLastError(), items: items };
+            return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "]: Scenario.Update() selhal: " + sc.GetLastError(), items: items, removed: removed };
         }
     } catch (eSc) {
-        return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "]: AddNew selhal: " + eSc.message, items: items };
+        return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "]: AddNew selhal: " + eSc.message, items: items, removed: removed };
     }
     if (typeof def.notes != "undefined") {
         try { sc.Notes = "" + def.notes; sc.Update(); } catch (eN) { warns.push("scenarios[" + i + "]: Notes nelze zapsat: " + eN.message); }
@@ -109,10 +131,10 @@ for (var i = 0; i < op.scenarios.length; i++) {
             if (typeof s.results != "undefined") { st.Results = "" + s.results; }
             if (typeof s.state != "undefined") { st.State = "" + s.state; }
             if (!st.Update()) {
-                return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "].steps[" + j + "]: Step.Update() selhal: " + st.GetLastError(), items: items };
+                return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "].steps[" + j + "]: Step.Update() selhal: " + st.GetLastError(), items: items, removed: removed };
             }
         } catch (eSt) {
-            return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "].steps[" + j + "]: " + eSt.message, items: items };
+            return { op: "create_or_update_scenarios", status: "error", code: "E_EXCEPTION", message: "scenarios[" + i + "].steps[" + j + "]: " + eSt.message, items: items, removed: removed };
         }
     }
     try { sc.Update(); sc.Steps.Refresh(); } catch (eU) { }

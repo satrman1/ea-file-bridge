@@ -2366,7 +2366,7 @@ t("N-K8-4 ROZHODNUTO (banka 2026-09-10): obalka <EADATA> bez Dataset_0 = ok / ro
     contains(r.warnings[0], "SQL API Open FAILED", "warning musi rict, jak se pozna chybny dotaz");
     contains(r.raw, "<EADATA", "raw nese zacatek odpovedi (diagnostika)");
     ok(r.raw.length <= 300);
-    var r2 = B.FB_OpQuery.call(B, supRepo(function () { return "<?xml version=\"1.0\"?><EADATA version=\"1.0\" exporter=\"Enterprise Architect\"></EADATA>"; }), { sql: "SELECT * FROM t_seclocks" });
+    var r2 = B.FB_OpQuery.call(B, supRepo(function () { return "<?xml version=\"1.0\"?><EADATA version=\"1.0\" exporter=\"Enterprise Architect\"></EADATA>"; }), { sql: "SELECT * FROM t_seclocks LIMIT 10" }); // v0.20: bez LIMIT/WHERE nad t_seclocks = E_SQL_UNBOUNDED (FB-PU-31)
     eq(r2.status, "ok", "SQLite K10 tvar = totez"); eq(r2.rowCount, 0);
 });
 t("N2 E_SQL: EA vrati chybovy text bez Dataset_0 -> status error, code E_SQL, hlaska EA v message", function () {
@@ -2402,7 +2402,7 @@ t("N2 legitimni prazdny SELECT: <Dataset_0> s prazdnym <Data/> = ok / rowCount 0
 });
 t("N2 normalni dotaz: n radku = ok / rowCount n; hodnota 'error' v datech NENI chyba", function () {
     var repo = mkRepo({ sqlRules: [{ re: /t_object/, rows: [{ Name: "ErrorHandler" }, { Name: "Open FAILED test" }] }] });
-    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_object" });
+    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_object WHERE Object_Type = 'Class'" }); // v0.20: bez WHERE nad t_object = E_SQL_UNBOUNDED
     eq(r.status, "ok"); eq(r.rowCount, 2); eq(r.rows[0].Name, "ErrorHandler");
 });
 t("N2 SuppressEADialogs: true behem SQLQuery, po dotazu vracena puvodni hodnota (i pri chybe)", function () {
@@ -2940,9 +2940,11 @@ t("BL-2 sonda: iterativni expanze po urovnich -> spravny IN seznam a soucet", fu
     eq(cnt.length, 1); contains(cnt[0], "IN (11,13)");
     ok(!repo._sqlLog.some(function (s) { return /^WITH/i.test(s); }), "bez useCte zadny WITH");
 });
-t("BL-2 sonda B6: soucet 0 nad existujici package = unknown (nikdy pod prahem)", function () {
-    eq(B.FB_SubtreeCount.call(B, blRepo(), 19, { probeBudgetMs: 500 }, 2000).status, "unknown");
-    eq(B.FB_SubtreeCount.call(B, blRepo({ countZero: true }), 11, { probeBudgetMs: 500 }, 2000).status, "unknown");
+t("BL-2 sonda B6 -> v0.20 FB-PU-33: soucet 0 nad existujici package S KANARKEM (koren ve vysledku, COUNT i diagramy vratily radek) = ok/0 (prazdny balicek), ne unknown", function () {
+    var z1 = B.FB_SubtreeCount.call(B, blRepo(), 19, { probeBudgetMs: 500 }, 2000);
+    eq(z1.status, "ok", z1.why); eq(z1.elements, 0); contains(z1.why, "prazdny balicek");
+    var z2 = B.FB_SubtreeCount.call(B, blRepo({ countZero: true }), 11, { probeBudgetMs: 500 }, 2000);
+    eq(z2.status, "ok", z2.why); eq(z2.elements, 0);
 });
 t("BL-2 sonda: selhani dotazu (zadny radek ani pro koren / COUNT bez radku) = unknown", function () {
     var a = B.FB_SubtreeCount.call(B, blRepo({ expandFails: true }), 11, { probeBudgetMs: 500 }, 2000);
@@ -4332,13 +4334,13 @@ t("B1 FB-PU-35: pod pumpou je baseDir slozka pumpy bez ohledu na FB_Config; zapi
 });
 
 // --- N-E2E-3: sonda pocita diagramy ---
-t("B1 N-E2E-3 (T6-33 bez prvku): balicek s 0 prvky a >= 1 diagramem = pod prahem (ok, diagrams N); 0 prvku a 0 diagramu = unknown; selhani dotazu na diagramy = unknown", function () {
+t("B1 N-E2E-3 (T6-33 bez prvku): balicek s 0 prvky a >= 1 diagramem = pod prahem (ok, diagrams N); 0 prvku a 0 diagramu = ok/0 (v0.20); selhani dotazu na diagramy = unknown", function () {
     b1Reset();
     var cfg = B.FB_BaselineConfig.call(B, mkRepo()).cfg;
     var r1 = B.FB_SubtreeCount.call(B, blRepo({ diagramsIn: [19] }), 19, cfg, 2000);
     eq(r1.status, "ok", r1.why); eq(r1.elements, 0); eq(r1.diagrams, 1); contains(r1.why, "diagram");
     var r2 = B.FB_SubtreeCount.call(B, blRepo(), 19, cfg, 2000);
-    eq(r2.status, "unknown"); contains(r2.why, "0 diagramu");
+    eq(r2.status, "ok", r2.why); eq(r2.elements, 0); eq(r2.diagrams, 0); contains(r2.why, "prazdny balicek"); // v0.20 FB-PU-33: nula s kanarkem = skutecna nula
     var r3 = B.FB_SubtreeCount.call(B, blRepo({ diagramCountFails: true }), 19, cfg, 2000);
     eq(r3.status, "unknown"); contains(r3.why, "diagramy");
     var r4 = B.FB_SubtreeCount.call(B, blRepo(), 12, cfg, 2000);
@@ -5555,7 +5557,7 @@ t("B2 okno: smisena davka (smazat prvek + upravit jiny) -> smazane zvlast od ost
 t("B2 okno: 'Co se stane' z operaci a cilu (scenare do UC + vazby), ne z metrik; vsechny duvody jako vety; Ceka od z resp.since", function () {
     b1Reset(); var repo = blRepo();
     var r = runFile(repo, [
-        { op: "create_or_update_scenarios", element: 103, scenarios: [{ name: "Basic", steps: ["a"] }, { name: "Alt", steps: ["b"] }] },
+        { op: "create_or_update_scenarios", element: 103, scenarios: [{ name: "Basic", steps: [{ text: "a" }] }, { name: "Alt", steps: [{ text: "b" }] }] }, // v0.20: krok = objekt {text} (retezec = E_ARGS, FB-PU-24)
         { op: "create_or_update_connectors", connectors: [{ source: 103, target: 101, type: "Dependency" }] }
     ], "b2a1");
     eq(r.status, "confirm_required");
@@ -5743,6 +5745,415 @@ t("B2 N-E2E-6: dialog uklidu baselines zacina lidskou vetou (kolik, ceho, starsi
     finally { global.Session = oSess; B.FB_BaselineConfig = oCfg; }
     var pr = global.Session === oSess ? null : null;
     ok(oSess === global.Session, "session vracena");
+});
+
+// ===========================================================================
+// BALIK B2 - OPERACE (Z261004b-7, v0.20): FB-PU-24/-25/-26/-27/-30/-31/-32/
+// -33/-43/-44/-45 + N-B-3. Kazdy bod ma test, ktery pri regresi zcervena.
+// ===========================================================================
+var REG_B2 = { "create_or_update_elements": { w: true }, "create_or_update_attributes": { w: true }, "create_or_update_operations": { w: true },
+               "create_or_update_connectors": { w: true }, "create_or_update_package": { w: true }, "create_or_update_scenarios": { w: true },
+               "create_or_update_messages": { w: true }, "set_diagram_object_style": { w: true }, "delete_from_model": { w: true }, "query": { w: false }, "ping": { w: false } };
+// --- FB-PU-24: nezname pole / aliasy / E_ARGS ---
+t("B2-op FB-PU-24: nezname pole 'sterotypes' -> varovani s napovedou; davka projde", function () {
+    var req = { ops: [{ op: "create_or_update_elements", elements: [{ name: "X", type: "Class", "package": "{P}", sterotypes: "x" }] }] };
+    var r = B.FB_FieldCheck.call(B, req, REG_B2);
+    eq(r.problems.length, 0); eq(r.warnings.length, 1);
+    contains(r.warnings[0], "ops[0].elements[0]: nezname pole 'sterotypes' (myslel jsi 'stereotypes'?)");
+    ok(typeof req.ops[0].elements[0].sterotypes != "undefined", "nezname pole se nemaze (jen varovani)");
+});
+t("B2-op FB-PU-24: alias stereotype -> stereotypes se prepise v davce + varovani 'prijato jako'", function () {
+    var req = { ops: [{ op: "create_or_update_elements", elements: [{ name: "X", type: "Class", "package": "{P}", stereotype: "use" }] }] };
+    var r = B.FB_FieldCheck.call(B, req, REG_B2);
+    eq(r.problems.length, 0); eq(r.aliased, 1);
+    eq(req.ops[0].elements[0].stereotypes, "use"); ok(typeof req.ops[0].elements[0].stereotype == "undefined", "puvodni klic pryc");
+    contains(r.warnings[0], "pole 'stereotype' prijato jako 'stereotypes'");
+});
+t("B2-op FB-PU-24: aliasy po operacich - attributes stereotypes->stereotype, defaultValue->default; operations parameters defaultValue->default; constraints description->notes; query limit->maxRows", function () {
+    var req = { ops: [
+        { op: "create_or_update_attributes", element: "{E}", attributes: [{ name: "a", stereotypes: "pk", defaultValue: "0" }] },
+        { op: "create_or_update_operations", element: "{E}", operations: [{ name: "op", parameters: [{ name: "p", defaultValue: "1" }] }] },
+        { op: "create_or_update_scenarios", element: "{E}", scenarios: [{ name: "S", description: "popis", steps: [{ text: "k" }] }] },
+        { op: "query", sql: "SELECT 1 FROM t_package WHERE 1=1", limit: 10 }
+    ] };
+    var r = B.FB_FieldCheck.call(B, req, REG_B2);
+    eq(r.problems.length, 0, JSON.stringify(r.problems));
+    eq(req.ops[0].attributes[0].stereotype, "pk"); eq(req.ops[0].attributes[0]["default"], "0");
+    eq(req.ops[1].operations[0].parameters[0]["default"], "1");
+    eq(req.ops[2].scenarios[0].notes, "popis");
+    eq(req.ops[3].maxRows, 10); ok(typeof req.ops[3].limit == "undefined");
+    eq(r.aliased, 5);
+});
+t("B2-op FB-PU-24: taggedValues jako objekt = E_ARGS (ne tiche preskoceni); krok scenare jako retezec / bez text = E_ARGS", function () {
+    var req = { ops: [
+        { op: "create_or_update_elements", elements: [{ name: "X", type: "Class", "package": "{P}", taggedValues: { k: "v" } }] },
+        { op: "create_or_update_scenarios", element: "{E}", scenarios: [{ name: "S", steps: ["a", { kind: "actor" }, { text: "ok" }] }] }
+    ] };
+    var r = B.FB_FieldCheck.call(B, req, REG_B2);
+    eq(r.problems.length, 3, JSON.stringify(r.problems));
+    eq(r.problems[0].code, "E_ARGS"); contains(r.problems[0].path, "elements[0].taggedValues"); contains(r.problems[0].message, "musi byt pole");
+    contains(r.problems[1].path, "scenarios[0].steps[0]"); contains(r.problems[1].message, "retezec");
+    contains(r.problems[2].path, "scenarios[0].steps[1].text");
+});
+t("B2-op FB-PU-24: barva jako '#FFCC00' se prevede na {red, green, blue} (driv = cerna); nesmysl = E_ARGS; dokumentacni klice (why) bez varovani; operace bez zaznamu se nekontroluje", function () {
+    var req = { ops: [
+        { op: "set_diagram_object_style", diagram: 5, why: "odbarveni", objects: [{ elementID: 1, backgroundColor: "#FFCC00" }, { elementID: 2, fontColor: "cervena" }] },
+        { op: "ping", echo: "x", cokoliv: 1 }
+    ] };
+    var r = B.FB_FieldCheck.call(B, req, REG_B2);
+    eq(req.ops[0].objects[0].backgroundColor.red, 255); eq(req.ops[0].objects[0].backgroundColor.green, 204); eq(req.ops[0].objects[0].backgroundColor.blue, 0);
+    eq(r.problems.length, 1); contains(r.problems[0].path, "objects[1].fontColor");
+    eq(r.warnings.length, 1, JSON.stringify(r.warnings)); contains(r.warnings[0], "barva");
+});
+t("B2-op FB-PU-24 pres FB_Main: varovani kontroly poli jsou v resp.warnings; E_ARGS z kontroly poli = P2 (nic neprovedeno)", function () {
+    b1Reset(); var repo = blRepo();
+    var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ elementID: 101, nots: "x" }] }], "fc-1");
+    eq(r.status, "done", JSON.stringify(r).substring(0, 300));
+    ok(r.warnings && /nezname pole 'nots' \(myslel jsi 'notes'\?\)/.test(r.warnings.join(" ")), "warning v odpovedi: " + JSON.stringify(r.warnings));
+    var r2 = runText(repo, [{ op: "create_or_update_elements", elements: [{ elementID: 101, taggedValues: { a: 1 } }] }], "fc-2");
+    eq(r2.status, "error"); eq(r2.code, "E_ARGS"); eq(r2.results[0].status, "skipped");
+    contains(r2.problems[0].path, "taggedValues");
+});
+// --- FB-PU-25: id jako klic upravy ---
+t("B2-op FB-PU-25: elements {id} = UPDATE existujiciho (zadny duplicitni create) - P2 alias i druha obrana v operaci", function () {
+    b1Reset(); var repo = blRepo();
+    var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ id: 101, notes: "pres id" }] }], "id-1");
+    eq(r.status, "done", JSON.stringify(r).substring(0, 300));
+    eq(r.results[0].items[0].created, false); eq(r.results[0].items[0].id, 101);
+    eq(repo.GetElementByID(101).Notes, "pres id");
+    // prime volani operace (bez P2): id funguje take
+    var d = B.FB_OpElements.call(B, repo, { elements: [{ id: 101, alias: "A" }] }, "id-1b");
+    eq(d.status, "ok"); eq(d.items[0].created, false); eq(repo.GetElementByID(101).Alias, "A");
+    // bez klice a bez type: hlaska radi guid/elementID
+    var e = B.FB_OpElements.call(B, repo, { elements: [{ name: "Nove" }] }, "id-1c");
+    eq(e.code, "E_ARGS"); contains(e.message, "pro upravu existujiciho prvku pouzij guid nebo elementID");
+});
+t("B2-op FB-PU-25: packages {id} = UPDATE; attributes/operations {id} = klic podle AttributeID/MethodID (ne nove jmeno = novy zaznam); connectors/messages {id}", function () {
+    b1Reset(); var repo = blRepo();
+    var pk11 = repo.GetPackageByID(11); pk11.Update = function () { return true; }; pk11.Element = { ElementID: 10011, TaggedValues: mkColl(function (n, v) { return { Name: n, Value: v, Update: function () { } }; }), Update: function () { return true; } };
+    var p = B.FB_OpPackage.call(B, repo, { packages: [{ id: 11, notes: "pkg pres id" }] }, "id-2");
+    eq(p.status, "ok", p.message); eq(p.items[0].created, false); eq(p.items[0].id, 11);
+    var el = repo._addElement({ id: 701, name: "Trida", packageID: 11 });
+    el.Attributes = mkColl(function (n, ty) { return { AttributeID: 4001 + el.Attributes._items.length, AttributeGUID: mkGuid(), Name: n, Type: ty, Update: function () { return true; }, TaggedValues: mkColl() }; });
+    el.Methods = mkColl(function (n, ty) { return { MethodID: 5001 + el.Methods._items.length, MethodGUID: mkGuid(), Name: n, ReturnType: ty, Parameters: mkColl(), Update: function () { return true; }, TaggedValues: mkColl() }; });
+    var a1 = B.FB_OpAttributes.call(B, repo, { element: 701, attributes: [{ name: "a" }] }, "id-3");
+    eq(a1.items[0].created, true);
+    var a2 = B.FB_OpAttributes.call(B, repo, { element: 701, attributes: [{ id: a1.items[0].id, name: "a_prejmenovano" }] }, "id-4");
+    eq(a2.status, "ok", a2.message); eq(a2.items[0].created, false); eq(el.Attributes.Count, 1, "zadny novy atribut"); eq(el.Attributes.GetAt(0).Name, "a_prejmenovano");
+    var o1 = B.FB_OpOperations.call(B, repo, { element: 701, operations: [{ name: "op" }] }, "id-5");
+    var o2 = B.FB_OpOperations.call(B, repo, { element: 701, operations: [{ id: o1.items[0].id, name: "op2" }] }, "id-6");
+    eq(o2.status, "ok", o2.message); eq(o2.items[0].created, false); eq(el.Methods.Count, 1); eq(el.Methods.GetAt(0).Name, "op2");
+    var a3 = B.FB_OpAttributes.call(B, repo, { element: 701, attributes: [{ id: 99999, name: "x" }] }, "id-7");
+    eq(a3.code, "E_NOT_FOUND"); contains(a3.message, "attributeID (id z vysledku) atributu TOHOTO elementu");
+    // connectors: id = connectorID (GetConnectorByID)
+    var cn = { ConnectorID: 777, ConnectorGUID: "{CN-777}", ClientID: 101, SupplierID: 102, Type: "Dependency", Name: "", Notes: "", Update: function () { return true; }, GetLastError: function () { return ""; },
+               ClientEnd: { Update: function () { return true; } }, SupplierEnd: { Update: function () { return true; } }, TaggedValues: mkColl() };
+    repo.GetConnectorByID = function (i) { return i == 777 ? cn : null; };
+    var c = B.FB_OpConnectors.call(B, repo, { connectors: [{ id: 777, name: "pres id" }] }, "id-8");
+    eq(c.status, "ok", c.message); eq(c.items[0].created, false); eq(cn.Name, "pres id");
+    var cE = B.FB_OpConnectors.call(B, repo, { connectors: [{ name: "bez klice" }] }, "id-9");
+    eq(cE.code, "E_ARGS"); contains(cE.message, "connectorID (id z vysledku)");
+});
+// --- FB-PU-26: polozky pri vyjimce ---
+t("B2-op FB-PU-26: vyjimka EA pri zapisu vlastnosti HNED po vzniku prvku -> items nese jeho GUID (partial), ne jen {op, status, code}", function () {
+    b1Reset(); var repo = blRepo();
+    var oTw = B.FB_TagWrite;
+    var n = 0;
+    B.FB_TagWrite = function () { if (++n == 2) { throw new Error("The parent package is locked by Project Security."); } return []; };
+    try {
+        var r = runText(repo, [{ op: "create_or_update_elements", elements: [
+            { name: "Prvni", type: "Class", "package": "{PK-11}" }, { name: "Druhy", type: "Class", "package": "{PK-11}" }, { name: "Treti", type: "Class", "package": "{PK-11}" }] }], "pu26-1");
+    } finally { B.FB_TagWrite = oTw; }
+    eq(r.status, "error"); var x = r.results[0];
+    eq(x.code, "E_PERMISSION", x.message); eq(x.partial, true);
+    eq(x.items.length, 2, "prvni dokonceny + druhy rozpracovany: " + JSON.stringify(x.items));
+    eq(x.items[1].name, "Druhy"); eq(x.items[1].created, true); eq(x.items[1].index, 1); ok(/^\{/.test(x.items[1].guid), "GUID druheho prvku je v odpovedi");
+    contains(x.message, "pred chybou probehlo 2 polozek");
+    ok(x.recovery && /obnova:/.test(x.recovery), "chyba rika, jak zpet: " + x.recovery);
+});
+t("B2-op FB-PU-26: po vyjimce se dohledaji prvky s razitkem ai.request davky, ktere v items nejsou -> stamped[] (opravna davka je nezaklada znovu)", function () {
+    b1Reset(); var repo = blRepo();
+    var reqId = "pu26-2";
+    repo._sqlRules.unshift({ re: /p\.Property = 'ai\.request' AND p\.Value = 'pu26-2'/i, rows: [
+        { Object_ID: "9001", ea_guid: "{STAMP-1}", Name: "Vznikly", Object_Type: "Class" },
+        { Object_ID: "9002", ea_guid: "{STAMP-2}", Name: "FB pu26-2", Object_Type: "Artifact" } ] });
+    var oE = B.FB_OpElements;
+    B.FB_OpElements = function () { this._fbOpProgress = { items: [] }; throw new Error("COM: Nesoulad typu"); };
+    try { var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "X", type: "Class", "package": "{PK-11}" }] }], reqId); }
+    finally { B.FB_OpElements = oE; }
+    eq(r.status, "error"); var x = r.results[0];
+    eq(x.code, "E_EXCEPTION");
+    ok(x.stamped && x.stamped.length == 1, "stamped[] bez audit Artifactu: " + JSON.stringify(x.stamped));
+    eq(x.stamped[0].guid, "{STAMP-1}"); eq(x.stamped[0].id, 9001);
+    contains(x.message, "1 dalsich prvku s razitkem teto davky (stamped[])");
+});
+// --- FB-PU-27: rebuild po validaci ---
+t("B2-op FB-PU-27: scenarios - druhy scenar bez name = E_ARGS a NIC se nesmaze (validace cele sady pred rebuildem)", function () {
+    var repo = wlRepo(); var el = mkScEl(repo, 7701, "UC", 1054);
+    var a = B.FB_OpScenarios.call(B, repo, { element: 7701, scenarios: [{ name: "Stary", steps: [{ text: "s" }] }] }, "sc-0");
+    eq(a.status, "ok", JSON.stringify(a).substring(0, 300)); eq(el.Scenarios.Count, 1);
+    var r = B.FB_OpScenarios.call(B, repo, { element: 7701, scenarios: [{ name: "Novy", steps: [{ text: "n" }] }, { steps: [{ text: "x" }] }] }, "sc-1");
+    eq(r.status, "error"); eq(r.code, "E_ARGS"); contains(r.message, "scenarios[1]: chybi name - nic nebylo smazano");
+    eq(el.Scenarios.Count, 1, "stary scenar zustal"); eq(el.Scenarios.GetAt(0).Name, "Stary");
+    var r2 = B.FB_OpScenarios.call(B, repo, { element: 7701, scenarios: [{ name: "Novy", steps: ["retezec"] }] }, "sc-2");
+    eq(r2.code, "E_ARGS"); contains(r2.message, "steps[0]: krok musi byt objekt"); eq(el.Scenarios.Count, 1);
+});
+t("B2-op FB-PU-27: scenarios - vyjimka EA po smazani -> removed v odpovedi + recovery veta (FB_Main)", function () {
+    var repo = wlRepo(); var el = mkScEl(repo, 7702, "UC2", 1054);
+    B.FB_OpScenarios.call(B, repo, { element: 7702, scenarios: [{ name: "A", steps: [{ text: "s" }] }, { name: "B", steps: [{ text: "t" }] }] }, "sc-3");
+    eq(el.Scenarios.Count, 2);
+    el.Scenarios.AddNew = function () { throw new Error("The parent package is locked by Project Security."); };
+    var rr = B.FB_OpScenarios.call(B, repo, { element: 7702, scenarios: [{ name: "C", steps: [{ text: "u" }] }] }, "sc-4");
+    eq(rr.status, "error"); eq(rr.code, "E_EXCEPTION"); eq(rr.removed, 2, "chyba po mazani nese removed: " + JSON.stringify(rr));
+    eq(B._fbOpProgress.removed, 2, "operace hlasi pocet smazanych i pres _fbOpProgress (pro vyjimku, kterou nechyti)");
+    // FB_Main: removed z progress -> odpoved + recovery veta (zaloha davky / zadna)
+    b1Reset(); var repoM = blRepo();
+    var oE = B.FB_OpElements;
+    B.FB_OpElements = function () { this._fbOpProgress = { items: [], removed: 3 }; throw new Error("The parent package is locked by Project Security."); };
+    try { var r = runText(repoM, [{ op: "create_or_update_elements", elements: [{ elementID: 101, notes: "x" }] }], "sc-5"); } finally { B.FB_OpElements = oE; }
+    eq(r.status, "error"); var x = r.results[0];
+    eq(x.code, "E_PERMISSION", x.message); eq(x.removed, 3, JSON.stringify(x));
+    contains(x.recovery, "obnova: baseline"); contains(x.recovery, "FB-AUTO");
+});
+t("B2-op FB-PU-27: messages rebuild - neexistujici target nove zpravy = chyba PRED mazanim (zadny Sequence konektor nezmizi)", function () {
+    b1Reset(); var repo = blRepo();
+    var dg = { DiagramID: 201, DiagramGUID: "{DG-201}", Name: "SeqB" };
+    repo.GetDiagramByID = function (i) { return i == 201 ? dg : null; };
+    var deleted = 0;
+    var life = repo.GetElementByID(109);
+    life.Connectors = mkColl(); life.Connectors.DeleteAt = function () { deleted++; };
+    repo._sqlRules.unshift({ re: /FROM t_connector WHERE DiagramID = 201/i, rows: [{ Connector_ID: "301" }] });
+    repo.GetConnectorByID = function (i) { return i == 301 ? { ConnectorID: 301, ClientID: 109, SupplierID: 101 } : null; };
+    var r = B.FB_OpMessages.call(B, repo, { diagram: 201, rebuild: true, messages: [{ source: 109, target: "{NEEXISTUJE}", seqNo: 1 }] }, "msg-1");
+    eq(r.status, "error"); eq(r.code, "E_NOT_FOUND", r.message); contains(r.message, "nic nebylo smazano (validace pred rebuildem)");
+    eq(deleted, 0, "zadne mazani");
+    var r2 = B.FB_OpMessages.call(B, repo, { diagram: 201, rebuild: true, messages: [{ source: 109, target: 101, seqNo: 1, operation: 424242 }] }, "msg-2");
+    eq(r2.code, "E_NOT_FOUND"); contains(r2.message, "operace nenalezena"); eq(deleted, 0);
+});
+// --- FB-PU-30: GUID bez zavorek / neplatny tvar ---
+t("B2-op FB-PU-30: GUID bez slozenych zavorek se doplni (resolvery i P2); {tvar s mezerou} = E_ARGS pred SQL", function () {
+    b1Reset(); var repo = blRepo();
+    var el = repo._addElement({ id: 7801, name: "Guidovy", guid: "{12345678-ABCD-4EF0-9876-ABCDEF012345}", packageID: 11 });
+    repo._sqlRules.unshift({ re: /ea_guid = '\{12345678-ABCD-4EF0-9876-ABCDEF012345\}'/i, rows: [{ Object_ID: "7801", ea_guid: "{12345678-ABCD-4EF0-9876-ABCDEF012345}", Package_ID: "11", Object_Type: "Class", Name: "Guidovy" }] });
+    var e1 = B.FB_ResolveEl.call(B, repo, "12345678-ABCD-4EF0-9876-ABCDEF012345");
+    ok(e1 != null && e1.ElementID == 7801, "bez zavorek = GUID, ne jmeno");
+    var tc = B.FB_TargetCache.call(B, repo, "element", "12345678-ABCD-4EF0-9876-ABCDEF012345");
+    ok(tc != null && tc.id == 7801, "TargetCache totez");
+    var q0 = repo._sqlLog.length;
+    var e2 = B.FB_ResolveEl.call(B, repo, "{abc def}");
+    ok(e2 == null && B._fbResolveErr && B._fbResolveErr.code == "E_ARGS", "neplatny tvar = E_ARGS: " + JSON.stringify(B._fbResolveErr));
+    contains(B._fbResolveErr.message, "neplatny tvar GUID");
+    var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ guid: "12345678-ABCD-4EF0-9876-ABCDEF012345", notes: "pres bare guid" }] }], "g30-1");
+    eq(r.status, "done", JSON.stringify(r).substring(0, 400)); eq(r.results[0].items[0].id, 7801); eq(el.Notes, "pres bare guid");
+    var r2 = runText(repo, [{ op: "create_or_update_elements", elements: [{ guid: "{12345678 ABCD}", notes: "x" }] }], "g30-2");
+    eq(r2.status, "error"); eq(r2.code, "E_ARGS"); contains(r2.problems[0].message, "neplatny tvar GUID");
+});
+// --- FB-PU-31 + N-B-3: query ---
+function qRepo(n, table) {
+    var rows = []; for (var i = 0; i < n; i++) { rows.push({ Name: "r" + i }); }
+    return mkRepo({ sqlRules: [{ re: new RegExp(table || "t_package", "i"), rows: rows }] });
+}
+t("B2-op FB-PU-31: ';' a INTO mimo retezec = E_SQL_READONLY (dotaz se nespusti); uvnitr '...' projde", function () {
+    var repo = qRepo(1);
+    var r1 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_package WHERE Name = 'a'; DELETE FROM t_package" });
+    eq(r1.code, "E_SQL_READONLY"); contains(r1.message, "';'");
+    var r2 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name INTO t_tmp FROM t_package WHERE 1=1" });
+    eq(r2.code, "E_SQL_READONLY"); contains(r2.message, "INTO");
+    var r3 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_package WHERE Name = 'a; INTO b'" });
+    eq(r3.status, "ok", r3.message); eq(r3.rowCount, 1);
+});
+t("B2-op FB-PU-31 / N-B-3: maxRows - vychozi 500: 600 radku -> rows 500, truncated true, rowCount 600, warning; maxRows 7000 -> strop 5000 + warning; maxRows 10 -> 10", function () {
+    var repo = qRepo(600);
+    var r = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_package WHERE Parent_ID = 1" });
+    eq(r.status, "ok"); eq(r.rowCount, 600); eq(r.rows.length, 500); eq(r.truncated, true); eq(r.maxRows, 500);
+    ok(r.warnings && /oriznut: dotaz vratil 600 radku, v odpovedi je prvnich 500/.test(r.warnings.join(" ")), JSON.stringify(r.warnings));
+    var r2 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_package WHERE Parent_ID = 1", maxRows: 7000 });
+    eq(r2.maxRows, 5000); eq(r2.rows.length, 600); ok(typeof r2.truncated == "undefined"); contains(r2.warnings[0], "presahuje strop 5000");
+    var r3 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_package WHERE Parent_ID = 1", maxRows: 10 });
+    eq(r3.rows.length, 10); eq(r3.truncated, true); eq(r3.rowCount, 600);
+    var r4 = B.FB_OpQuery.call(B, qRepo(5), { sql: "SELECT Name FROM t_package WHERE Parent_ID = 1" });
+    eq(r4.rowCount, 5); ok(typeof r4.truncated == "undefined"); ok(typeof r4.warnings == "undefined", "bez varovani: " + JSON.stringify(r4.warnings));
+});
+t("B2-op FB-PU-31 / N-B-3: dotaz bez TOP/LIMIT/WHERE nad velkou tabulkou = E_SQL_UNBOUNDED (nespusti se); nad malou = varovani; COUNT(*) bez WHERE projde; TOP/LIMIT projde", function () {
+    var repo = qRepo(3, "t_");
+    var r1 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Object_ID, Name FROM t_object" });
+    eq(r1.status, "error"); eq(r1.code, "E_SQL_UNBOUNDED"); contains(r1.message, "t_object"); contains(r1.message, "TOP N");
+    ok(r1.tables && r1.tables[0] == "t_object");
+    var r1b = B.FB_OpQuery.call(B, repo, { sql: "SELECT o.Name FROM t_package p INNER JOIN t_connector c ON c.Start_Object_ID = p.Package_ID" });
+    eq(r1b.code, "E_SQL_UNBOUNDED"); contains(r1b.message, "t_connector");
+    var r2 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_package" });
+    eq(r2.status, "ok", r2.message); ok(r2.warnings && /dotaz bez omezeni/.test(r2.warnings[0]), JSON.stringify(r2.warnings));
+    var r3 = B.FB_OpQuery.call(B, repo, { sql: "SELECT COUNT(*) AS c FROM t_object" });
+    eq(r3.status, "ok", r3.message); ok(typeof r3.warnings == "undefined", "agregace bez varovani");
+    var r4 = B.FB_OpQuery.call(B, repo, { sql: "SELECT TOP 10 Name FROM t_object" });
+    eq(r4.status, "ok", r4.message); ok(typeof r4.warnings == "undefined");
+    var r5 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_object LIMIT 10" });
+    eq(r5.status, "ok", r5.message);
+    var r6 = B.FB_OpQuery.call(B, repo, { sql: "SELECT Name FROM t_object WHERE Object_Type = 'Class'" });
+    eq(r6.status, "ok", r6.message); ok(typeof r6.warnings == "undefined");
+});
+t("B2-op FB-PU-31: chat ACK u oriznuteho vysledku rika ORIZNUTO + maxRows", function () {
+    var resp = { protocol: "eafb/0.2", id: "q-tr", status: "done", repository: "X", results: [{ op: "query", status: "ok", rowCount: 600, maxRows: 500, truncated: true, rows: [{ a: 1 }] }] };
+    var txt = chat(resp);
+    contains(txt, "600 radku"); contains(txt, "ORIZNUTO"); contains(txt, "maxRows 500");
+});
+// --- FB-PU-32: identita repozitare jednou ---
+t("B2-op FB-PU-32: identita repozitare (DB_NAME) se v jednom volani FB_Main zjisti JEDNOU; mimo FB_Main zadna pamet (kazde volani cerstve)", function () {
+    b1Reset(); var repo = blRepo({ repositoryType: "SQLSVR" });
+    var dbq = 0;
+    repo._sqlRules.unshift({ re: /SELECT DB_NAME\(\)/i, rows: function () { dbq++; return [{ db: "EAEXAMPLE.QEA" }]; } });
+    B._fbRepoIdCache = null; B._fbRepoIdCacheOn = false;
+    B.FB_RepoId.call(B, repo); B.FB_RepoId.call(B, repo);
+    eq(dbq, 2, "mimo FB_Main bez pameti");
+    dbq = 0;
+    var r = runText(repo, [{ op: "create_or_update_elements", elements: [{ name: "N32", type: "Class", "package": "{PK-11}" }] }, { op: "ping", echo: "x" }], "rid-1");
+    eq(r.status, "done", JSON.stringify(r).substring(0, 300)); eq(r.repository, "EAEXAMPLE.QEA");
+    eq(dbq, 1, "DB_NAME() prave jednou za davku (driv 15-20x)");
+    ok(B._fbRepoIdCache === null && B._fbRepoIdCacheOn === false, "pamet po FB_Main zahozena");
+});
+// --- FB-PU-33: sonda ---
+t("B2-op FB-PU-33: rozpocet vytece behem POSLEDNIHO COUNT -> hotovy vysledek se prijme (ok), ne unknown; vytece pred dalsim dotazem -> unknown", function () {
+    var slow = 0;
+    var repo = blRepo();
+    var origRules = repo._sqlRules;
+    // COUNT trva ~40 ms (busy wait); rozpocet 25 ms: expanze stihne, COUNT zacne pred vyprsenim a dokonci se po nem
+    repo._sqlRules = [{ re: /COUNT\(\*\) AS c FROM t_object/i, rows: function () { var t0 = new Date().getTime(); while (new Date().getTime() - t0 < 40) { } slow++; return [{ c: 7 }]; } }].concat(origRules);
+    var r = B.FB_SubtreeCount.call(B, repo, 12, { probeBudgetMs: 25 }, 1000);
+    eq(r.status, "ok", r.why); eq(r.elements, 7); eq(slow, 1);
+    // rozpocet 0 -> unknown pred prvnim dotazem (chovani beze zmeny)
+    var r0 = B.FB_SubtreeCount.call(B, blRepo(), 12, { probeBudgetMs: 500 }, 0);
+    eq(r0.status, "unknown");
+});
+// --- FB-PU-43: vratny jen s gatekeeper: true ---
+t("B2-op FB-PU-43: polozka vratneho v menu JEN pri FB_Config.gatekeeper === true; launcher bez nej odmitne; s nim se zepta Ano/Ne (Ne = nic)", function () {
+    var repo = mkRepo();
+    var oC = B.FB_Config;
+    B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", auditPkg: "{A}" }]; };
+    try {
+        var m1 = B.EA_GetMenuItems.call(B, repo, 2, "-AI Bridge");
+        ok(m1.join("|").indexOf("vratny") < 0, "bez gatekeeper polozka chybi: " + m1.join("|"));
+        var l1 = "" + B.FB_GatekeeperLaunch.call(B, repo);
+        contains(l1, "neni pro tento repozitar povolen"); contains(l1, "gatekeeper: true");
+        B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", auditPkg: "{A}", gatekeeper: true, baseDir: "C:\\HARNESS\\gk" }]; };
+        var m2 = B.EA_GetMenuItems.call(B, repo, 2, "-AI Bridge");
+        ok(m2.join("|").indexOf("Zapnout AI import rezim (vratny)") >= 0, "s gatekeeper polozka je: " + m2.join("|"));
+        var oSess = global.Session; var asked = [];
+        global.Session = { _outputs: [], Output: function (m) { }, Prompt: function (m, k) { asked.push({ m: "" + m, k: k }); return 4; } };
+        try { var l2 = "" + B.FB_GatekeeperLaunch.call(B, repo); } finally { global.Session = oSess; }
+        eq(asked.length, 1); eq(asked[0].k, 2, "promptYESNO"); contains(asked[0].m, "SKRYTY proces powershell.exe");
+        contains(l2, "nespusten");
+    } finally { B.FB_Config = oC; }
+    // doma: EAEXAMPLE ma gatekeeper: true (vratny v menu zustava), QEAX ne
+    var cfgs = B.FB_Config.call(B);
+    eq(cfgs[0].gatekeeper, true); ok(cfgs[1].gatekeeper !== true);
+});
+// --- FB-PU-44 / FB-PU-45: schranka ---
+function clipRepo() {
+    var repo = blRepo();
+    return repo;
+}
+function withClipEnv(fn) {
+    b1Reset();
+    var oC = B.FB_Config; B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", baseDir: B1_BASE, auditPkg: "{A}" }]; };
+    var oSess = global.Session; global.Session = { _outputs: [], Output: function () { }, Prompt: function () { return 1; } };
+    var oPa = B.FB_PumpAlive; B.FB_PumpAlive = function () { return { running: false, text: "" }; };
+    try { return asEaRuntime(fn); } finally { B.FB_Config = oC; global.Session = oSess; B.FB_PumpAlive = oPa; }
+}
+t("B2-op FB-PU-44 (a): davka ve schrance s markdownovym obalem ```json ... ``` a vetou kolem -> JSON se vyrizne, davka projde (zadny E_PARSE)", function () {
+    withClipEnv(function () {
+        var repo = clipRepo();
+        var body = JSON.stringify({ protocol: "eafb/0.2", id: "clip-md-1", repo: "EAEXAMPLE.QEA", ops: [{ op: "ping", echo: "md" }] });
+        mockClipboard.text = "Tady je davka pro bridge:\n```json\n" + body + "\n```\nDej vedet, jak dopadla.";
+        var out = "" + B.FB_ClipboardImport.call(B, repo);
+        contains(out, "Davka clip-md-1 zpracovana"); contains(out, "Obal kolem JSON"); contains(out, "markdownovy blok");
+        ok(out.indexOf("E_PARSE") < 0, out);
+        eq(memFs.files[B1_REQ + "\\processed\\" + Object.keys(memFs.files).filter(function (k) { return k.indexOf(B1_REQ + "\\processed\\req-clip-md-1") === 0; })[0].substring((B1_REQ + "\\processed\\").length)] === body, true, "req soubor = presne vyriznuty JSON (bez obalu)");
+        var res = JSON.parse(memFs.files[B1_RES + "\\res-clip-md-1.json"]);
+        eq(res.status, "done");
+    });
+});
+t("B2-op FB-PU-44 (a): typograficke uvozovky = srozumitelna hlaska (ne 'prazdna schranka')", function () {
+    withClipEnv(function () {
+        mockClipboard.text = "{\u201Eprotocol\u201C: \u201Eeafb/0.2\u201C, \u201Eid\u201C: \u201Ex\u201C}";
+        var out = "" + B.FB_ClipboardImport.call(B, clipRepo());
+        contains(out, "typograficke uvozovky");
+    });
+});
+t("B2-op FB-PU-44 (b): 'je ve schrance' jen po overeni zpetnym ctenim; kdyz zapis selze, dialog to rekne", function () {
+    withClipEnv(function () {
+        var repo = clipRepo();
+        mockClipboard.text = JSON.stringify({ protocol: "eafb/0.2", id: "clip-wb-1", repo: "EAEXAMPLE.QEA", ops: [{ op: "ping", echo: "wb" }] });
+        var out1 = "" + B.FB_ClipboardImport.call(B, repo);
+        contains(out1, "Chat verze je ve schrance (overeno zpetnym ctenim)");
+        ok(mockClipboard.text.indexOf("EAFB") >= 0 || mockClipboard.text.indexOf("ping") >= 0, "schranka nese chat ACK");
+        // setData i clip.exe "selzou" (schranka drzi puvodni text)
+        var keep = JSON.stringify({ protocol: "eafb/0.2", id: "clip-wb-2", repo: "EAEXAMPLE.QEA", ops: [{ op: "ping", echo: "wb2" }] });
+        mockClipboard.text = keep;
+        var oHtml = MockHtmlfile.prototype;
+        var origSet = null;
+        var oCom = B.FB_ComObj;
+        B.FB_ComObj = function (id) { var o = oCom.call(B, id); if (("" + id).toLowerCase() == "htmlfile") { o.parentWindow.clipboardData.setData = function () { }; } return o; };
+        try { var out2 = "" + B.FB_ClipboardImport.call(B, repo); } finally { B.FB_ComObj = oCom; }
+        contains(out2, "Vlozeni do schranky se NEZDARILO"); eq(mockClipboard.text, keep, "schranka nezmenena");
+    });
+});
+t("B2-op FB-PU-44 (c): dedup pres KONECNY res-<id>.json - tataz davka po 'restartu EA' (pamet W5 pryc) se neprovede znovu; cekajici (confirm_required) dedup neblokuje", function () {
+    withClipEnv(function () {
+        var repo = clipRepo();
+        var body = JSON.stringify({ protocol: "eafb/0.2", id: "clip-dd-1", repo: "EAEXAMPLE.QEA", ops: [{ op: "ping", echo: "dd" }] });
+        mockClipboard.text = body;
+        var out1 = "" + B.FB_ClipboardImport.call(B, repo);
+        contains(out1, "zpracovana");
+        delete B._fbClipSeen; // restart EA = pamet zanika
+        mockClipboard.text = body; // clovek znovu zkopiroval tutez davku
+        var called = 0; var oM = B.FB_Main; B.FB_Main = function () { called++; return oM.apply(B, arguments); };
+        try { var out2 = "" + B.FB_ClipboardImport.call(B, repo); } finally { B.FB_Main = oM; }
+        eq(called, 0, "FB_Main se nevolal"); contains(out2, "uz byla zpracovana (res-clip-dd-1.json: done)"); contains(out2, "zmen id");
+        // confirm_required res = ceka -> dedup NEblokuje (dialog se nabidne znovu / FB_Main resi P3)
+        memFs.files[B1_RES + "\\res-clip-dd-2.json"] = JSON.stringify({ protocol: "eafb/0.2", id: "clip-dd-2", status: "confirm_required", confirm: { nonce: "n" } });
+        mockClipboard.text = JSON.stringify({ protocol: "eafb/0.2", id: "clip-dd-2", repo: "EAEXAMPLE.QEA", ops: [{ op: "ping", echo: "dd2" }] });
+        var out3 = "" + B.FB_ClipboardImport.call(B, repo);
+        ok(out3.indexOf("uz byla zpracovana") < 0, out3);
+    });
+});
+t("B2-op FB-PU-45: otisk davky ignoruje BOM - soubor s BOM (pumpa, surove bajty) i bez BOM (EA runtime, text) daji tyz payloadHash; potvrzeni pumpou nad davkou ze schranky neni E_RISK_INTEGRITY", function () {
+    b1Reset(); var repo = blRepo();
+    var ops = [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }];
+    var body = JSON.stringify({ protocol: "eafb/0.2", id: "bom-1", repo: "EAEXAMPLE.QEA", ops: ops });
+    var p = B1_REQ + "\\req-bom-1.json";
+    memFs.files[p] = body;
+    // EA runtime (schranka): hash z textu bez BOM
+    var r1 = asEaRuntime(function () { return JSON.parse(B.FB_Main.call(B, repo, p)); });
+    eq(r1.status, "confirm_required", JSON.stringify(r1).substring(0, 300));
+    memFs.files[B1_RES + "\\res-bom-1.json"] = JSON.stringify(r1);
+    // pumpa (JScript): surove bajty souboru - soubor ma BOM EF BB BF
+    function utf8(s) { var out = []; for (var i = 0; i < s.length; i++) { out.push(s.charCodeAt(i) & 255); } return out; }
+    var oFb = B.FB_FileBytes; B.FB_FileBytes = function () { return [239, 187, 191].concat(utf8(body)); };
+    try {
+        var r2 = JSON.parse("" + B.FB_ConfirmPending.call(B, repo, r1.confirm.pendingPath, r1.confirm.nonce, r1.confirm.payloadHash, "pumpa", true));
+    } finally { B.FB_FileBytes = oFb; }
+    ok(r2.code != "E_RISK_INTEGRITY" && r2.status != "rejected", "BOM nesmi zmenit otisk: " + r2.code + " " + r2.message);
+    ok(r2.results && r2.results.length == 1 && r2.results[0].status != "skipped", "potvrzeni proslo az k exekuci: " + JSON.stringify(r2).substring(0, 200));
+    // FB_Main primo nad bajty s BOM = tyz hash jako text bez BOM
+    b1Reset(); var repoB = blRepo();
+    memFs.files[B1_REQ + "\\req-bom-2.json"] = body.replace("bom-1", "bom-2");
+    var hashText = asEaRuntime(function () { return JSON.parse(B.FB_Main.call(B, repoB, B1_REQ + "\\req-bom-2.json")).confirm.payloadHash; });
+    b1Reset(); var repoC = blRepo();
+    memFs.files[B1_REQ + "\\req-bom-3.json"] = body.replace("bom-1", "bom-3");
+    B.FB_FileBytes = function () { return [239, 187, 191].concat(utf8(body.replace("bom-1", "bom-3"))); };
+    try { var hashBom = JSON.parse(B.FB_Main.call(B, repoC, B1_REQ + "\\req-bom-3.json")).confirm.payloadHash; } finally { B.FB_FileBytes = oFb; }
+    eq(hashBom, "" + B.FB_Sha256.call(B, body.replace("bom-1", "bom-3")), "hash surovych bajtu bez BOM == hash textu");
+});
+t("B2-op FB-PU-45: schrankovy kanal zapisuje req UTF-8 BEZ BOM (ADODB binarni cesta), fallback s BOM jen kdyz binarni cesta chybi", function () {
+    // zdroj: writeUtf8 ma binarni cestu Position = 3 (preskoci EF BB BF)
+    var src = srcOf("FB_ClipboardImport");
+    contains(src, "st.Position = 0; st.Type = 1; st.Position = 3;");
+    contains(src, "bin.SaveToFile(path, 2);");
+});
+t("B2-op pravidlo: kazdy novy kod odpovedi je v FB_ReasonText/ChatRender neutralni (E_SQL_UNBOUNDED nespadne na prazdny render)", function () {
+    var resp = { protocol: "eafb/0.2", id: "q-ub", status: "error", repository: "X", results: [{ op: "query", status: "error", code: "E_SQL_UNBOUNDED", message: "Dotaz bez TOP" }] };
+    var txt = chat(resp);
+    contains(txt, "E_SQL_UNBOUNDED");
 });
 
 // ------------------------------------------------------------------ vysledek
