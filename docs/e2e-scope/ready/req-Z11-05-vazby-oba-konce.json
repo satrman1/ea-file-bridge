@@ -1,0 +1,8 @@
+{ "protocol": "eafb/0.2", "id": "Z11-05-vazby-oba-konce", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_connectors", "connectors": [
+   { "guid": "{A26940FA-E8CE-4b77-A1E9-E400437C7C57}", "name": "chr-src->vol2 (prejmenovano Z11 - jeden konec venku)" }
+ ] },
+ { "op": "create_or_update_connectors", "connectors": [
+   { "source": "{B4F10BFC-E14D-4b3d-8A7E-0D042326032C}", "target": "{534F77F3-F00B-4566-84EC-D2072E17FAE5}", "type": "Dependency", "name": "chr->chr-sub (oba konce chranene)" }
+ ] }
+] }

@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z11-01-ping-pred", "repo": "EA17_Yoga_QEA2.qeax", "ops": [ { "op": "ping", "echo": "pred deployem Z261004b-11" } ] }

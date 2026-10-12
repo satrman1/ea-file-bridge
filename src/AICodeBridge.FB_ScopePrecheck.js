@@ -6,21 +6,26 @@
 // ID, jmeno, cesta {path}, owningElement, dedupKey, baselineRoot) spocita:
 //   - E_SCOPE_CONFIG  vadna konfigurace FB_WriteScope / FB_Config (jedina
 //                     chyba, cile se dal nezkoumaji); auditovano
-//   - E_BLACKLIST     cil (nebo zdroj menene/mazane vazby, novy zdroj po
+//   - E_BLACKLIST     cil (nebo vazba s OBEMA konci v chranene casti - i po
 //                     presmerovani, podstrom mazaneho/klonovaneho balicku,
-//                     koren jako cil updatu) lezi v chranene casti; auditovano
+//                     koren jako cil updatu, kaskada mazani do chranene casti
+//                     pri cascadeDelete "block") lezi v chranene casti; auditovano
 //   - E_AMBIGUOUS     jmeno/cesta odpovida vic objektum (guids[] + candidates[])
 //   - E_NOT_FOUND     jmeno/cesta nenalezeno (s napovedou cesty)
 // Jediny zakazany cil = davka se neprovede vubec, ani zaloha (FB-CZ-08).
 // Vraci { problems: [ { op, path, code, message, ... } ], resolved: [ { op,
-// path, ref, kind, guid, id, fullPath } ] } - resolved = odkazy zadane jmenem
+// path, ref, kind, guid, id, fullPath } ], cascades: [ { op, path, kind,
+// what, count, items[], message } ] } - resolved = odkazy zadane jmenem
 // nebo cestou se skutecnym GUIDem a plnou cestou (FB-CZ-18, FB_Main je
-// prida do odpovedi). $N odkazy se tu preskakuji (dohledaji se az pri
-// provedeni - druha obrana FB_CheckWrite/FB_CheckWriteEl v operacich).
+// prida do odpovedi); cascades = kaskady mazani do chranene casti (W2 b/c)
+// pri cascadeDelete "allow" - FB_Main je da do duvodu potvrzovaciho okna
+// (clovek rozhoduje s informaci, Z261004b-11). $N odkazy se tu preskakuji
+// (dohledaji se az pri provedeni - druha obrana FB_CheckWrite/FB_CheckWriteEl
+// v operacich).
 // Jen SQL nad standardnimi sloupci (FB_TargetCache / FB_ScopeCheck sdili
 // mezipamet s provedenim); nikdy nevyhazuje.
 var self = this;
-var problems = [], resolved = [];
+var problems = [], resolved = [], cascades = [];
 var isArr = function (v) { return Object.prototype.toString.call(v) == "[object Array]"; };
 var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
 function blank(v) { return v === null || typeof v == "undefined" || ("" + v) == ""; }
@@ -39,11 +44,11 @@ var cfg = null;
 try { cfg = this.FB_WriteScopeCfg(Repository); } catch (eCfg) { cfg = null; }
 if (cfg == null) {
     prob(-1, "FB_WriteScope", "E_SCOPE_CONFIG", "kontrola konfigurace cile zapisu selhala (FB_WriteScopeCfg) - fail-closed");
-    return { problems: problems, resolved: resolved };
+    return { problems: problems, resolved: resolved, cascades: cascades };
 }
 if (!cfg.repoKnown) {
     prob(-1, "FB_WriteScope", "E_REPO", "pripojeny repozitar (" + cfg.repoId + ") nema polozku ve FB_WriteScope - zapis zamitnut");
-    return { problems: problems, resolved: resolved };
+    return { problems: problems, resolved: resolved, cascades: cascades };
 }
 if (cfg.problems.length > 0) {
     // OPRAVNY KANAL (zivy nalez EAExample 2026-10-12, krok 9e): davka slozena
@@ -63,7 +68,7 @@ if (cfg.problems.length > 0) {
     if (!onlyDeploy) {
         for (var cp = 0; cp < cfg.problems.length; cp++) { prob(-1, "FB_WriteScope", "E_SCOPE_CONFIG", cfg.problems[cp]); }
     }
-    return { problems: problems, resolved: resolved };
+    return { problems: problems, resolved: resolved, cascades: cascades };
 }
 // --- pomocne: plna cesta balicku / prvku z radku mezipameti ---
 function pkgPathById(id) {
@@ -153,29 +158,29 @@ function endById(id) {
     if (r != null && r.code == "E_NOT_FOUND") { return null; }
     return { row: row, prot: isProt(r), chk: r, name: row ? row.name : ("" + id) };
 }
-// pravidlo vazeb (kap. 5.5, O3 = a, O11 = c, B2):
+// PRAVIDLO VAZEB (kap. 5.5 v1.2; rozhodnuti Milose 12. 10. 2026, nahrazuje
+// "vazbu vlastni zdroj" z B2): vazba (i zprava) je chranena, JEN kdyz jsou OBA
+// jeji konce v chranene casti - s jednim koncem venku chranena neni, at vede
+// kterymkoli smerem. Zmena/smazani vazby s jednim volnym koncem projde;
+// presmerovani se posuzuje nad NOVYM parem koncu (novy konec nahrazuje
+// skutecny). allowIncomingRefs (O3 = a) zustava jen jako volitelne zprisneni
+// ZALOZENI / presmerovani cile: zdroj volny -> cil v chranene vetvi s
+// allowIncomingRefs: false = E_BLACKLIST.
 //   existing = { src, tgt } skutecne konce dohledaneho konektoru (null = create)
 //   newSrc / newTgt = konce z requestu (create: povinne; update: presmerovani)
 function connRule(opIdx, pth, existing, newSrc, newTgt, what) {
-    if (existing != null) {
-        if (existing.src && existing.src.prot) {
-            prob(opIdx, pth, "E_BLACKLIST", what + ": zdroj existujici vazby ('" + existing.src.name + "') lezi v chranene casti - zmena ani smazani vazby chraneneho prvku neni povolena. " + existing.src.chk.message, { branch: existing.src.chk.branch });
-            return;
-        }
-        if (newSrc && newSrc.prot) {
-            prob(opIdx, pth, "E_BLACKLIST", what + ": novy zdroj vazby ('" + newSrc.name + "') lezi v chranene casti - presmerovani zdroje do chranene casti neni povolene. " + newSrc.chk.message, { branch: newSrc.chk.branch });
-            return;
-        }
-        if (newTgt && newTgt.prot && !allowIn(newTgt.chk)) {
-            prob(opIdx, pth, "E_BLACKLIST", what + ": novy cil vazby ('" + newTgt.name + "') lezi v chranene vetvi s allowIncomingRefs: false. " + newTgt.chk.message, { branch: newTgt.chk.branch });
-        }
+    var src = newSrc || (existing ? existing.src : null);
+    var tgt = newTgt || (existing ? existing.tgt : null);
+    var srcProt = !!(src && src.prot), tgtProt = !!(tgt && tgt.prot);
+    if (existing != null && existing.src && existing.src.prot && existing.tgt && existing.tgt.prot) {
+        prob(opIdx, pth, "E_BLACKLIST", what + ": oba konce existujici vazby ('" + existing.src.name + "' -> '" + existing.tgt.name + "') lezi v chranene casti - zmena ani smazani vazby chranene casti neni povolena. " + existing.src.chk.message, { branch: existing.src.chk.branch });
         return;
     }
-    if (newSrc && newTgt && newSrc.prot && newTgt.prot) {
-        prob(opIdx, pth, "E_BLACKLIST", what + ": oba konce vazby lezi v chranene casti. " + newSrc.chk.message, { branch: newSrc.chk.branch });
+    if (srcProt && tgtProt) {
+        prob(opIdx, pth, "E_BLACKLIST", what + ": oba konce vazby" + (existing != null ? " po presmerovani" : "") + " ('" + src.name + "' -> '" + tgt.name + "') lezi v chranene casti. " + src.chk.message, { branch: src.chk.branch });
         return;
     }
-    if (newTgt && newTgt.prot && !allowIn(newTgt.chk) && !(newSrc && newSrc.prot)) {
+    if (newTgt && newTgt.prot && !srcProt && !allowIn(newTgt.chk)) {
         prob(opIdx, pth, "E_BLACKLIST", what + ": cil vazby ('" + newTgt.name + "') lezi v chranene vetvi s allowIncomingRefs: false - vazba z volne casti do ni neni povolena. " + newTgt.chk.message, { branch: newTgt.chk.branch });
     }
 }
@@ -190,6 +195,54 @@ function connByDedup(key) {
     var rc = rows("SELECT c.Connector_ID, c.Start_Object_ID, c.End_Object_ID FROM t_connector c INNER JOIN t_connectortag t ON t.ElementID = c.Connector_ID WHERE t.Property = 'ai.dedup' AND t.VALUE = '" + esc(key) + "'");
     if (rc == null || rc.length != 1) { return null; }
     return { id: num(rc[0].Connector_ID), src: endById(num(rc[0].Start_Object_ID)), tgt: endById(num(rc[0].End_Object_ID)) };
+}
+// --- KASKADY MAZANI do chranene casti (W2 b/c; rozhodnuti Milose 12. 10.
+// 2026, varianta c): spocitaji se UZ TADY (stejne SQL jako FB_OpDelete.cascade)
+// a podle cfg.cascadeDelete jdou bud do problems (block = E_BLACKLIST), nebo
+// do cascades[] (allow) - FB_Main je da do textu potvrzovaciho okna. Kaskada
+// (a) "prichozi vazba s chranenym zdrojem" uz NENI zasahem do chranene casti
+// (vazba s jednim volnym koncem neni chranena). idsSql = SQL vyraz mnoziny
+// Object_ID (jeden prvek nebo obsah podstromu balicku).
+function cascadeCheck(opIdx, pth, idsSql, what) {
+    var found = [];
+    var rd = rows("SELECT DISTINCT x.Diagram_ID FROM t_diagramobjects x WHERE x.Object_ID IN (" + idsSql + ")");
+    if (rd == null) { prob(opIdx, pth, "E_BLACKLIST", what + ": vyskyt na diagramech nelze overit (SQL) - fail-closed"); return; }
+    var dgs = [];
+    for (var d = 0; d < rd.length; d++) {
+        var did = num(rd[d].Diagram_ID), dr = null;
+        try { dr = self.FB_ScopeCheck(Repository, "diagram", "" + did); } catch (eD) { dr = null; }
+        if (isProt(dr)) { dgs.push((dr.target && dr.target.path) ? dr.target.path : ("diagram " + did)); }
+    }
+    if (dgs.length > 0) { found.push({ kind: "diagram", count: dgs.length, items: dgs, text: "objekt lezi na " + dgs.length + " CHRANENEM/CHRANENYCH diagramu (" + dgs.slice(0, 5).join(", ") + (dgs.length > 5 ? ", ..." : "") + ") - EA ho z nich smazanim odstrani" }); }
+    var ri = rows("SELECT Object_ID FROM t_object WHERE Classifier IN (" + idsSql + ")");
+    if (ri == null) { prob(opIdx, pth, "E_BLACKLIST", what + ": instance klasifikatoru nelze overit (SQL) - fail-closed"); return; }
+    var inst = [];
+    for (var ii = 0; ii < ri.length && ii < 200; ii++) {
+        var iid = num(ri[ii].Object_ID), ir = null;
+        try { ir = self.FB_ScopeCheck(Repository, "element", "" + iid); } catch (eI) { ir = null; }
+        if (isProt(ir)) { inst.push((ir.target && ir.target.path) ? ir.target.path : ("prvek " + iid)); }
+    }
+    if (inst.length > 0) { found.push({ kind: "classifier", count: inst.length, items: inst, text: "mazany prvek je klasifikatorem " + inst.length + " instanci v chranene casti (" + inst.slice(0, 5).join(", ") + (inst.length > 5 ? ", ..." : "") + ") - EA jim nastavi Classifier = 0 (zive overeno Z10-13)" }); }
+    for (var f = 0; f < found.length; f++) {
+        var msg = what + ": " + found[f].text;
+        if (cfg.cascadeDelete == "block") {
+            prob(opIdx, pth, "E_BLACKLIST", msg + ". Kaskada do chranene casti je zakazana (FB_WriteScope.cascadeDelete = block) - pozadej cloveka.", { cascade: found[f].kind, count: found[f].count, items: found[f].items });
+        } else {
+            cascades.push({ op: opIdx, path: pth, kind: found[f].kind, what: what, count: found[f].count, items: found[f].items,
+                message: "VAROVANI (kaskada mazani do chranene casti, cascadeDelete = allow): " + msg + ". Zaloha pred zapisem chraneny balicek NEKRYJE." });
+        }
+    }
+}
+function subtreeObjectsSql(rootId) {
+    var ids = [rootId], queue = [rootId], seen = {}, guard = 0;
+    seen[rootId] = 1;
+    while (queue.length > 0 && guard++ < 500) {
+        var pid = queue.shift();
+        var rp = rows("SELECT Package_ID FROM t_package WHERE Parent_ID = " + pid);
+        if (rp == null) { return null; }
+        for (var k = 0; k < rp.length; k++) { var n = num(rp[k].Package_ID); if (!seen[n]) { seen[n] = 1; ids.push(n); queue.push(n); } }
+    }
+    return "SELECT Object_ID FROM t_object WHERE Package_ID IN (" + ids.join(",") + ")";
 }
 function elByDedup(key) {
     var r = rows("SELECT o.Object_ID FROM t_object o INNER JOIN t_objectproperties p ON p.Object_ID = o.Object_ID WHERE p.Property = 'ai.dedup' AND p.Value = '" + esc(key) + "'");
@@ -278,10 +331,10 @@ for (var i = 0; i < req.ops.length; i++) {
         var dgT = null;
         if (!blank(o.diagram)) { dgT = target(i, P + ".diagram", "diagram", o.diagram, "diagram zprav"); }
         if ((o.rebuild === true || ("" + o.rebuild) == "true") && dgT && dgT.row) {
-            var sq = rows("SELECT Connector_ID, Start_Object_ID FROM t_connector WHERE DiagramID = " + dgT.row.id + " AND Connector_Type = 'Sequence'");
+            var sq = rows("SELECT Connector_ID, Start_Object_ID, End_Object_ID FROM t_connector WHERE DiagramID = " + dgT.row.id + " AND Connector_Type = 'Sequence'");
             for (var sqi = 0; sq != null && sqi < sq.length; sqi++) {
-                var se = endById(num(sq[sqi].Start_Object_ID));
-                if (se && se.prot) { prob(i, P + ".rebuild", "E_BLACKLIST", "rebuild: zprava " + sq[sqi].Connector_ID + " ma zdroj ('" + se.name + "') v chranene casti - mazani zprav chraneneho prvku neni povolene. " + se.chk.message, { branch: se.chk.branch }); break; }
+                var se = endById(num(sq[sqi].Start_Object_ID)), te = endById(num(sq[sqi].End_Object_ID));
+                if (se && se.prot && te && te.prot) { prob(i, P + ".rebuild", "E_BLACKLIST", "rebuild: zprava " + sq[sqi].Connector_ID + " ma oba konce ('" + se.name + "' -> '" + te.name + "') v chranene casti - mazani zprav chranene casti neni povolene. " + se.chk.message, { branch: se.chk.branch }); break; }
             }
         }
         lst = isArr(o.messages) ? o.messages : [];
@@ -302,13 +355,20 @@ for (var i = 0; i < req.ops.length; i++) {
             it = lst[j]; if (!it || typeof it != "object") { continue; }
             var DQ = P + ".targets[" + j + "]";
             var ty = ("" + (it.type || "")).toUpperCase();
-            if (ty == "ELEMENT") { target(i, DQ, "element", it.guid || it.id, "mazani"); }
+            if (ty == "ELEMENT") {
+                tr = target(i, DQ, "element", it.guid || it.id, "mazani");
+                if (tr && tr.row && !isProt(tr.chk)) { cascadeCheck(i, DQ, "" + tr.row.id, "kaskada mazani prvku '" + tr.row.name + "'"); }
+            }
             else if (ty == "DIAGRAM") { target(i, DQ, "diagram", it.guid || it.id, "mazani"); }
             else if (ty == "PACKAGE") {
                 tr = target(i, DQ, "package", it.guid || it.id, "mazani");
                 if (tr && tr.row) {
                     if (tr.row.parentId === 0) { prob(i, DQ, "E_ARGS", "root package nelze mazat"); }
-                    else if (!isProt(tr.chk)) { subtreeHas(i, DQ, tr.row.id, "Mazani balicku"); }
+                    else if (!isProt(tr.chk) && !subtreeHas(i, DQ, tr.row.id, "Mazani balicku")) {
+                        var sSql = subtreeObjectsSql(tr.row.id);
+                        if (sSql == null) { prob(i, DQ, "E_BLACKLIST", "mazani balicku '" + tr.row.name + "': podstrom nelze precist (SQL) - fail-closed"); }
+                        else { cascadeCheck(i, DQ, sSql, "kaskada mazani balicku '" + tr.row.name + "'"); }
+                    }
                 }
             } else if (ty == "CONNECTOR") {
                 var dex = connEndsBy(it.guid, it.id);
@@ -391,4 +451,4 @@ for (var i = 0; i < req.ops.length; i++) {
     }
     // deploy_src: cil = element AICodeBridge, hlida B4 v Risk Gate (E_RISK_BLOCKED / E_OP_FORBIDDEN)
 }
-return { problems: problems, resolved: resolved };
+return { problems: problems, resolved: resolved, cascades: cascades };

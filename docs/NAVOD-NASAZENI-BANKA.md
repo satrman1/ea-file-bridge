@@ -69,7 +69,9 @@ Verze **v0.3**, revize 2026-09-04 (vlákno Z260904-5; původní text 2026-08-14)
 
 Výsledky nadiktovat Claudovi → protokol vyhodnocení (finální GO/NO-GO na iterace 1+2) → fáze 3 (přenosové primitivy M365: E2E za studena s ručním přenosem, zaznamenat `(1)` varianty názvů při opakovaném stažení).
 
-## 6. Upgrade whitelistu na název databáze (z v0.1 na v0.2)
+## 6. Upgrade whitelistu na název databáze (z v0.1 na v0.2) — historie; identita repozitáře platí dál
+
+> **Poznámka 12. 10. 2026 (vlákno Z261004b-11, kód v0.17):** **whitelist zanikl** — rozhodnutí Miloše 11. 10. 2026 (zadání `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` v1.1, O1 = b; v1.2 = popis stavu). `FB_Whitelist.js` v `src\` už není; hranici zápisu určuje EA security + **blacklist `FB_WriteScope`** (položka `{ repo: "<TEST-DB>", cascadeDelete: "block", blacklist: [ { pkg: "{<PROTECTED-PKG-1>}", name, note } ] }`) a implicitní ochrana balíčku auditu a add-inu. Z této kapitoly **platí dál jen mechanika identity repozitáře** (název databáze z `DB_NAME()`, podřetězec case-insensitive, stejná hodnota ve všech šesti konfiguracích najednou — teď včetně `FB_WriteScope`); kroky 2 a 5 níže čti jako „přepiš položku ve `FB_WriteScope`" a „ping musí nést `writeScope.blacklist[]` s `found: true` a plnou cestou". Aktuální postup = `NAVOD-NASAZENI-KLIKACI.md` 5.2 a 6.3 (v1.3). Text kapitoly ponechán jako historie přechodu v0.1 → v0.2.
 
 Fáze 2 na v0.1 běžela s provizorním whitelistem na název `.qea` zástupce. **Proč se to musí změnit:** cesta k zástupci není autoritativní — na jiné stanici se jmenuje jinak a nic o skutečně připojené databázi neříká. Testovací repozitář navíc vzniká **klonem produkčního**, takže **package GUIDy jsou v obou stejné** a GUID sám instanci nerozliší. Od v0.2 je identita repozitáře **název databáze**, který si executor zjistí sám (`FB_RepoId` → `DB_NAME()`), a whitelist tak funguje na každé stanici bez editace.
 
@@ -112,4 +114,5 @@ Přechod (~5 minut):
 
 - **v0.3 — 2026-09-04** (vlákno Z260904-5): dělba s novým `NAVOD-NASAZENI-KLIKACI.md` (tento soubor = plán fáze 2, klikací postup jinde); §6 přepsán na přesný postup zjištění a dosazení názvu databáze včetně pasti podřetězce u klonů a ostatních pěti konfiguračních sekcí; §2.4 opraven výstup bootstrapu (105 souborů místo „16 operací") a doplněny konfigurační sekce iterací 5–7; troubleshooting odkazuje na klikací návod.
 - **v0.2 — 2026-08-14**: identita repozitáře = název databáze (`FB_RepoId`) místo connection stringu / názvu `.qea` zástupce.
+- 2026-10-12 — datovaná poznámka v §6: whitelist zanikl (v0.17, `FB_WriteScope` blacklist), identita repozitáře platí dál (vlákno Z261004b-11).
 - v0.1 — 2026-08: vznik (fáze 2 POC s provizorním whitelistem na název zástupce).

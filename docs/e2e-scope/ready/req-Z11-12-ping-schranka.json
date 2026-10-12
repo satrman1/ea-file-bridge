@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z11-12-ping-schranka", "repo": "EA17_Yoga_QEA2.qeax", "ops": [ { "op": "ping", "echo": "schranka Z261004b-11" } ] }

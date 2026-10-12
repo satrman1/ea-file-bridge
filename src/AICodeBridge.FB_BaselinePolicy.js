@@ -224,13 +224,31 @@ function dgmPkgRaw(ref) {
     else { rr = rows("SELECT Package_ID FROM t_diagram WHERE Name = '" + esc(t) + "'"); }
     return (rr != null && rr.length == 1) ? parseInt(rr[0].Package_ID, 10) : 0;
 }
-// konce konektoru dle guid/ID jednim SELECT (B3 i): package ZDROJE nebo 0
+// konce konektoru dle guid/ID jednim SELECT (B3 i): package ZDROJE nebo 0.
+// Pravidlo vazeb "oba konce" (Z261004b-11, 12. 10. 2026): vazba s jednim
+// koncem v chranene casti se smi menit i mazat, ale zalohu nad chranenym
+// balickem bridge neporizuje (E_BLACKLIST -> E_NO_BASELINE, zive Z11-05b) ->
+// pro zalohu se bere balicek VOLNEHO konce: zdroj, a je-li zdroj chraneny,
+// cil (oba chranene = P2 davku zastavi driv).
+function pkgProtected(pkgId) {
+    if (!pkgId || pkgId <= 0) { return false; }
+    var r = null;
+    try { r = self.FB_ScopeCheck(Repository, "package", "" + pkgId); } catch (eS) { r = null; }
+    return (r != null && r.code == "E_BLACKLIST");
+}
+function connEndsPkg(startId, endId) {
+    var sp = elPkgRaw("" + startId);
+    if (sp > 0 && !pkgProtected(sp)) { return sp; }
+    var ep = elPkgRaw("" + endId);
+    if (ep > 0 && !pkgProtected(ep)) { return ep; }
+    return sp > 0 ? sp : ep;
+}
 function connSrcPkg(guid, id) {
     var rc = null;
-    if (!blank(guid) && !refRe.test("" + guid)) { rc = rows("SELECT Start_Object_ID FROM t_connector WHERE ea_guid = '" + esc(guid) + "'"); }
-    else if (!blank(id) && /^[0-9]+$/.test("" + id)) { rc = rows("SELECT Start_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(id, 10)); }
+    if (!blank(guid) && !refRe.test("" + guid)) { rc = rows("SELECT Start_Object_ID, End_Object_ID FROM t_connector WHERE ea_guid = '" + esc(guid) + "'"); }
+    else if (!blank(id) && /^[0-9]+$/.test("" + id)) { rc = rows("SELECT Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(id, 10)); }
     if (rc == null || rc.length != 1) { return 0; }
-    return elPkgRaw("" + rc[0].Start_Object_ID);
+    return connEndsPkg(rc[0].Start_Object_ID, rc[0].End_Object_ID);
 }
 // resolvery -> Package_ID nebo 0 (nezjisteno)
 function elPkg(ref, ctx, opIdx) {
@@ -374,9 +392,9 @@ for (i = 0; i < req.ops.length; i++) {
                 else if (refRe.test("" + (c.guid || c.connectorID))) { var cdp = dollarPkg(c.guid || c.connectorID, i); if (cdp > 0) { addPkgId(cdp, name + " (update konektoru pres $N)"); } else if (dollarOwn(c.guid || c.connectorID, i) !== true) { unk(ctx + ".connectors[" + j + "]: $N odkaz na nejisty konektor"); } }
                 else { unk(ctx + ".connectors[" + j + "]: konektor '" + (c.guid || c.connectorID) + "' nenalezen - konce neresolvovany"); }
             } else if (c.dedupKey) {
-                var rck = rows("SELECT c.Start_Object_ID FROM t_connector c INNER JOIN t_connectortag t ON t.ElementID = c.Connector_ID WHERE t.Property = 'ai.dedup' AND t.VALUE = '" + esc(c.dedupKey) + "'");
+                var rck = rows("SELECT c.Start_Object_ID, c.End_Object_ID FROM t_connector c INNER JOIN t_connectortag t ON t.ElementID = c.Connector_ID WHERE t.Property = 'ai.dedup' AND t.VALUE = '" + esc(c.dedupKey) + "'");
                 if (rck == null || rck.length > 1) { unk(ctx + ".connectors[" + j + "]: dedupKey '" + c.dedupKey + "' " + (rck == null ? "nelze dohledat" : "neni jednoznacny")); }
-                else if (rck.length == 1) { addEl("" + rck[0].Start_Object_ID, ctx + ".connectors[" + j + "].dedup", i, name + " (dedupKey - existujici konektor, package source)"); }
+                else if (rck.length == 1) { var ckp = connEndsPkg(rck[0].Start_Object_ID, rck[0].End_Object_ID); if (ckp > 0) { addPkgId(ckp, name + " (dedupKey - existujici konektor, package volneho konce)"); } else { unk(ctx + ".connectors[" + j + "]: konce konektoru dle dedupKey nezjisteny"); } }
                 else if (c.match) { addEl(c.source, ctx + ".connectors[" + j + "].source", i, name + " (match, package source)"); }
             } else if (c.match) {
                 addEl(c.source, ctx + ".connectors[" + j + "].source", i, name + " (match, package source)");
@@ -459,9 +477,9 @@ for (i = 0; i < req.ops.length; i++) {
                 }
             } else if (ty == "CONNECTOR") {
                 var rc = null;
-                if (dt.guid) { rc = rows("SELECT Start_Object_ID FROM t_connector WHERE ea_guid = '" + esc(dt.guid) + "'"); }
-                else if (/^[0-9]+$/.test("" + dt.id)) { rc = rows("SELECT Start_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(dt.id, 10)); }
-                if (rc != null && rc.length == 1) { addEl("" + rc[0].Start_Object_ID, dctx + ".source", i, name + " (konektor, package source)"); }
+                if (dt.guid) { rc = rows("SELECT Start_Object_ID, End_Object_ID FROM t_connector WHERE ea_guid = '" + esc(dt.guid) + "'"); }
+                else if (/^[0-9]+$/.test("" + dt.id)) { rc = rows("SELECT Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(dt.id, 10)); }
+                if (rc != null && rc.length == 1) { var dcp = connEndsPkg(rc[0].Start_Object_ID, rc[0].End_Object_ID); if (dcp > 0) { addPkgId(dcp, name + " (konektor, package volneho konce)"); } else { unk(dctx + ".source: konce konektoru nezjisteny"); } }
                 else { unk(dctx + ": konektor nenalezen - rodic neresolvovan"); }
             } else if (ty == "ATTRIBUTE" || ty == "OPERATION" || ty == "PARAMETER") {
                 var ra = null;
@@ -484,9 +502,9 @@ for (i = 0; i < req.ops.length; i++) {
             else if (tty == "PACKAGETAGGEDVALUE") { var tpk = pkgRow(tt.guid || tt.id, tctx, i); if (tpk && !tpk.own) { addPkgId(tpk.id, name + " (package)"); } }
             else if (tty == "CONNECTORTAGGEDVALUE") {
                 var rtc = null;
-                if (tt.guid) { rtc = rows("SELECT Start_Object_ID FROM t_connector WHERE ea_guid = '" + esc(tt.guid) + "'"); }
-                else if (/^[0-9]+$/.test("" + tt.id)) { rtc = rows("SELECT Start_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(tt.id, 10)); }
-                if (rtc != null && rtc.length == 1) { addEl("" + rtc[0].Start_Object_ID, tctx + ".source", i, name + " (konektor, package source)"); }
+                if (tt.guid) { rtc = rows("SELECT Start_Object_ID, End_Object_ID FROM t_connector WHERE ea_guid = '" + esc(tt.guid) + "'"); }
+                else if (/^[0-9]+$/.test("" + tt.id)) { rtc = rows("SELECT Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(tt.id, 10)); }
+                if (rtc != null && rtc.length == 1) { var tcp = connEndsPkg(rtc[0].Start_Object_ID, rtc[0].End_Object_ID); if (tcp > 0) { addPkgId(tcp, name + " (konektor, package volneho konce)"); } else { unk(tctx + ".source: konce konektoru nezjisteny"); } }
                 else { unk(tctx + ": vlastnik tagu (konektor) neresolvovan"); }
             } else if (tty == "ATTRIBUTETAGGEDVALUE" || tty == "OPERATIONTAGGEDVALUE") {
                 var rta = null;

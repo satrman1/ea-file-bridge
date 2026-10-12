@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "Z11-08-kaskada-allow", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "delete_from_model", "targets": [ { "type": "Element", "guid": "{708D45C6-FF01-46ef-96D3-1EF13C5A791F}" } ] }
+] }

@@ -7,8 +7,12 @@
 // jen jako uzel (B1, O5 = a) a to resi operace samy (FB_OpPackage, FB_OpDelete)
 // a FB_RiskGate (duvod okna "novy balicek pod korenem").
 // Vraci { repoId, repoKnown, entry, problems[], warnings[], blacklist[],
-//         implicit[], protectedIds{}, ancestorIds{}, auditPkg, bridge }:
+//         implicit[], protectedIds{}, ancestorIds{}, auditPkg, bridge,
+//         cascadeDelete }:
 //   problems      vady konfigurace -> E_SCOPE_CONFIG pro vsechny zapisy
+//   cascadeDelete "allow" | "block" (klic polozky; chybi = "block", jina
+//                 hodnota = vada) - kaskady mazani do chranene casti (W2 b/c),
+//                 rozhodnuti Milose 12. 10. 2026 (Z261004b-11)
 //   blacklist[]   { pkg, name, note, allowIncomingRefs, found, id, path, actualName }
 //   implicit[]    { kind "audit"|"addin", id, guid, name, path, note }
 //   protectedIds  Package_ID -> { kind, guid, name, path, note, allowIncomingRefs }
@@ -28,7 +32,7 @@ if (this._fbScopeCfg && typeof this._fbScopeCfg == "object" && this._fbScopeCfg.
     return this._fbScopeCfg;
 }
 var out = { repoId: ridRaw, repoKnown: false, entry: null, problems: [], warnings: [], blacklist: [], implicit: [],
-            protectedIds: {}, ancestorIds: {}, auditPkg: null, bridge: null, checked: { pkg: {}, el: {}, dgm: {} } };
+            protectedIds: {}, ancestorIds: {}, auditPkg: null, bridge: null, cascadeDelete: "block", checked: { pkg: {}, el: {}, dgm: {} } };
 function isArr(v) { return Object.prototype.toString.call(v) == "[object Array]"; }
 function esc(s) { return ("" + s).replace(/'/g, "''"); }
 function rows(sql) { try { return self.FB_XmlRows(Repository.SQLQuery(sql)); } catch (eQ) { return null; } }
@@ -87,6 +91,14 @@ if (isArr(ws)) {
 if (!out.repoKnown) {
     this._fbScopeCfg = out;
     return out; // E_REPO resi volajici (bez auditu - muze jit o cizi repozitar)
+}
+// --- (1b) cascadeDelete (Z261004b-11): chybi = block (fail-closed) ---
+if (typeof out.entry.cascadeDelete == "undefined" || out.entry.cascadeDelete === null) {
+    out.cascadeDelete = "block";
+} else {
+    var cdv = ("" + out.entry.cascadeDelete).toLowerCase();
+    if (cdv == "allow" || cdv == "block") { out.cascadeDelete = cdv; }
+    else { out.cascadeDelete = "block"; out.problems.push("polozka FB_WriteScope pro repozitar '" + out.entry.repo + "': cascadeDelete musi byt \"allow\" nebo \"block\" (je '" + out.entry.cascadeDelete + "')"); }
 }
 // --- (2) blacklist ---
 if (!isArr(out.entry.blacklist)) {

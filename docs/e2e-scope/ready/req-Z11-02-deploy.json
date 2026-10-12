@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z11-02-deploy", "repo": "EA17_Yoga_QEA2.qeax", "ops": [ { "op": "deploy_src" } ] }

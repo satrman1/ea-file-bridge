@@ -48,8 +48,10 @@ var items = [], warns = [];
 this._fbOpProgress = { items: items }; // W3
 var self = this;
 // CIL ZAPISU (rezim blacklist, kap. 5.5, B2): tataz pravidla jako FB_OpConnectors -
-// zdroj existujici zpravy v chranene casti = E_BLACKLIST (i rebuild), novy zdroj
-// v chranene casti = E_BLACKLIST, cil podle allowIncomingRefs; osa vlastniku (I14).
+// pravidlo "oba konce" (v1.2, rozhodnuti Milose 12. 10. 2026): zprava je
+// chranena, jen kdyz jsou OBA jeji konce v chranene casti (i rebuild);
+// presmerovani se posuzuje nad novym parem koncu; cil s allowIncomingRefs:
+// false a volny zdroj = E_BLACKLIST; osa vlastniku (I14).
 function chkEl(el) { try { return self.FB_CheckWriteEl(Repository, el); } catch (eC) { return { code: "E_EXCEPTION", message: "kontrola cile selhala: " + eC.message }; } }
 function allowIn(r) { return !(r && r.branch && r.branch.allowIncomingRefs === false); }
 // --- OPT-IN rebuild mod (audit B2, K3): smaz Sequence konektory diagramu + postav znovu ---
@@ -78,7 +80,7 @@ if (rebuild) {
         return { op: "create_or_update_messages", status: "error", code: "E_EXCEPTION", message: "rebuild: dotaz na zpravy diagramu selhal: " + eRQ.message };
     }
     // pre-check cile VSECH mazanych konektoru PRED prvnim mazanim (zadne parcialni
-    // mazani): zdroj zpravy v chranene casti = E_BLACKLIST (vlastni vazba prvku)
+    // mazani): oba konce zpravy v chranene casti = E_BLACKLIST
     var toDel = [];
     for (var di = 0; di < delRows.length; di++) {
         var dcid = parseInt(delRows[di].Connector_ID, 10);
@@ -86,10 +88,13 @@ if (rebuild) {
         try { dc = Repository.GetConnectorByID(dcid); } catch (eDC) { dc = null; }
         if (dc == null) { continue; }
         var dCli = Repository.GetElementByID(dc.ClientID);
-        var dChk1 = chkEl(dCli);
-        if (dChk1 != null) {
-            return { op: "create_or_update_messages", status: "error", code: dChk1.code,
-                message: "rebuild: zprava " + dcid + " ma zdroj ('" + (dCli ? dCli.Name : "?") + "') v chranene casti - nic nebylo smazano. " + dChk1.message };
+        var dSup = null;
+        try { dSup = Repository.GetElementByID(dc.SupplierID); } catch (eDS) { dSup = null; }
+        var dChk1 = chkEl(dCli), dChk2 = (dSup != null) ? chkEl(dSup) : null;
+        if (dChk1 != null && dChk1.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: dChk1.code, message: "rebuild: zprava " + dcid + ": " + dChk1.message }; }
+        if (dChk1 != null && dChk2 != null) {
+            return { op: "create_or_update_messages", status: "error", code: "E_BLACKLIST",
+                message: "rebuild: zprava " + dcid + " ma oba konce ('" + (dCli ? dCli.Name : "?") + "' -> '" + (dSup ? dSup.Name : "?") + "') v chranene casti - nic nebylo smazano. " + dChk1.message };
         }
         toDel.push({ id: dcid, clientID: dc.ClientID });
     }
@@ -134,28 +139,33 @@ for (var i = 0; i < op.messages.length; i++) {
     }
     var ns = null, nt = null;
     if (conn != null) {
-        var chkRS = chkEl(srcEl);
-        if (chkRS != null) {
-            return { op: "create_or_update_messages", status: "error", code: chkRS.code,
-                message: "messages[" + i + "]: zdroj existujici zpravy ('" + srcEl.Name + "') lezi v chranene casti - zmena zpravy chraneneho prvku neni povolena. " + chkRS.message, items: items };
+        var chkRS = chkEl(srcEl), chkRT = (tgtEl != null) ? chkEl(tgtEl) : null;
+        if (chkRS != null && chkRS.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: chkRS.code, message: "messages[" + i + "]: " + chkRS.message, items: items }; }
+        if (chkRT != null && chkRT.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: chkRT.code, message: "messages[" + i + "]: " + chkRT.message, items: items }; }
+        if (chkRS != null && chkRT != null) {
+            return { op: "create_or_update_messages", status: "error", code: "E_BLACKLIST",
+                message: "messages[" + i + "]: oba konce existujici zpravy ('" + srcEl.Name + "' -> '" + (tgtEl ? tgtEl.Name : "?") + "') lezi v chranene casti - zmena zpravy chranene casti neni povolena. " + chkRS.message, items: items };
         }
+        var chkNS = chkRS, chkNT = chkRT, nsName = srcEl.Name, ntName = tgtEl ? tgtEl.Name : "?";
         if (msg.source) {
             ns = this.FB_ResolveEl(Repository, msg.source);
             if (ns == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + i + "]: novy source nenalezen (" + msg.source + ").", items); }
-            var chkNS = chkEl(ns);
-            if (chkNS != null) {
-                return { op: "create_or_update_messages", status: "error", code: chkNS.code,
-                    message: "messages[" + i + "]: novy zdroj zpravy ('" + ns.Name + "') lezi v chranene casti - presmerovani zdroje neni povolene. " + chkNS.message, items: items };
-            }
+            chkNS = chkEl(ns); nsName = ns.Name;
+            if (chkNS != null && chkNS.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: chkNS.code, message: "messages[" + i + "]: " + chkNS.message, items: items }; }
         }
         if (msg.target) {
             nt = this.FB_ResolveEl(Repository, msg.target);
             if (nt == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + i + "]: novy target nenalezen (" + msg.target + ").", items); }
-            var chkNT = chkEl(nt);
-            if (chkNT != null && (chkNT.code != "E_BLACKLIST" || !allowIn(chkNT))) {
-                return { op: "create_or_update_messages", status: "error", code: chkNT.code,
-                    message: "messages[" + i + "]: novy cil zpravy ('" + nt.Name + "') lezi v chranene vetvi s allowIncomingRefs: false. " + chkNT.message, items: items };
-            }
+            chkNT = chkEl(nt); ntName = nt.Name;
+            if (chkNT != null && chkNT.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: chkNT.code, message: "messages[" + i + "]: " + chkNT.message, items: items }; }
+        }
+        if (chkNS != null && chkNT != null) {
+            return { op: "create_or_update_messages", status: "error", code: "E_BLACKLIST",
+                message: "messages[" + i + "]: oba konce zpravy po presmerovani ('" + nsName + "' -> '" + ntName + "') lezi v chranene casti. " + chkNS.message, items: items };
+        }
+        if (msg.target && chkNT != null && chkNS == null && !allowIn(chkNT)) {
+            return { op: "create_or_update_messages", status: "error", code: "E_BLACKLIST",
+                message: "messages[" + i + "]: novy cil zpravy ('" + ntName + "') lezi v chranene vetvi s allowIncomingRefs: false. " + chkNT.message, items: items };
         }
     } else {
         var chkS = chkEl(srcEl), chkT = chkEl(tgtEl);

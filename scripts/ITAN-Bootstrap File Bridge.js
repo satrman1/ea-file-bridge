@@ -360,7 +360,7 @@ function main() {
     if (parSynced > 0) {
         Session.Output("POZOR: " + parSynced + " operaci melo v modelu jiny seznam parametru nez hlavicka souboru (radky PX vyse) - bez tohoto srovnani by EA runtime i pumpa volaly nove telo se starymi parametry (FB-PU-01). Po restartu spust kontrolni dotaz parametru (NAVOD-NASAZENI-KLIKACI.md).");
     }
-    Session.Output("DALSI KROKY: 1) zkontroluj configy v src (FB_Whitelist/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,");
+    Session.Output("DALSI KROKY: 1) zkontroluj configy v src (FB_WriteScope/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,");
     Session.Output("2) PLNY restart EA (kod EA runtime) a spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.");
 }
 

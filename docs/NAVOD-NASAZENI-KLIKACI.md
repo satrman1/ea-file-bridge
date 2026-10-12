@@ -1,6 +1,6 @@
 # Nasazení EA File Bridge — klikací návod (bez terminálu)
 
-Verze **v1.2**, 2026-10-10 (vlákno Z261004b-1, pojistka nasazení FB-PU-01 — ověřeno živě doma; v1.1 2026-09-10 vlákno Z260908-5, po živém nasazení v bance) · Kód: **v0.14 + opravy `d53164c`/`47fdbb2`** (`docs/PROTOKOL-EAFB.md` v0.14, registr **42 operací**, harness 248/248) · **Proveden: Miloš, v bance St 10. 9. 2026 — PASS s nálezy** (`docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`); v1.1 zapracovává korekce z K8 QEAX (`docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`) a z banky (N-B-1…10)
+Verze **v1.3**, 2026-10-12 (vlákno Z261004b-11, cíl zápisu — režim **blacklist** místo whitelistu; v1.2 2026-10-10 vlákno Z261004b-1, pojistka nasazení FB-PU-01; v1.1 2026-09-10 vlákno Z260908-5, po živém nasazení v bance) · Kód: **v0.17 (cíl zápisu)** (`docs/PROTOKOL-EAFB.md`, registr **42 operací**, harness 519/519) · **Proveden: Miloš, v bance St 10. 9. 2026 — PASS s nálezy** (`docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`, tehdy v0.14 s whitelistem); v1.3 ještě v bance neproběhla — nasazení v bance je samostatný krok Miloše (zadání `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` v1.2)
 
 > **Co tenhle soubor je.** Postup v pořadí, v jakém se to v bance skutečně klikne — od pullu kurýrního klonu po první ping. Žádný terminál: git jde přes **VS Code → Source Control**, kód do modelu přes **EA UI**, dávky přes **pumpu (dvojklik)** nebo **schránku (menu v EA)**.
 > **Co tenhle soubor NENÍ.** Není to protokol testu (ty jsou `docs/e2e-pumpa/PROTOKOL-E2E-PUMPA.md` a `docs/e2e-k8-qeax/PROTOKOL-K8.md`) ani plán fáze 2 POC (`docs/NAVOD-NASAZENI-BANKA.md`, který na tenhle návod odkazuje).
@@ -14,22 +14,23 @@ Verze **v1.2**, 2026-10-10 (vlákno Z261004b-1, pojistka nasazení FB-PU-01 — 
 | `<PROD-DB>` | název **produkční** databáze (jen abys ji poznal — nic se na ni nenasazuje) |
 | `<KLON>` | cesta kurýrního klonu, např. `C:\work\transfer\ea-file-bridge` |
 | `<KORP>` | cesta pracovní kopie korporátního repa |
-| `<AI-SANDBOX>` | package, kam smí AI zapisovat (whitelist větev) |
+| `<PROTECTED-PKG-1>`, `<PROTECTED-PKG-2>`… | GUIDy balíčků na **blacklistu** (`FB_WriteScope`, 5.2) — větve, kam AI nesmí (každá chrání celý svůj podstrom). Od v0.17 (12. 10. 2026) nahrazují `<AI-SANDBOX>` (whitelist zanikl) |
+| `<AI-SANDBOX>` | *(historicky, do v0.16)* package, kam směla AI zapisovat (whitelist větev). Od v0.17 **nic takového není** — AI zapisuje kamkoli, kam ji pustí EA security, kromě blacklistu; pracovní prostor určuje kit agenta a zámky, ne kód |
 | `<AI-LOG>` | package auditu (Artifacty `FB <id>`) |
 | `<WRITE-GROUP>` | název EA security skupiny s právem na write fíčury |
 | `<GUID-AILOG>` | GUID package `<AI-LOG>` — od v0.14 **povinný** ve `FB_Config.auditPkg` (audit jinak padá do PRVNÍ package jménem `#AI-LOG`) |
 
 > **Dosazování v bance (od 10. 9.):** dávky s placeholdery `<TEST-DB>`, `<GUID-SANDBOX>`, `<GUID-AILOG>`, `<WRITE-GROUP>`, `<LOGIN>` se do `requests\` NEkopírují ručně — vloží se do `<KORP>\banka-ready\` a dvojklik `tools\banka-dosad.cmd` je dosadí z `config\banka-hodnoty.json` (gitignored; v bance ho napsal Copilot podle promptu). Ruční nahrazování vedlo 2× k `E_REPO`/prázdnému výsledku.
 
-**Zásada celého nasazení:** na `<PROD-DB>` se nenasazuje ani nespouští nic. Whitelist i dávky jsou vázané na `<TEST-DB>`; při neshodě executor odmítne (`E_REPO`) a neprovede ani audit.
+**Zásada celého nasazení:** na `<PROD-DB>` se nenasazuje ani nespouští nic. Konfigurace cíle zápisu (`FB_WriteScope`, blacklist) i dávky jsou vázané na `<TEST-DB>`; při neshodě executor odmítne (`E_REPO`) a neprovede ani audit.
 
 ## Před startem si připrav (5 minut)
 
 - [ ] VS Code s přístupem ke **kurýrnímu klonu** i k **pracovní kopii korporátního repa** (kanál: `PROBLEMS/kuryrni-kanal-prenos-repa.md`, fáze D–F).
 - [ ] EA připojená na **`<TEST-DB>`** (title bar zkontroluj pohledem).
 - [ ] Vědět, **jestli má repozitář zapnutou EA security** (Configure → Security). Rozhoduje o krocích 3.3 a 5.4.
-- [ ] Vědět, do jakého package smí AI zapisovat (`<AI-SANDBOX>`) a kde je `<AI-LOG>`.
-- [ ] **Záloha:** existující baseline / snapshot dle zvyklostí repozitáře. Bridge sám dělá session baseline whitelistovaných packages při startu pumpy, ale to je až druhá pojistka.
+- [ ] Vědět, **do kterých větví AI nesmí** (`<PROTECTED-PKG-1>`… — kandidáti: master katalogy, `#Template structure`, šablony, cokoli citlivé i pro lidi s širokými právy) a kde je `<AI-LOG>`. **Od v0.17 AI zapisuje všude jinde, kam ji pustí EA security** — i do cizího nezamčeného balíčku (5.2).
+- [ ] **Záloha:** existující baseline / snapshot dle zvyklostí repozitáře. Bridge zálohuje automaticky až **před každým zápisem nad cílovým balíčkem** (Baseline politika); session baseline při startu pumpy se od v0.17 nedělá.
 
 ---
 
@@ -56,7 +57,7 @@ Tyhle soubory nesou lokální hodnoty, které do repa nikdy nešly. Po překopí
 
 | Soubor | Co je bankovní adaptace |
 |---|---|
-| `src\AICodeBridge.FB_Whitelist.js` | položka `{ repo: "<TEST-DB>", pkg: "{GUID <AI-SANDBOX>}" }` |
+| `src\AICodeBridge.FB_WriteScope.js` | položka `{ repo: "<TEST-DB>", cascadeDelete: "block", blacklist: [ { pkg: "{<PROTECTED-PKG-1>}", name: "<jméno>", note: "<proč>" }, … ] }` (od v0.17; `FB_Whitelist.js` v `src\` už není — osiřelou operaci `FB_Whitelist` v modelu nech být, nikdo ji nevolá) |
 | `src\AICodeBridge.FB_Config.js` | položka `{ repo: "<TEST-DB>", baseDir/srcDir, navProbe: false }` |
 | `src\AICodeBridge.FB_OpsAllowed.js` | položka `<TEST-DB>` s **deny** dle 5.3 |
 | `src\AICodeBridge.FB_AccessGroups.js` | položka `{ repo: "<TEST-DB>", writeGroups: ["<WRITE-GROUP>"] }` |
@@ -94,7 +95,7 @@ Kód executoru žije **jako operace elementu `AICodeBridge`** (stereotyp `Javasc
 - **JAK:**
   1. Najdi element **AICodeBridge** → pravým → **Copy / Paste → Copy**.
   2. Otevři **`<TEST-DB>`** → pravým na cílový package (kam patří add-iny) → **Copy / Paste → Paste Element(s)…** → v dialogu zvol **Full Structure for Duplication** → **OK**.
-- **OČEKÁVANÝ VÝSLEDEK:** pod cílovým packagem je nový **AICodeBridge**; dvojklik → záložka **Operations** ukazuje řádově **100+ operací** (`FB_Main`, `FB_Whitelist`, `EA_MenuClick`, `EA_GetMenuItems`…). Vendor add-iny, které v modelu už jsou, **nesahat**.
+- **OČEKÁVANÝ VÝSLEDEK:** pod cílovým packagem je nový **AICodeBridge**; dvojklik → záložka **Operations** ukazuje řádově **130 operací** (`FB_Main`, `FB_WriteScope`, `EA_MenuClick`, `EA_GetMenuItems`…). Vendor add-iny, které v modelu už jsou, **nesahat**. **Od v0.17 musí být `AICodeBridge` v balíčku, kde kromě add-inů (elementy `JavascriptAddin`) nic jiného není — žádné podbalíčky, žádné cizí prvky** (bridge ten balíček implicitně chrání; cizí obsah = `E_SCOPE_CONFIG`, 5.2).
 - **KDYŽ SELŽE:** pokračuj rovnou 2.2 a **zapiš, na čem to spadlo**.
 
 ## 2.2 ITAN-Bootstrap (kód z disku)
@@ -162,7 +163,8 @@ Kód executoru žije **jako operace elementu `AICodeBridge`** (stereotyp `Javasc
   1. **kdo smí add-in používat** = aktivace v Manage Add-Ins (3.1),
   2. **kdo smí write fíčury** = členství ve skupině dle `FB_AccessGroups` → jinak `E_ADDIN_ACCESS`,
   3. **kam smí zapisovat** = balíčková práva EA (platí i přes API; bridge chybu jen překládá → `E_PERMISSION` / `E_LOCKED`),
-  4. **co smí AI kanál** = `FB_Whitelist` + `FB_OpsAllowed`.
+  4. **co smí AI kanál** = `FB_OpsAllowed` + **blacklist** `FB_WriteScope` (od v0.17; do v0.16 whitelist `FB_Whitelist`).
+- **DŮSLEDEK VRSTVY 3 V BANCE (od v0.17, zadání cíle zápisu kap. 2 bod 3):** dosah AI = práva uživatele, pod kterým bridge běží. Testovací repozitář běží ve **standardním režimu security** (zámky skupin a uživatelů, ne „Require User Lock to Edit"): **nezamčený balíček je zapisovatelný každým, tedy i AI do cizího pracovního balíčku.** Kdo má přístup do zamčených balíčků, tomu je ani AI nezastaví — zastaví ji jen blacklist. Proto blacklist musí krýt i to, co je citlivé pro privilegované uživatele, ne jen to, co je zamčené. **Doporučení správci:** balíček add-inu (`AICodeBridge`) a balíček auditu zamknout pro správce (bridge je chrání před dávkou, ne před ruční editací v EA).
 
 ---
 
@@ -222,13 +224,24 @@ Všech šest je zároveň **chráněný element** (`PROTOKOL-EAFB.md` §8 bod 8)
 - **Pole:** `repo` = podřetězec identity repozitáře (u MS SQL **název databáze**, viz 5.2); `baseDir` = kořen výměnných složek — **v bance nastav na `<KORP>`**, aby schránkový kanál a *Stav bridge* ukazovaly tutéž složku, kterou čte pumpa (ta čte `requests\` **vedle `pump.wsf`** bez ohledu na baseDir; bez baseDir ukazuje EA default `%USERPROFILE%\Documents\EA-File-Bridge\…` a dávky pak končí ve špatné složce); `srcDir` = složka kanonu kódu; `navProbe: false` (spike menu do banky nepatří); **`auditPkg` = GUID package `<AI-LOG>` — od v0.14 povinný** (bez něj jde audit do první package jménem `#AI-LOG`; K8 N-K8-3).
 - **OČEKÁVANÝ VÝSLEDEK:** po bootstrapu a restartu ukáže menu **Stav bridge** správnou složku výměny.
 
-## 5.2 `FB_Whitelist` — kam smí zápis
+## 5.2 `FB_WriteScope` — kam zápis NESMÍ (blacklist; od v0.17 místo `FB_Whitelist`)
 
-- **CO:** vymezit jedinou větev modelu, do které smí AI kanál zapisovat.
-- **KDE:** `<KORP>\src\AICodeBridge.FB_Whitelist.js`.
-- **JAK:** položka `{ repo: "<TEST-DB>", pkg: "{GUID <AI-SANDBOX>}" }`. GUID zjistíš **čtecí dávkou** (6.1 krok „ping"), nebo dotazem správce nad `t_package`.
-- **KLÍČOVÉ — identita repozitáře je NÁZEV DATABÁZE, ne cesta k `.qea` zástupci** (upgrade v0.1 → v0.2, přesný postup v `NAVOD-NASAZENI-BANKA.md` §6). Executor si název zjistí sám (`FB_RepoId` → `DB_NAME()`), takže položka funguje na **každé stanici** bez ohledu na to, jak se lokální zástupce jmenuje a kde leží. Testovací repozitář vzniká **klonem produkčního** → package GUIDy jsou v obou stejné a **GUID sám instanci nerozliší**; proto je identita databáze povinná druhá polovina klíče.
-- **OČEKÁVANÝ VÝSLEDEK:** zápis projde jen když identita obsahuje `<TEST-DB>` **a zároveň** sedí GUID package. Jinak `E_REPO` (nesedí repo — neprovede se nic, ani audit) nebo `E_WHITELIST` (správné repo, package mimo větev).
+- **CO:** vymezit větve modelu, do kterých AI kanál **nesmí** (každá chrání celý svůj podstrom). Všude jinde AI zapisuje, kam ji pustí EA security (vrstva 3, 3.3). Režim whitelist (`FB_Whitelist`, jediná povolená větev `<AI-SANDBOX>`) **zanikl 12. 10. 2026 (v0.17, rozhodnutí O1 = b)** — žádný přechodný režim.
+- **KDE:** `<KORP>\src\AICodeBridge.FB_WriteScope.js`.
+- **JAK:** položka
+  ```js
+  { repo: "<TEST-DB>", cascadeDelete: "block",
+    blacklist: [ { pkg: "{<PROTECTED-PKG-1>}", name: "<jméno balíčku>", note: "<proč je chráněný>" },
+                 { pkg: "{<PROTECTED-PKG-2>}", name: "<jméno>", note: "<proč>" } ] }
+  ```
+  GUIDy zjistíš **čtecí dávkou** (`find_packages_by_name`, `get_packages_information`) nebo dotazem správce nad `t_package`. `name` je povinné (druhá polovina klíče — překlep v GUIDu by jinak tiše vypnul ochranu), `note` se ukazuje v chybě a v pingu. **Prázdný blacklist se píše výslovně** (`blacklist: []`). Volitelné `allowIncomingRefs: false` u položky zakáže i novou vazbu z volné části do té větve (výchozí `true`).
+- **`cascadeDelete`:** co s mazáním **volného** objektu, které by kaskádou EA sáhlo do chráněné části (objekt leží na chráněném diagramu → EA ho z něj odstraní; objekt je klasifikátorem instancí v chráněné části → EA jim nastaví `Classifier = 0`): **v bance `"block"`** (= `E_BLACKLIST` v předběžné kontrole, nic se neprovede); doma `"allow"` (povolit s důrazným varováním — výčet kaskád je v potvrzovacím okně). Chybí-li klíč, platí `block`.
+- **Implicitně chráněno vždy, i s prázdným blacklistem:** balíček auditu (`FB_Config.auditPkg` — **povinný**, bez něj `E_SCOPE_CONFIG`) a balíček, ve kterém leží element `AICodeBridge` (oba dědičně na podstrom); kořeny modelu jen jako uzel (nejdou smazat ani přejmenovat, nový balíček přímo pod kořenem = potvrzovací okno).
+- **KLÍČOVÉ — identita repozitáře je NÁZEV DATABÁZE, ne cesta k `.qea` zástupci** (přesný postup v `NAVOD-NASAZENI-BANKA.md` §6). Executor si název zjistí sám (`FB_RepoId` → `DB_NAME()`), takže položka funguje na **každé stanici** bez ohledu na to, jak se lokální zástupce jmenuje a kde leží. Testovací repozitář vzniká **klonem produkčního** → package GUIDy jsou v obou stejné a **GUID sám instanci nerozliší**; proto je identita databáze povinná druhá polovina klíče.
+- **Kontrola konfigurace (start session, ping, každá zápisová dávka):** chybějící klíč `blacklist`, GUID, který v repozitáři není (hláška říká, jestli balíček toho jména existuje s jiným GUID — překlep), jméno nesedí, chybějící `auditPkg`, balíček add-inu s cizím obsahem (jiný typ prvku nebo podbalíček), `cascadeDelete` mimo `allow|block` → **`E_SCOPE_CONFIG` pro všechny zápisy v repozitáři, čtení běží**. Cena přiznaná: smazaný chráněný balíček zastaví všechny zápisy, dokud správce konfiguraci neopraví (bootstrap). Dávka složená **jen z `deploy_src`** vadnou konfiguraci neblokuje (opravný kanál — v bance je `deploy_src` v deny, takže tam platí jen bootstrap).
+- **Vazby a zámky — co správce musí vědět (živě ověřeno 12. 10. 2026, FB-CZ-22):** zámek EA (skupinový zámek balíčku) přes Automation hlídá **prvky** (založení `E_PERMISSION`, změna `E_LOCKED`), ale **vazby vůbec** — vazba ze zamčeného prvku i do něj vznikne, dá se přejmenovat i smazat. Bridge zámky u vazeb **nekontroluje** (rozhodnutí Miloše 12. 10. 2026: směr vazby je dán logikou řešení, ne vlastnictvím). Pro blacklist platí: **vazba je chráněná, jen když jsou oba její konce v chráněné části**; s jedním koncem venku ji AI smí založit, změnit i smazat, ať vede kterýmkoli směrem.
+- **Standardní režim security = AI zapisuje i do cizích nezamčených balíčků** (3.3, poslední odrážka). Pracovní prostor analytika drží kit agenta („Zapíšu do: …") a zámky, které správce přiděluje ručně — ne kód.
+- **OČEKÁVANÝ VÝSLEDEK:** zápis do volného balíčku projde (o zbytku rozhodne EA security: `E_PERMISSION` / `E_LOCKED`); zápis do chráněné větve skončí `E_BLACKLIST` **v předběžné kontrole** (před oknem i zálohou, nic se neprovede, dávka v `rejected\`, audit v `<AI-LOG>` se zapíše); identita mimo `<TEST-DB>` → `E_REPO` (nic, ani audit); vadná položka → `E_SCOPE_CONFIG`.
 
 ## 5.3 `FB_OpsAllowed` — které operace jsou povolené
 
@@ -241,7 +254,7 @@ Všech šest je zároveň **chráněný element** (`PROTOKOL-EAFB.md` §8 bod 8)
            "remove_elements_from_diagram", "clone_package", "clone_elements",
            "deploy_src"] }
   ```
-- **Mechanika:** čtecí operace jsou povolené **vždy** (whitelist se na ně nevztahuje). Zápisové projdou jen když je repo v seznamu a operace projde `allow`/`deny`; **`deny` má přednost**. Repozitář **bez položky = žádný zápis** (fail-secure).
+- **Mechanika:** čtecí operace jsou povolené **vždy** (whitelist operací ani blacklist balíčků se na ně nevztahuje). Zápisové projdou jen když je repo v seznamu a operace projde `allow`/`deny`; **`deny` má přednost**. Repozitář **bez položky = žádný zápis** (fail-secure).
 - **TRVALE V DENY V BANCE:** `deploy_src` (nasazení kódu je výhradně dev operace — v bance kód mění bootstrap, což je vědomý ruční úkon), `delete_from_model`, `clone_package`, `clone_elements`. Delete operace se zapínají nejdřív v P2+, a to rozhodnutím, ne mimochodem.
 - **OČEKÁVANÝ VÝSLEDEK:** dávka s `deploy_src` skončí `E_OP_FORBIDDEN` a nic nezapíše.
 
@@ -275,14 +288,14 @@ Všech šest je zároveň **chráněný element** (`PROTOKOL-EAFB.md` §8 bod 8)
 
 - **CO:** dostat upravené soubory z disku do modelu.
 - **JAK:** spusť znovu **ITAN-Bootstrap** (2.2, tentokrát už jen doplní kód — element existuje) → **plný restart EA** (krok 4) → **kontrola parametrů** (4a; po opakovaném bootstrapu musí být `Parametry: 0 operaci srovnano` a 0 rozdílů).
-- **OČEKÁVANÝ VÝSLEDEK:** menu **Specialize → AI Bridge → Stav bridge (kam zapisuje / co cte)** ukáže identitu repozitáře, whitelist packages **s plnou cestou** a složku výměny. Když tam vidíš `<TEST-DB>` a `<AI-SANDBOX>`, configy jsou v modelu.
+- **OČEKÁVANÝ VÝSLEDEK:** menu **Specialize → AI Bridge → Stav bridge (kam zapisuje / co cte)** ukáže identitu repozitáře, **chráněné větve blacklistu s plnou cestou a GUIDem**, implicitní ochranu (balíček auditu, balíček add-inu), režim kaskád mazání a složku výměny. Když tam vidíš `<TEST-DB>` a `<PROTECTED-PKG-1>` s cestou, configy jsou v modelu. Řádek `CHYBA KONFIGURACE (E_SCOPE_CONFIG …)` = oprav 5.2 a nasaď znovu.
 - **KONTROLA, KTEROU NEPŘESKAKUJ:** dokud je v configu placeholder (`<TEST-DB>` doslova), **žádný zápis neprojde** — `E_REPO`. To je fail-secure, ne porucha.
 
 ---
 
 # 6. První ping — oběma kanály
 
-Ping je **kotva session**: vrací identitu repozitáře, rozvinutý whitelist s cestami a stav přístupu. Pusť ho **oběma kanály**, protože každý se chová jinak.
+Ping je **kotva session**: vrací identitu repozitáře, blok **`writeScope`** (režim blacklist, chráněné větve s cestami, implicitní ochrana, stav konfigurace, `cascadeDelete`, lidská věta `summary` a pravidla pro agenta `agentNotes`) a stav přístupu. Pusť ho **oběma kanály**, protože každý se chová jinak.
 
 **Dávka (obě varianty stejná, jen `id` a `echo` měň):**
 ```json
@@ -292,19 +305,19 @@ Ping je **kotva session**: vrací identitu repozitáře, rozvinutý whitelist s 
 
 ## 6.1 Pumpou
 
-- **CO:** ověřit souborový kanál a session baseline.
+- **CO:** ověřit souborový kanál a hlášení cíle zápisu na startu session.
 - **KDE:** `<KORP>\pump.wsf`; EA s otevřeným `<TEST-DB>` musí běžet (a **jediná** — pumpa se připojí na první instanci).
 - **JAK:**
   1. **Dvojklik `pump.wsf`.** Když Windows nabídne výběr aplikace, zvol **Microsoft ® Windows Based Script Host** (není to blokace).
   2. Ulož dávku jako `req-banka-ping-01.json` do **`<KORP>\requests\`** (vedle `pump.wsf` — pumpa čte jen tu; *Stav bridge* ukazuje `baseDir` z 5.1, který má být totéž). V bance přes `banka-ready\` + `tools\banka-dosad.cmd` (viz Placeholdery).
   3. Počkej ~2 s.
 - **OČEKÁVANÝ VÝSLEDEK:**
-  - **konzole pumpy** hlásí verzi, **připojený repozitář** (pohledem zkontroluj, že je tam `<TEST-DB>`, ne `<PROD-DB>`), **počet načtených operací** (Code loader, ~105) a **`Session baseline: 1 vytvoren`**, pak `Zpracovavam req-banka-ping-01.json` / `Hotovo … -> res-banka-ping-01.json`;
-  - v `responses\` je `res-banka-ping-01.json` se `"status": "done"`, `"repository"` = `<TEST-DB>` a v `results[0]` pole `echo`, `eaVersion`, **`whitelist[]`** (položky s `guid`, `name`, **`path` plnou cestou**) a **`access{level, securityEnabled, reason}`**;
+  - **konzole pumpy** hlásí verzi, **připojený repozitář** (pohledem zkontroluj, že je tam `<TEST-DB>`, ne `<PROD-DB>`), **počet načtených operací** (Code loader, ~130) a řádek **`Zapis: blacklist (N chranenych vetvi) | EA security zapnuta | chraneno: <cesty> | bridge chrani i sam sebe: <cesty> | kaskady mazani do chranene casti: zakazane …`** (od v0.17; `Session baseline: … vytvoren` už není — session baseline se nedělá), pak `Zpracovavam req-banka-ping-01.json` / `Hotovo … -> res-banka-ping-01.json`;
+  - v `responses\` je `res-banka-ping-01.json` se `"status": "done"`, `"repository"` = `<TEST-DB>` a v `results[0]` pole `echo`, `eaVersion`, **`writeScope{mode: "blacklist", securityEnabled, cascadeDelete, summary, blacklist[{guid, name, path, note, found, allowIncomingRefs}], implicit[], problems[], warnings[], agentNotes[]}`** (pole `whitelist[]` od v0.17 není) a **`access{level, securityEnabled, reason}`**;
   - **Output tab „AI Bridge"** má jeden řádek `FB banka-ping-01 -> done: 1 ops (1 ok, 0 chyb)`;
   - **schránka se nezmění** a nikde není text `EAFB OK …`.
 - **DŮLEŽITÉ — to poslední je správně, ne chyba:** **pumpa chatovou verzi ACK nerenderuje** (zjištění E2E 4. 9. 2026, `docs/e2e-pumpa/PROTOKOL-E2E-PUMPA.md` P2). Identita výsledků je pro pumpu **výhradně v `res-*.json`**. Chat ACK dělá jen schránkový kanál (`FB_ClipboardImport`) a vrátný.
-- **Hláška „POZOR: … žádná whitelist položka"** = whitelist nesedí na připojený repozitář (špatný krok 5.2, nebo je v EA otevřený jiný projekt). **Zastav se a oprav**, nepokračuj.
+- **Hláška „POZOR: repozitar nema polozku ve FB_WriteScope"** = konfigurace nesedí na připojený repozitář (špatný krok 5.2, nebo je v EA otevřený jiný projekt); **„CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG …)"** = položka je vadná (hláška říká co). **Zastav se a oprav**, nepokračuj.
 
 ## 6.2 Schránkou
 
@@ -319,7 +332,7 @@ Ping je **kotva session**: vrací identitu repozitáře, rozvinutý whitelist s 
     ```
     EAFB OK banka-ping-02: 1/1 ops | ping: EA <verze>, repo <TEST-DB>
     ```
-    plus rozvinutý **whitelist s plnou cestou** a řádek `access` (u zapnuté security `level` + `login`/`groups` se **nerenderují** — datová minimalizace);
+    plus segment **`zapis: blacklist (N chranenych vetvi, EA security zapnuta): <cesty chráněných větví>`** a řádek `access` (u zapnuté security `level` + `login`/`groups` se **nerenderují** — datová minimalizace);
   - **tentýž text je ve schránce** (`Ctrl+V` do libovolného okna to potvrdí);
   - plná odpověď je v `responses\res-banka-ping-02.json`.
 - **Když se ACK ve schránce neobjeví, ale dialog ano:** je to známé chování zápisu do schránky z EA runtime — `FB_ClipboardImport` má read-back ověření a fallback přes `clip.exe`. **Dialog je autoritativní**, obsah si z něj přečteš i tak.
@@ -327,12 +340,15 @@ Ping je **kotva session**: vrací identitu repozitáře, rozvinutý whitelist s 
 ## 6.3 Co ping musí potvrdit, než jdeš dál
 
 - [ ] `repository` = **`<TEST-DB>`** (ne `<PROD-DB>`, ne název zástupce)
-- [ ] `whitelist[]` obsahuje `<AI-SANDBOX>` s **plnou cestou**, která odpovídá tomu, co vidíš v Project Browseru
+- [ ] `writeScope.mode` = `blacklist`, `writeScope.repoKnown` = `true`, `writeScope.problems` je **prázdné** (jinak `E_SCOPE_CONFIG` — oprav 5.2)
+- [ ] `writeScope.blacklist[]` obsahuje **každý** `<PROTECTED-PKG-n>` s `found: true` a **plnou cestou**, která odpovídá tomu, co vidíš v Project Browseru (položka s `found: false` = překlep v GUIDu nebo smazaný balíček — ping ji nikdy tiše nezahodí)
+- [ ] `writeScope.implicit[]` má dvě položky: `audit` (cesta k `<AI-LOG>`) a `addin` (balíček, kde leží `AICodeBridge`)
+- [ ] `writeScope.cascadeDelete` = `block` (bankovní šablona)
+- [ ] `writeScope.securityEnabled` = `true` (jen informativní — bridge security nekontroluje; `false` by znamenalo, že jedinou hranicí zápisu je blacklist)
 - [ ] `access` odpovídá realitě (security zapnutá → `securityEnabled: true`; ty jsi členem `<WRITE-GROUP>` → write)
-- [ ] Code loader v konzoli pumpy hlásí ~105 operací (ne 16, ne 0)
-- [ ] `Session baseline: 1 vytvoren`
+- [ ] Code loader v konzoli pumpy hlásí ~130 operací (ne 16, ne 0); řádek `Zapis: blacklist …` na startu session říká totéž co `writeScope.summary`
 
-Teprve pak má smysl pouštět zápisovou dávku.
+Teprve pak má smysl pouštět zápisovou dávku. **Kontrola blacklistu naostro (doporučeno):** čtecí dávkou nic nezjistíš — pošli malý zápis (`create_or_update_package` s `parent` = `<PROTECTED-PKG-1>`) a očekávej `E_BLACKLIST` v předběžné kontrole (nic se neprovede, dávka v `rejected\`, audit v `<AI-LOG>`).
 
 ### 6.4 Čtecí recon po pingu (od v1.1 — K8 6.3 + banka)
 
@@ -372,8 +388,27 @@ Nejčastější příčina po přenosu z jiného modelu: **cizí `SignalGUID`**.
 ## 7.3 `E_REPO`
 
 - **Znamená:** deklarace `repo` v dávce nesedí na **připojený** repozitář. Neprovede se nic — **ani audit**. Je to správné chování ochrany, ne porucha.
-- **Řešení:** zkontroluj v tomhle pořadí: (1) **který projekt je v EA otevřený** (title bar), (2) `repo` v dávce, (3) položka ve `FB_Whitelist` — nezůstal tam placeholder? Chat ACK u `E_REPO` **pojmenuje připojený repozitář**, takže se dá opravit hned.
-- **Když se to stane u pumpy:** konzole hlásí `POZOR: … žádná whitelist položka`. Zastav se — nespouštěj další dávky.
+- **Řešení:** zkontroluj v tomhle pořadí: (1) **který projekt je v EA otevřený** (title bar), (2) `repo` v dávce, (3) položka ve `FB_WriteScope` (a ostatních pěti configech) — nezůstal tam placeholder? Chat ACK u `E_REPO` **pojmenuje připojený repozitář**, takže se dá opravit hned.
+- **Když se to stane u pumpy:** konzole hlásí `POZOR: repozitar nema polozku ve FB_WriteScope`. Zastav se — nespouštěj další dávky.
+
+## 7.3a `E_BLACKLIST` (od v0.17)
+
+- **Znamená:** cíl dávky (balíček, prvek, diagram, oba konce vazby, zdroj klonu, podstrom mazaného balíčku, kaskáda mazání při `cascadeDelete: "block"`) leží v chráněné části — na blacklistu, v balíčku auditu nebo v balíčku add-inu. Hláška nese **plnou cestu cíle, chráněnou větev a `note`** z konfigurace. Přijde **v předběžné kontrole**: nic se neprovedlo, žádné okno, žádná záloha, dávka je v `rejected\`, **audit v `<AI-LOG>` se zapsal** (pokus o zápis do chráněné části je bezpečnostně zajímavý).
+- **Řešení:** je to správné chování, ne porucha. Agent má dávku **neopakovat ani nedělit** a požádat o jiný cíl. Když má být cíl opravdu zapisovatelný, položku z `FB_WriteScope` odebere správce (bootstrap + restart) — rozhodnutí, ne mimochodem.
+
+## 7.3b `E_SCOPE_CONFIG` (od v0.17)
+
+- **Znamená:** konfigurace cíle zápisu je vadná (5.2: chybí `blacklist`, GUID v repozitáři není, jméno nesedí, chybí `auditPkg`, balíček add-inu obsahuje cizí obsah, `cascadeDelete` mimo `allow|block`). **Všechny zápisy v repozitáři stojí, čtení běží.** Vidíš to už na startu pumpy (`CHYBA konfigurace cile zapisu …`), v pingu (`writeScope.problems[]`) i ve *Stav bridge*.
+- **Řešení:** oprav `FB_WriteScope.js` / `FB_Config.js` v `<KORP>\src\` podle výčtu vad → bootstrap → plný restart EA + pumpy → ping. V bance není jiná cesta (`deploy_src` je v deny); doma opravu nese dávka jen s `deploy_src`.
+
+## 7.3c `E_AMBIGUOUS` u jména nebo cesty (od v0.17)
+
+- **Znamená:** jméno v zápisové operaci (nebo úroveň cesty `{ "path": […] }`) odpovídá víc objektům — bridge nebere „první shodu". Odpověď nese `guids[]` a `candidates[{guid, path}]` (nejvýš 10). Chybějící úroveň cesty = `E_NOT_FOUND` s nejhlubší nalezenou úrovní a jmény jejích podbalíčků.
+- **Řešení:** agent vybere kandidáta s člověkem a pošle GUID nebo cestu. Čtecí operace vrací první shodu a varování.
+
+## 7.3d `E_WHITELIST` (zaniklo)
+
+- Kód z režimu whitelist (do v0.16). Od v0.17 **nikdy nepřijde**; starší kity a dávky, které s ním počítají, přepsat na `E_BLACKLIST`.
 
 ## 7.4 `E_PERMISSION` / `E_LOCKED` — balíčková práva
 
@@ -392,7 +427,7 @@ Chysta se SMAZAT 1 prvek z modelu.
 Balicky: <jméno>
 Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 ```
-- **Než klikneš Ano:** cesta musí začínat stejně jako `path` ve whitelistu z pingu (6.1) a končit jménem toho, co má zmizet. Při více cílech jsou cesty jako odrážky.
+- **Než klikneš Ano:** cesta musí ležet tam, kde ji čekáš (porovnej s Project Browserem) a **nesmí** začínat cestou žádné chráněné větve z pingu (6.1) — to by ostatně dávka skončila `E_BLACKLIST` ještě před oknem. Při více cílech jsou cesty jako odrážky. Blok `POZOR - smazani sahne kaskadou EA do CHRANENE casti …` (jen při `cascadeDelete: "allow"`, v bance nikdy) vyjmenovává chráněné diagramy a instance, kterých se smazání dotkne — záloha je nekryje.
 - **Storno / timeout** = dávka **čeká dál** v `pending\`, přežije i restart EA a pumpy. Zamítnutí = `E_RISK_REJECTED`, dávka jde do `rejected\` a **zapíše se audit**.
 - **Nonce ani plný hash nikdy neopouštějí `res-*.json`** — do chatu jde maximálně `hashPrefix` (12 znaků). Kdyby ti někdo (nebo něco) tvrdilo opak, je to pokus o obejití potvrzení.
 
@@ -427,7 +462,9 @@ Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 | Windows: „Vyberte aplikaci pro .wsf" | Microsoft ® Windows Based Script Host |
 | Dvě EA běží zároveň | pumpa se připojí na **první** — zavři, co nepotřebuješ, a pumpu spusť znovu |
 | Pumpa i schránka zároveň | nikdy — oba čtou `requests\`. Před schránkou pumpu zavři |
-| Pumpa hlásí `POZOR: … žádná whitelist položka` po startu | configy ještě nejsou v modelu (blok 5) — před configy je to očekávané; po nich = špatná identita v 5.2 |
+| Pumpa hlásí `POZOR: repozitar nema polozku ve FB_WriteScope` po startu | configy ještě nejsou v modelu (blok 5) — před configy je to očekávané; po nich = špatná identita v 5.2 |
+| Pumpa hlásí `CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG …)` po startu | vadná položka `FB_WriteScope` / chybějící `auditPkg` / cizí obsah v balíčku add-inu → 7.3b |
+| Zápis skončil `E_BLACKLIST`, ale cíl „přece není na blacklistu" | cíl je v podstromu chráněné větve, v balíčku auditu / add-inu, nebo ho vlastní chráněný prvek; u vazby jsou **oba** konce chráněné; u mazání kaskáda (`cascadeDelete: "block"`) → hláška říká kterou větev (7.3a) |
 | `E_REPO` u dávky, i když identita v configu sedí | v dávce zůstal placeholder `<TEST-DB>` (banka 10. 9.) → dosazuj nástrojem `banka-dosad`, ne ručně |
 
 ## 7.10 Menu je, ale klik nic neudělá — `Unhandled menu item: -AI Bridge`
@@ -453,9 +490,11 @@ Rozhodnutí 4. 10. 2026 (revize FB-PU-01, bod 4), upřesněno 10. 10. 2026: **na
 | 2 | Bootstrap: Specialize → Scripting → `ITAN-Bootstrap` → vložit obsah `scripts\ITAN-Bootstrap File Bridge.js` → Save → Run; zapsat řádky `PX` a souhrn | 2.2 | cesta `src\` se najde sama (`C:\GIT\ea-file-bridge\src\`) |
 | 3 | Plný restart EA (File → Exit) + restart pumpy | 4 | pumpa: zavřít okno, dvojklik `pump.wsf` |
 | 4 | Kontrola parametrů — 0 rozdílů | 4a | dávku vhazuje a vyhodnocuje Claude (`res`) |
-| 5 | Stav bridge (Specialize → AI Bridge → Stav bridge) — jen kontrola identity a whitelistu; configy se doma nemění | 5.7 | — |
+| 5 | Stav bridge (Specialize → AI Bridge → Stav bridge) — jen kontrola identity a blacklistu; configy se doma nemění | 5.7 | — |
 | 6 | Ping pumpou | 6.1 | `"repo": "EAEXAMPLE.QEA"` |
-| 7 | LOW zápis do `#FB-TEST` + kontrola auditu v `#AI-LOG`; ELEVATED dávka s oknem Ne i Ano; úklid testovacího balíčku | `docs/e2e-nasazeni/` | vzor dávek `docs/e2e-nasazeni/ready/req-nas-*.json` |
+| 7 | LOW zápis do volného balíčku (`FBT-VOLNE`) + kontrola auditu v `#AI-LOG`; ELEVATED dávka s oknem Ne i Ano; zápis do `FBT-CHRANENE` = `E_BLACKLIST`; úklid testovacího balíčku | `docs/e2e-nasazeni/`, `docs/e2e-scope/` | vzor dávek `docs/e2e-nasazeni/ready/req-nas-*.json`, `docs/e2e-scope/ready/req-Z10-*.json` |
+
+> **Poznámka 12. 10. 2026:** rozhodnutí 10. 10. 2026 večer (Miloš: „kód budeme ladit doma, ale deployment si ulehčíme") tuhle kapitolu zužuje — doma se nová verze nasazuje **`deploy_src` pumpou**; bootstrap podle této kapitoly se doma dělá **jen jednou před nasazením v bance** jako generálka celé verze (a byl předmětem vlákna Z261004b-1). Tabulka výše platí pro tu generálku.
 
 Bankovní kroky 1 (kurýrní klon), 3 (Manage Add-Ins), 5.1–5.6 (configy) a 6.2 (schránka) doma odpadají — element, add-in i configy už v modelu jsou. Živě proběhlo 10. 10. 2026 (`docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md`): nejdřív se starým bootstrapem (past potvrzena: `E_EXCEPTION` až po zápisu), pak s novým (`PX` 2×, 0 rozdílů, zápis + audit, okno Ne/Ano).
 
@@ -463,7 +502,8 @@ Bankovní kroky 1 (kurýrní klon), 3 (Manage Add-Ins), 5.1–5.6 (configy) a 6.
 
 | Potřebuješ | Kde |
 |---|---|
-| Plán fáze 2 POC, akceptační kritéria, upgrade whitelistu v0.1 → v0.2 | `docs/NAVOD-NASAZENI-BANKA.md` |
+| Plán fáze 2 POC, akceptační kritéria, identita repozitáře (§6; whitelist tam je jen historie) | `docs/NAVOD-NASAZENI-BANKA.md` |
+| Cíl zápisu — zadání, rozhodnutí, kritéria (v1.2 = popis stavu) | `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` |
 | Technická reference (registr 42 operací, chybové kódy, Risk Gate, historie) | `docs/PROTOKOL-EAFB.md` |
 | Samonosný popis řešení pro čtenáře mimo repo | `IT-ANALYSIS/Dokumentace-EA-File-Bridge.md` |
 | Jak psát dávky pro Copilota ve schránkovém režimu | `docs/NAVOD-COPILOT-SCHRANKA.md` |
@@ -472,6 +512,7 @@ Bankovní kroky 1 (kurýrní klon), 3 (Manage Add-Ins), 5.1–5.6 (configy) a 6.
 
 ## Changelog
 
+- **v1.3 — 2026-10-12** (vlákno Z261004b-11, cíl zápisu v0.17 — režim blacklist): Placeholdery `<PROTECTED-PKG-n>` místo `<AI-SANDBOX>`; 1.2 řádek `FB_WriteScope` místo `FB_Whitelist` v tabulce „Co v diffu ZACHOVAT"; 2.1 balíček add-inu bez cizího obsahu; 3.3 vrstva 4 = `FB_OpsAllowed` + blacklist a **důsledek standardního režimu security** (AI zapisuje i do cizích nezamčených balíčků; doporučení zamknout balíček add-inu a auditu); **5.2 přepsána** (`FB_WriteScope`: blacklist, `cascadeDelete`, implicitní ochrana, kontrola konfigurace, vazby „oba konce", zámky EA vazby nehlídají); 5.7 Stav bridge; 6 ping s `writeScope`; 6.1 start session bez session baseline; 6.2 segment `zapis:`; **6.3 nový checklist**; 7.3 `FB_WriteScope`; **nové 7.3a `E_BLACKLIST`, 7.3b `E_SCOPE_CONFIG`, 7.3c `E_AMBIGUOUS`, 7.3d `E_WHITELIST` zaniklo**; 7.5 kaskády v okně; 7.9 nové řádky; 8 poznámka k rozhodnutí 10. 10. (doma `deploy_src`). Zdroj: `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` v1.2, `docs/e2e-scope/VYSLEDKY-2026-10-12-jadro.md` a `-hlaseni.md`.
 - **v1.2 — 2026-10-10** (vlákno Z261004b-1, pojistka nasazení FB-PU-01 — živě doma): 2.2 očekávaný výstup s řádky `PX <operace>: (staré) -> (nové)`, `Parametry: P operaci srovnano` a varování / STOP při více elementech `AICodeBridge` (N-B-4); nový krok **4a Kontrola parametrů po nasazení** (čtecí dávka `docs/e2e-banka/ready/req-banka-kontrola-parametru.json`, 0 rozdílů, jinak nepokračovat); 5.7 odkaz na 4a; 7.10 obecná varianta pasti; nová kap. **8 Doma: nasazení jako v bance** (bootstrap, ne `deploy_src`). Zdroj: `IT-ANALYSIS/AUDIT-usability-pumpy-2026-10-04.md` kap. 3.1, `docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md`.
 - **v1.1 — 2026-09-10** (vlákno Z260908-5, po živém nasazení v bance St 10. 9. — PASS s nálezy): blok 2 = jen bootstrap (Copy/Paste nepoužívat; bootstrap zakládá receptions i opravuje jejich parametry — řádky `RX`/`PX`), blok 3 sloupce Groups/Status Optional v security modelu, blok 4 + 5.4 + 7.2 restart **EA i pumpy** po změně členství, 5.1 `auditPkg` povinný + `baseDir = <KORP>`, 5.5 nejmenší bankovní RiskPolicy, 6.1 dávky do `<KORP>\requests\` přes `banka-dosad`, nová 6.4 čtecí recon + pravidlo `TOP N`, 7.7 prázdný výsledek ≠ `E_SQL` (od `47fdbb2`), nové 7.10 (Unhandled menu item) a 7.11 (pumpa visí na velkém SELECTu), placeholder `<GUID-AILOG>`. Zdroj: `docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`, `docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`.
 - **v1.0 — 2026-09-04** (vlákno Z260904-5): vznik. Deliverable ze zadání kap. 5 („klikací návod pro Miloše"), nikdy dřív nedodaný. Pokrývá stav po iteracích 5–7 včetně prokliků per typ artefaktu a plné cesty v ELEVATED dialogu (commit `689c7ad`) a konfiguračních sekcí se security modelem (commit `79bce7f`).

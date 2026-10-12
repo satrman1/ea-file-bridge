@@ -649,26 +649,26 @@ t("FB_Main: security VYPNUTA + zapis -> gate nebrani (E_ADDIN_ACCESS se nevyda)"
 });
 
 // --- FB_OpSelectedContext (iterace 5, C): get_selected_context
-t("get_selected_context: vybrany element -> type/guid/path/branch/inWhitelist", function () {
+t("get_selected_context (FB-CZ-19): vybrany element -> type/guid/path/branch/repository/writeCheck {ok, code, note}; volny prvek = ok true", function () {
     var repo = mkRepo();
     var root = repo._addPackage({ id: 1, name: "Model" });
     var sub = repo._addPackage({ id: 2, name: "Domain", parentID: 1, guid: "{PKG-DOMAIN}" });
     var el = repo._addElement({ id: 11, guid: "{EL-ZAK}", name: "Zakaznik", type: "Class", packageID: 2 });
     repo.GetTreeSelectedItemType = function () { return 4; };
     repo.GetTreeSelectedObject = function () { return el; };
-    var origWl = B.FB_Whitelist;
-    B.FB_Whitelist = function () { return [{ repo: "EAEXAMPLE.QEA", pkg: "{PKG-DOMAIN}" }]; };
-    var r = B.FB_OpSelectedContext.call(B, repo, { op: "get_selected_context" });
-    B.FB_Whitelist = origWl;
+    var r = withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [] }], function () { return B.FB_OpSelectedContext.call(B, repo, { op: "get_selected_context" }); });
     eq(r.status, "ok");
     eq(r.selected, true);
+    contains(r.repository, "EAEXAMPLE.QEA", "identita repa pro schranku/davku");
     eq(r.context.type, "Element");
     eq(r.context.guid, "{EL-ZAK}");
     eq(r.context.path, "Model.Domain.Zakaznik");
     eq(r.context.branchGuid, "{PKG-DOMAIN}");
-    eq(r.context.inWhitelist, true);
+    ok(r.context.writeCheck && r.context.writeCheck.ok === true, "writeCheck.ok: " + JSON.stringify(r.context.writeCheck));
+    eq(r.context.writeCheck.code, ""); contains(r.context.writeCheck.note, "zamky EA");
+    ok(typeof r.context.inWhitelist == "undefined" && typeof r.context.whitelistNote == "undefined", "inWhitelist/whitelistNote uz neexistuji (O1 = b)");
 });
-t("get_selected_context: vybrany package -> branch = on sam; package na blacklistu = inWhitelist false (writeCheck doladi Z261004b-11)", function () {
+t("get_selected_context (FB-CZ-19): vybrany package -> branch = on sam; package na blacklistu = writeCheck.ok false, code E_BLACKLIST, note s chranenou vetvi", function () {
     var repo = mkRepo();
     var root = repo._addPackage({ id: 1, name: "Model" });
     var sub = repo._addPackage({ id: 2, name: "Domain", parentID: 1, guid: "{PKG-DOMAIN}" });
@@ -679,8 +679,15 @@ t("get_selected_context: vybrany package -> branch = on sam; package na blacklis
     });
     eq(r.context.type, "Package");
     eq(r.context.branchGuid, "{PKG-DOMAIN}");
-    eq(r.context.inWhitelist, false, "package na blacklistu");
-    contains(r.context.whitelistNote || "", "E_BLACKLIST");
+    eq(r.context.writeCheck.ok, false, "package na blacklistu");
+    eq(r.context.writeCheck.code, "E_BLACKLIST");
+    contains(r.context.writeCheck.note, "Model.Domain"); contains(r.context.writeCheck.note, "test");
+    // repozitar bez polozky -> writeCheck E_REPO
+    var repo2 = mkRepo({ connectionString: "C:\\X\\JINY.QEA" });
+    repo2._addPackage({ id: 1, name: "Model" }); var s2 = repo2._addPackage({ id: 2, name: "D", parentID: 1, guid: "{PKG-D2}" });
+    repo2.GetTreeSelectedItemType = function () { return 5; }; repo2.GetTreeSelectedObject = function () { return s2; };
+    var r2 = B.FB_OpSelectedContext.call(B, repo2, { op: "get_selected_context" });
+    eq(r2.context.writeCheck.ok, false); eq(r2.context.writeCheck.code, "E_REPO");
 });
 t("get_selected_context: nic nevybrano -> selected:false, status ok", function () {
     var repo = mkRepo();
@@ -1068,18 +1075,25 @@ t("ChatRender: query 0 radku = 'dotaz nic nevratil', ne 'data neexistuji' (T4-3c
 // Testy = akceptacni kriteria par. 6 (1-9) + 11' (uplnost proti REG).
 // =====================================================================
 
-t("I7 krit.1: get_selected_context -> ACK nese GUID, jmeno, inWhitelist i plnou path (regrese res-20260821-03)", function () {
+t("I7 krit.1 / FB-CZ-19: get_selected_context -> ACK nese GUID, jmeno, writeCheck i plnou path (regrese res-20260821-03; writeCheck misto inWhitelist od v1.2)", function () {
     var out = chat({
         status: "done", id: "20260821-03", repository: "EAEXAMPLE.QEA",
         results: [{ op: "get_selected_context", status: "ok", selected: true,
             context: { type: "Package", guid: "{5A55C1C5-3A34-4a5f-A33C-A6E829A29AAA}", id: 1054,
-                name: "#FB-TEST", path: "Model.Sandbox.#FB-TEST", inWhitelist: true, whitelistNote: "" },
+                name: "#FB-TEST", path: "Model.Sandbox.#FB-TEST", writeCheck: { ok: true, code: "", note: "" } },
             selectedElements: [], currentDiagram: null, treeType: 5 }]
     });
     contains(out, "{5A55C1C5-3A34-4a5f-A33C-A6E829A29AAA}");
     contains(out, "#FB-TEST");
-    contains(out, "inWhitelist=true");
+    contains(out, "writeCheck=ok");
     contains(out, "path=Model.Sandbox.#FB-TEST", "path plnou cestou (par. 4.2/I5)");
+    var out2 = chat({
+        status: "done", id: "20260821-04", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "get_selected_context", status: "ok", selected: true,
+            context: { type: "Package", guid: "{G}", id: 1, name: "Chr", path: "Model.Chr", writeCheck: { ok: false, code: "E_BLACKLIST", note: "cil Model.Chr lezi v chranene vetvi 'Model.Chr'" } },
+            selectedElements: [], currentDiagram: null, treeType: 5 }]
+    });
+    contains(out2, "writeCheck=NE E_BLACKLIST"); contains(out2, "chranene vetvi");
 });
 
 t("I7 krit.2a: find_elements_by_name se 3 polozkami -> ACK nese 3 GUIDy", function () {
@@ -4406,7 +4420,7 @@ t("B1 pravidlo 8: kodove kotvy pumpy a adapteru pro nove kody - E_INTERRUPTED/E_
 //           > 900 FBT-CHRANENE (blacklist) > 901 Podbalicek > 12 PodPrvek; 11 ChranenyPrvek; diagram 101 ChranenyDg
 //           > 950 #AI-LOG (auditPkg z FB_Config EAEXAMPLE) ; > 960 EA Addins (AICodeBridge 3352)
 //           > 3 Dvojnik, 4 Dvojnik (stejne jmeno = nejednoznacne), 5 dvojnik (jen velikost pismen, W7)
-// konektory: 301 11->10 (zdroj chraneny), 302 10->14 (volna), 303 10->11 (cil chraneny), 304 12->10 (zdroj v podbalicku)
+// konektory: 301 11->10 (zdroj chraneny, cil volny = NENI chranena, pravidlo "oba konce" 12. 10.), 302 10->14 (volna), 303 10->11 (cil chraneny), 304 12->10 (zdroj v podbalicku), 305 11->12 (OBA konce chranene = chranena vazba)
 var SC_AUDIT_GUID = "" + B.FB_Config.call(B)[0].auditPkg;
 function scopeRepo(opts) {
     opts = opts || {};
@@ -4418,10 +4432,10 @@ function scopeRepo(opts) {
               [3352, 960, 0, "AICodeBridge", "{EL-BRIDGE}", "Class"], [20, 2, 0, "Dvojprvek", "{EL-DUP-A}", "Class"], [21, 900, 0, "Dvojprvek", "{EL-DUP-B}", "Class"],
               [22, 2, 0, "Instance", "{EL-INST}", "Object"]];
     var DG = [[100, 2, 0, "VolnyDg", "{DG-FREE}"], [101, 900, 0, "ChranenyDg", "{DG-BL}"]];
-    var CN = [[301, 11, 10, "{CN-BL}"], [302, 10, 14, "{CN-FREE}"], [303, 10, 11, "{CN-IN}"], [304, 12, 10, "{CN-BL-SUB}"]];
+    var CN = [[301, 11, 10, "{CN-BL}"], [302, 10, 14, "{CN-FREE}"], [303, 10, 11, "{CN-IN}"], [304, 12, 10, "{CN-BL-SUB}"], [305, 11, 12, "{CN-BOTH}"]];
     var DOBJ = opts.diagramObjects || [[101, 10]]; // [Diagram_ID, Object_ID]: volny prvek 10 lezi na chranenem diagramu 101
     var DEDUP_EL = opts.dedupEl || { "k-bl": 11, "k-free": 10 };
-    var DEDUP_CN = opts.dedupConn || { "ck-bl": 301, "ck-free": 302 };
+    var DEDUP_CN = opts.dedupConn || { "ck-bl": 301, "ck-free": 302, "ck-both": 305 };
     function key(sql) {
         var m;
         if ((m = /ea_guid = '([^']+)'/i.exec(sql))) { return { guid: m[1] }; }
@@ -4519,6 +4533,7 @@ t("CZ-00a skutecny FB_WriteScope: tvar polozek (repo, pole blacklist, pkg jako {
         ok(typeof e.repo == "string" && e.repo.length > 0, "repo[" + i + "]");
         ok(cfgRepos[e.repo] === 1, "repo '" + e.repo + "' musi mit polozku i ve FB_Config");
         ok(Array.isArray(e.blacklist), "blacklist[" + i + "] je pole");
+        ok(e.cascadeDelete == "allow" || e.cascadeDelete == "block", "cascadeDelete[" + i + "] = allow|block (doma allow): " + e.cascadeDelete);
         ok(!/<TEST-DB>|<PROTECTED/.test(e.repo), "zadne bankovni placeholdery v kodu");
         for (var b = 0; b < e.blacklist.length; b++) {
             var w = e.blacklist[b];
@@ -4572,10 +4587,10 @@ var CZ07 = {
     "create_or_update_elements":       { op: "create_or_update_elements", elements: [{ guid: "{EL-BL}", name: "N" }] },
     "move_elements":                   { op: "move_elements", "package": "{PKG-BL}", elements: ["{EL-FREE}"] },
     "create_or_update_package":        { op: "create_or_update_package", packages: [{ guid: "{PKG-BL-SUB}", name: "N" }] },
-    "create_or_update_connectors":     { op: "create_or_update_connectors", connectors: [{ guid: "{CN-BL}", name: "N" }] },
+    "create_or_update_connectors":     { op: "create_or_update_connectors", connectors: [{ guid: "{CN-BOTH}", name: "N" }] },
     "create_or_update_attributes":     { op: "create_or_update_attributes", element: "{EL-BL}", attributes: [{ name: "a" }] },
     "create_or_update_operations":     { op: "create_or_update_operations", element: "{EL-BL}", operations: [{ name: "o" }] },
-    "create_or_update_messages":       { op: "create_or_update_messages", messages: [{ guid: "{CN-BL}", name: "m" }] },
+    "create_or_update_messages":       { op: "create_or_update_messages", messages: [{ guid: "{CN-BOTH}", name: "m" }] },
     "delete_from_model":               { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-BL}" }] },
     "delete_taggedvalue_from_model":   { op: "delete_taggedvalue_from_model", targets: [{ type: "ElementTaggedValue", guid: "{EL-BL}", name: "t" }] },
     "remove_elements_from_diagram":    { op: "remove_elements_from_diagram", diagram: "{DG-BL}", elementIDs: ["{EL-FREE}"] },
@@ -4655,17 +4670,22 @@ t("CZ-09 FB-CZ-09: kontrola pri provedeni nad skutecnym objektem - dedupKey, mat
     // $N se pri provedeni rozresolvuje na GUID (FB_Main.resolveRefs) -> handler dostane totez jako tady
     var r5 = withScope(scopeBL(), function () { return B.FB_OpAttributes.call(B, repo, { op: "create_or_update_attributes", element: "{EL-BL}", attributes: [{ name: "a" }] }, "cz09e"); });
     eq(r5.code, "E_BLACKLIST", JSON.stringify(r5).substring(0, 400)); eq(bl.Attributes.Count, 0);
-    // B2: konektor dohledany pres dedupKey, vlastneny chranenym prvkem, s VOLNYMI source/target v requestu
-    var cn = repo.GetConnectorByID(301);
-    var r6 = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-bl" }] }, "cz09f"); });
-    eq(r6.code, "E_BLACKLIST", JSON.stringify(r6).substring(0, 300)); contains(r6.message, "zdroj existujici vazby"); eq(cn.ClientID, 11, "vazba beze zmeny"); eq(cn.SupplierID, 10);
-    var r6p = scopeRun(repo, [{ op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-bl" }] }], "cz09g");
+    // B2 + pravidlo "oba konce" (12. 10.): konektor dohledany pres dedupKey s OBEMA konci v chranene casti (305: 11->12),
+    // s VOLNYMI source/target v requestu -> E_BLACKLIST (kontrola nad skutecnymi konci, ne nad requestem)
+    var cn = repo.GetConnectorByID(305);
+    var r6 = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-both" }] }, "cz09f"); });
+    eq(r6.code, "E_BLACKLIST", JSON.stringify(r6).substring(0, 300)); contains(r6.message, "oba konce existujici vazby"); eq(cn.ClientID, 11, "vazba beze zmeny"); eq(cn.SupplierID, 12);
+    var r6p = scopeRun(repo, [{ op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-both" }] }], "cz09g");
     eq(r6p.code, "E_BLACKLIST", "P2 chyta dedupKey konektoru: " + JSON.stringify(r6p).substring(0, 300));
-    // match composite nad existujicim chranenym konektorem 301 (11->10)
-    var r7 = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-BL}", target: "{EL-FREE}", type: "Association", match: "composite", name: "prejmenovat" }] }, "cz09h"); });
+    // konektor 301 (11->10, jeden konec volny) dohledany pres dedupKey uz chraneny NENI (pravidlo "oba konce")
+    var cn1 = repo.GetConnectorByID(301);
+    var r6b = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-bl", name: "volna" }] }, "cz09fb"); });
+    eq(r6b.status, "ok", "vazba s jednim volnym koncem neni chranena: " + JSON.stringify(r6b).substring(0, 300)); eq(cn1.Name, "volna");
+    // match composite nad existujicim konektorem s obema konci v chranene casti 305 (11->12)
+    var r7 = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-BL}", target: "{EL-BL-SUB}", type: "Association", match: "composite", name: "prejmenovat" }] }, "cz09h"); });
     eq(r7.code, "E_BLACKLIST", JSON.stringify(r7).substring(0, 300)); eq(cn.Name, "");
 });
-t("CZ-10 FB-CZ-10: mazani balicku s chranenym podstromem -> E_BLACKLIST; smazani volneho prvku na chranenem diagramu -> E_BLACKLIST (W2); klasifikator chranenych instanci = varovani", function () {
+t("CZ-10 FB-CZ-10: mazani balicku s chranenym podstromem -> E_BLACKLIST; kaskady mazani do chranene casti (W2 b diagram, W2 c klasifikator) podle cascadeDelete: block = E_BLACKLIST, allow = provede se s varovanim; prichozi vazba s chranenym zdrojem (W2 a) mazani uz NEBRANI (pravidlo 'oba konce' 12. 10.)", function () {
     var repo = scopeRepo();
     var r1 = scopeRun(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-ROOT}" }] }], "cz10a");
     ok(r1.code == "E_BLACKLIST" || r1.code == "E_ARGS", "koren: " + r1.code);
@@ -4673,26 +4693,66 @@ t("CZ-10 FB-CZ-10: mazani balicku s chranenym podstromem -> E_BLACKLIST; smazani
     var r2 = scopeRun(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-FREE}" }] }], "cz10b",
         [{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-ONE}", name: "Jedinacek", note: "pod Volne" }] }]);
     eq(r2.code, "E_BLACKLIST", JSON.stringify(r2).substring(0, 300)); contains(r2.problems[0].message, "podstrom");
-    // W2 b: volny prvek 14 na chranenem diagramu 101 -> provedeni E_BLACKLIST; bez vyskytu projde
+    // W2 b: volny prvek 14 na chranenem diagramu 101; bez vyskytu projde (vychozi cascadeDelete = block, kdyz klic chybi)
     var r3 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repo, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10c"); });
     eq(r3.status, "ok", "prvek 14 na zadnem chranenem diagramu neni: " + JSON.stringify(r3).substring(0, 200));
     var repoB = scopeRepo({ diagramObjects: [[101, 14]] });
     var r4 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repoB, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10d"); });
-    eq(r4.code, "E_BLACKLIST", JSON.stringify(r4).substring(0, 300)); contains(r4.message, "CHRANENEM diagramu");
+    eq(r4.code, "E_BLACKLIST", JSON.stringify(r4).substring(0, 300)); contains(r4.message, "CHRANENEM/CHRANENYCH diagramu"); contains(r4.message, "cascadeDelete = block");
     ok(repoB.GetElementByID(14) != null, "prvek nesmazan");
-    // W2 a: prichozi vazba se zdrojem v chranene casti (301: 11 -> 10) brani smazani prvku 10
+    // W2 a (ZRUSENO 12. 10.): prichozi vazba se zdrojem v chranene casti (301: 11 -> 10) mazani prvku 10 NEBRANI
     var repoC = scopeRepo({ diagramObjects: [] });
     var r5 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repoC, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE}" }] }, "cz10e"); });
-    eq(r5.code, "E_BLACKLIST"); contains(r5.message, "prichozi vazba");
-    // W2 c: klasifikator instanci v chranene casti = varovani (chovani EA zive)
+    eq(r5.status, "ok", "vazba s jednim volnym koncem neni chranena - prvek 10 se smaze: " + JSON.stringify(r5).substring(0, 300));
+    // W2 c: klasifikator instanci v chranene casti - block (vychozi) = E_BLACKLIST
     var repoD = scopeRepo({ diagramObjects: [], classifierInstances: [[14, 11]] });
     var r6 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repoD, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10f"); });
-    eq(r6.status, "ok", JSON.stringify(r6).substring(0, 300)); ok(r6.warnings && /klasifikatorem 1 instanci/.test(r6.warnings[0]), JSON.stringify(r6.warnings));
-    // mazani vazby se zdrojem v chranene casti
+    eq(r6.code, "E_BLACKLIST", JSON.stringify(r6).substring(0, 300)); contains(r6.message, "klasifikatorem 1 instanci"); ok(repoD.GetElementByID(14) != null, "prvek nesmazan");
+    // mazani vazby: jeden konec volny (301 11->10) projde; oba konce chranene (305 11->12) E_BLACKLIST
     var r7 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, scopeRepo(), { op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-BL}" }] }, "cz10g"); });
-    eq(r7.code, "E_BLACKLIST"); contains(r7.message, "zdroj konektoru");
+    eq(r7.status, "ok", "vazba z chraneneho zdroje do volneho cile se mazat smi: " + JSON.stringify(r7).substring(0, 200));
+    var r7b = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, scopeRepo(), { op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-BOTH}" }] }, "cz10gb"); });
+    eq(r7b.code, "E_BLACKLIST", JSON.stringify(r7b).substring(0, 300)); contains(r7b.message, "oba konce konektoru");
+    var r7p = scopeRun(scopeRepo(), [{ op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-BOTH}" }] }], "cz10gp");
+    eq(r7p.code, "E_BLACKLIST", "P2: " + JSON.stringify(r7p).substring(0, 300)); contains(r7p.problems[0].message, "oba konce existujici vazby");
     var r8 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, scopeRepo(), { op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-IN}" }] }, "cz10h"); });
     eq(r8.status, "ok", "vazba z volneho zdroje do chraneneho cile se mazat smi: " + JSON.stringify(r8).substring(0, 200));
+});
+t("CZ-10c prepinac cascadeDelete (rozhodnuti Milose 12. 10. 2026, varianta c): allow = kaskady W2 b/c se povoli s DURAZNYM varovanim, vycet je uz v P2 (cascades[]) a v textu potvrzovaciho okna; block = E_BLACKLIST v P2 pred oknem; chybi = block; jina hodnota = E_SCOPE_CONFIG", function () {
+    function sc(mode) { var e = scopeBL()[0]; if (typeof mode != "undefined") { e.cascadeDelete = mode; } return [e]; }
+    eq(scopeCfgOk(scopeRepo(), sc()).cascadeDelete, "block", "chybi = block (fail-closed)");
+    eq(scopeCfgOk(scopeRepo(), sc("allow")).cascadeDelete, "allow");
+    var bad = scopeCfgOk(scopeRepo(), sc("maybe"));
+    contains(bad.problems.join("; "), "cascadeDelete musi byt");
+    // provedeni (allow): prvek 14 na chranenem diagramu + klasifikator chranene instance -> ok + 2 varovani
+    var repoA = scopeRepo({ diagramObjects: [[101, 14]], classifierInstances: [[14, 11]] });
+    var ra = withScope(sc("allow"), function () { return B.FB_OpDelete.call(B, repoA, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10ca"); });
+    eq(ra.status, "ok", JSON.stringify(ra).substring(0, 400)); eq(ra.items[0].deleted, true);
+    ok(ra.warnings && ra.warnings.length == 2, "2 varovani: " + JSON.stringify(ra.warnings));
+    contains(ra.warnings[0], "VAROVANI (kaskada mazani do chranene casti"); contains(ra.warnings[0], "Model.FBT-CHRANENE.ChranenyDg"); contains(ra.warnings[1], "Classifier = 0"); contains(ra.warnings[1], "NEKRYJE");
+    // P2 (allow): davka pres pumpu = confirm_required (mazani je ELEVATED), res nese cascades[] i risk.cascades, okno vycet ukaze
+    b1Reset();
+    var repoP = scopeRepo({ diagramObjects: [[101, 14]], classifierInstances: [[14, 11]] });
+    var rp = withScope(sc("allow"), function () { return pumpRun(repoP, [{ op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }], "cz10cp"); });
+    eq(rp.status, "confirm_required", JSON.stringify(rp).substring(0, 400));
+    ok(rp.cascades && rp.cascades.length == 2, "cascades[] v odpovedi: " + JSON.stringify(rp.cascades));
+    eq(rp.cascades[0].kind, "diagram"); eq(rp.cascades[0].count, 1); eq(rp.cascades[0].items[0], "Model.FBT-CHRANENE.ChranenyDg");
+    eq(rp.cascades[1].kind, "classifier"); eq(rp.cascades[1].items[0], "Model.FBT-CHRANENE.ChranenyPrvek");
+    ok(rp.risk && rp.risk.cascades && rp.risk.cascades.length == 2, "risk.cascades");
+    ok(/kaskada mazani do chranene casti/.test(rp.risk.riskReasons.join(" | ")), "duvod okna: " + rp.risk.riskReasons.join(" | "));
+    var sum = "" + B.FB_ConfirmSummary.call(B, rp);
+    contains(sum, "POZOR - smazani sahne kaskadou EA do CHRANENE casti"); contains(sum, "Model.FBT-CHRANENE.ChranenyDg"); contains(sum, "Classifier = 0");
+    ok(repoP.GetElementByID(14) != null, "pred potvrzenim nic nesmazano");
+    // P2 (block): tataz davka = E_BLACKLIST pred oknem, nic neprovedeno, soubor v rejected\\
+    b1Reset();
+    var repoQ = scopeRepo({ diagramObjects: [[101, 14]] });
+    var rq = withScope(sc("block"), function () { return pumpRun(repoQ, [{ op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }], "cz10cq"); });
+    eq(rq.code, "E_BLACKLIST", JSON.stringify(rq).substring(0, 400)); eq(rq.results[0].status, "skipped");
+    contains(rq.problems[0].message, "cascadeDelete = block"); eq(rq.problems[0].cascade, "diagram"); eq(rq.problems[0].items[0], "Model.FBT-CHRANENE.ChranenyDg");
+    ok(repoQ.GetElementByID(14) != null, "prvek nesmazan"); eq(b1Files(B1_REQ + "\\rejected\\").length, 1, "soubor v rejected\\");
+    // kaskada balicku: obsah podstromu jde pres P2 (mock vraci [] pro subselect - jen ze SQL nespadne a davka dojde k oknu)
+    var rk = withScope(sc("allow"), function () { return scopeRun(scopeRepo(), [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-ONE}" }] }], "cz10ck"); });
+    ok(rk.code != "E_BLACKLIST" && rk.code != "E_EXCEPTION", "mazani volneho balicku bez kaskad dojde k Risk Gate: " + rk.code + " " + ("" + rk.message).substring(0, 160));
 });
 t("CZ-10b FB-CZ-10b (W1): uklid automatickych baselines vynecha a vykaze kandidaty v chranenych balickach", function () {
     var repo = scopeRepo();
@@ -4737,36 +4797,60 @@ t("CZ-11 FB-CZ-11: implicitni ochrana - balicek add-inu a balicek auditu (dedicn
     var c = scopeCfgOk(scopeRepo({ noBridge: true }), EMPTY);
     eq(c.problems.length, 0); eq(c.implicit.length, 1);
 });
-t("CZ-12 FB-CZ-12: vazby - zdroj chraneny -> cil volny projde (O11 = c); zdroj volny -> cil chraneny jen s allowIncomingRefs (vychozi true); oba chranene E_BLACKLIST; zmena/smazani vazby chraneneho zdroje E_BLACKLIST i kdyby 'aspon jeden konec' prosel (I9); presmerovani zdroje do chranene casti E_BLACKLIST", function () {
+t("CZ-12 FB-CZ-12 (v1.2, pravidlo 'oba konce' 12. 10.): vazba je chranena, jen kdyz jsou OBA konce v chranene casti - zalozeni/zmena/smazani s jednim volnym koncem projde (obema smery); oba konce E_BLACKLIST; presmerovani nad novym parem koncu; allowIncomingRefs: false = zprisneni zalozeni z volne casti do chranene", function () {
     var repo = scopeRepo();
     function conn(c, id, scope) { return withScope(scope || scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [c] }, id); }); }
     var a = conn({ source: "{EL-BL}", target: "{EL-FREE}", type: "Realization" }, "cz12a");
-    eq(a.status, "ok", "zdroj chraneny -> cil volny (krok 4b katalogu): " + JSON.stringify(a).substring(0, 300));
+    eq(a.status, "ok", "zdroj chraneny -> cil volny (krok 4b katalogu, O11 = c): " + JSON.stringify(a).substring(0, 300));
     var b = conn({ source: "{EL-FREE}", target: "{EL-BL}", type: "Dependency" }, "cz12b");
     eq(b.status, "ok", "volny -> chraneny s vychozim allowIncomingRefs true: " + JSON.stringify(b).substring(0, 300));
     var c = conn({ source: "{EL-FREE}", target: "{EL-BL}", type: "Dependency" }, "cz12c", scopeBL(false));
     eq(c.code, "E_BLACKLIST", "allowIncomingRefs: false: " + JSON.stringify(c).substring(0, 300)); contains(c.message, "allowIncomingRefs");
+    var c2 = conn({ source: "{EL-BL}", target: "{EL-FREE}", type: "Dependency" }, "cz12c2", scopeBL(false));
+    eq(c2.status, "ok", "allowIncomingRefs: false se tyka jen prichozich vazeb - odchozi z chranene casti projde");
     var d = conn({ source: "{EL-BL}", target: "{EL-BL-SUB}", type: "Dependency" }, "cz12d");
     eq(d.code, "E_BLACKLIST", "oba konce chranene"); contains(d.message, "oba konce");
-    var cn = repo.GetConnectorByID(301);
+    // zmena existujici vazby: 301 (chraneny zdroj, volny cil) PROJDE; 303 (volny zdroj, chraneny cil) PROJDE; 305 (oba) E_BLACKLIST
+    var cn1 = repo.GetConnectorByID(301), cn5 = repo.GetConnectorByID(305);
     var e = conn({ guid: "{CN-BL}", name: "prejmenovana" }, "cz12e");
-    eq(e.code, "E_BLACKLIST", "update vazby chraneneho zdroje: " + JSON.stringify(e).substring(0, 300)); eq(cn.Name, "", "vazba beze zmeny");
+    eq(e.status, "ok", "update vazby s chranenym zdrojem a volnym cilem projde: " + JSON.stringify(e).substring(0, 300)); eq(cn1.Name, "prejmenovana");
+    var h = conn({ guid: "{CN-IN}", name: "x" }, "cz12h");
+    eq(h.status, "ok", "update vazby s volnym zdrojem a chranenym cilem projde: " + JSON.stringify(h).substring(0, 200));
+    var e5 = conn({ guid: "{CN-BOTH}", name: "zakazano" }, "cz12e5");
+    eq(e5.code, "E_BLACKLIST", "update vazby s obema konci v chranene casti: " + JSON.stringify(e5).substring(0, 300)); contains(e5.message, "oba konce existujici vazby"); eq(cn5.Name, "", "vazba beze zmeny");
+    // presmerovani se posuzuje nad NOVYM parem koncu
     var f = conn({ guid: "{CN-FREE}", source: "{EL-BL}" }, "cz12f");
-    eq(f.code, "E_BLACKLIST", "presmerovani zdroje do chranene casti"); contains(f.message, "novy zdroj"); eq(repo.GetConnectorByID(302).ClientID, 10, "vazba beze zmeny");
+    eq(f.status, "ok", "presmerovani zdroje do chranene casti s volnym cilem projde: " + JSON.stringify(f).substring(0, 200)); eq(repo.GetConnectorByID(302).ClientID, 11);
+    repo.GetConnectorByID(302).ClientID = 10; // mock zpet: 302 = volna vazba 10 -> 14
+    var f2 = conn({ guid: "{CN-BL}", target: "{EL-BL-SUB}" }, "cz12f2");
+    eq(f2.code, "E_BLACKLIST", "presmerovani cile tak, ze jsou oba konce chranene: " + JSON.stringify(f2).substring(0, 300)); contains(f2.message, "po presmerovani"); eq(cn1.SupplierID, 10, "vazba beze zmeny");
+    var f3 = conn({ guid: "{CN-BOTH}", target: "{EL-FREE}" }, "cz12f3");
+    eq(f3.code, "E_BLACKLIST", "vazba s obema konci chranenymi se nesmi ani presmerovat ven (zmena chranene vazby)"); eq(cn5.SupplierID, 12);
     var g = conn({ guid: "{CN-FREE}", target: "{EL-BL}" }, "cz12g");
     eq(g.status, "ok", "presmerovani cile do chranene vetve s allowIncomingRefs true projde: " + JSON.stringify(g).substring(0, 200));
     var g2 = conn({ guid: "{CN-FREE}", target: "{EL-BL}" }, "cz12g2", scopeBL(false));
-    eq(g2.code, "E_BLACKLIST", "presmerovani cile s allowIncomingRefs false");
-    var h = conn({ guid: "{CN-IN}", name: "x" }, "cz12h");
-    eq(h.status, "ok", "update vazby s volnym zdrojem a chranenym cilem projde: " + JSON.stringify(h).substring(0, 200));
+    eq(g2.code, "E_BLACKLIST", "presmerovani cile s allowIncomingRefs false (zdroj volny)");
     // P2 chyta totez predem
-    var p = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-BL}", name: "x" }] }], "cz12p");
-    eq(p.code, "E_BLACKLIST"); contains(p.problems[0].message, "zdroj existujici vazby");
+    var p = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-BOTH}", name: "x" }] }], "cz12p");
+    eq(p.code, "E_BLACKLIST", JSON.stringify(p).substring(0, 300)); contains(p.problems[0].message, "oba konce existujici vazby");
+    var p1 = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-BL}", name: "x" }, { guid: "{CN-IN}", name: "y" }] }], "cz12p1");
+    ok(p1.code != "E_BLACKLIST", "P2 nesmi blokovat vazby s jednim volnym koncem: " + p1.code + " " + JSON.stringify(p1.problems || []).substring(0, 200));
+    // zaloha u vazby s chranenym zdrojem a volnym cilem: nad balickem VOLNEHO konce, ne nad chranenym (zivy nalez Z11-05b: E_NO_BASELINE)
+    ok(p1.code != "E_NO_BASELINE", "zaloha nesmi mirit do chranene casti: " + p1.code + " " + ("" + p1.message).substring(0, 200));
+    var bpk = ((p1.baseline || {}).packages || []).map(function (x) { return x.path || x.name || x.guid; });
+    ok(bpk.length >= 1 && bpk.join("|").indexOf("FBT-CHRANENE") < 0 && /Volne/.test(bpk.join("|")), "zaloha nad Model.Volne: " + JSON.stringify(bpk));
+    var pdel = scopeRun(scopeRepo(), [{ op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-BL}" }] }], "cz12pdel");
+    var bpk2 = ((pdel.baseline || {}).packages || []).map(function (x) { return x.path || x.name || x.guid; });
+    ok(pdel.code != "E_NO_BASELINE" && pdel.code != "E_BLACKLIST", "mazani vazby s volnym koncem: " + pdel.code); ok(bpk2.join("|").indexOf("FBT-CHRANENE") < 0, "zaloha mazani vazby mimo chranenou cast: " + JSON.stringify(bpk2));
     var p2 = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-BL}", type: "Dependency" }] }], "cz12p2", scopeBL(false));
     eq(p2.code, "E_BLACKLIST"); contains(p2.problems[0].message, "allowIncomingRefs");
+    var p3 = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-BL}", target: "{EL-BL-SUB}" }] }], "cz12p3");
+    eq(p3.code, "E_BLACKLIST", "P2: presmerovani nad novym parem koncu: " + JSON.stringify(p3).substring(0, 300)); contains(p3.problems[0].message, "po presmerovani");
     // zpravy: tataz pravidla (update + rebuild)
-    var m = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ guid: "{CN-BL}", name: "m" }] }, "cz12m"); });
-    eq(m.code, "E_BLACKLIST", JSON.stringify(m).substring(0, 200));
+    var m = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ guid: "{CN-BOTH}", name: "m" }] }, "cz12m"); });
+    eq(m.code, "E_BLACKLIST", JSON.stringify(m).substring(0, 200)); contains(m.message, "oba konce existujici zpravy");
+    var m1 = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ guid: "{CN-BL}", name: "m1" }] }, "cz12m1"); });
+    eq(m1.status, "ok", "zprava s jednim volnym koncem se smi menit: " + JSON.stringify(m1).substring(0, 200));
     var m2 = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ source: "{EL-BL}", target: "{EL-FREE}", name: "m" }] }, "cz12m2"); });
     eq(m2.status, "ok", "zprava z chraneneho zdroje do volneho cile: " + JSON.stringify(m2).substring(0, 200));
     // find_or_create_referencing_sr: vazba SR -> operace v chranene vetvi podle allowIncomingRefs
@@ -4899,6 +4983,79 @@ t("CZ-18 FB-CZ-18: potvrzovaci okno ukazuje plnou cestu cile zadaneho cestou/jme
     eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300));
     var txt = "" + B.FB_ConfirmSummary.call(B, r);
     contains(txt, "Model.Volne.Jedinacek", "plna cesta cile zadaneho cestou v okne: " + txt.substring(0, 400));
+});
+t("CZ-27 FB-CZ-27: ping vraci writeScope (mode, securityEnabled, cascadeDelete, summary, blacklist s path/found/note, implicit, problems, agentNotes) bez pole whitelist; start session a 'Stav bridge' ukazou TUTEZ lidskou vetu; chat ACK ma segment zapisu misto whitelistu", function () {
+    var repo = scopeRepo();
+    var pg = withScope(scopeBL(), function () { B._fbScopeCfg = null; return B.FB_OpPing.call(B, repo, { op: "ping" }); });
+    var w = pg.writeScope;
+    ok(w && w.mode == "blacklist", "mode blacklist"); ok(typeof pg.whitelist == "undefined", "pole whitelist[] zaniklo (O1 = b)");
+    eq(w.repoKnown, true); eq(w.cascadeDelete, "block", "scopeBL bez klice = block");
+    eq(w.blacklist.length, 1); eq(w.blacklist[0].path, "Model.FBT-CHRANENE"); eq(w.blacklist[0].found, true); eq(w.blacklist[0].note, "test blacklistu"); eq(w.blacklist[0].allowIncomingRefs, true);
+    eq(w.implicit.length, 2); ok(/audit|addin/.test(w.implicit[0].kind), "implicit kind");
+    eq(w.problems.length, 0);
+    contains(w.summary, "Zapis: blacklist (1 chranenych vetvi)"); contains(w.summary, "Model.FBT-CHRANENE [test blacklistu]"); contains(w.summary, "bridge chrani i sam sebe"); contains(w.summary, "kaskady mazani do chranene casti: zakazane");
+    ok(w.agentNotes && w.agentNotes.length >= 5, "agentNotes pro kit: " + (w.agentNotes || []).length);
+    var notes = w.agentNotes.join(" | ");
+    contains(notes, "OBA jeji konce"); contains(notes, "vazby ne - most zamky u vazeb nekontroluje"); contains(notes, "odkazuj $N"); contains(notes, "cascadeDelete = block"); contains(notes, "Zapisu do:");
+    // allow: summary i note to rikaji
+    var pa = withScope([{ repo: "EAEXAMPLE.QEA", cascadeDelete: "allow", blacklist: scopeBL()[0].blacklist }], function () { B._fbScopeCfg = null; return B.FB_OpPing.call(B, repo, { op: "ping" }); });
+    eq(pa.writeScope.cascadeDelete, "allow"); contains(pa.writeScope.summary, "povoleny s varovanim"); contains(pa.writeScope.agentNotes.join(" | "), "PROJDE - clovek dostane vycet kaskad");
+    // tataz veta na startu session, ve 'Stav bridge' a v pingu
+    var ss = withScope(scopeBL(), function () { return "" + B.FB_SessionStart.call(B, repo); });
+    contains(ss, w.summary, "start session nese tutez vetu jako ping");
+    var stv = withScope(scopeBL(), function () { return "" + B.FB_Status.call(B, repo); });
+    contains(stv, w.summary, "Stav bridge nese tutez vetu"); contains(stv, "{PKG-BL}"); contains(stv, "Kaskady mazani do chranene casti"); contains(stv, "OBEMA konci"); ok(stv.indexOf("whitelist") < 0, "slovo whitelist ve Stavu uz neni");
+    // chat ACK: segment zapisu
+    var ack = chat({ status: "done", id: "cz27", repository: "EAEXAMPLE.QEA", results: [pg] });
+    contains(ack, "zapis: blacklist (1 chranenych vetvi"); contains(ack, "Model.FBT-CHRANENE"); ok(ack.indexOf("whitelist") < 0, "segment whitelist: v ACK uz neni");
+});
+t("CZ-05b FB-CZ-05b: GUID z blacklistu, ktery v repozitari neni -> ping found: false + problems[], start session vadu ohlasi (E_SCOPE_CONFIG), summary rika NENALEZEN", function () {
+    var repo = scopeRepo();
+    var bad = [{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-NENI}", name: "FBT-CHRANENE", note: "t" }] }];
+    var pg = withScope(bad, function () { B._fbScopeCfg = null; return B.FB_OpPing.call(B, repo, { op: "ping" }); });
+    eq(pg.writeScope.blacklist[0].found, false); eq(pg.writeScope.blacklist[0].guid, "{PKG-NENI}");
+    ok(pg.writeScope.problems.length >= 1 && /PKG-NENI/.test(pg.writeScope.problems[0]), "problems[] jmenuje GUID: " + JSON.stringify(pg.writeScope.problems));
+    contains(pg.writeScope.summary, "FBT-CHRANENE (NENALEZEN)");
+    var ss = withScope(bad, function () { return "" + B.FB_SessionStart.call(B, repo); });
+    contains(ss, "CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG"); contains(ss, "{PKG-NENI}"); contains(ss, "opravny kanal");
+    var ack = chat({ status: "done", id: "cz05b", repository: "EAEXAMPLE.QEA", results: [pg] });
+    contains(ack, "NENALEZEN"); contains(ack, "E_SCOPE_CONFIG");
+});
+t("CZ-20 FB-CZ-20: menu 'Kontext vyberu do schranky' zkopiruje JEN identitu vyberu (repozitar, typ, GUID, plna cesta, writeCheck; multi-vyber GUIDy, aktivni diagram) - nikdy obsah; bez vyberu nic nekopiruje; polozka je v menu a EA_MenuClick ji obslouzi", function () {
+    var repo = scopeRepo();
+    var el = repo.GetElementByID(10); el.Notes = "TAJNY OBSAH prvku"; 
+    repo.GetTreeSelectedItemType = function () { return 4; };
+    repo.GetTreeSelectedObject = function () { return el; };
+    repo.GetCurrentDiagram = function () { return repo.GetDiagramByID(100); };
+    mockClipboard.text = "puvodni";
+    var out = withScope(scopeBL(), function () { return "" + B.FB_ClipboardContext.call(B, repo); });
+    contains(out, "Do schranky zkopirovano");
+    var clip = mockClipboard.text;
+    ok(clip != "puvodni", "schranka prepsana");
+    var lines = clip.split("\n");
+    eq(lines.length, 2, "radek pro cloveka + radek JSON");
+    contains(lines[0], "Element 'VolnyPrvek' {EL-FREE}"); contains(lines[0], "cesta: Model.Volne.VolnyPrvek"); contains(lines[0], "EAEXAMPLE.QEA"); contains(lines[0], "zapis sem: ANO");
+    var j = JSON.parse(lines[1]);
+    eq(j.kind, "eafb-context"); contains(j.repository, "EAEXAMPLE.QEA"); eq(j.type, "Element"); eq(j.guid, "{EL-FREE}"); eq(j.path, "Model.Volne.VolnyPrvek"); eq(j.writeCheck.ok, true);
+    eq(j.currentDiagram.guid, "{DG-FREE}");
+    ok(clip.indexOf("TAJNY OBSAH") < 0, "obsah (Notes) do schranky nejde"); ok(typeof j.notes == "undefined" && typeof j.attributes == "undefined", "zadny obsah v JSON");
+    // chraneny balicek -> writeCheck NE
+    var pk = repo.GetPackageByID(901);
+    repo.GetTreeSelectedItemType = function () { return 5; }; repo.GetTreeSelectedObject = function () { return pk; };
+    var out2 = withScope(scopeBL(), function () { return "" + B.FB_ClipboardContext.call(B, repo); });
+    var j2 = JSON.parse(mockClipboard.text.split("\n")[1]);
+    eq(j2.type, "Package"); eq(j2.path, "Model.FBT-CHRANENE.Podbalicek"); eq(j2.writeCheck.ok, false); eq(j2.writeCheck.code, "E_BLACKLIST");
+    contains(mockClipboard.text.split("\n")[0], "zapis sem: NE - E_BLACKLIST"); ok(mockClipboard.text.indexOf("E_BLACKLIST: E_BLACKLIST") < 0, "kod se v lidske vete neopakuje (zive 12. 10.)");
+    // bez vyberu: schranka beze zmeny
+    repo.GetTreeSelectedObject = function () { return null; }; repo.GetCurrentDiagram = function () { return null; };
+    mockClipboard.text = "beze zmeny";
+    var out3 = withScope(scopeBL(), function () { return "" + B.FB_ClipboardContext.call(B, repo); });
+    contains(out3, "neni nic vybrano"); eq(mockClipboard.text, "beze zmeny");
+    // menu: polozka existuje a klik ji obslouzi
+    var items = B.EA_GetMenuItems.call(B, repo, "MainMenu", "-AI Bridge");
+    ok(items.indexOf("Kontext vyberu do schranky (pro Copilota)") >= 0, "polozka v menu: " + JSON.stringify(items));
+    var src = fs.readFileSync(path.join(SRC, "AICodeBridge.EA_MenuClick.js"), "utf8");
+    contains(src, 'ItemName == "Kontext vyberu do schranky (pro Copilota)"'); contains(src, "FB_ClipboardContext(Repository)");
 });
 t("CZ-28 FB-CZ-28: E_BLACKLIST rika, ve ktere chranene vetvi cil lezi (plna cesta + note) a co delat", function () {
     var r = scopeRun(scopeRepo(), [{ op: "create_or_update_elements", elements: [{ guid: "{EL-BL-SUB}", name: "N" }] }], "cz28");

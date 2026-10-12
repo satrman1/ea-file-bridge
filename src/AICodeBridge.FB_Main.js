@@ -580,6 +580,9 @@ if (writesInBatch > 0) {
     if (pre2 && pre2.ok === false) { return emitPrecheck(pre2); }
     // odkazy zadane jmenem nebo cestou -> skutecny GUID a plna cesta (FB-CZ-18)
     if (pre2 && pre2.resolved && pre2.resolved.length > 0) { resp.resolved = pre2.resolved; }
+    // kaskady mazani do chranene casti (W2 b/c, cascadeDelete = allow): do
+    // odpovedi a do duvodu okna (nize, po Risk Gate) - Z261004b-11
+    if (pre2 && pre2.cascades && pre2.cascades.length > 0) { resp.cascades = pre2.cascades; }
 }
 if (writesInBatch > 0) {
     // W8 pres soubor (par. 1a/5): EA runtime nedrzi this._fb* mezi invokacemi
@@ -627,6 +630,14 @@ if (writesInBatch > 0) {
         risk.payloadHash = "";
         if (risk.riskLevel == "LOW") { risk.riskLevel = "ELEVATED"; }
         risk.riskReasons.push("FB_Sha256 selhal: " + eH.message + " (fail-closed)");
+    }
+    // KASKADY MAZANI do chranene casti (rozhodnuti Milose 12. 10. 2026, varianta
+    // c): pri cascadeDelete "allow" se povoli s DURAZNYM varovanim - vycet jde
+    // do duvodu okna (FB_ConfirmSummary ho ukaze cely) a davka nikdy neni LOW.
+    if (resp.cascades && resp.cascades.length > 0 && risk.riskLevel != "BLOCKED") {
+        if (risk.riskLevel == "LOW") { risk.riskLevel = "ELEVATED"; }
+        risk.cascades = resp.cascades;
+        for (var ci2 = 0; ci2 < resp.cascades.length; ci2++) { risk.riskReasons.push("" + resp.cascades[ci2].message); }
     }
     resp.risk = risk;
     if (risk.riskLevel == "BLOCKED") {

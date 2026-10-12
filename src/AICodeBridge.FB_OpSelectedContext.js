@@ -14,15 +14,22 @@
 // COM volani (past par. 1a/4).
 // Response:
 //   selected: true|false
+//   repository: identita repa (FB_RepoId) - do schranky / do davky
 //   context: { type: Element|Package|Diagram|Attribute|Operation, guid, id,
 //     name, path (teckova), branchGuid+branchId (vetev pro scope/adresaci),
-//     inWhitelist (prosel by zapis AI-sandboxem?), whitelistNote }
+//     writeCheck { ok, code, note } - TATAZ kontrola cile zapisu jako pri
+//     zapisu (blacklist + implicitni ochrana, osa balicku i vlastniku), BEZ
+//     zamku EA (ty se projevi az pri zapisu: E_PERMISSION / E_LOCKED).
+//     Nahrazuje inWhitelist/whitelistNote (cil zapisu v1.2, FB-CZ-19,
+//     Z261004b-11). Je to snimek v okamziku cteni - rozhoduje kontrola pri
+//     provedeni (davka nese GUID).
 //   selectedElements: [{guid,id,name,type}] (multi-vyber, max 50)
 //   currentDiagram: { guid, id, name, type } | null
 //   treeType: syrova hodnota GetTreeSelectedItemType (diagnostika)
 var self = this;
-var r = { op: "get_selected_context", status: "ok", selected: false,
+var r = { op: "get_selected_context", status: "ok", selected: false, repository: "",
     context: null, selectedElements: [], currentDiagram: null, treeType: 0 };
+try { r.repository = "" + this.FB_RepoId(Repository); } catch (eRid) { r.repository = ""; }
 try { r.treeType = Repository.GetTreeSelectedItemType(); } catch (eT) { r.treeType = 0; }
 var obj = null;
 try { obj = Repository.GetTreeSelectedObject(); } catch (eO) { obj = null; }
@@ -30,40 +37,45 @@ function prop(o, name) {
     try { var v = o[name]; return (typeof v == "undefined") ? null : v; }
     catch (e) { return null; }
 }
-function wlCheck(pkgObj) {
-    try {
-        var err = self.FB_CheckWrite(Repository, pkgObj);
-        return { inWhitelist: (err == null), note: err ? (err.code + ": zapis do teto vetve by AI-sandbox odmitl") : "" };
-    } catch (e) { return { inWhitelist: false, note: "kontrola whitelistu selhala: " + e.message }; }
+// writeCheck = tataz kontrola jako pri zapisu (FB_CheckWrite pro balicek,
+// FB_CheckWriteEl pro prvek/diagram - osa balicku i vlastniku), bez zamku EA
+function wcFrom(err, what) {
+    if (err == null) { return { ok: true, code: "", note: "zapis sem by prosel kontrolou cile (blacklist + implicitni ochrana); zamky EA rozhodnou az pri zapisu" }; }
+    return { ok: false, code: "" + err.code, note: (what ? what + ": " : "") + err.message };
+}
+function wcPkg(pkgObj) {
+    try { return wcFrom(self.FB_CheckWrite(Repository, pkgObj), ""); }
+    catch (e) { return { ok: false, code: "E_EXCEPTION", note: "kontrola cile zapisu selhala: " + e.message }; }
+}
+function wcEl(obj, kind) {
+    try { return wcFrom(self.FB_CheckWriteEl(Repository, obj, kind), ""); }
+    catch (e) { return { ok: false, code: "E_EXCEPTION", note: "kontrola cile zapisu selhala: " + e.message }; }
 }
 function elCtx(el, typeLabel, ownGuid, ownId, ownName) {
     var pkg = null;
     try { pkg = Repository.GetPackageByID(el.PackageID); } catch (eP) { pkg = null; }
-    var wl = pkg ? wlCheck(pkg) : { inWhitelist: false, note: "package vyberu nenalezen" };
     return { type: typeLabel, guid: "" + ownGuid, id: ownId, name: "" + ownName,
         path: "" + self.FB_ElementPath(Repository, "element", el)
             + (typeLabel == "Element" ? "" : ("." + ownName)),
         branchGuid: pkg ? ("" + pkg.PackageGUID) : "", branchId: pkg ? pkg.PackageID : 0,
-        inWhitelist: wl.inWhitelist, whitelistNote: wl.note };
+        writeCheck: wcEl(el, "element") };
 }
 if (obj != null) {
     var ctxInfo = null;
     if (prop(obj, "ElementGUID") != null) {
         ctxInfo = elCtx(obj, "Element", obj.ElementGUID, obj.ElementID, obj.Name);
     } else if (prop(obj, "PackageGUID") != null) {
-        var wlP = wlCheck(obj);
         ctxInfo = { type: "Package", guid: "" + obj.PackageGUID, id: obj.PackageID, name: "" + obj.Name,
             path: "" + this.FB_ElementPath(Repository, "package", obj),
             branchGuid: "" + obj.PackageGUID, branchId: obj.PackageID,
-            inWhitelist: wlP.inWhitelist, whitelistNote: wlP.note };
+            writeCheck: wcPkg(obj) };
     } else if (prop(obj, "DiagramGUID") != null) {
         var pkgD = null;
         try { pkgD = Repository.GetPackageByID(obj.PackageID); } catch (eD) { pkgD = null; }
-        var wlD = pkgD ? wlCheck(pkgD) : { inWhitelist: false, note: "package diagramu nenalezen" };
         ctxInfo = { type: "Diagram", guid: "" + obj.DiagramGUID, id: obj.DiagramID, name: "" + obj.Name,
             path: (pkgD ? ("" + this.FB_ElementPath(Repository, "package", pkgD) + ".") : "") + obj.Name,
             branchGuid: pkgD ? ("" + pkgD.PackageGUID) : "", branchId: pkgD ? pkgD.PackageID : 0,
-            inWhitelist: wlD.inWhitelist, whitelistNote: wlD.note };
+            writeCheck: pkgD ? wcEl(obj, "diagram") : { ok: false, code: "E_NOT_FOUND", note: "package diagramu nenalezen" } };
     } else if (prop(obj, "AttributeGUID") != null || prop(obj, "MethodGUID") != null) {
         var isAttr = (prop(obj, "AttributeGUID") != null);
         var parEl = null;

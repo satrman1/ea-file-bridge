@@ -12,6 +12,11 @@ if (MenuName == "-AI Bridge") {
         "Zapnout AI import rezim (vratny)",
         "-",
         "Stav bridge (kam zapisuje / co cte)",
+        // Cil zapisu (FB-UX-03, O6 = a, Z261004b-11): identita vyberu ve
+        // stromu (repozitar, typ, GUID, plna cesta, writeCheck) do schranky
+        // pro schrankovy kanal (M365 Copilot) - jen identita, nikdy obsah.
+        // Nova polozka menu = plny restart EA (PROTOKOL par. 1a).
+        "Kontext vyberu do schranky (pro Copilota)",
         // Baseline politika par. 6.3/5 (Z260907-5): nova polozka menu se
         // v EA projevi az po PLNEM RESTARTU EA (PROTOKOL par. 1a)
         "Uklid automatickych baselines (ukazat / provest)",

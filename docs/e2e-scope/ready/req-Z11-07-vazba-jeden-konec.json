@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "Z11-07-vazba-jeden-konec", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_connectors", "connectors": [
+   { "guid": "{A26940FA-E8CE-4b77-A1E9-E400437C7C57}", "name": "chr-src->vol2 (prejmenovano Z11 - jeden konec venku)" }
+ ] }
+] }

@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z11-10-ctx-volne", "repo": "EA17_Yoga_QEA2.qeax", "ops": [ { "op": "get_selected_context" } ] }

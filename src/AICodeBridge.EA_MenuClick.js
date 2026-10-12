@@ -27,8 +27,16 @@ else if (ItemName == "Zapnout AI import rezim (vratny)") {
     try { Session.Output("[AI Bridge] " + outG); } catch (eOG) { }
     Session.Prompt("AI import rezim:\n\n" + outG, 0);
 }
+else if (ItemName == "Kontext vyberu do schranky (pro Copilota)") {
+    // FB-UX-03 (Z261004b-11): identita vyberu ve stromu do schranky pro
+    // schrankovy kanal - repozitar, typ, GUID, plna cesta, writeCheck
+    var outK = "";
+    try { outK = "" + this.FB_ClipboardContext(Repository); }
+    catch (eKx) { outK = "CHYBA kontextu vyberu: " + eKx.message; }
+    Session.Prompt(outK, 0);
+}
 else if (ItemName == "Stav bridge (kam zapisuje / co cte)") {
-    // prehled repozitare, whitelistu (kam smi zapisovat, s cestou), slozky
+    // prehled repozitare, blacklistu (kam NESMI zapisovat, s cestou), slozky
     var outS = "";
     try { outS = "" + this.FB_Status(Repository); }
     catch (eSt) { outS = "CHYBA nacteni stavu: " + eSt.message; }

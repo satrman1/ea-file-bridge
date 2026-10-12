@@ -306,8 +306,10 @@ function segCtx(rr, idx, level) {
     if (level >= 2 && c.name) { s3 += c.name + " "; }
     s3 += (c.guid || "?");
     if (level >= 3 && c.path) { s3 += " path=" + c.path; } // plna cesta (I5)
-    s3 += " inWhitelist=" + (c.inWhitelist ? "true" : "false");
-    if (level >= 3 && c.whitelistNote) { s3 += " (" + clip(c.whitelistNote, 120) + ")"; }
+    // writeCheck misto inWhitelist (cil zapisu v1.2, FB-CZ-19, Z261004b-11)
+    var wc = c.writeCheck || null;
+    s3 += " writeCheck=" + (wc ? (wc.ok ? "ok" : ("NE " + (wc.code || "?"))) : "?");
+    if (level >= 3 && wc && !wc.ok && wc.note) { s3 += " (" + clip(wc.note, 160) + ")"; }
     if (rr.selectedElements && rr.selectedElements.length > 1) {
         s3 += " | multi-vyber " + rr.selectedElements.length + " prvku (GUIDy v res-" + id + ".json)";
     }

@@ -29,7 +29,7 @@
 var self = this;
 var AUDIT_CODES = { "E_BLACKLIST": 1, "E_SCOPE_CONFIG": 1 }; // Z261004b-10: pokus o zapis do chranene casti / vadna konfigurace se auditu (kap. 5.3, odchylka od pravidla 1 KONCEPCE oken)
 var problems = [];
-var resolvedOut = [];
+var resolvedOut = [], cascadesOut = [];
 var ph = ("" + (phase || "shape")).toLowerCase();
 function prob(opIdx, pth, code, msg, extra) {
     var p = { op: opIdx, path: pth, code: code, message: msg };
@@ -360,9 +360,10 @@ if (ph == "targets") {
     catch (eSc) { scopeRes = { problems: [{ op: -1, path: "FB_WriteScope", code: "E_SCOPE_CONFIG", message: "FB_ScopePrecheck selhal: " + eSc.message + " - fail-closed" }], resolved: [] }; }
     if (scopeRes && scopeRes.problems) { for (var sp = 0; sp < scopeRes.problems.length; sp++) { problems.push(scopeRes.problems[sp]); } }
     if (scopeRes && scopeRes.resolved && scopeRes.resolved.length > 0) { resolvedOut = scopeRes.resolved; }
+    if (scopeRes && scopeRes.cascades && scopeRes.cascades.length > 0) { cascadesOut = scopeRes.cascades; } // W2 b/c pri cascadeDelete allow -> okno
 }
 // ===================== vysledek =====================
-if (problems.length == 0) { return { ok: true, problems: [], resolved: resolvedOut }; }
+if (problems.length == 0) { return { ok: true, problems: [], resolved: resolvedOut, cascades: cascadesOut }; }
 // kod davky = nejzavaznejsi z problemu (poradi: konfigurace > chranena cast >
 // neznama operace > zakazana operace > nejednoznacnost > nenalezeno > tvar)
 var ORDER = { "E_SCOPE_CONFIG": 7, "E_BLACKLIST": 6, "E_REPO": 6, "E_UNKNOWN_OP": 5, "E_OP_FORBIDDEN": 4, "E_AMBIGUOUS": 3, "E_NOT_FOUND": 2, "E_ARGS": 1 };

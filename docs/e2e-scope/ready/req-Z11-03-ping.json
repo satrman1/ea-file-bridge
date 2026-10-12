@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z11-03-ping", "repo": "EA17_Yoga_QEA2.qeax", "ops": [ { "op": "ping", "echo": "pumpa po deployi Z261004b-11" } ] }

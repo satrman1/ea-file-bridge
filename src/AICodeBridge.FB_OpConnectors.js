@@ -22,15 +22,22 @@
 //                           = E_AMBIGUOUS s vyctem GUIDu. Default off - chovani
 //                           stavajicich davek se NEMENI.
 // } ]
-// CIL ZAPISU (rezim blacklist, zadani v1.1 kap. 5.5, B2, Z261004b-10): kontrola
+// CIL ZAPISU (rezim blacklist, zadani v1.2 kap. 5.5; Z261004b-10/-11): kontrola
 // se pocita nad konci SKUTECNEHO konektoru po dohledani (guid, dedupKey,
-// match) a znovu nad NOVYMI konci, meni-li davka source/target:
-//   create: zdroj chraneny -> cil volny = povoleno vzdy (O11 = c); zdroj volny
-//           -> cil chraneny = podle allowIncomingRefs vetve (O3 = a, vychozi
-//           true); oba konce chranene = E_BLACKLIST
-//   update: zdroj existujici vazby v chranene casti = E_BLACKLIST (vlastni
-//           vazba chraneneho prvku); presmerovani zdroje do chranene casti =
-//           E_BLACKLIST; presmerovani cile podle allowIncomingRefs
+// match) a znovu nad NOVYM PAREM koncu, meni-li davka source/target.
+// PRAVIDLO (rozhodnuti Milose 12. 10. 2026, nahrazuje "vazbu vlastni zdroj"
+// z B2): vazba je chranena, JEN kdyz jsou OBA jeji konce v chranene casti -
+// s jednim koncem venku chranena neni, at vede kterymkoli smerem:
+//   create: oba konce chranene = E_BLACKLIST; zdroj volny -> cil v chranene
+//           vetvi s allowIncomingRefs: false = E_BLACKLIST (O3 = a, volitelne
+//           zprisneni zalozeni); jinak povoleno (vc. zdroj chraneny -> cil
+//           volny, O11 = c)
+//   update: oba konce existujici vazby chranene = E_BLACKLIST (zmena i
+//           smazani); presmerovani: novy par koncu oba chranene = E_BLACKLIST;
+//           novy cil v chranene vetvi s allowIncomingRefs: false a volny zdroj
+//           = E_BLACKLIST; jinak povoleno
+// Zamky EA u vazeb most nehlida (FB-CZ-22: EA je pres Automation nehlida
+// vubec; smer vazby je dan logikou reseni, ne vlastnictvim).
 // Osa vlastniku (I14) pres FB_CheckWriteEl. Prvni obrana je P2 (FB_ScopePrecheck).
 // POZOR (par. 7g): Connector.Update() umi vratit false bez vyhozeni chyby -
 // navratova hodnota se kontroluje VZDY; updaty direction davkovat po jednom.
@@ -119,33 +126,39 @@ for (var i = 0; i < op.connectors.length; i++) {
             }
         }
     }
-    // --- pravidlo vazeb nad SKUTECNYMI konci (B2) a NOVYMI konci ---
+    // --- pravidlo vazeb "oba konce" nad SKUTECNYMI konci a NOVYM parem koncu ---
     var ns = null, nt = null;
     if (conn != null) {
         var realSrc = null, realTgt = null;
         try { realSrc = Repository.GetElementByID(conn.ClientID); realTgt = Repository.GetElementByID(conn.SupplierID); } catch (eRe) { realSrc = null; }
         var chkRS = (realSrc != null) ? chkEl(realSrc) : { code: "E_EXCEPTION", message: "zdroj konektoru nelze nacist" };
-        if (chkRS != null) {
-            return { op: "create_or_update_connectors", status: "error", code: chkRS.code,
-                message: "connectors[" + i + "]: zdroj existujici vazby" + (realSrc ? " ('" + realSrc.Name + "')" : "") + " lezi v chranene casti - zmena vazby chraneneho prvku neni povolena. " + chkRS.message, items: items };
+        var chkRT = (realTgt != null) ? chkEl(realTgt) : { code: "E_EXCEPTION", message: "cil konektoru nelze nacist" };
+        if (chkRS != null && chkRS.code != "E_BLACKLIST") { return { op: "create_or_update_connectors", status: "error", code: chkRS.code, message: "connectors[" + i + "]: " + chkRS.message, items: items }; }
+        if (chkRT != null && chkRT.code != "E_BLACKLIST") { return { op: "create_or_update_connectors", status: "error", code: chkRT.code, message: "connectors[" + i + "]: " + chkRT.message, items: items }; }
+        if (chkRS != null && chkRT != null) {
+            return { op: "create_or_update_connectors", status: "error", code: "E_BLACKLIST",
+                message: "connectors[" + i + "]: oba konce existujici vazby ('" + realSrc.Name + "' -> '" + realTgt.Name + "') lezi v chranene casti - zmena vazby chranene casti neni povolena. " + chkRS.message, items: items };
         }
+        var chkNS = chkRS, chkNT = chkRT, nsName = realSrc ? realSrc.Name : "?", ntName = realTgt ? realTgt.Name : "?";
         if (c.source) {
             ns = this.FB_ResolveEl(Repository, c.source);
             if (ns == null) { return this.FB_ResolveFail("create_or_update_connectors", "connectors[" + i + "]: novy source nenalezen (" + c.source + ").", items); }
-            var chkNS = chkEl(ns);
-            if (chkNS != null) {
-                return { op: "create_or_update_connectors", status: "error", code: chkNS.code,
-                    message: "connectors[" + i + "]: novy zdroj vazby ('" + ns.Name + "') lezi v chranene casti - presmerovani zdroje do chranene casti neni povolene. " + chkNS.message, items: items };
-            }
+            chkNS = chkEl(ns); nsName = ns.Name;
+            if (chkNS != null && chkNS.code != "E_BLACKLIST") { return { op: "create_or_update_connectors", status: "error", code: chkNS.code, message: "connectors[" + i + "]: " + chkNS.message, items: items }; }
         }
         if (c.target) {
             nt = this.FB_ResolveEl(Repository, c.target);
             if (nt == null) { return this.FB_ResolveFail("create_or_update_connectors", "connectors[" + i + "]: novy target nenalezen (" + c.target + ").", items); }
-            var chkNT = chkEl(nt);
-            if (chkNT != null && (chkNT.code != "E_BLACKLIST" || !allowIn(chkNT))) {
-                return { op: "create_or_update_connectors", status: "error", code: chkNT.code,
-                    message: "connectors[" + i + "]: novy cil vazby ('" + nt.Name + "') lezi v chranene vetvi s allowIncomingRefs: false. " + chkNT.message, items: items };
-            }
+            chkNT = chkEl(nt); ntName = nt.Name;
+            if (chkNT != null && chkNT.code != "E_BLACKLIST") { return { op: "create_or_update_connectors", status: "error", code: chkNT.code, message: "connectors[" + i + "]: " + chkNT.message, items: items }; }
+        }
+        if (chkNS != null && chkNT != null) {
+            return { op: "create_or_update_connectors", status: "error", code: "E_BLACKLIST",
+                message: "connectors[" + i + "]: oba konce vazby po presmerovani ('" + nsName + "' -> '" + ntName + "') lezi v chranene casti. " + chkNS.message, items: items };
+        }
+        if (c.target && chkNT != null && chkNS == null && !allowIn(chkNT)) {
+            return { op: "create_or_update_connectors", status: "error", code: "E_BLACKLIST",
+                message: "connectors[" + i + "]: novy cil vazby ('" + ntName + "') lezi v chranene vetvi s allowIncomingRefs: false. " + chkNT.message, items: items };
         }
     } else {
         var chkS = chkEl(srcEl);
@@ -160,7 +173,7 @@ for (var i = 0; i < op.connectors.length; i++) {
             return { op: "create_or_update_connectors", status: "error", code: "E_BLACKLIST",
                 message: "connectors[" + i + "]: cil vazby ('" + tgtEl.Name + "') lezi v chranene vetvi s allowIncomingRefs: false - vazba z volne casti do ni neni povolena. " + chkT.message, items: items };
         }
-        // zdroj chraneny -> cil volny: povoleno vzdy (O11 = c, krok 4b katalogu)
+        // jeden konec venku = vazba neni chranena (vc. zdroj chraneny -> cil volny, O11 = c, krok 4b katalogu)
     }
     if (conn == null) {
         conn = srcEl.Connectors.AddNew((typeof c.name == "undefined" ? "" : "" + c.name), "" + c.type);

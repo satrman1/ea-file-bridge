@@ -17,17 +17,23 @@ r.repository = "" + this.FB_RepoId(Repository);
 r.connection = "" + Repository.ConnectionString;
 r.time = "" + d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate())
     + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
-// --- cil zapisu (rezim blacklist, Z261004b-10, kap. 5.11): blok writeScope
-// misto pole whitelist[] (zanika): stav EA security (informativne), blacklist
-// (GUID, jmeno, plna cesta, note, found, allowIncomingRefs), implicitni ochrany
-// s cestou, stav konfigurace (vady = E_SCOPE_CONFIG). Lidske vety doladuje
-// Z261004b-11 (FB-CZ-27); nedohledatelna polozka se vypise s found: false,
-// NIKDY se tise nezahodi (par. 4.5).
-r.writeScope = { mode: "blacklist", securityEnabled: false, repoKnown: false, blacklist: [], implicit: [], problems: [], warnings: [] };
+// --- cil zapisu (rezim blacklist, Z261004b-10/-11, kap. 5.11): blok writeScope
+// misto pole whitelist[] (zaniklo, O1 = b): stav EA security (informativne),
+// blacklist (GUID, jmeno, plna cesta, note, found, allowIncomingRefs),
+// implicitni ochrany s cestou, stav konfigurace (vady = E_SCOPE_CONFIG),
+// cascadeDelete, summary = tataz lidska veta jako start session a "Stav
+// bridge" (FB_ScopeText, FB-CZ-27), agentNotes = pravidla pro agenta (vazby
+// "oba konce", zamky EA nehlidaji vazby, $N misto jmen, kaskady mazani).
+// Nedohledatelna polozka se vypise s found: false, NIKDY se tise nezahodi.
+r.writeScope = { mode: "blacklist", securityEnabled: false, repoKnown: false, cascadeDelete: "block", summary: "", blacklist: [], implicit: [], problems: [], warnings: [], agentNotes: [] };
 try { r.writeScope.securityEnabled = (Repository.IsSecurityEnabled === true); } catch (eSe) { }
 try {
-    this._fbScopeCfg = null; // ping = cerstve cteni konfigurace
-    var ws = this.FB_WriteScopeCfg(Repository);
+    var st = this.FB_ScopeText(Repository); // cerstve cteni konfigurace
+    var ws = st.cfg;
+    r.writeScope.summary = st.sentence;
+    r.writeScope.cascadeDelete = st.cascadeDelete;
+    r.writeScope.agentNotes = st.agentNotes;
+    if (ws == null) { throw new Error("FB_WriteScopeCfg nelze precist"); }
     r.writeScope.repoKnown = ws.repoKnown;
     for (var wi = 0; wi < ws.blacklist.length; wi++) {
         var w = ws.blacklist[wi];
@@ -38,7 +44,7 @@ try {
         r.writeScope.implicit.push({ kind: im.kind, guid: im.guid, name: im.name, path: im.path, note: im.note });
     }
     r.writeScope.problems = ws.problems;
-    r.writeScope.warnings = ws.warnings;
+    r.writeScope.warnings = st.warnings; // vc. informativniho varovani o vypnute security
 } catch (eWl) { r.writeScope.error = "" + eWl.message; }
 // --- riskPolicy (KONCEPCE potvrzovaci okna pravidlo 7, Z261004b-3): agent si
 // na zacatku prace precte tridy operaci a prahy a predem rekne cloveku,

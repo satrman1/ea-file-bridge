@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "Z11-04-vazby-cteni", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "query", "sql": "SELECT c.Connector_ID, c.ea_guid, c.Name, c.Connector_Type, c.Start_Object_ID, s.Name AS SrcName, c.End_Object_ID, e.Name AS TgtName FROM t_connector c INNER JOIN t_object s ON s.Object_ID = c.Start_Object_ID INNER JOIN t_object e ON e.Object_ID = c.End_Object_ID WHERE s.Package_ID IN (714,715,716) OR e.Package_ID IN (714,715,716)" }
+] }

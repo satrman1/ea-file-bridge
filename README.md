@@ -26,13 +26,13 @@ AI driver ◄── responses\res-*.json ◄────────────
 ## Rychlý start (doma)
 
 1. EA s `EAExample.qea` + jednorázově: EA Scripting → spustit `scripts/ITAN-Inject Addin Code.js` (JScript)
-2. Dvojklik `pump.wsf` → konzole hlásí „Pripojeno na EA" + „Session baseline: 1 vytvoren"
+2. Dvojklik `pump.wsf` → konzole hlásí „Pripojeno na EA" + řádek `Zapis: blacklist (N chranenych vetvi) | EA security … | chraneno: …` (od v0.17; session baseline se nedělá, zálohy vznikají až před zápisem)
 3. VS Code → Open Folder → tento repozitář → Copilot agent mode (postup: `docs/NAVOD-GENERALKA-DOMA.md`)
 
 ## Klíčová pravidla
 
 - Zápis do modelu výhradně Automation API; SQL jen čtení (SELECT/WITH).
-- Whitelist vázaný na **instanci repozitáře** (`FB_Whitelist`: repo + GUID) + povinná deklarace `repo` v dávce — ochrana proti klonům repozitáře (testovací klon × produkce).
+- Hranice zápisu = **EA security + blacklist** vázaný na **instanci repozitáře** (`FB_WriteScope`: repo + GUIDy chráněných větví; od v0.17, 12. 10. 2026 — nahrazuje whitelist `FB_Whitelist`) + povinná deklarace `repo` v dávce — ochrana proti klonům repozitáře (testovací klon × produkce). Detail `docs/PROTOKOL-EAFB.md` §6k.
 - SQL dialekt: doma SQLite (.qea), v bance MS SQL 2022 — hlídá autor dotazu.
 - EA Scripting skripty výhradně JScript. Po každé změně kódu v modelu sync zpět do `src/`.
 

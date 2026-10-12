@@ -6,8 +6,8 @@
 //  (1) HLASENI - bezi VZDY: identita repa dle FB_RepoId, stav konfigurace
 //      cile zapisu (FB_WriteScopeCfg: chranene vetve blacklistu, implicitni
 //      ochrana auditu a add-inu, vady = E_SCOPE_CONFIG), varovani, kdyz
-//      repozitar nema polozku ve FB_WriteScope (prevence E_REPO). Lidskou
-//      vetu a ping (writeScope) doladuje Z261004b-11.
+//      repozitar nema polozku ve FB_WriteScope (prevence E_REPO). Lidska
+//      veta = FB_ScopeText (tataz v menu "Stav bridge" a v pingu, FB-CZ-27).
 //  (2) ZALOHA session se uz NEDELA: sessionBaseline "auto" nema bez whitelistu
 //      cil - FB_BaselineConfig ji preklopi na "off" a ohlasi to (FB-CZ-25).
 //      Zalohy vznikaji az pred zapisem, vzdy nad konkretnim balickem.
@@ -26,28 +26,16 @@ var cfgB = null, cfgWarn = [];
 try { var cb = this.FB_BaselineConfig(Repository); cfgB = cb.cfg; cfgWarn = cb.warnings || []; } catch (eCfg) { cfgB = null; }
 var parts = [];
 parts.push("Repozitar: " + ridRaw);
-var ws = null;
-try { ws = this.FB_WriteScopeCfg(Repository); } catch (eWs) { ws = null; }
-var secOn = false;
-try { secOn = (Repository.IsSecurityEnabled === true); } catch (eSe) { secOn = false; }
-if (ws == null) {
+// jedna lidska veta o cili zapisu - tataz jako v menu "Stav bridge" a v pingu
+// (FB_ScopeText, FB-CZ-27, Z261004b-11); stav EA security jen informativne
+var st = null;
+try { st = this.FB_ScopeText(Repository); } catch (eSt) { st = null; }
+if (st == null) {
     parts.push("POZOR: konfiguraci cile zapisu (FB_WriteScope) nelze precist - zapisy skonci E_SCOPE_CONFIG");
-} else if (!ws.repoKnown) {
-    parts.push("POZOR: repozitar nema polozku ve FB_WriteScope - zapisy budou zamitnuty (E_REPO). Identita: " + ridRaw + " | Pripojeni: " + Repository.ConnectionString);
 } else {
-    var bl = [];
-    for (var b = 0; b < ws.blacklist.length; b++) {
-        var w = ws.blacklist[b];
-        bl.push((w.found ? w.path : (w.name || w.pkg) + " (NENALEZEN)") + (w.note ? " [" + w.note + "]" : ""));
-    }
-    var im = [];
-    for (var i = 0; i < ws.implicit.length; i++) { im.push(ws.implicit[i].path || ws.implicit[i].name); }
-    parts.push("Zapis: blacklist (" + ws.blacklist.length + " chranenych vetvi) | EA security " + (secOn ? "zapnuta" : "vypnuta")
-        + " | chraneno: " + (bl.length > 0 ? bl.join(", ") : "(nic na blacklistu)")
-        + " | bridge chrani i sam sebe: " + (im.length > 0 ? im.join(", ") : "(balicek add-inu/auditu nedohledan)"));
-    if (!secOn) { parts.push("Varovani: EA security je vypnuta - jedinou hranici zapisu je blacklist a implicitni ochrana (O2 = b)"); }
-    if (ws.problems.length > 0) { parts.push("CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG - vsechny zapisy zastavene, cteni bezi): " + ws.problems.join(" | ")); }
-    if (ws.warnings.length > 0) { parts.push("Upozorneni: " + ws.warnings.join(" | ")); }
+    parts.push(st.sentence);
+    if (st.problems.length > 0) { parts.push("CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG - vsechny zapisy zastavene, cteni bezi; opravny kanal = davka jen s deploy_src): " + st.problems.join(" | ")); }
+    if (st.warnings.length > 0) { parts.push("Upozorneni: " + st.warnings.join(" | ")); }
 }
 for (var cw = 0; cw < cfgWarn.length; cw++) { parts.push(cfgWarn[cw]); }
 parts.push("Session baseline se nedela (sessionBaseline off). Zalohy se poridi automaticky az pred prvnim zapisem - vzdy nad konkretnim balickem, ne nad celou vetvi.");

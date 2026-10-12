@@ -59,6 +59,20 @@ if (bl && bl.lines && bl.lines.length > 0) {
     L.push("");
     L.push("POZOR: zalohu se nepodarilo naplanovat (" + (bl.reason || "?") + ") - zapis probehne BEZ pre-image.");
 }
+// --- KASKADY MAZANI do chranene casti (W2 b/c, cascadeDelete = allow;
+// rozhodnuti Milose 12. 10. 2026): clovek rozhoduje S INFORMACI, ne s
+// varovanim po smazani - vycet cely, zaloha chraneny balicek nekryje.
+if (risk.cascades && risk.cascades.length > 0) {
+    L.push("");
+    L.push("POZOR - smazani sahne kaskadou EA do CHRANENE casti (zaloha ji nekryje):");
+    for (var ki = 0; ki < risk.cascades.length; ki++) {
+        var kc = risk.cascades[ki] || {};
+        L.push("  - " + (kc.what || "") + ": " + (kc.kind == "diagram" ? "lezi na chranenem diagramu" : (kc.kind == "classifier" ? "je klasifikatorem instanci v chranene casti (EA jim nastavi Classifier = 0)" : "kaskada")) + " - " + (kc.count || 0) + "x");
+        var kit = kc.items || [];
+        for (var kj = 0; kj < kit.length && kj < 8; kj++) { L.push("      " + kit[kj]); }
+        if (kit.length > 8) { L.push("      ... a dalsich " + (kit.length - 8)); }
+    }
+}
 // --- proc se ptam (plainu, prvni konkretni duvod) ---
 if (risk.riskReasons && risk.riskReasons.length > 0) {
     L.push("");
