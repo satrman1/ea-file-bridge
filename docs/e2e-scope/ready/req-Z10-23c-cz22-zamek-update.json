@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "Z10-23c-cz22-zamek-update", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "query", "sql": "SELECT Connector_ID, Name, Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_ID IN (1868, 1869)" },
+ { "op": "create_or_update_connectors", "connectors": [ { "guid": "{D34BD8A4-67E0-4322-BEE0-805EDBCF028E}", "name": "ZAM-Prvek->vol2 (prejmenovano, zdroj v zamku)" } ] },
+ { "op": "create_or_update_elements", "elements": [ { "guid": "{AA1F87B9-E88D-47dc-89ED-E6E8C8CB6777}", "notes": "pokus o update prvku v zamku (ocekavano E_PERMISSION)" } ] } ] }

@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-23e-readback", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "query", "sql": "SELECT Connector_ID, Name FROM t_connector WHERE Connector_ID IN (1868, 1869)" } ] }

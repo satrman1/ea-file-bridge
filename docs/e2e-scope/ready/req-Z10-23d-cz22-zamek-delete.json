@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-23d-cz22-zamek-delete", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "delete_from_model", "targets": [ { "type": "Connector", "guid": "{D34BD8A4-67E0-4322-BEE0-805EDBCF028E}" } ] } ] }
