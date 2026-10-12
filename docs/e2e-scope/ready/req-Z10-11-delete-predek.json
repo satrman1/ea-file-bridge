@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-11-delete-predek", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "delete_from_model", "targets": [ { "type": "Package", "guid": "{25A6D2B3-A683-48d2-8FF1-7EDEE7E15476}" } ] } ] }

@@ -20,6 +20,7 @@ if (!op || !op.diagrams || Object.prototype.toString.call(op.diagrams) != "[obje
     return { op: "create_or_update_diagram", status: "error", code: "E_ARGS", message: "Povinne: diagrams (neprazdne pole objektu)." };
 }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.diagrams.length; i++) {
     var d = op.diagrams[i];
     var dg = null, created = false;
@@ -31,7 +32,7 @@ for (var i = 0; i < op.diagrams.length; i++) {
             else if (/^[0-9]+$/.test(ref)) { dg = Repository.GetDiagramByID(parseInt(ref, 10)); }
         } catch (eG) { dg = null; }
         if (dg == null) { return { op: "create_or_update_diagram", status: "error", code: "E_NOT_FOUND", message: "diagrams[" + i + "]: diagram nenalezen (" + ref + ")", items: items }; }
-        var chkU = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+        var chkU = this.FB_CheckWriteEl(Repository, dg, "diagram");
         if (chkU != null) { return { op: "create_or_update_diagram", status: "error", code: chkU.code, message: "diagrams[" + i + "]: " + chkU.message, items: items }; }
         if (typeof d.name != "undefined") { dg.Name = "" + d.name; }
     } else {
@@ -44,7 +45,7 @@ for (var i = 0; i < op.diagrams.length; i++) {
         if (d.owningElement) {
             var owner = this.FB_ResolveEl(Repository, d.owningElement);
             if (owner == null) { return { op: "create_or_update_diagram", status: "error", code: "E_NOT_FOUND", message: "diagrams[" + i + "]: owningElement nenalezen (" + d.owningElement + ")", items: items }; }
-            var chkO = this.FB_CheckWrite(Repository, Repository.GetPackageByID(owner.PackageID));
+            var chkO = this.FB_CheckWriteEl(Repository, owner);
             if (chkO != null) { return { op: "create_or_update_diagram", status: "error", code: chkO.code, message: "diagrams[" + i + "]: " + chkO.message, items: items }; }
             dg = owner.Diagrams.AddNew(nm, typ);
             if (!dg.Update()) { return { op: "create_or_update_diagram", status: "error", code: "E_EXCEPTION", message: "diagrams[" + i + "]: Diagram.Update() selhal: " + dg.GetLastError(), items: items }; }

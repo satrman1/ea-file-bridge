@@ -6,7 +6,7 @@
 if (!op || !op["package"]) {
     return { op: "get_baselines", status: "error", code: "E_ARGS", message: "Povinne: package." };
 }
-var pkg = this.FB_ResolvePkg(Repository, op["package"]);
+var pkg = this.FB_ResolvePkg(Repository, op["package"], "read"); // cteni (cil zapisu kap. 5.7)
 if (pkg == null) { return { op: "get_baselines", status: "error", code: "E_NOT_FOUND", message: "Package nenalezen: " + op["package"] }; }
 var pi = Repository.GetProjectInterface();
 var xml = "";

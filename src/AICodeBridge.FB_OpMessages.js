@@ -45,6 +45,13 @@ if (op.diagram) {
     if (dg == null) { return { op: "create_or_update_messages", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + op.diagram }; }
 }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3
+var self = this;
+// CIL ZAPISU (rezim blacklist, kap. 5.5, B2): tataz pravidla jako FB_OpConnectors -
+// zdroj existujici zpravy v chranene casti = E_BLACKLIST (i rebuild), novy zdroj
+// v chranene casti = E_BLACKLIST, cil podle allowIncomingRefs; osa vlastniku (I14).
+function chkEl(el) { try { return self.FB_CheckWriteEl(Repository, el); } catch (eC) { return { code: "E_EXCEPTION", message: "kontrola cile selhala: " + eC.message }; } }
+function allowIn(r) { return !(r && r.branch && r.branch.allowIncomingRefs === false); }
 // --- OPT-IN rebuild mod (audit B2, K3): smaz Sequence konektory diagramu + postav znovu ---
 var rebuild = (op.rebuild === true || ("" + op.rebuild) == "true");
 var removed = 0;
@@ -70,7 +77,8 @@ if (rebuild) {
     } catch (eRQ) {
         return { op: "create_or_update_messages", status: "error", code: "E_EXCEPTION", message: "rebuild: dotaz na zpravy diagramu selhal: " + eRQ.message };
     }
-    // pre-check whitelistu VSECH mazanych konektoru PRED prvnim mazanim (zadne parcialni mazani)
+    // pre-check cile VSECH mazanych konektoru PRED prvnim mazanim (zadne parcialni
+    // mazani): zdroj zpravy v chranene casti = E_BLACKLIST (vlastni vazba prvku)
     var toDel = [];
     for (var di = 0; di < delRows.length; di++) {
         var dcid = parseInt(delRows[di].Connector_ID, 10);
@@ -78,12 +86,10 @@ if (rebuild) {
         try { dc = Repository.GetConnectorByID(dcid); } catch (eDC) { dc = null; }
         if (dc == null) { continue; }
         var dCli = Repository.GetElementByID(dc.ClientID);
-        var dSup = Repository.GetElementByID(dc.SupplierID);
-        var dChk1 = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dCli.PackageID));
-        var dChk2 = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dSup.PackageID));
-        if (dChk1 != null && dChk2 != null) {
+        var dChk1 = chkEl(dCli);
+        if (dChk1 != null) {
             return { op: "create_or_update_messages", status: "error", code: dChk1.code,
-                message: "rebuild: konektor " + dcid + " ma oba konce mimo whitelist - nic nebylo smazano. " + dChk1.message };
+                message: "rebuild: zprava " + dcid + " ma zdroj ('" + (dCli ? dCli.Name : "?") + "') v chranene casti - nic nebylo smazano. " + dChk1.message };
         }
         toDel.push({ id: dcid, clientID: dc.ClientID });
     }
@@ -122,17 +128,47 @@ for (var i = 0; i < op.messages.length; i++) {
             return { op: "create_or_update_messages", status: "error", code: "E_ARGS", message: "messages[" + i + "]: create vyzaduje source a target.", items: items };
         }
         srcEl = this.FB_ResolveEl(Repository, msg.source);
+        if (srcEl == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + i + "]: source nenalezen (" + msg.source + ").", items); }
         tgtEl = this.FB_ResolveEl(Repository, msg.target);
-        if (srcEl == null || tgtEl == null) {
-            return { op: "create_or_update_messages", status: "error", code: "E_NOT_FOUND",
-                message: "messages[" + i + "]: " + (srcEl == null ? "source" : "target") + " nenalezen.", items: items };
-        }
+        if (tgtEl == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + i + "]: target nenalezen (" + msg.target + ").", items); }
     }
-    var chkS = this.FB_CheckWrite(Repository, Repository.GetPackageByID(srcEl.PackageID));
-    var chkT = this.FB_CheckWrite(Repository, Repository.GetPackageByID(tgtEl.PackageID));
-    if (chkS != null && chkT != null) {
-        return { op: "create_or_update_messages", status: "error", code: chkS.code,
-            message: "messages[" + i + "]: zadny konec neni ve whitelistovane vetvi. " + chkS.message, items: items };
+    var ns = null, nt = null;
+    if (conn != null) {
+        var chkRS = chkEl(srcEl);
+        if (chkRS != null) {
+            return { op: "create_or_update_messages", status: "error", code: chkRS.code,
+                message: "messages[" + i + "]: zdroj existujici zpravy ('" + srcEl.Name + "') lezi v chranene casti - zmena zpravy chraneneho prvku neni povolena. " + chkRS.message, items: items };
+        }
+        if (msg.source) {
+            ns = this.FB_ResolveEl(Repository, msg.source);
+            if (ns == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + i + "]: novy source nenalezen (" + msg.source + ").", items); }
+            var chkNS = chkEl(ns);
+            if (chkNS != null) {
+                return { op: "create_or_update_messages", status: "error", code: chkNS.code,
+                    message: "messages[" + i + "]: novy zdroj zpravy ('" + ns.Name + "') lezi v chranene casti - presmerovani zdroje neni povolene. " + chkNS.message, items: items };
+            }
+        }
+        if (msg.target) {
+            nt = this.FB_ResolveEl(Repository, msg.target);
+            if (nt == null) { return this.FB_ResolveFail("create_or_update_messages", "messages[" + i + "]: novy target nenalezen (" + msg.target + ").", items); }
+            var chkNT = chkEl(nt);
+            if (chkNT != null && (chkNT.code != "E_BLACKLIST" || !allowIn(chkNT))) {
+                return { op: "create_or_update_messages", status: "error", code: chkNT.code,
+                    message: "messages[" + i + "]: novy cil zpravy ('" + nt.Name + "') lezi v chranene vetvi s allowIncomingRefs: false. " + chkNT.message, items: items };
+            }
+        }
+    } else {
+        var chkS = chkEl(srcEl), chkT = chkEl(tgtEl);
+        if (chkS != null && chkS.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: chkS.code, message: "messages[" + i + "]: " + chkS.message, items: items }; }
+        if (chkT != null && chkT.code != "E_BLACKLIST") { return { op: "create_or_update_messages", status: "error", code: chkT.code, message: "messages[" + i + "]: " + chkT.message, items: items }; }
+        if (chkS != null && chkT != null) {
+            return { op: "create_or_update_messages", status: "error", code: "E_BLACKLIST",
+                message: "messages[" + i + "]: oba konce zpravy lezi v chranene casti. " + chkS.message, items: items };
+        }
+        if (chkT != null && chkS == null && !allowIn(chkT)) {
+            return { op: "create_or_update_messages", status: "error", code: "E_BLACKLIST",
+                message: "messages[" + i + "]: cil zpravy ('" + tgtEl.Name + "') lezi v chranene vetvi s allowIncomingRefs: false. " + chkT.message, items: items };
+        }
     }
     // --- vazba na operaci ---
     var meth = null;
@@ -165,8 +201,8 @@ for (var i = 0; i < op.messages.length; i++) {
         created = true;
     } else {
         if (name !== null) { conn.Name = name; }
-        if (msg.source) { var ns = this.FB_ResolveEl(Repository, msg.source); if (ns != null) { conn.ClientID = ns.ElementID; } }
-        if (msg.target) { var nt = this.FB_ResolveEl(Repository, msg.target); if (nt != null) { conn.SupplierID = nt.ElementID; } }
+        if (ns != null) { conn.ClientID = ns.ElementID; }
+        if (nt != null) { conn.SupplierID = nt.ElementID; }
     }
     // --- kind/synch dle MCP reference: PDATA1=Sync/Async, PDATA3=Call ---
     if (typeof msg.isAsynchronous != "undefined") {

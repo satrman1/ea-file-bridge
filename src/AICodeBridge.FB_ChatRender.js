@@ -252,22 +252,28 @@ function segPing(rr, idx, level) {
         if (level >= 3 && ac.reason) { s2 += "; " + clip(ac.reason, 200); }
         s2 += ")";
     }
-    var wlA = rr.whitelist;
-    if (wlA && wlA.length > 0) {
-        var wbuf = [];
-        for (var wx = 0; wx < wlA.length; wx++) {
-            var w1 = wlA[wx] || {};
-            var ws = "";
-            if (level >= 2 && w1.name) { ws += w1.name + " "; }
-            ws += (w1.guid || "?");
-            if (level >= 3 && w1.path) { ws += " path=" + w1.path; } // plna cesta (par. 4.2, I5)
-            if (w1.note) { ws += " (" + w1.note + ")"; }
-            wbuf.push(ws);
+    // cil zapisu (rezim blacklist, Z261004b-10): segment "zapis: blacklist (N
+    // chranenych vetvi)" misto segmentu whitelist (kap. 5.11; lidske vety
+    // doladuje Z261004b-11)
+    var wsA = rr.writeScope;
+    if (wsA) {
+        var blA = wsA.blacklist || [];
+        if (!wsA.repoKnown) {
+            s2 += " | zapis: repozitar NEMA polozku ve FB_WriteScope - zapis skonci E_REPO";
+        } else {
+            s2 += " | zapis: blacklist (" + blA.length + " chranenych vetvi" + (wsA.securityEnabled ? ", EA security zapnuta" : ", EA security VYPNUTA") + ")";
+            if (level >= 2 && blA.length > 0) {
+                var wbuf = [];
+                for (var wx = 0; wx < blA.length; wx++) {
+                    var w1 = blA[wx] || {};
+                    var ws = (w1.found ? (w1.path || w1.name) : (w1.name || w1.guid) + " NENALEZEN");
+                    if (level >= 3 && w1.note) { ws += " (" + w1.note + ")"; }
+                    wbuf.push(ws);
+                }
+                s2 += ": " + wbuf.join("; ");
+            }
+            if (wsA.problems && wsA.problems.length > 0) { s2 += " | KONFIGURACE CILE ZAPISU VADNA (E_SCOPE_CONFIG): " + clip(wsA.problems.join("; "), 300); }
         }
-        s2 += " | whitelist: " + wbuf.join("; ");
-    } else if (wlA) {
-        // prazdny whitelist = explicitni veta, ne prazdne pole (par. 4.5)
-        s2 += " | whitelist: PRAZDNY - repozitar nema zadny povoleny cil zapisu (bez zmeny FB_Whitelist zapis neprojde)";
     }
     // riskPolicy (pravidlo 7 KONCEPCE, Z261004b-3): strucne prahy a okna,
     // aby agent predem rekl cloveku, ktera davka bude chtit potvrzeni

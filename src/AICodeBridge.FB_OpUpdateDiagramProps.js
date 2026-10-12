@@ -11,6 +11,7 @@ if (!op || !op.diagrams || Object.prototype.toString.call(op.diagrams) != "[obje
     return { op: "update_diagram_properties", status: "error", code: "E_ARGS", message: "Povinne: diagrams (neprazdne pole objektu)." };
 }
 var items = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.diagrams.length; i++) {
     var d = op.diagrams[i];
     var dg = null;
@@ -25,7 +26,7 @@ for (var i = 0; i < op.diagrams.length; i++) {
         }
     } catch (eG) { dg = null; }
     if (dg == null) { return { op: "update_diagram_properties", status: "error", code: "E_NOT_FOUND", message: "diagrams[" + i + "]: diagram nenalezen (" + ref + ")", items: items }; }
-    var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+    var chk = this.FB_CheckWriteEl(Repository, dg, "diagram");
     if (chk != null) { return { op: "update_diagram_properties", status: "error", code: chk.code, message: "diagrams[" + i + "]: " + chk.message, items: items }; }
     if (typeof d.name != "undefined") { dg.Name = "" + d.name; }
     if (typeof d.author != "undefined") { dg.Author = "" + d.author; }       // K6

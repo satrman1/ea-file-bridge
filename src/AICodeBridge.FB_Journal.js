@@ -67,7 +67,7 @@ var OP_MAP = { name: "Name", returnType: "ReturnType", returnClassifierID: "Clas
 function pad2(x) { return (x < 10 ? "0" : "") + x; } // na urovni funkce - deklarace v bloku neni ES3
 function full() { if (items.length >= MAX_TARGETS) { return true; } return false; }
 function isDollar(v) { return /^\$\d+/.test("" + v); }
-function resolveEl(ref) { try { return self.FB_ResolveEl(Repository, ref); } catch (eE) { return null; } }
+function resolveEl(ref) { try { return self.FB_ResolveEl(Repository, ref, "read"); } catch (eE) { return null; } }
 
 try {
     for (var i = 0; i < req.ops.length; i++) {
@@ -98,7 +98,7 @@ try {
                 if (isDollar(pref)) { unc(name + "[" + i + "].packages[" + j + "]: $N reference"); continue; }
                 if (full()) { unc(name + "[" + i + "].packages[" + j + "]: strop " + MAX_TARGETS + " cilu"); continue; }
                 var pk = null;
-                try { pk = self.FB_ResolvePkg(Repository, pref); } catch (ePk) { pk = null; }
+                try { pk = self.FB_ResolvePkg(Repository, pref, "read"); } catch (ePk) { pk = null; }
                 if (pk == null) { unc(name + "[" + i + "].packages[" + j + "]: package nenalezen"); continue; }
                 var pf = {};
                 if (has(p, "name")) { pf.Name = rd(pk, "Name"); }

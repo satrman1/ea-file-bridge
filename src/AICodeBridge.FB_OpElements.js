@@ -34,6 +34,7 @@ if (!op || !op.elements || Object.prototype.toString.call(op.elements) != "[obje
     return { op: "create_or_update_elements", status: "error", code: "E_ARGS", message: "Povinne: elements (neprazdne pole)." };
 }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou (E_PERMISSION / E_LOCKED)
 for (var i = 0; i < op.elements.length; i++) {
     var e = op.elements[i];
     var el = null, created = false, matchedBy = "";
@@ -41,10 +42,9 @@ for (var i = 0; i < op.elements.length; i++) {
     if (e.guid || e.elementID) {
         el = this.FB_ResolveEl(Repository, e.guid || e.elementID);
         if (el == null) {
-            return { op: "create_or_update_elements", status: "error", code: "E_NOT_FOUND",
-                message: "elements[" + i + "]: element nenalezen (" + (e.guid || e.elementID) + ")", items: items };
+            return this.FB_ResolveFail("create_or_update_elements", "elements[" + i + "]: element nenalezen (" + (e.guid || e.elementID) + ")", items);
         }
-        var chkU = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+        var chkU = this.FB_CheckWriteEl(Repository, el); // osa balicku + osa vlastniku (I14)
         if (chkU != null) { return { op: "create_or_update_elements", status: "error", code: chkU.code, message: "elements[" + i + "]: " + chkU.message, items: items }; }
         if (e.type) { el.Type = "" + e.type; } // K7: zmena typu elementu
     } else {
@@ -64,7 +64,7 @@ for (var i = 0; i < op.elements.length; i++) {
             }
             if (dfE.count == 1) {
                 el = dfE.obj;
-                var chkD = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+                var chkD = this.FB_CheckWriteEl(Repository, el); // cil dohledany pres dedupKey (kap. 5.6)
                 if (chkD != null) { return { op: "create_or_update_elements", status: "error", code: chkD.code, message: "elements[" + i + "]: " + chkD.message, items: items }; }
                 if (e.type) { el.Type = "" + e.type; } // parita s UPDATE cestou (K7)
                 matchedBy = "dedupKey";
@@ -75,8 +75,8 @@ for (var i = 0; i < op.elements.length; i++) {
         }
         if (el == null && e.owningElement) {
             var owner = this.FB_ResolveEl(Repository, e.owningElement);
-            if (owner == null) { return { op: "create_or_update_elements", status: "error", code: "E_NOT_FOUND", message: "elements[" + i + "]: owningElement nenalezen.", items: items }; }
-            var chkO = this.FB_CheckWrite(Repository, Repository.GetPackageByID(owner.PackageID));
+            if (owner == null) { return this.FB_ResolveFail("create_or_update_elements", "elements[" + i + "]: owningElement nenalezen (" + e.owningElement + ").", items); }
+            var chkO = this.FB_CheckWriteEl(Repository, owner);
             if (chkO != null) { return { op: "create_or_update_elements", status: "error", code: chkO.code, message: "elements[" + i + "]: " + chkO.message, items: items }; }
             if (e.matchByName && nm != "") {
                 // K1: scoped na parent element (ParentID) - FB_ResolveEl je globalni, proto vlastni dotaz
@@ -109,7 +109,7 @@ for (var i = 0; i < op.elements.length; i++) {
             }
         } else if (el == null) {
             var pkg = this.FB_ResolvePkg(Repository, e["package"]);
-            if (pkg == null) { return { op: "create_or_update_elements", status: "error", code: "E_NOT_FOUND", message: "elements[" + i + "]: package nenalezen (" + e["package"] + ")", items: items }; }
+            if (pkg == null) { return this.FB_ResolveFail("create_or_update_elements", "elements[" + i + "]: package nenalezen (" + ((e["package"] && e["package"].path) ? "path " + e["package"].path.join(".") : e["package"]) + ")", items); }
             var chkC = this.FB_CheckWrite(Repository, pkg);
             if (chkC != null) { return { op: "create_or_update_elements", status: "error", code: chkC.code, message: "elements[" + i + "]: " + chkC.message, items: items }; }
             if (e.matchByName && nm != "") {

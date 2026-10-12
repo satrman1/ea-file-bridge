@@ -6,7 +6,7 @@
 // pres .qea zastupce vraci Repository.ConnectionString cestu k zastupci -
 // nazev lokalniho souboru nema zadnou autoritu (lze prejmenovat/prepojit),
 // je stanice-zavisly a nemusi odpovidat nazvu DB ani EA connection.
-// Proti teto hodnote se porovnava FB_Whitelist.repo i deklarace repo v davce.
+// Proti teto hodnote se porovnava FB_WriteScope.repo i deklarace repo v davce.
 // !! Sonda DB_NAME() se pousti VYHRADNE na MS SQL (RepositoryType SQLSVR).
 // Na lokalnim .qea/SQLite se EA z SQLQuery s neznamou funkci nevrati
 // (pumpa se 14.8. pri startu zasekla) - proto se tam SQL vubec nespousti.

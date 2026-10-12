@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "Z10-21b-cz22-zamek-zdroj", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_connectors", "connectors": [
+   { "source": "{4AE4571B-0C2A-4393-A4D0-A6F8F4CCA6C0}", "target": "{07573080-2415-4a64-A09E-5E1E7C9A7E3C}", "type": "Dependency", "name": "ZAMCENE->vol2 (FB-CZ-22, zdroj = objekt zamceneho balicku)" } ] } ] }

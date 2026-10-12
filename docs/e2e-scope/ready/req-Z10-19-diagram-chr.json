@@ -1,0 +1,12 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-19-diagram-chr",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "layout_connectors",
+   "diagram": "{2E1F3AB1-D288-4736-8108-295B63D9002E}",
+   "style": "orthS"
+  }
+ ]
+}

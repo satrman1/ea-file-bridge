@@ -1,0 +1,33 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-02-fixtures",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  { "op": "create_or_update_package", "packages": [
+    { "parent": "{25A6D2B3-A683-48d2-8FF1-7EDEE7E15476}", "name": "FBT-CHRANENE", "notes": "Z261004b-10: testovaci chraneny balicek (blacklist)" },
+    { "parent": "{25A6D2B3-A683-48d2-8FF1-7EDEE7E15476}", "name": "FBT-VOLNE", "notes": "Z261004b-10: testovaci volny balicek mimo #FB-TEST" } ] },
+  { "op": "create_or_update_package", "packages": [ { "parent": "$0[0]", "name": "FBT-CHRANENE-SUB" } ] },
+  { "op": "create_or_update_elements", "elements": [
+    { "name": "CHR-Prvek", "type": "Class", "package": "$0[0]" },
+    { "name": "CHR-SubPrvek", "type": "Class", "package": "$1[0]" },
+    { "name": "CHR-Klasifikator", "type": "Class", "package": "$0[0]" } ] },
+  { "op": "create_or_update_elements", "elements": [
+    { "name": "VOL-Prvek", "type": "Class", "package": "$0[1]" },
+    { "name": "VOL-Prvek2", "type": "Class", "package": "$0[1]" },
+    { "name": "VOL-Smazat", "type": "Class", "package": "$0[1]" },
+    { "name": "VOL-Klasifikator", "type": "Class", "package": "$0[1]" },
+    { "name": "VOL-Instance", "type": "Object", "package": "$0[1]", "classifier": "$2[2]" } ] },
+  { "op": "create_or_update_elements", "elements": [
+    { "name": "CHR-Instance", "type": "Object", "package": "$0[0]", "classifier": "$3[3]" } ] },
+  { "op": "create_or_update_connectors", "connectors": [
+    { "source": "$2[0]", "target": "$3[0]", "type": "Dependency", "name": "chr->vol" },
+    { "source": "$3[0]", "target": "$2[0]", "type": "Dependency", "name": "vol->chr" },
+    { "source": "$3[1]", "target": "$3[0]", "type": "Association", "name": "vol->vol" },
+    { "source": "$2[0]", "target": "$3[2]", "type": "Dependency", "name": "chr->smazat" } ] },
+  { "op": "create_or_update_diagram", "diagrams": [
+    { "name": "CHR-Diagram", "type": "Logical", "package": "$0[0]" },
+    { "name": "VOL-Diagram", "type": "Logical", "package": "$0[1]" } ] },
+  { "op": "place_elements_on_diagram", "diagram": "$6[0]", "elementPlacements": [ { "element": "$2[0]", "x": 50, "y": 50 }, { "element": "$3[2]", "x": 300, "y": 50 } ] },
+  { "op": "place_elements_on_diagram", "diagram": "$6[1]", "elementPlacements": [ { "element": "$3[0]", "x": 50, "y": 50 }, { "element": "$2[0]", "x": 300, "y": 50 } ] }
+ ]
+}

@@ -22,7 +22,7 @@ try {
     else if (/^[0-9]+$/.test(ref)) { dg = Repository.GetDiagramByID(parseInt(ref, 10)); }
 } catch (eG) { dg = null; }
 if (dg == null) { return { op: "layout_connectors", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + ref }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, dg, "diagram");
 if (chk != null) { return { op: "layout_connectors", status: "error", code: chk.code, message: chk.message }; }
 var filter = null;
 if (op.connectorIDs && Object.prototype.toString.call(op.connectorIDs) == "[object Array]") {

@@ -5,12 +5,13 @@
 if (!op || !op.packages || Object.prototype.toString.call(op.packages) != "[object Array]" || op.packages.length == 0) {
     return { op: "get_packages_information", status: "error", code: "E_ARGS", message: "Povinne: packages (neprazdne pole referenci)." };
 }
-var out = [];
+var out = [], warnsR = [];
 for (var i = 0; i < op.packages.length; i++) {
-    var pkg = this.FB_ResolvePkg(Repository, op.packages[i]);
+    var pkg = this.FB_ResolvePkg(Repository, op.packages[i], "read"); // cteni: prvni shoda jmena + varovani (cil zapisu kap. 5.7)
     if (pkg == null) {
         return { op: "get_packages_information", status: "error", code: "E_NOT_FOUND", message: "packages[" + i + "]: package nenalezen (" + op.packages[i] + ")", items: out };
     }
+    if (this._fbResolveWarn) { warnsR.push("packages[" + i + "]: " + this._fbResolveWarn); }
     var d = {
         id: pkg.PackageID, guid: "" + pkg.PackageGUID, name: "" + pkg.Name,
         parentID: pkg.ParentID, notes: "" + pkg.Notes
@@ -43,4 +44,6 @@ for (var i = 0; i < op.packages.length; i++) {
     }
     out.push(d);
 }
-return { op: "get_packages_information", status: "ok", count: out.length, items: out };
+var resGP = { op: "get_packages_information", status: "ok", count: out.length, items: out };
+if (warnsR.length > 0) { resGP.warnings = warnsR; }
+return resGP;

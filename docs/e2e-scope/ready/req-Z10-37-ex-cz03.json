@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-37-ex-cz03", "repo": "EAEXAMPLE.QEA", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "name": "VOL-Novy", "type": "Class", "package": "{07475E42-13BC-4182-B01E-AB46EDA94BBE}" } ] } ] }

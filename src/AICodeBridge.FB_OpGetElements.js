@@ -6,12 +6,13 @@
 if (!op || !op.elements || Object.prototype.toString.call(op.elements) != "[object Array]" || op.elements.length == 0) {
     return { op: "get_elements_information", status: "error", code: "E_ARGS", message: "Povinne: elements (neprazdne pole referenci)." };
 }
-var out = [];
+var out = [], warnsR = [];
 for (var i = 0; i < op.elements.length; i++) {
-    var el = this.FB_ResolveEl(Repository, op.elements[i]);
+    var el = this.FB_ResolveEl(Repository, op.elements[i], "read"); // cteni: prvni shoda jmena + varovani (cil zapisu kap. 5.7)
     if (el == null) {
         return { op: "get_elements_information", status: "error", code: "E_NOT_FOUND", message: "elements[" + i + "]: element nenalezen (" + op.elements[i] + ")", items: out };
     }
+    if (this._fbResolveWarn) { warnsR.push("elements[" + i + "]: " + this._fbResolveWarn); }
     var d = {
         id: el.ElementID, guid: "" + el.ElementGUID, name: "" + el.Name,
         type: "" + el.Type, stereotypes: "" + el.StereotypeEx, alias: "" + el.Alias,
@@ -78,4 +79,6 @@ for (var i = 0; i < op.elements.length; i++) {
     }
     out.push(d);
 }
-return { op: "get_elements_information", status: "ok", count: out.length, items: out };
+var resGE = { op: "get_elements_information", status: "ok", count: out.length, items: out };
+if (warnsR.length > 0) { resGE.warnings = warnsR; }
+return resGE;

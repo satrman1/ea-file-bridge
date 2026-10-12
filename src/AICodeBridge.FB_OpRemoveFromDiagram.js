@@ -12,7 +12,7 @@ try {
     else if (/^[0-9]+$/.test(ref)) { dg = Repository.GetDiagramByID(parseInt(ref, 10)); }
 } catch (eG) { dg = null; }
 if (dg == null) { return { op: "remove_elements_from_diagram", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + ref }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, dg, "diagram");
 if (chk != null) { return { op: "remove_elements_from_diagram", status: "error", code: chk.code, message: chk.message }; }
 var want = {};
 for (var i = 0; i < op.elementIDs.length; i++) { want[parseInt(op.elementIDs[i], 10)] = 1; }

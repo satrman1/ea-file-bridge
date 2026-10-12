@@ -157,6 +157,8 @@ for (var i = 0; i < files.length; i++) {
     var rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
         || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
             || (respText.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0) // Baseline politika par. 7
+            || (respText.indexOf("\"code\":\"E_BLACKLIST\"") >= 0) // cil zapisu kap. 5.3 (Z261004b-10)
+            || (respText.indexOf("\"code\":\"E_SCOPE_CONFIG\"") >= 0)
         || (respText.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0);
     var stamped = f.name.replace(/\.json$/i, "") + "." + ts() + ".json";
     if (fso.FileExists(f.path)) {

@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-10b-jmeno-cteni", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "get_packages_information", "packages": ["#AI-LOG"] } ] }

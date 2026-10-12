@@ -126,4 +126,12 @@ if (has(sec, "cleanup")) {
         if (typeof sec.cleanup[k2] != "function" && typeof DEF.cleanup[k2] != "undefined") { out.cleanup[k2] = sec.cleanup[k2]; }
     }
 }
-return { cfg: out, valid: true, present: true, why: "", warnings: [] };
+var warnOut = [];
+// cil zapisu kap. 5.9/4 (Z261004b-10): session baseline "auto" nema bez
+// whitelistu cil (nad cim?) - chova se jako "off" a kontrola konfigurace to
+// ohlasi; zalohy vznikaji az u zapisu nad konkretnim balickem (FB-CZ-25)
+if (out.sessionBaseline == "auto") {
+    out.sessionBaseline = "off";
+    warnOut.push("Baseline politika: sessionBaseline 'auto' nema v rezimu blacklist cil (zadny koren whitelistu) - chova se jako 'off'; zalohy vznikaji az pred zapisem nad konkretnim balickem. Zmen sekci baseline ve FB_RiskPolicy na 'off'.");
+}
+return { cfg: out, valid: true, present: true, why: "", warnings: warnOut };

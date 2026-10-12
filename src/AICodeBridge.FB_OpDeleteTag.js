@@ -9,6 +9,7 @@ if (!op || !op.targets || Object.prototype.toString.call(op.targets) != "[object
     return { op: "delete_taggedvalue_from_model", status: "error", code: "E_ARGS", message: "Povinne: targets (neprazdne pole)." };
 }
 var items = [];
+this._fbOpProgress = { items: items }; // W3
 function delFromCollection(col, name) {
     for (var j = 0; j < col.Count; j++) {
         if (("" + col.GetAt(j).Name) == ("" + name)) { col.DeleteAt(j, false); col.Refresh(); return true; }
@@ -61,7 +62,12 @@ for (var i = 0; i < op.targets.length; i++) {
         return { op: "delete_taggedvalue_from_model", status: "error", code: "E_ARGS",
             message: "targets[" + i + "]: neznamy type '" + t.type + "'.", items: items };
     }
-    var chk = this.FB_CheckWrite(Repository, ownerPkg);
+    // cil zapisu (Z261004b-10): vlastnik tagu vc. osy vlastniku (I14); u konektoru
+    // zdroj (vlastni vazba chraneneho prvku, kap. 5.5 bod 2); u package samotny balicek
+    var chk = null;
+    if (typ == "CONNECTORTAGGEDVALUE") { chk = this.FB_CheckWriteEl(Repository, cli); }
+    else if (ownerEl != null && typ != "PACKAGETAGGEDVALUE") { chk = this.FB_CheckWriteEl(Repository, ownerEl); }
+    else { chk = this.FB_CheckWrite(Repository, ownerPkg); }
     if (chk != null) { return { op: "delete_taggedvalue_from_model", status: "error", code: chk.code, message: "targets[" + i + "]: " + chk.message, items: items }; }
     if (!delFromCollection(col, t.name)) {
         return { op: "delete_taggedvalue_from_model", status: "error", code: "E_NOT_FOUND",

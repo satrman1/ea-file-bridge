@@ -186,6 +186,8 @@ if (out.indexOf("\"status\":\"confirm_required\"") >= 0) {
 }
 var toRejected = (out.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
     || (out.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0) // Baseline politika par. 7
+    || (out.indexOf("\"code\":\"E_BLACKLIST\"") >= 0) // cil zapisu kap. 5.3 (Z261004b-10)
+    || (out.indexOf("\"code\":\"E_SCOPE_CONFIG\"") >= 0)
     || (out.indexOf("\"code\":\"E_PARSE\"") >= 0)
     || (out.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0);
 try { moveTo(toRejected ? rejDir : procDir); }

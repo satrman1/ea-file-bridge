@@ -15,8 +15,13 @@ var SRC = path.join(__dirname, "..", "src");
 // ---------------------------------------------------------------- test runner
 var passed = 0, failed = 0, failures = [];
 var TRACE = !!process.env.HARNESS_TRACE; // HARNESS_TRACE=1 node test/harness.js -> vypis jmen testu (hledani zacykleni)
+var ONLY = process.env.HARNESS_ONLY || ""; // HARNESS_ONLY=<podretezec jmena> -> spusti jen vybrane testy (ladeni)
 function t(name, fn) {
+    if (ONLY && name.indexOf(ONLY) < 0 && name.indexOf("syntax:") !== 0) { return; }
     if (TRACE) { console.log("  > " + name); }
+    // mezipameti JEDNOHO volani FB_Main (FB_TargetCache, FB_WriteScopeCfg) -
+    // FB_Main je nuluje sam; primo volane handlery/gate je v testech sdilet nesmi
+    if (typeof B != "undefined" && B) { B._fbTargetCache = null; B._fbScopeCfg = null; }
     try {
         fn();
         passed++;
@@ -267,6 +272,41 @@ function loadBridge() {
 // -------------------------------------------------------------------- testy
 var L = loadBridge();
 var B = L.bridge;
+// Skutecny FB_WriteScope je konfigurace ZIVYCH domacich modelu (GUIDy fixtur
+// FBT-CHRANENE v EAExample/QEAX, ktere mock nema) - harness ho nahrazuje
+// neutralni polozkou (prazdny blacklist); testy cile zapisu si nasazuji
+// vlastni pres withScope. Syntax a tvar skutecneho souboru hlida test nize.
+var FB_WRITESCOPE_LIVE = B.FB_WriteScope;
+B.FB_WriteScope = function () { return [{ repo: "EAEXAMPLE.QEA", blacklist: [] }]; };
+// cil zapisu (Z261004b-10, rezim blacklist): docasna konfigurace FB_WriteScope
+// pro test; mezipamet FB_WriteScopeCfg se vzdy vynuluje
+function withScope(entries, fn) {
+    var o1 = B.FB_WriteScope;
+    B.FB_WriteScope = function () { return entries; };
+    B._fbScopeCfg = null;
+    try { return fn(); } finally { B.FB_WriteScope = o1; B._fbScopeCfg = null; }
+}
+// EAEXAMPLE s chranenym balickem {PKG-BL} jmena "FBT-CHRANENE" (allowIncomingRefs volitelne)
+function scopeBL(allowIn, extra) {
+    var e = { pkg: "{PKG-BL}", name: "FBT-CHRANENE", note: "test blacklistu" };
+    if (typeof allowIn != "undefined") { e.allowIncomingRefs = allowIn; }
+    var bl = [e];
+    if (extra) { for (var i = 0; i < extra.length; i++) { bl.push(extra[i]); } }
+    return [{ repo: "EAEXAMPLE.QEA", blacklist: bl }];
+}
+// SQL pravidla mocku pro chraneny balicek {PKG-BL} (id 900) pod korenem Model (id 1)
+function blRules() {
+    return [
+        { re: /FROM t_package WHERE ea_guid = '\{PKG-BL\}'/i, rows: [{ Package_ID: "900", Parent_ID: "1", ea_guid: "{PKG-BL}", Name: "FBT-CHRANENE" }] },
+        { re: /FROM t_package WHERE Package_ID = 900\b/i, rows: [{ Package_ID: "900", Parent_ID: "1", ea_guid: "{PKG-BL}", Name: "FBT-CHRANENE" }] },
+        { re: /FROM t_package WHERE Package_ID = 901\b/i, rows: [{ Package_ID: "901", Parent_ID: "900", ea_guid: "{PKG-BL-SUB}", Name: "Podbalicek" }] },
+        { re: /FROM t_package WHERE ea_guid = '\{PKG-BL-SUB\}'/i, rows: [{ Package_ID: "901", Parent_ID: "900", ea_guid: "{PKG-BL-SUB}", Name: "Podbalicek" }] },
+        { re: /FROM t_package WHERE Package_ID = 1\b/i, rows: [{ Package_ID: "1", Parent_ID: "0", ea_guid: "{PKG-ROOT}", Name: "Model" }] },
+        { re: /FROM t_package WHERE ea_guid = '\{PKG-ROOT\}'/i, rows: [{ Package_ID: "1", Parent_ID: "0", ea_guid: "{PKG-ROOT}", Name: "Model" }] },
+        { re: /FROM t_package WHERE Package_ID = 2\b/i, rows: [{ Package_ID: "2", Parent_ID: "1", ea_guid: "{PKG-FREE}", Name: "Volne" }] },
+        { re: /FROM t_package WHERE ea_guid = '\{PKG-FREE\}'/i, rows: [{ Package_ID: "2", Parent_ID: "1", ea_guid: "{PKG-FREE}", Name: "Volne" }] }
+    ];
+}
 
 // pravidlo ActiveXObject: primy vyskyt jen v allowlistu (JScript-only /
 // typeof-guard soubory); vsude jinde VYHRADNE this.FB_ComObj (par. 1a)
@@ -628,19 +668,19 @@ t("get_selected_context: vybrany element -> type/guid/path/branch/inWhitelist", 
     eq(r.context.branchGuid, "{PKG-DOMAIN}");
     eq(r.context.inWhitelist, true);
 });
-t("get_selected_context: vybrany package -> branch = on sam", function () {
+t("get_selected_context: vybrany package -> branch = on sam; package na blacklistu = inWhitelist false (writeCheck doladi Z261004b-11)", function () {
     var repo = mkRepo();
     var root = repo._addPackage({ id: 1, name: "Model" });
     var sub = repo._addPackage({ id: 2, name: "Domain", parentID: 1, guid: "{PKG-DOMAIN}" });
     repo.GetTreeSelectedItemType = function () { return 5; };
     repo.GetTreeSelectedObject = function () { return sub; };
-    var origWl = B.FB_Whitelist;
-    B.FB_Whitelist = function () { return [{ repo: "EAEXAMPLE.QEA", pkg: "{JINY}" }]; };
-    var r = B.FB_OpSelectedContext.call(B, repo, { op: "get_selected_context" });
-    B.FB_Whitelist = origWl;
+    var r = withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-DOMAIN}", name: "Domain", note: "test" }] }], function () {
+        return B.FB_OpSelectedContext.call(B, repo, { op: "get_selected_context" });
+    });
     eq(r.context.type, "Package");
     eq(r.context.branchGuid, "{PKG-DOMAIN}");
-    eq(r.context.inWhitelist, false, "package mimo whitelist");
+    eq(r.context.inWhitelist, false, "package na blacklistu");
+    contains(r.context.whitelistNote || "", "E_BLACKLIST");
 });
 t("get_selected_context: nic nevybrano -> selected:false, status ok", function () {
     var repo = mkRepo();
@@ -1156,18 +1196,20 @@ t("I7 krit.5: zakaz obsahu - notes/XMLContent/raw/rtf_b64/png_b64 NIKDY v ACK", 
     contains(out, "[zprav: 2]", "zpravy diagramu jen poctem (par. 4.2)");
 });
 
-t("I7 krit.6: ping ACK nese whitelist (GUID+jmeno+plna path) + access; nikdy login/groups/connection/nonce", function () {
+t("I7 krit.6: ping ACK nese segment zapisu (blacklist + chranene vetve) + access; nikdy login/groups/connection/nonce (cil zapisu kap. 5.11)", function () {
     var out = chat({
         status: "done", id: "t7-ping", repository: "EAEXAMPLE.QEA",
         results: [{ op: "ping", status: "ok", echo: "x", eaVersion: "1715",
             repository: "EAEXAMPLE.QEA", connection: "C:\\Users\\tajnylogin\\models\\EAEXAMPLE.QEA",
-            whitelist: [{ guid: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", name: "#FB-TEST", path: "Model.Sandbox.#FB-TEST" }],
+            writeScope: { mode: "blacklist", securityEnabled: true, repoKnown: true,
+                blacklist: [{ guid: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", name: "FBT-CHRANENE", path: "Model.Sandbox.FBT-CHRANENE", note: "test", found: true, allowIncomingRefs: true }],
+                implicit: [], problems: [], warnings: [] },
             access: { securityEnabled: true, login: "TAJNY-LOGIN", access: "write",
                 groups: ["TAJNA-SKUPINA"], reason: "clen write skupiny dle FB_AccessGroups" } }]
     });
-    contains(out, "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}");
-    contains(out, "#FB-TEST");
-    contains(out, "path=Model.Sandbox.#FB-TEST", "plna cesta whitelist package (par. 4.5/I5)");
+    contains(out, "zapis: blacklist (1 chranenych vetvi", "segment zapisu misto whitelistu");
+    contains(out, "Model.Sandbox.FBT-CHRANENE", "plna cesta chranene vetve");
+    ok(out.indexOf("whitelist") < 0, "slovo whitelist v ACK uz neni");
     contains(out, "pristup: write");
     contains(out, "clen write skupiny", "reason plnym textem");
     ok(out.indexOf("TAJNY-LOGIN") < 0, "login se nerenderuje (datova minimalizace par. 4.5)");
@@ -1176,36 +1218,44 @@ t("I7 krit.6: ping ACK nese whitelist (GUID+jmeno+plna path) + access; nikdy log
     ok(out.toLowerCase().indexOf("nonce") < 0, "zadny nonce v ACK");
 });
 
-t("I7 krit.6b: prazdny whitelist = explicitni veta, ne prazdne pole", function () {
+t("I7 krit.6b: repozitar bez polozky FB_WriteScope = explicitni veta E_REPO; vadna konfigurace = veta E_SCOPE_CONFIG", function () {
     var out = chat({
         status: "done", id: "t7-pw0", repository: "JINE.QEA",
-        results: [{ op: "ping", status: "ok", repository: "JINE.QEA", whitelist: [],
+        results: [{ op: "ping", status: "ok", repository: "JINE.QEA", writeScope: { mode: "blacklist", repoKnown: false, blacklist: [], implicit: [], problems: [] },
             access: { securityEnabled: false, access: "write", reason: "security vypnuta" } }]
     });
-    contains(out, "whitelist: PRAZDNY", "prazdny whitelist musi byt explicitne pojmenovan (par. 4.5)");
+    contains(out, "NEMA polozku ve FB_WriteScope", "chybejici polozka musi byt explicitne pojmenovana (par. 4.5)");
+    var out2 = chat({
+        status: "done", id: "t7-pw1", repository: "EAEXAMPLE.QEA",
+        results: [{ op: "ping", status: "ok", repository: "EAEXAMPLE.QEA", writeScope: { mode: "blacklist", repoKnown: true, blacklist: [], implicit: [], problems: ["GUID {X} nenalezen"] },
+            access: { securityEnabled: false, access: "write", reason: "security vypnuta" } }]
+    });
+    contains(out2, "E_SCOPE_CONFIG", "vadna konfigurace v ACK");
 });
 
-t("I7: FB_OpPing rozvine whitelist filtrovany na repo; nedohledatelna polozka s poznamkou", function () {
+t("I7 / FB-CZ-05a: FB_OpPing nese writeScope; nedohledatelna polozka blacklistu found: false + vada E_SCOPE_CONFIG, ne tiche zahozeni", function () {
     delete B._fbAccessCache;
     var repo = mkRepo();
-    var r = B.FB_OpPing.call(B, repo, { op: "ping", echo: "x" });
+    var r = withScope(scopeBL(), function () { return B.FB_OpPing.call(B, repo, { op: "ping", echo: "x" }); });
     eq(r.status, "ok");
-    ok(r.whitelist && r.whitelist.length === 1, "radek EAEXAMPLE z FB_Whitelist se ma propsat");
-    contains(r.whitelist[0].guid, "{CCD344F6", "GUID z FB_Whitelist");
-    contains(r.whitelist[0].note || "", "nedohledatelna", "nedohledatelny package = poznamka, ne tiche zahozeni");
+    ok(typeof r.whitelist == "undefined", "pole whitelist zanika (kap. 5.11)");
+    ok(r.writeScope && r.writeScope.mode == "blacklist" && r.writeScope.repoKnown === true, "writeScope repoKnown");
+    eq(r.writeScope.blacklist.length, 1, "polozka EAEXAMPLE z FB_WriteScope se ma propsat");
+    eq(r.writeScope.blacklist[0].found, false, "GUID v mocku neni -> found: false");
+    ok(r.writeScope.problems.length >= 1 && /nenalezen/.test(r.writeScope.problems.join(" ")), "vada: GUID nenalezen");
     eq(r.access.access, "write", "security vypnuta -> write (FB_UserAccess)");
 });
 
-t("I7: FB_OpPing dohleda jmeno + plnou cestu whitelist package", function () {
+t("I7: FB_OpPing dohleda jmeno + plnou cestu chranene vetve (found: true, bez vad)", function () {
     delete B._fbAccessCache;
-    var repo = mkRepo();
-    repo._addPackage({ id: 1, name: "Model" });
-    repo._addPackage({ id: 2, name: "Sandbox", parentID: 1 });
-    repo._addPackage({ id: 3, name: "#FB-TEST", parentID: 2, guid: "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}" });
-    var r = B.FB_OpPing.call(B, repo, { op: "ping" });
-    eq(r.whitelist.length, 1);
-    eq(r.whitelist[0].name, "#FB-TEST");
-    eq(r.whitelist[0].path, "Model.Sandbox.#FB-TEST", "path plnou cestou pres FB_ElementPath");
+    var repo = mkRepo({ sqlRules: blRules() });
+    repo._addPackage({ id: 1, name: "Model", guid: "{PKG-ROOT}" });
+    repo._addPackage({ id: 900, name: "FBT-CHRANENE", parentID: 1, guid: "{PKG-BL}" });
+    var r = withScope(scopeBL(), function () { return B.FB_OpPing.call(B, repo, { op: "ping" }); });
+    eq(r.writeScope.blacklist.length, 1);
+    eq(r.writeScope.blacklist[0].found, true);
+    eq(r.writeScope.blacklist[0].path, "Model.FBT-CHRANENE", "path plnou cestou");
+    eq(r.writeScope.problems.length, 0, "bez vad: " + r.writeScope.problems.join("; "));
 });
 
 t("I7 krit.7: E_REPO pojmenuje pripojeny repozitar (basename souborove cesty)", function () {
@@ -1543,14 +1593,23 @@ t("move_elements: neznamy cil -> E_NOT_FOUND a NIC se nepresune (validace pred z
     eq(a.PackageID, 1067, "prvni prvek se nesmel presunout, kdyz druhy neprosel validaci");
     eq(b2.PackageID, 1067);
 });
-t("move_elements: cil mimo whitelist -> E_WHITELIST", function () {
+t("move_elements: cil v chranene casti (blacklist) -> E_BLACKLIST, nic nepresunuto (FB-CZ-13)", function () {
     var repo = moveRepo();
-    repo._addPackage({ id: 2000, name: "MIMO", parentID: 0 });
+    repo._addPackage({ id: 2000, name: "FBT-CHRANENE", parentID: 0, guid: "{PKG-BL}" });
     var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
-    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 2000, elements: [11310] }, "t-m5");
+    var res = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 2000, elements: [11310] }, "t-m5"); });
     eq(res.status, "error");
-    eq(res.code, "E_WHITELIST");
+    eq(res.code, "E_BLACKLIST", JSON.stringify(res).substring(0, 300));
+    contains(res.message, "FBT-CHRANENE", "zprava jmenuje chranenou vetev");
     eq(uc.PackageID, 1067);
+});
+t("move_elements: cil mimo byvaly sandbox (volny balicek) PROJDE - whitelist zanikl (FB-CZ-01)", function () {
+    var repo = moveRepo();
+    repo._addPackage({ id: 2000, name: "MIMO SANDBOX", parentID: 0 });
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 2000, elements: [11310] }, "t-m5b");
+    eq(res.status, "ok", JSON.stringify(res).substring(0, 300));
+    eq(uc.PackageID, 2000);
 });
 t("move_elements: chybejici cilovy package -> E_ARGS", function () {
     var repo = moveRepo();
@@ -1758,17 +1817,31 @@ t("move_elements: noop beh NIC nezapise (zadne razitko ai.request)", function ()
     eq(res.moved, 0);
     eq(uc.TaggedValues.Count, 0, "noop nesmi sahnout na model ani razitkem (idempotence par. 5a)");
 });
-t("move_elements: potomek mimo whitelist -> warning, bridge ho neprepisuje", function () {
+t("move_elements: vlastneny potomek v chranene casti -> E_BLACKLIST PRED prvnim presunem (I6, FB-CZ-13)", function () {
     var repo = moveRepo();
-    repo._addPackage({ id: 2001, name: "MIMO WHITELIST", parentID: 0 });
+    repo._addPackage({ id: 2001, name: "FBT-CHRANENE", parentID: 0, guid: "{PKG-BL}" });
+    repo._sqlRules.push({ re: /FROM t_object WHERE ParentID IN \(11310\)/i, rows: [{ Object_ID: "11399", Name: "Potomek jinde" }] });
     var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
     var cizi = addChild(repo, uc, 11399, "Potomek jinde", 2001);
-    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m9");
-    eq(res.status, "ok");
-    eq(uc.PackageID, 1069, "rodic se presunout mel");
-    eq(cizi.PackageID, 2001, "potomek mimo whitelist se nesmi prepsat");
-    ok(res.warnings && res.warnings.length === 1, "chybi warning o potomkovi mimo whitelist: " + JSON.stringify(res.warnings));
-    contains(res.warnings[0], "mimo whitelist");
+    var res = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m9"); });
+    eq(res.status, "error", JSON.stringify(res).substring(0, 300));
+    eq(res.code, "E_BLACKLIST");
+    contains(res.message, "Potomek jinde", "zprava jmenuje potomka");
+    eq(uc.PackageID, 1067, "rodic se NESMEL presunout (kontrola pred prvnim zapisem)");
+    eq(cizi.PackageID, 2001);
+});
+t("move_elements: podstrom hlubsi nez strop -> E_BLACKLIST 'presun po castech', nikdy tichy presun (I6)", function () {
+    var repo = moveRepo();
+    // kazda uroven vraci dalsiho potomka -> nekonecna hloubka
+    var depthCounter = 0;
+    repo._sqlRules.push({ re: /FROM t_object WHERE ParentID IN \(/i, rows: function () { depthCounter++; return [{ Object_ID: "" + (20000 + depthCounter), Name: "L" + depthCounter }]; } });
+    var uc = mkMoveEl(repo, 11310, "UC-95002", 1067);
+    for (var d = 1; d <= 70; d++) { mkMoveEl(repo, 20000 + d, "L" + d, 1067); }
+    var res = B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": 1069, elements: [11310] }, "t-m9b");
+    eq(res.status, "error");
+    eq(res.code, "E_BLACKLIST");
+    contains(res.message, "po castech");
+    eq(uc.PackageID, 1067);
 });
 t("scenarios: necislena hodnota attachTo.step -> warning, ne TICHA ztrata vetve", function () {
     var repo = wlRepo();
@@ -1942,7 +2015,7 @@ t("FB_Main: delete error po castecnem smazani -> FB_LogChanges se vola (Output n
 });
 
 // --- K8 QEAX (Z260904-6): configy se zastupnou identitou repa = fail-secure
-var K8_CFG_FILES = ["AICodeBridge.FB_Whitelist.js", "AICodeBridge.FB_Config.js", "AICodeBridge.FB_OpsAllowed.js",
+var K8_CFG_FILES = ["AICodeBridge.FB_WriteScope.js", "AICodeBridge.FB_Config.js", "AICodeBridge.FB_OpsAllowed.js",
                     "AICodeBridge.FB_RiskPolicy.js", "AICodeBridge.FB_AccessGroups.js"];
 // 6b 2026-09-09 (zivy K3): identita QEAX = nazev souboru .qeax, GUID #FB-TEST
 // z res-K3.json. Placeholder uz nesmi byt nikde (ani v komentari by nevadil,
@@ -1958,8 +2031,9 @@ t("K8: skutecna identita QEAX je PRAVE JEDNOU a placeholder 0x v kazdem z 5 conf
         eq(active.indexOf("<QEAX-FILENAME>"), -1, f + ": placeholder <QEAX-FILENAME> uz v aktivnim kodu nesmi byt");
         eq(active.indexOf("<GUID-685>"), -1, f + ": placeholder <GUID-685> uz v aktivnim kodu nesmi byt");
     });
-    var wl = B.FB_Whitelist.call(B);
-    ok(wl.length === 2 && wl[1].repo === K8_REPO_ID && wl[1].pkg === K8_PKG_GUID, "QEAX polozka whitelistu se skutecnou identitou a GUID #FB-TEST");
+    var ws = FB_WRITESCOPE_LIVE.call(B);
+    ok(ws.length === 2 && ws[1].repo === K8_REPO_ID && Object.prototype.toString.call(ws[1].blacklist) == "[object Array]", "QEAX polozka FB_WriteScope se skutecnou identitou a klicem blacklist (FB-CZ-06)");
+    ok(!fs.existsSync(path.join(SRC, "AICodeBridge.FB_Whitelist.js")), "FB_Whitelist.js v src\\ uz neni (FB-CZ-01, O1 = b)");
 });
 t("K8: FB_RiskPolicy polozka QEAX ma tytez tridy a prahy jako eaexample", function () {
     var pol = B.FB_RiskPolicy.call(B);
@@ -2014,16 +2088,21 @@ t("K8 fail-secure: cteci davka BEZ pole repo projde i v neznamem repu (K3 recon)
     var resp = JSON.parse(out);
     eq(resp.status, "done", "cteni musi projit: " + out.substring(0, 300));
     contains(resp.repository, "QEAX-K8-MODEL.QEA", "ping vraci identitu repa pro doplneni configu");
-    eq(resp.results[0].whitelist.length, 0, "placeholder whitelist se do ACK nepropisuje");
+    eq(resp.results[0].writeScope.repoKnown, false, "cizi repo: writeScope.repoKnown false (zapis by byl E_REPO)");
     eq(resp.results[0].access.access, "read");
 });
-t("K8 fail-secure: repo doplneno, pkg jeste placeholder -> FB_CheckWrite = E_WHITELIST", function () {
+t("K8 fail-secure / FB-CZ-02: repo doplneno, pkg blacklistu jeste placeholder -> FB_CheckWrite = E_SCOPE_CONFIG (fail-closed, ne tiche vypnuti ochrany)", function () {
     var repo = k8Repo({ securityEnabled: false });
-    var origWl = B.FB_Whitelist;
-    B.FB_Whitelist = function () { return [{ repo: "QEAX-K8-MODEL.QEA", pkg: "<GUID-685>" }]; };
-    var chk;
-    try { chk = B.FB_CheckWrite.call(B, repo, repo.GetPackageByID(685)); } finally { B.FB_Whitelist = origWl; }
-    ok(chk != null && chk.code === "E_WHITELIST", "ocekavan E_WHITELIST: " + JSON.stringify(chk));
+    var chk = withScope([{ repo: "QEAX-K8-MODEL.QEA", blacklist: [{ pkg: "<GUID-685>", name: "X", note: "" }] }], function () {
+        return B.FB_CheckWrite.call(B, repo, repo.GetPackageByID(685));
+    });
+    ok(chk != null && chk.code === "E_SCOPE_CONFIG", "ocekavan E_SCOPE_CONFIG: " + JSON.stringify(chk));
+    contains(chk.message, "{...}", "hlaska rika, ze pkg musi byt GUID");
+});
+t("K8 fail-secure / FB-CZ-01: repo bez polozky FB_WriteScope -> FB_CheckWrite = E_REPO", function () {
+    var repo = k8Repo({ securityEnabled: false });
+    var chk = B.FB_CheckWrite.call(B, repo, repo.GetPackageByID(685));
+    ok(chk != null && chk.code === "E_REPO", "ocekavan E_REPO: " + JSON.stringify(chk));
 });
 
 // --- K8 ZIVE 2026-09-09 (Z260904-6b, K6): jmena security tabulek + chybny SQL bez vyjimky
@@ -2168,10 +2247,10 @@ t("ITAN-Bootstrap mock FB-PU-01: existujici operace s 1 parametrem, hlavicka se 
     ok(!r2.out.some(function (l) { return /^POZOR/.test(l); }), "bez POZOR pri 0 srovnanych");
 });
 t("ITAN-Bootstrap mock: parametry se srovnavaji podle hlavicky KAZDE operace (zadny seznam SIG) - zamena poradi i nadbytecny parametr", function () {
-    var el = bootElement(1, { FB_OpPing: ["op", "Repository"], FB_Whitelist: ["Repository"] });
+    var el = bootElement(1, { FB_OpPing: ["op", "Repository"], FB_WriteScope: ["Repository"] });
     var r = runBootstrap({ rows: [{ id: 1, guid: "{ADDIN-1}", stereo: "JavascriptAddin", pkg: "P", el: el }], signals: BOOT_SIGNALS });
     eq(el._params("FB_OpPing").join(","), "Repository,op", "poradi podle hlavicky");
-    eq(el._params("FB_Whitelist").join(","), "", "hlavicka bez parametru -> parametry odebrany");
+    eq(el._params("FB_WriteScope").join(","), "", "hlavicka bez parametru -> parametry odebrany");
     contains(r.done, "Parametry: 2 operaci srovnano");
 });
 t("ITAN-Bootstrap mock N-B-4: dva elementy AICodeBridge, jeden se stereotypem -> VAROVANI se seznamem (ElementID, stereotyp, package), kod jde do toho se stereotypem", function () {
@@ -2482,10 +2561,16 @@ t("BL-1 config: repo bez polozky politiky = chybejici sekce (validni, warning)",
     var c = B.FB_BaselineConfig.call(B, mkRepo({ connectionString: "C:\\X\\JINY.QEA" }));
     eq(c.valid, true); eq(c.present, false); eq(c.cfg.sessionBaseline, "off");
 });
-t("BL-1 config: ostra dev politika ma sekci, validni, sessionBaseline auto, mode report", function () {
+t("BL-1 config: ostra dev politika ma sekci, validni, sessionBaseline off (auto nema v rezimu blacklist cil), mode report", function () {
     var c = B.FB_BaselineConfig.call(B, mkRepo());
-    eq(c.valid, true, c.why); eq(c.present, true); eq(c.warnings.length, 0);
-    eq(c.cfg.sessionBaseline, "auto"); eq(c.cfg.cleanup.mode, "report"); eq(c.cfg.requireRecoveryForUpdates, false);
+    eq(c.valid, true, c.why); eq(c.present, true); eq(c.warnings.length, 0, c.warnings.join("; "));
+    eq(c.cfg.sessionBaseline, "off"); eq(c.cfg.cleanup.mode, "report"); eq(c.cfg.requireRecoveryForUpdates, false);
+});
+t("BL-1 config / FB-CZ-25: sessionBaseline 'auto' se chova jako 'off' a kontrola konfigurace to ohlasi", function () {
+    var c = withPolicy(polBase({ sessionBaseline: "auto" }), function () { return B.FB_BaselineConfig.call(B, mkRepo()); });
+    eq(c.valid, true, c.why);
+    eq(c.cfg.sessionBaseline, "off");
+    ok(c.warnings.length === 1 && /auto/.test(c.warnings[0]) && /off/.test(c.warnings[0]), "warning o auto -> off: " + c.warnings.join("; "));
 });
 t("BL-1 config: castecna sekce se doplni defaulty", function () {
     var c = withPolicy(polBase({ freshWithinMin: 5 }), function () { return B.FB_BaselineConfig.call(B, mkRepo()); });
@@ -2752,9 +2837,10 @@ t("BL-2 T6-29 runtime: zapisova operace bez polozky SCOPE = unknown + missingSco
     ["M1 elements dedupKey neexistujici -> cisty create; nejednoznacny -> unknown", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}", dedupKey: "k-new" }] }], "", false],
     ["M1 elements dedupKey nejednoznacny -> unknown", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}", dedupKey: "k-dup" }] }], "", true],
     ["H1 create_or_update_diagram update pres guid / diagramID (aliasy FB_OpDiagram) -> package diagramu", [{ op: "create_or_update_diagram", diagrams: [{ guid: "{DG-201}", name: "n" }, { diagramID: 201, notes: "x" }] }], "12", false],
-    ["H1 $N na diagram aktualizovany pres guid NENI vlastni", [{ op: "create_or_update_diagram", diagrams: [{ guid: "{DG-201}", name: "n" }] }, { op: "layout_connectors", diagram: "$0" }], "12", true],
+    ["H1 / B3: $N na diagram aktualizovany pres guid NENI vlastni -> pro zalohu balicek diagramu z definice predchozi operace (uz ne unknown)", [{ op: "create_or_update_diagram", diagrams: [{ guid: "{DG-201}", name: "n" }] }, { op: "layout_connectors", diagram: "$0" }], "12", false],
     ["M2 apply_classifier_stereotypes s elementIDs -> package diagramu + packages menenych prvku", [{ op: "apply_classifier_stereotypes", diagram: 201, elementIDs: [101, 104] }], "11,12,14", false],
-    ["connectors update dle guid -> unknown", [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-301}", name: "n" }] }], "", true],
+    ["B3 (i) / FB-CZ-23: connectors update dle guid -> konce dohledany jednim SELECT, package SOURCE, rozsah znamy", [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-301}", name: "n" }] }], "11", false],
+    ["B3 (i): connectors update dle neexistujiciho guid -> unknown", [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-999}", name: "n" }] }], "", true],
     ["attributes -> package rodice", [{ op: "create_or_update_attributes", element: 102, attributes: [{ name: "a" }] }], "12", false],
     ["operations bez parameters -> package rodice, nedestruktivni", [{ op: "create_or_update_operations", element: 103, operations: [{ name: "o" }] }], "13", false, function (sc) { eq(sc.destructive, false); }],
     ["operations s parameters -> destruktivni podtrida", [{ op: "create_or_update_operations", element: 103, operations: [{ name: "o", parameters: [{ name: "p" }] }] }], "13", false, function (sc) { eq(sc.destructive, true); }],
@@ -2762,7 +2848,8 @@ t("BL-2 T6-29 runtime: zapisova operace bez polozky SCOPE = unknown + missingSco
     ["messages bez rebuild -> package diagramu, nedestruktivni", [{ op: "create_or_update_messages", diagram: "{DG-201}", messages: [{ source: 109, target: 101, name: "m" }] }], "12", false, function (sc) { eq(sc.destructive, false); }],
     ["delete element -> vlastnici package", [{ op: "delete_from_model", targets: [{ type: "Element", id: 104 }] }], "14", false, function (sc) { eq(sc.destructive, true); }],
     ["T6-12 delete package -> RODIC", [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PK-13}" }] }], "11", false],
-    ["T6-28 delete korenove whitelist package -> package sam + parentOutOfWhitelist", [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "10", false, function (sc) { eq(sc.packages[0].parentOutOfWhitelist, true); }],
+    ["T6-28 / FB-CZ-24: delete package, rodic (koren Model) pod prahem -> zaloha nad RODICEM i kdyz je to koren (whitelist zanikl)", [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "1", false, function (sc) { eq(sc.packages[0].parentOverThreshold, false); }],
+    ["T6-28 / FB-CZ-24: delete package, rodic NAD prahem subtreeMax (i pri thresholdsShadow: true) -> package sam + parentOverThreshold", [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "10", false, function (sc) { eq(sc.packages[0].parentOverThreshold, true); }, { subtreeMax: 0, thresholdsShadow: true }],
     ["delete diagram -> package diagramu", [{ op: "delete_from_model", targets: [{ type: "Diagram", id: 201 }] }], "12", false],
     ["delete connector -> package source", [{ op: "delete_from_model", targets: [{ type: "Connector", id: 301 }] }], "11", false],
     ["delete attribute -> package rodice", [{ op: "delete_from_model", targets: [{ type: "Attribute", id: 401 }] }], "12", false],
@@ -2789,11 +2876,12 @@ t("BL-2 T6-29 runtime: zapisova operace bez polozky SCOPE = unknown + missingSco
     ["deploy_src -> none", [{ op: "deploy_src", files: [] }], "", false],
     ["T6-27 $N na vysledek CTECI operace -> unknown", [{ op: "find_elements_by_name", name: "x" }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "", true],
     ["$N na CREATE vetev teto davky -> vlastni prvek, nic", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}" }] }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "", false],
-    ["$N na UPDATE vetev -> unknown", [{ op: "create_or_update_elements", elements: [{ guid: "{EL-101}", name: "n" }] }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "11", true],
+    ["B3 (ii) / FB-CZ-23: $N na UPDATE vetev -> pro zalohu balicek cile predchozi operace (uz ne unknown)", [{ op: "create_or_update_elements", elements: [{ guid: "{EL-101}", name: "n" }] }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "11", false],
+    ["B3 (ii): $N na UPDATE vetev s neznamym cilem (dedupKey nejednoznacny) -> unknown", [{ op: "create_or_update_elements", elements: [{ name: "n", "package": "{PK-11}", dedupKey: "k-dup" }] }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "", true],
     ["cteci operace se ignoruji", [{ op: "ping" }, { op: "query", sql: "SELECT 1" }], "", false]
 ].forEach(function (c) {
     t("BL-2 SCOPE: " + c[0], function () {
-        var sc = scopeOf(c[1]);
+        var sc = scopeOf(c[1], c[5]);
         eq(ids(sc), c[2], "packages (" + sc.unknownWhy.join("; ") + ")");
         eq(sc.unknown, c[3], "unknown: " + sc.unknownWhy.join("; "));
         if (c[4]) { c[4](sc); }
@@ -2924,10 +3012,12 @@ function runText(repo, ops, id) {
     return JSON.parse(B.FB_Main.call(B, repo, JSON.stringify({ protocol: "eafb/0.2", id: id || ("bl3-" + (++guidSeq)), repo: "EAEXAMPLE.QEA", ops: ops })));
 }
 // davka souborem (kontrakt I5) -> confirm okruh jde odehrat cely
-function runFile(repo, ops, id) {
+function runFile(repo, ops, id, extraTop) {
     delete B._fbAccessCache; delete B._fbPrevExc;
     var p = BL_BASE + "\\requests\\req-" + id + ".json";
-    memFs.files[p] = JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops });
+    var body = { protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops };
+    if (extraTop) { for (var k in extraTop) { body[k] = extraTop[k]; } }
+    memFs.files[p] = JSON.stringify(body);
     var out = asEaRuntime(function () { return B.FB_Main.call(B, repo, p); });
     memFs.files[BL_BASE + "\\responses\\res-" + id + ".json"] = out;
     return JSON.parse(out);
@@ -3197,21 +3287,66 @@ t("BL-3 T6-26b: dedupKey, ktery v modelu NEEXISTUJE -> skutecny create, bez dial
         ok(r.status != "confirm_required" && r.code != "E_NO_BASELINE", JSON.stringify(r).substring(0, 300)); eq(r.baseline.decision, "none");
     });
 });
-t("BL-3 T6-27: $N odkaz na existujici prvek -> velikost neznama (navadena cesta), nikdy cisty create", function () {
+t("BL-3 T6-27 / FB-CZ-23: $N na vysledek CTECI operace -> velikost neznama (navadena cesta), nikdy cisty create; bez dohledaneho cile rada 'baselineRoot', nikdy E_NO_BASELINE", function () {
     blReset(); var repo = blRepo();
     var r = runFile(repo, [{ op: "find_elements_by_name", name: "ElA" }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }], "t627");
-    eq(r.status, "confirm_required"); eq(r.baseline.action, "guided"); ok(r.baseline.reason.indexOf("cisty create") < 0);
-    contains(r.baseline.manual.missing.join(";"), "koren whitelistu");
+    eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300)); eq(r.baseline.action, "guided"); ok(r.baseline.reason.indexOf("cisty create") < 0);
+    contains(r.baseline.manual.missing.join(";"), "baselineRoot", "bez dohledaneho cile: rada uvest baselineRoot (B3)");
 });
-t("BL-3 T6-28: delete korenove whitelist package -> povinne confirm s vysvetlenim, baseline nad package samym, nikdy E_WHITELIST", function () {
+t("BL-3 FB-CZ-23 (B3 iii-v): neznamy rozsah s dohledanymi cili -> navadena cesta nad NEJBLIZSIM SPOLECNYM PREDKEM (rucni baseline nad nim ji splni)", function () {
+    blReset(); var repo = blRepo({ dedupEl: { "k-dup": [11, 12] } });
+    // nejednoznacny dedupKey (k-dup) + update prvku v A1 (13) a B (12): spolecny predek = #FB-TEST (10)
+    var ops = [{ op: "create_or_update_elements", elements: [{ name: "n", type: "Class", "package": "{PK-11}", dedupKey: "k-dup" }, { guid: "{EL-103}", name: "x" }, { guid: "{EL-102}", name: "y" }] }];
+    var r = runFile(repo, ops, "t623a");
+    eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300)); eq(r.baseline.action, "guided");
+    contains(r.baseline.manual.missing.join(";"), "Model.#FB-TEST", "rada: rucni baseline nad spolecnym predkem");
+    contains(r.baseline.manual.missing.join(";"), "spolecny predek");
+    repo._addBaseline(WL_GUID, "rucni pred davkou", 1);
+    var r2 = runFile(repo, ops, "t623b");
+    eq(r2.status, "confirm_required"); eq(r2.baseline.manual.ok, true, JSON.stringify(r2.baseline.manual));
+    contains(r2.baseline.manual.found.join(";"), "rucni pred davkou nad Model.#FB-TEST");
+});
+t("BL-3 FB-CZ-23 (B3): neznamy rozsah bez dohledaneho cile + pole davky baselineRoot -> navadena cesta nad baselineRoot; baselineRoot v chranene casti = E_BLACKLIST", function () {
+    blReset(); var repo = blRepo();
+    repo._addBaseline("{PK-11}", "rucni nad A", 1);
+    var ops = [{ op: "find_elements_by_name", name: "ElA" }, { op: "create_or_update_attributes", element: "$0", attributes: [{ name: "a" }] }];
+    var r = runFile(repo, ops, "t623c", { baselineRoot: "{PK-11}" });
+    eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300));
+    eq(r.baseline.manual.ok, true, JSON.stringify(r.baseline.manual));
+    contains(r.baseline.manual.found.join(";"), "baselineRoot z davky");
+    var rb = withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PK-11}", name: "A", note: "t" }] }], function () { return runFile(repo, ops, "t623d", { baselineRoot: "{PK-11}" }); });
+    eq(rb.code, "E_BLACKLIST", JSON.stringify(rb).substring(0, 300));
+});
+t("BL-3 FB-CZ-26: coveredBy najde rucni baseline nad KORENEM modelu (ochrana uzlu korene hledani nezastavi)", function () {
+    blReset(); var repo = blRepo({ dedupEl: { "k-dup": [11, 12] } });
+    repo._addBaseline("{PK-1}", "rucni nad korenem", 1);
+    var ops = [{ op: "create_or_update_elements", elements: [{ name: "n", type: "Class", "package": "{PK-11}", dedupKey: "k-dup" }, { guid: "{EL-103}", name: "x" }] }];
+    var r = runFile(repo, ops, "t626");
+    eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300)); eq(r.baseline.action, "guided");
+    eq(r.baseline.manual.ok, true, JSON.stringify(r.baseline.manual));
+    contains(r.baseline.manual.found.join(";"), "nad Model");
+});
+t("BL-3 T6-28 / FB-CZ-24: delete package s rodicem NAD prahem (i pri thresholdsShadow: true) -> povinne confirm s vysvetlenim, baseline nad package samym; rodic pod prahem -> baseline nad rodicem (korenem)", function () {
     blReset(); var repo = blRepo();
     var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [] }; };
     try {
-        var r = runFile(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "t628");
-        eq(r.status, "confirm_required"); contains(r.risk.riskReasons.join("; "), "parentOutOfWhitelist");
+        var r = withPolicy(polBase({ subtreeMax: 0, thresholdsShadow: true }), function () {
+            return runFile(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "t628");
+        });
+        eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300)); contains(r.risk.riskReasons.join("; "), "parentOverThreshold");
         contains("" + B.FB_ConfirmSummary.call(B, r), "ZANIKNE");
-        var r2 = confirmFile(repo, r, "t628", true);
+        var r2 = withPolicy(polBase({ subtreeMax: 0, thresholdsShadow: true }), function () { return confirmFile(repo, r, "t628", true); });
         eq(r2.status, "done", JSON.stringify(r2).substring(0, 300)); eq(autoNames(repo, WL_GUID).length, 1);
+        // rodic (koren Model) pod prahem -> zaloha nad rodicem, zadne varovani ZANIKNE
+        blReset(); var repoB = blRepo();
+        var rB = runFile(repoB, [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "t628b");
+        eq(rB.status, "confirm_required"); ok(rB.risk.riskReasons.join("; ").indexOf("parentOverThreshold") < 0, "rodic pod prahem nesmi varovat");
+        eq(rB.baseline.packages[0].path, "Model", "zaloha nad rodicem = korenem modelu");
+        // rodic s NEZNAMOU velikosti = jako nad prahem
+        blReset(); var repoC = blRepo({ countFails: true });
+        var rC = runFile(repoC, [{ op: "delete_from_model", targets: [{ type: "Package", guid: WL_GUID }] }], "t628c");
+        eq(rC.status, "confirm_required", JSON.stringify(rC).substring(0, 300));
+        eq(rC.baseline.packages[0].path, "Model.#FB-TEST", "neznama velikost rodice = jako nad prahem: zaloha nad mazanym balickem samym");
     } finally { B.FB_OpDelete = oD; }
 });
 t("BL-3 razitka: ai.baseline tag (pkgGuid;name;decision) + radek v Notes auditu", function () {
@@ -3270,36 +3405,43 @@ t("BL-3 T6-24 regrese: den dev skillu (scaffold + UC + vlastni diagram) -> zadny
     eq(repo._countBaselines(), 1, "3 menici davky do teze package = 1 baseline (reuse session)");
 });
 // --- FB_SessionStart ---
-t("BL-3 T6-2 SessionStart 'off': zadna baseline; hlaseni nese identitu repa a cesty whitelistu", function () {
+t("BL-3 T6-2 SessionStart 'off': zadna baseline; hlaseni nese identitu repa, rezim blacklist a chranene vetve (cil zapisu kap. 5.11)", function () {
     blReset(); var repo = blRepo();
-    var out = withPolicy(polBase({ sessionBaseline: "off" }), function () { return "" + B.FB_SessionStart.call(B, repo); });
-    eq(repo._createCalls, 0); contains(out, "EAEXAMPLE.QEA"); contains(out, "Model.#FB-TEST"); contains(out, "az pred prvnim zapisem");
+    var out = withPolicy(polBase({ sessionBaseline: "off" }), function () {
+        return withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PK-14}", name: "C", note: "test" }] }], function () { return "" + B.FB_SessionStart.call(B, repo); });
+    });
+    eq(repo._createCalls, 0); contains(out, "EAEXAMPLE.QEA"); contains(out, "Zapis: blacklist (1 chranenych vetvi)"); contains(out, "Model.#FB-TEST.C [test]");
+    contains(out, "az pred prvnim zapisem"); ok(out.indexOf("whitelist") < 0, "slovo whitelist v hlaseni uz neni");
 });
-t("BL-3 T6-3 SessionStart 'auto' nad prahem: 0 baselines, 'preskocena (nad limitem)' s poctem", function () {
+t("BL-3 T6-3 / FB-CZ-25: SessionStart 'auto' -> zadna session baseline (auto se chova jako off) a hlaseni to rekne", function () {
     blReset(); var repo = blRepo({ mult: 1000 });
-    var out = "" + B.FB_SessionStart.call(B, repo);
-    eq(repo._createCalls, 0); contains(out, "preskocena (nad limitem)"); contains(out, "11000 prvku > 5000");
+    var out = withPolicy(polBase({ sessionBaseline: "auto" }), function () { return "" + B.FB_SessionStart.call(B, repo); });
+    eq(repo._createCalls, 0); contains(out, "chova se jako 'off'"); contains(out, "Session baseline se nedela");
+    blReset(); var repo2 = blRepo();
+    var out2 = withPolicy(polBase({ sessionBaseline: "auto" }), function () { return "" + B.FB_SessionStart.call(B, repo2); });
+    eq(repo2._createCalls, 0, "ani pod prahem se session baseline nevyrabi"); eq(autoNames(repo2, WL_GUID).length, 0);
+    ok(out2.indexOf("vytvorena nad") < 0);
 });
-t("BL-3 SessionStart 'auto' pod prahem: baseline pod autoPrefix se sufixem (session); druhy start v teze session = reuse", function () {
-    blReset(); var repo = blRepo();
-    var out = "" + B.FB_SessionStart.call(B, repo);
-    var nm = autoNames(repo, WL_GUID);
-    eq(nm.length, 1); ok(/ \(session\)$/.test(nm[0]), nm[0]); ok(B.FB_BaselineName.call(B, "parse", nm[0], "FB-AUTO ").session);
-    contains(out, "vytvorena nad: Model.#FB-TEST");
-    ok(!(repo._baselines[WL_GUID] || []).some(function (b) { return /^FB \d{4}/.test(b.version); }), "legacy tvar 'FB <datum>' se uz nevyrabi");
-    var out2 = "" + B.FB_SessionStart.call(B, repo);
-    eq(autoNames(repo, WL_GUID).length, 1); contains(out2, "uz existuje");
-});
-t("BL-3 I4 SessionStart: CreateBaseline false -> hlasi SELHANI (ne 'vytvoreno') a NEvaruje o chybejicim whitelistu", function () {
-    blReset(); var repo = blRepo({ createFalse: true });
-    var out = "" + B.FB_SessionStart.call(B, repo);
-    contains(out, "SELHALA"); ok(out.indexOf("vytvorena nad") < 0); ok(out.indexOf("E_REPO") < 0, "whitelist je v poradku");
-});
-t("BL-3 I4 SessionStart: repo bez whitelist polozky -> varovani E_REPO (z identity, ne z poctu zaloh)", function () {
+t("BL-3 I4 SessionStart: repo bez polozky FB_WriteScope -> varovani E_REPO (z identity)", function () {
     blReset();
     var repo = mkRepo({ connectionString: "C:\\X\\JINY.QEA" });
     var out = "" + B.FB_SessionStart.call(B, repo);
-    contains(out, "zadna whitelist polozka neodpovida"); contains(out, "E_REPO");
+    contains(out, "nema polozku ve FB_WriteScope"); contains(out, "E_REPO");
+});
+t("BL-3 / FB-CZ-05a FB-CZ-02: SessionStart s vadnou konfiguraci (GUID blacklistu v modelu neni) -> hlaseni CHYBA konfigurace E_SCOPE_CONFIG; zapis E_SCOPE_CONFIG, cteni bezi", function () {
+    blReset(); var repo = blRepo();
+    var out = withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PK-NENI}", name: "Neni", note: "t" }] }], function () { return "" + B.FB_SessionStart.call(B, repo); });
+    contains(out, "E_SCOPE_CONFIG"); contains(out, "{PK-NENI}");
+    var r = withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PK-NENI}", name: "Neni", note: "t" }] }], function () {
+        return runFile(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PK-11}" }] }], "tscfg");
+    });
+    eq(r.code, "E_SCOPE_CONFIG", JSON.stringify(r).substring(0, 300)); eq(r.results[0].status, "skipped");
+    ok(r.problems && r.problems.length >= 1 && /PK-NENI/.test(r.problems[0].message), "seznam vad v problems[]");
+    ok(r.audit && typeof r.audit.aiLogGuid == "string", "E_SCOPE_CONFIG se audituje");
+    var rr = withScope([{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PK-NENI}", name: "Neni", note: "t" }] }], function () {
+        return runFile(repo, [{ op: "query", sql: "SELECT 1 AS x" }], "tscfg-r");
+    });
+    eq(rr.status, "done", "cteni bezi i s vadnou konfiguraci: " + JSON.stringify(rr).substring(0, 200));
 });
 
 // ===========================================================================
@@ -3750,7 +3892,7 @@ function pumpRun(repo, ops, id, text) {
     memFs.files[p] = (typeof text == "string") ? text : JSON.stringify({ protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops });
     var out = asEaRuntime(function () { return "" + B.FB_Main.call(B, repo, p); });
     memFs.files[B1_RES + "\\res-" + id + ".json"] = out;
-    var rejected = /"code":"(E_PARSE|E_RISK_BLOCKED|E_RISK_CONFIRM|E_NO_BASELINE)"/.test(out);
+    var rejected = /"code":"(E_PARSE|E_RISK_BLOCKED|E_RISK_CONFIRM|E_NO_BASELINE|E_BLACKLIST|E_SCOPE_CONFIG)"/.test(out); // zrcadlo pump.wsf (rejected)
     if (out.indexOf("\"status\":\"confirm_required\"") < 0 && typeof memFs.files[p] != "undefined") {
         memFs.files[B1_REQ + "\\" + (rejected ? "rejected" : "processed") + "\\" + name.replace(/\.json$/, "") + ".stamp.json"] = memFs.files[p];
         delete memFs.files[p];
@@ -4256,6 +4398,515 @@ t("B1 pravidlo 8: kodove kotvy pumpy a adapteru pro nove kody - E_INTERRUPTED/E_
     eq(e.status, "rejected"); eq(e.code, "E_RISK_EXPIRED");
 });
 
+// ===========================================================================
+// CIL ZAPISU - rezim blacklist (Z261004b-10, zadani cil zapisu v1.1 kap. 8)
+// ===========================================================================
+// Model mocku: 1 Model (koren) > 2 Volne > (10 VolnyPrvek, 14 VolnyPrvek2, 13 VolnyVlastneny
+// [ParentID 11 - vlastneny chranenym prvkem, I14], diagram 100 VolnyDg)
+//           > 900 FBT-CHRANENE (blacklist) > 901 Podbalicek > 12 PodPrvek; 11 ChranenyPrvek; diagram 101 ChranenyDg
+//           > 950 #AI-LOG (auditPkg z FB_Config EAEXAMPLE) ; > 960 EA Addins (AICodeBridge 3352)
+//           > 3 Dvojnik, 4 Dvojnik (stejne jmeno = nejednoznacne), 5 dvojnik (jen velikost pismen, W7)
+// konektory: 301 11->10 (zdroj chraneny), 302 10->14 (volna), 303 10->11 (cil chraneny), 304 12->10 (zdroj v podbalicku)
+var SC_AUDIT_GUID = "" + B.FB_Config.call(B)[0].auditPkg;
+function scopeRepo(opts) {
+    opts = opts || {};
+    var PK = [[1, 0, "Model", "{PKG-ROOT}"], [2, 1, "Volne", "{PKG-FREE}"], [900, 1, "FBT-CHRANENE", "{PKG-BL}"], [901, 900, "Podbalicek", "{PKG-BL-SUB}"],
+              [950, 1, "#AI-LOG", SC_AUDIT_GUID], [960, 1, "EA Addins", "{PKG-ADDIN}"], [3, 1, "Dvojnik", "{PKG-DUP-A}"], [4, 2, "Dvojnik", "{PKG-DUP-B}"], [5, 2, "dvojnik", "{PKG-DUP-C}"],
+              [6, 2, "Jedinacek", "{PKG-ONE}"], [7, 0, "Volne", "{PKG-FREE-TWIN}"], [8, 2, "Dvojnik", "{PKG-DUP-D}"]];
+    var EL = [[10, 2, 0, "VolnyPrvek", "{EL-FREE}", "Class"], [14, 2, 0, "VolnyPrvek2", "{EL-FREE2}", "Class"], [13, 2, 11, "VolnyVlastneny", "{EL-OWNED}", "Class"],
+              [11, 900, 0, "ChranenyPrvek", "{EL-BL}", "Class"], [12, 901, 0, "PodPrvek", "{EL-BL-SUB}", "Class"],
+              [3352, 960, 0, "AICodeBridge", "{EL-BRIDGE}", "Class"], [20, 2, 0, "Dvojprvek", "{EL-DUP-A}", "Class"], [21, 900, 0, "Dvojprvek", "{EL-DUP-B}", "Class"],
+              [22, 2, 0, "Instance", "{EL-INST}", "Object"]];
+    var DG = [[100, 2, 0, "VolnyDg", "{DG-FREE}"], [101, 900, 0, "ChranenyDg", "{DG-BL}"]];
+    var CN = [[301, 11, 10, "{CN-BL}"], [302, 10, 14, "{CN-FREE}"], [303, 10, 11, "{CN-IN}"], [304, 12, 10, "{CN-BL-SUB}"]];
+    var DOBJ = opts.diagramObjects || [[101, 10]]; // [Diagram_ID, Object_ID]: volny prvek 10 lezi na chranenem diagramu 101
+    var DEDUP_EL = opts.dedupEl || { "k-bl": 11, "k-free": 10 };
+    var DEDUP_CN = opts.dedupConn || { "ck-bl": 301, "ck-free": 302 };
+    function key(sql) {
+        var m;
+        if ((m = /ea_guid = '([^']+)'/i.exec(sql))) { return { guid: m[1] }; }
+        if ((m = /Parent_ID = (\d+) AND Name = '([^']+)'/i.exec(sql))) { return { parent: parseInt(m[1], 10), name: m[2] }; }
+        if ((m = /(?:Object_ID|Package_ID|Diagram_ID|Connector_ID|OperationID|\bID) = (\d+)/i.exec(sql))) { return { id: parseInt(m[1], 10) }; }
+        if ((m = /Parent_ID = (\d+)/i.exec(sql))) { return { parentOnly: parseInt(m[1], 10) }; }
+        if ((m = /Name = '([^']+)'/i.exec(sql))) { return { name: m[1] }; }
+        return {};
+    }
+    function inList(sql, col) { var m = new RegExp(col + " IN \\(([0-9, ]+)\\)", "i").exec(sql); return m ? m[1].split(",").map(function (x) { return parseInt(x, 10); }) : []; }
+    function pkRow(p) { return { Package_ID: p[0], Parent_ID: p[1], Name: p[2], ea_guid: p[3] }; }
+    function elRow(e) { return { Object_ID: e[0], Package_ID: e[1], ParentID: e[2], Name: e[3], ea_guid: e[4], Object_Type: e[5], Stereotype: (e[0] == 3352 ? "JavascriptAddin" : "") }; }
+    function dgRow(d) { return { Diagram_ID: d[0], Package_ID: d[1], ParentID: d[2], Name: d[3], ea_guid: d[4] }; }
+    function cnRow(c) { return { Connector_ID: c[0], Start_Object_ID: c[1], End_Object_ID: c[2], ea_guid: c[3] }; }
+    var rules = [
+        { re: /#AI-LOG' ORDER BY/i, rows: [] },
+        { re: /Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin'/i, rows: function () { return opts.noBridge ? [] : [{ Object_ID: 3352, ea_guid: "{EL-BRIDGE}", Package_ID: 960 }]; } },
+        { re: /FROM t_object WHERE Package_ID = 960/i, rows: function () { var r = [elRow(EL[5])]; if (opts.addinForeign) { r.push({ Object_ID: 3399, Name: "Cizi prvek", Stereotype: "", ParentID: 0 }); } return r; } },
+        { re: /FROM t_object WHERE Package_ID IN/i, rows: function (sql) { var ids = inList(sql, "Package_ID"); return EL.filter(function (e) { return ids.indexOf(e[1]) >= 0; }).map(function (e) { return { Object_ID: e[0] }; }); } },
+        { re: /t_objectproperties/i, rows: function (sql) { var m = /Value = '([^']+)'/i.exec(sql); var id = DEDUP_EL[m ? m[1] : ""]; if (!id) { return []; }
+            var ids = Object.prototype.toString.call(id) == "[object Array]" ? id : [id];
+            return ids.map(function (x) { var e = EL.filter(function (q) { return q[0] == x; })[0]; return { Object_ID: x, Package_ID: e ? e[1] : 0, ea_guid: e ? e[4] : "" }; }); } },
+        { re: /t_connectortag/i, rows: function (sql) { var m = /VALUE = '([^']+)'/i.exec(sql); var id = DEDUP_CN[m ? m[1] : ""]; if (!id) { return []; }
+            var c = CN.filter(function (q) { return q[0] == id; })[0]; return c ? [cnRow(c)] : []; } },
+        { re: /FROM t_connector c WHERE c\.End_Object_ID IN/i, rows: function (sql) { var ids = inList(sql, "c.End_Object_ID"); var out = [];
+            CN.forEach(function (c) { if (ids.indexOf(c[2]) >= 0 && ids.indexOf(c[1]) < 0) { out.push({ Start_Object_ID: c[1] }); } }); return out; } },
+        { re: /FROM t_connector WHERE DiagramID/i, rows: [] },
+        { re: /FROM t_connector WHERE Start_Object_ID = (\d+) AND End_Object_ID = (\d+)/i, rows: function (sql) { var m = /Start_Object_ID = (\d+) AND End_Object_ID = (\d+)/i.exec(sql);
+            return CN.filter(function (c) { return c[1] == parseInt(m[1], 10) && c[2] == parseInt(m[2], 10); }).map(cnRow); } },
+        { re: /FROM t_connector(?: c)? WHERE/i, rows: function (sql) { var k = key(sql); return CN.filter(function (c) { return (k.guid && k.guid == c[3]) || (k.id && k.id == c[0]); }).map(cnRow); } },
+        { re: /FROM t_diagramobjects x WHERE x\.Object_ID IN/i, rows: function (sql) { var ids = inList(sql, "x.Object_ID"); return DOBJ.filter(function (d) { return ids.indexOf(d[1]) >= 0; }).map(function (d) { return { Diagram_ID: d[0] }; }); } },
+        { re: /FROM t_diagramobjects WHERE Diagram_ID = (\d+)/i, rows: function (sql) { var m = /Diagram_ID = (\d+)/i.exec(sql); return DOBJ.filter(function (d) { return d[0] == parseInt(m[1], 10); }).map(function (d) { return { Object_ID: d[1] }; }); } },
+        { re: /t_diagramobjects/i, rows: [] },
+        { re: /Classifier IN/i, rows: function (sql) { var ids = inList(sql, "Classifier"); return (opts.classifierInstances || []).filter(function (x) { return ids.indexOf(x[0]) >= 0; }).map(function (x) { return { Object_ID: x[1] }; }); } },
+        { re: /FROM t_object WHERE ParentID IN/i, rows: function (sql) { var ids = inList(sql, "ParentID"); return EL.filter(function (e) { return e[2] > 0 && ids.indexOf(e[2]) >= 0; }).map(function (e) { return { Object_ID: e[0], Name: e[3] }; }); } },
+        { re: /FROM t_diagram WHERE ParentID IN/i, rows: function (sql) { var ids = inList(sql, "ParentID"); return DG.filter(function (d) { return d[2] > 0 && ids.indexOf(d[2]) >= 0; }).map(function (d) { return { Diagram_ID: d[0], Name: d[3] }; }); } },
+        { re: /FROM t_package WHERE Parent_ID IN/i, rows: function (sql) { var ids = inList(sql, "Parent_ID"); return PK.filter(function (p) { return ids.indexOf(p[1]) >= 0; }).map(pkRow); } },
+        { re: /FROM t_package WHERE/i, rows: function (sql) { var k = key(sql);
+            return PK.filter(function (p) { return (k.guid && k.guid == p[3]) || (k.id && k.id == p[0]) || (typeof k.parent == "number" && k.parent == p[1] && k.name.toLowerCase() == p[2].toLowerCase())
+                || (typeof k.parentOnly == "number" && k.parentOnly == p[1]) || (k.name && !("parent" in k) && k.name.toLowerCase() == p[2].toLowerCase()); }).map(pkRow); } },
+        { re: /FROM t_object WHERE/i, rows: function (sql) { var k = key(sql);
+            return EL.filter(function (e) { return (k.guid && k.guid == e[4]) || (k.id && k.id == e[0]) || (k.name && k.name.toLowerCase() == e[3].toLowerCase()); }).map(elRow); } },
+        { re: /FROM t_diagram WHERE/i, rows: function (sql) { var k = key(sql);
+            return DG.filter(function (d) { return (k.guid && k.guid == d[4]) || (k.id && k.id == d[0]) || (k.name && k.name == d[3]); }).map(dgRow); } },
+        { re: /FROM t_attribute WHERE/i, rows: function (sql) { var k = key(sql); return (k.id == 401) ? [{ Object_ID: 11 }] : ((k.id == 402) ? [{ Object_ID: 10 }] : []); } },
+        { re: /FROM t_operation WHERE/i, rows: function (sql) { var k = key(sql); return (k.id == 501 || k.guid == "{OP-BL}") ? [{ Object_ID: 11 }] : ((k.id == 502 || k.guid == "{OP-FREE}") ? [{ Object_ID: 10 }] : []); } },
+        { re: /COUNT\(\*\) AS c FROM t_object/i, rows: function (sql) { var ids = inList(sql, "Package_ID"); return [{ c: EL.filter(function (e) { return ids.indexOf(e[1]) >= 0; }).length }]; } },
+        { re: /COUNT\(\*\) AS c FROM t_diagram/i, rows: [{ c: 0 }] },
+        { re: /FROM t_document/i, rows: [] }
+    ];
+    var repo = mkRepo({ sqlRules: rules, securityEnabled: opts.securityEnabled, login: opts.login });
+    PK.forEach(function (p) { repo._addPackage({ id: p[0], parentID: p[1], name: p[2], guid: p[3] }); });
+    function mkConn(owner) { return function (n, t) { return { ConnectorID: ++guidSeq, ConnectorGUID: mkGuid(), Name: n, Type: t, ClientID: owner.ElementID, SupplierID: 0, Notes: "", StereotypeEx: "", Direction: "", TransitionEvent: "", TransitionAction: "", TransitionGuard: "", DiagramID: 0,
+        ClientEnd: { Update: function () { return true; } }, SupplierEnd: { Update: function () { return true; } }, TaggedValues: mkColl(function (n2) { return { Name: n2, Value: "", Update: function () { return true; } }; }),
+        Update: function () { return true; }, GetLastError: function () { return ""; } }; }; }
+    EL.forEach(function (e) { var el = repo._addElement({ id: e[0], packageID: e[1], parentID: e[2], name: e[3], guid: e[4], type: e[5] }); el.Connectors = mkColl(mkConn(el)); el.Elements = mkColl(); el.Diagrams = mkColl(); el.Methods = mkColl();
+        el.Attributes = mkColl(function (n, t) { return { AttributeID: ++guidSeq, Name: n, Type: t, Notes: "", Default: "", Visibility: "", Stereotype: "", Alias: "", IsStatic: false, IsConst: false, IsOrdered: false, AllowDuplicates: false, LowerBound: "", UpperBound: "", ClassifierID: 0, TaggedValues: mkColl(function (n2) { return { Name: n2, Value: "", Update: function () { return true; } }; }), Update: function () { return true; }, GetLastError: function () { return ""; } }; });
+        el.Clone = function () { var c = repo._addElement({ name: el.Name + " (klon)", packageID: el.PackageID }); c.Diagrams = mkColl(); return c; }; });
+    EL.forEach(function (e) { var el = repo.GetElementByID(e[0]); if (e[2] > 0) { var ow = repo.GetElementByID(e[2]); if (ow) { ow.Elements._items.push(el); } } else { repo.GetPackageByID(e[1]).Elements._items.push(el); } });
+    var conns = {};
+    CN.forEach(function (c) { var cn = { ConnectorID: c[0], ConnectorGUID: c[3], ClientID: c[1], SupplierID: c[2], Type: "Association", Name: "", Notes: "", Stereotype: "", Direction: "",
+        ClientEnd: { Update: function () { return true; } }, SupplierEnd: { Update: function () { return true; } }, TaggedValues: mkColl(function (n) { return { Name: n, Value: "", Update: function () { return true; } }; }),
+        Update: function () { return true; }, GetLastError: function () { return ""; } };
+        conns[c[0]] = cn; conns[c[3]] = cn; var src = repo.GetElementByID(c[1]); if (src) { src.Connectors._items.push(cn); } });
+    repo.GetConnectorByID = function (id) { return conns[id] || null; };
+    repo.GetConnectorByGuid = function (g) { return conns[g] || null; };
+    var dgs = {};
+    DG.forEach(function (d) { var dg = { DiagramID: d[0], DiagramGUID: d[4], PackageID: d[1], ParentID: d[2], Name: d[3], Type: "Logical", Notes: "", Update: function () { return true; }, GetLastError: function () { return ""; },
+        DiagramObjects: mkColl(function () { return { ElementID: 0, left: 0, right: 0, top: 0, bottom: 0, Sequence: 0, Style: "", Update: function () { return true; }, GetLastError: function () { return ""; } }; }), DiagramLinks: mkColl() };
+        dgs[d[0]] = dg; dgs[d[4]] = dg; });
+    repo.GetDiagramByID = function (id) { return dgs[id] || null; };
+    repo.GetDiagramByGuid = function (g) { return dgs[g] || null; };
+    PK.forEach(function (p) { var pk = repo.GetPackageByID(p[0]); pk.Diagrams = mkColl(); pk.Clone = function () { return repo._addPackage({ name: pk.Name + " (klon)", parentID: pk.ParentID }); }; });
+    repo.GetMethodByID = function (id) { return (id == 501 || id == 502) ? { MethodID: id, MethodGUID: (id == 501 ? "{OP-BL}" : "{OP-FREE}"), Name: "op", Notes: "", ReturnType: "", Parameters: mkColl() } : null; };
+    repo.GetMethodByGuid = function (g) { return (g == "{OP-BL}") ? repo.GetMethodByID(501) : ((g == "{OP-FREE}") ? repo.GetMethodByID(502) : null); };
+    repo.GetProjectInterface = function () { return { GUIDtoXML: function (g) { return g; }, CreateBaseline: function () { return true; }, GetBaselines: function () { return "<EA.BaseLines></EA.BaseLines>"; }, DeleteBaseline: function () { return true; } }; };
+    return repo;
+}
+function scopeRun(repo, ops, id, scope, extra) {
+    delete B._fbAccessCache; delete B._fbPrevExc;
+    var body = { protocol: "eafb/0.2", id: id, repo: "EAEXAMPLE.QEA", ops: ops };
+    if (extra) { for (var k in extra) { body[k] = extra[k]; } }
+    return withScope(scope || scopeBL(), function () { return JSON.parse("" + B.FB_Main.call(B, repo, JSON.stringify(body))); });
+}
+function scopeCfgOk(repo, scope) {
+    return withScope(scope || scopeBL(), function () { B._fbScopeCfg = null; return B.FB_WriteScopeCfg.call(B, repo); });
+}
+t("CZ-00a skutecny FB_WriteScope: tvar polozek (repo, pole blacklist, pkg jako {GUID}, name, note), repa shodna s FB_Config/FB_OpsAllowed, zadna bankovni hodnota", function () {
+    var live = FB_WRITESCOPE_LIVE.call(B);
+    ok(Array.isArray(live) && live.length >= 2, "pole s domacimi modely");
+    var cfgRepos = {}, cfgArr = B.FB_Config.call(B);
+    for (var c = 0; c < cfgArr.length; c++) { cfgRepos[cfgArr[c].repo] = 1; }
+    for (var i = 0; i < live.length; i++) {
+        var e = live[i];
+        ok(typeof e.repo == "string" && e.repo.length > 0, "repo[" + i + "]");
+        ok(cfgRepos[e.repo] === 1, "repo '" + e.repo + "' musi mit polozku i ve FB_Config");
+        ok(Array.isArray(e.blacklist), "blacklist[" + i + "] je pole");
+        ok(!/<TEST-DB>|<PROTECTED/.test(e.repo), "zadne bankovni placeholdery v kodu");
+        for (var b = 0; b < e.blacklist.length; b++) {
+            var w = e.blacklist[b];
+            ok(/^\{[0-9A-Fa-f-]{36}\}$/.test("" + w.pkg), "pkg je {GUID}: " + w.pkg);
+            ok(typeof w.name == "string" && w.name.length > 0, "name povinne");
+            ok(typeof w.note == "string", "note");
+        }
+    }
+});
+t("CZ-00 mock: konfigurace cile zapisu nad scopeRepo je v poradku (blacklist nalezen, audit + add-in implicitne chraneny)", function () {
+    var c = scopeCfgOk(scopeRepo());
+    eq(c.problems.join("; "), "", "bez vad");
+    eq(c.blacklist[0].found, true); eq(c.blacklist[0].path, "Model.FBT-CHRANENE");
+    ok(c.protectedIds["900"] && c.protectedIds["950"] && c.protectedIds["960"], "chranene: 900 blacklist, 950 audit, 960 add-in");
+    ok(c.ancestorIds["1"] && c.ancestorIds["1"].length == 3, "koren Model je predkem 3 chranenych vetvi");
+});
+t("CZ-02 FB-CZ-02: vady konfigurace -> E_SCOPE_CONFIG se seznamem (chybejici blacklist, GUID neni, jmeno nesedi, chybejici auditPkg, balicek add-inu s cizim obsahem)", function () {
+    var repo = scopeRepo();
+    var c1 = scopeCfgOk(repo, [{ repo: "EAEXAMPLE.QEA" }]);
+    contains(c1.problems.join("; "), "nema klic blacklist");
+    var c2 = scopeCfgOk(repo, [{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-NENI}", name: "FBT-CHRANENE", note: "" }] }]);
+    contains(c2.problems.join("; "), "nenalezen"); contains(c2.problems.join("; "), "existuje s GUID {PKG-BL} - preklep?", "napoveda podle jmena (I11)");
+    var c3 = scopeCfgOk(repo, [{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-BL}", name: "Jine jmeno", note: "" }] }]);
+    contains(c3.problems.join("; "), "se jmenuje 'FBT-CHRANENE', konfigurace ceka 'Jine jmeno'");
+    var oC = B.FB_Config; B.FB_Config = function () { return [{ repo: "EAEXAMPLE.QEA", srcDir: "x" }]; };
+    try { var c4 = scopeCfgOk(repo); contains(c4.problems.join("; "), "auditPkg"); } finally { B.FB_Config = oC; }
+    var c5 = scopeCfgOk(scopeRepo({ addinForeign: true }));
+    contains(c5.problems.join("; "), "presun add-in do vlastniho balicku"); contains(c5.problems.join("; "), "Cizi prvek");
+    var r = scopeRun(scopeRepo({ addinForeign: true }), [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-FREE}" }] }], "cz02");
+    eq(r.code, "E_SCOPE_CONFIG"); eq(r.results[0].status, "skipped"); ok(r.problems.length >= 1);
+    var rr = scopeRun(scopeRepo({ addinForeign: true }), [{ op: "get_elements_information", elements: ["{EL-FREE}"] }], "cz02r");
+    eq(rr.status, "done", "cteni bezi: " + JSON.stringify(rr).substring(0, 200));
+});
+t("CZ-02b opravny kanal: vadna konfigurace NEZASTAVI davku slozenou jen z deploy_src (jinak by se preklep nedal doma opravit); deploy_src + jiny zapis = E_SCOPE_CONFIG", function () {
+    var rd = scopeRun(scopeRepo({ addinForeign: true }), [{ op: "deploy_src" }], "cz02d");
+    ok(rd.code != "E_SCOPE_CONFIG", "deploy_src sam neni E_SCOPE_CONFIG: " + JSON.stringify(rd).substring(0, 300));
+    ok(rd.status == "confirm_required" || rd.status == "done" || rd.status == "error", "deploy_src dosel az k Risk Gate: " + rd.status);
+    var rm = scopeRun(scopeRepo({ addinForeign: true }), [{ op: "deploy_src" }, { op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-FREE}" }] }], "cz02dm");
+    eq(rm.code, "E_SCOPE_CONFIG", "smisena davka zustava zastavena");
+});
+t("CZ-01 FB-CZ-01: cil mimo byvaly sandbox (volny balicek) projde; jiny repozitar bez polozky = E_REPO, nic neprovedeno", function () {
+    var repo = scopeRepo();
+    var r = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-FREE}" }] }], "cz01");
+    eq(r.status, "done", JSON.stringify(r).substring(0, 300));
+    var chk = withScope([{ repo: "JINY.QEA", blacklist: [] }], function () { return B.FB_CheckWrite.call(B, repo, repo.GetPackageByID(2)); });
+    eq(chk.code, "E_REPO");
+});
+// --- FB-CZ-07: tabulkovy test VSECH zapisovych operaci registru (operace bez radku = test spadne) ---
+var CZ07 = {
+    "create_element":                  { op: "create_element", "package": "{PKG-BL}", name: "N", type: "Class" },
+    "create_or_update_elements":       { op: "create_or_update_elements", elements: [{ guid: "{EL-BL}", name: "N" }] },
+    "move_elements":                   { op: "move_elements", "package": "{PKG-BL}", elements: ["{EL-FREE}"] },
+    "create_or_update_package":        { op: "create_or_update_package", packages: [{ guid: "{PKG-BL-SUB}", name: "N" }] },
+    "create_or_update_connectors":     { op: "create_or_update_connectors", connectors: [{ guid: "{CN-BL}", name: "N" }] },
+    "create_or_update_attributes":     { op: "create_or_update_attributes", element: "{EL-BL}", attributes: [{ name: "a" }] },
+    "create_or_update_operations":     { op: "create_or_update_operations", element: "{EL-BL}", operations: [{ name: "o" }] },
+    "create_or_update_messages":       { op: "create_or_update_messages", messages: [{ guid: "{CN-BL}", name: "m" }] },
+    "delete_from_model":               { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-BL}" }] },
+    "delete_taggedvalue_from_model":   { op: "delete_taggedvalue_from_model", targets: [{ type: "ElementTaggedValue", guid: "{EL-BL}", name: "t" }] },
+    "remove_elements_from_diagram":    { op: "remove_elements_from_diagram", diagram: "{DG-BL}", elementIDs: ["{EL-FREE}"] },
+    "create_baseline":                 { op: "create_baseline", "package": "{PKG-BL}" },
+    "clone_package":                   { op: "clone_package", "package": "{PKG-BL}" },
+    "clone_elements":                  { op: "clone_elements", elements: ["{EL-BL}"] },
+    "import_element_linked_documents": { op: "import_element_linked_documents", documents: [{ element: "{EL-BL}", file: "x.rtf" }] },
+    "layout_connectors":               { op: "layout_connectors", diagram: "{DG-BL}", style: "x" },
+    "change_connector_visibility":     { op: "change_connector_visibility", diagram: "{DG-BL}", connectorIDs: [302], hidden: true },
+    "update_diagram_properties":       { op: "update_diagram_properties", diagrams: [{ diagram: "{DG-BL}", name: "N" }] },
+    "set_diagram_object_style":        { op: "set_diagram_object_style", diagram: "{DG-BL}", objects: [{ element: "{EL-FREE}" }] },
+    "create_or_update_diagram":        { op: "create_or_update_diagram", diagrams: [{ guid: "{DG-BL}", name: "N" }] },
+    "place_elements_on_diagram":       { op: "place_elements_on_diagram", diagram: "{DG-BL}", elementPlacements: [{ element: "{EL-FREE}" }] },
+    "create_or_update_scenarios":      { op: "create_or_update_scenarios", element: "{EL-BL}", scenarios: [{ name: "BE", type: "Basic Path", steps: [{ text: "k" }] }] },
+    "create_or_update_constraints":    { op: "create_or_update_constraints", element: "{EL-BL}", constraints: [{ name: "c" }] },
+    "create_or_update_requirements":   { op: "create_or_update_requirements", element: "{EL-BL}", requirements: [{ name: "r" }] },
+    "apply_classifier_stereotypes":    { op: "apply_classifier_stereotypes", diagram: "{DG-FREE}", elementIDs: ["{EL-BL}"] },
+    "find_or_create_referencing_sr":   { op: "find_or_create_referencing_sr", targetPackage: "{PKG-BL}", operation: 502, packageName: "SR" },
+    "deploy_src":                      { op: "deploy_src", files: [] }
+};
+t("CZ-07 FB-CZ-07: kazda z 27 zapisovych operaci registru odmitne cil v chranene casti kodem E_BLACKLIST (deploy_src = E_OP_FORBIDDEN/E_RISK_BLOCKED podle B4); operace bez radku = test spadne", function () {
+    var reg = regFull(), missing = [], nW = 0;
+    for (var op in reg) { if (reg[op].w) { nW++; if (!CZ07[op]) { missing.push(op); } } }
+    eq(missing.join(","), "", "zapisove operace BEZ radku v tabulce CZ07");
+    ok(nW >= 27, "registr ma mit aspon 27 zapisovych operaci, nalezeno " + nW);
+    var bad = [];
+    for (var name in CZ07) {
+        if (!reg[name] || !reg[name].w) { bad.push(name + ": radek mimo registr"); continue; }
+        var repo = scopeRepo();
+        var r;
+        if (name == "deploy_src") {
+            var oA = B.FB_OpsAllowed; B.FB_OpsAllowed = function () { return [{ repo: "EAEXAMPLE.QEA", allow: ["*"], deny: ["deploy_src"] }]; };
+            try { r = scopeRun(repo, [CZ07[name]], "cz07-" + name); } finally { B.FB_OpsAllowed = oA; }
+            if (r.code != "E_OP_FORBIDDEN" && r.code != "E_RISK_BLOCKED") { bad.push(name + ": " + r.code + " " + ("" + r.message).substring(0, 160)); }
+            continue;
+        }
+        r = scopeRun(repo, [CZ07[name]], "cz07-" + name);
+        if (r.code != "E_BLACKLIST") { bad.push(name + ": " + r.code + " " + ("" + r.message).substring(0, 200)); continue; }
+        if (!r.results || r.results.length != 1 || r.results[0].status != "skipped") { bad.push(name + ": vysledek neni skipped"); }
+        if (!r.audit || typeof r.audit.aiLogGuid != "string") { bad.push(name + ": E_BLACKLIST bez auditu"); }
+        if (!/FBT-CHRANENE/.test(r.message + JSON.stringify(r.problems))) { bad.push(name + ": zprava nejmenuje chranenou vetev (FB-CZ-28)"); }
+    }
+    eq(bad.join(" | "), "", "radky, ktere neprosly");
+});
+t("CZ-08 FB-CZ-08: jediny zakazany cil = davka se neprovede vubec (nic, ani zaloha), soubor do rejected\\, audit v #AI-LOG", function () {
+    b1Reset(); var repo = scopeRepo();
+    var created = 0; var oE = B.FB_OpElements; B.FB_OpElements = function () { created++; return { op: "create_or_update_elements", status: "ok", items: [] }; };
+    var baselines = 0; var oB = B.FB_AutoBaseline; B.FB_AutoBaseline = function () { baselines++; return { status: "created", name: "x", guid: "{b}" }; };
+    try {
+        var r = withScope(scopeBL(), function () { return pumpRun(repo, [
+            { op: "create_or_update_elements", elements: [{ guid: "{EL-FREE}", name: "ok" }] },
+            { op: "create_or_update_elements", elements: [{ guid: "{EL-BL}", name: "zakazano" }] }], "cz08"); });
+        eq(r.code, "E_BLACKLIST", JSON.stringify(r).substring(0, 300)); eq(created, 0, "nic se neprovedlo"); eq(baselines, 0, "ani zaloha");
+        eq(r.results[0].status, "skipped"); eq(r.results[1].status, "skipped");
+        eq(r.problems[0].op, 1); contains(r.problems[0].path, "ops[1].elements[0]");
+        ok(r.audit && typeof r.audit.aiLogGuid == "string", "audit volan");
+        eq(b1Files(B1_REQ + "\\rejected\\").length, 1, "soubor v rejected\\"); eq(b1Files(B1_PEND + "\\").length, 0);
+    } finally { B.FB_OpElements = oE; B.FB_AutoBaseline = oB; }
+});
+t("CZ-09 FB-CZ-09: kontrola pri provedeni nad skutecnym objektem - dedupKey, match composite, matchByName, owningElement, $N -> E_BLACKLIST, chraneny objekt beze zmeny", function () {
+    var repo = scopeRepo();
+    var bl = repo.GetElementByID(11), blName = bl.Name;
+    // dedupKey prvku miri do chranene casti (P2 i provedeni)
+    var r1 = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-FREE}", dedupKey: "k-bl" }] }, "cz09a"); });
+    eq(r1.code, "E_BLACKLIST", JSON.stringify(r1).substring(0, 200)); eq(bl.Name, blName);
+    // owningElement v chranene casti
+    var ownedBefore = bl.Elements.Count;
+    var r2 = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ name: "N", type: "Class", owningElement: "{EL-BL}" }] }, "cz09b"); });
+    eq(r2.code, "E_BLACKLIST"); eq(bl.Elements.Count, ownedBefore);
+    // osa vlastniku (I14): prvek ve volnem balicku vlastneny chranenym prvkem
+    var owned = repo.GetElementByID(13);
+    var r3 = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ guid: "{EL-OWNED}", name: "N" }] }, "cz09c"); });
+    eq(r3.code, "E_BLACKLIST", JSON.stringify(r3).substring(0, 200)); contains(r3.message, "vlastnik"); eq(owned.Name, "VolnyVlastneny");
+    // matchByName v chranenem balicku = cil balicek -> E_BLACKLIST; $N na chraneny prvek pri provedeni
+    var r4 = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ name: "ChranenyPrvek", type: "Class", "package": "{PKG-BL}", matchByName: true }] }, "cz09d"); });
+    eq(r4.code, "E_BLACKLIST");
+    // $N se pri provedeni rozresolvuje na GUID (FB_Main.resolveRefs) -> handler dostane totez jako tady
+    var r5 = withScope(scopeBL(), function () { return B.FB_OpAttributes.call(B, repo, { op: "create_or_update_attributes", element: "{EL-BL}", attributes: [{ name: "a" }] }, "cz09e"); });
+    eq(r5.code, "E_BLACKLIST", JSON.stringify(r5).substring(0, 400)); eq(bl.Attributes.Count, 0);
+    // B2: konektor dohledany pres dedupKey, vlastneny chranenym prvkem, s VOLNYMI source/target v requestu
+    var cn = repo.GetConnectorByID(301);
+    var r6 = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-bl" }] }, "cz09f"); });
+    eq(r6.code, "E_BLACKLIST", JSON.stringify(r6).substring(0, 300)); contains(r6.message, "zdroj existujici vazby"); eq(cn.ClientID, 11, "vazba beze zmeny"); eq(cn.SupplierID, 10);
+    var r6p = scopeRun(repo, [{ op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-FREE2}", type: "Association", dedupKey: "ck-bl" }] }], "cz09g");
+    eq(r6p.code, "E_BLACKLIST", "P2 chyta dedupKey konektoru: " + JSON.stringify(r6p).substring(0, 300));
+    // match composite nad existujicim chranenym konektorem 301 (11->10)
+    var r7 = withScope(scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [{ source: "{EL-BL}", target: "{EL-FREE}", type: "Association", match: "composite", name: "prejmenovat" }] }, "cz09h"); });
+    eq(r7.code, "E_BLACKLIST", JSON.stringify(r7).substring(0, 300)); eq(cn.Name, "");
+});
+t("CZ-10 FB-CZ-10: mazani balicku s chranenym podstromem -> E_BLACKLIST; smazani volneho prvku na chranenem diagramu -> E_BLACKLIST (W2); klasifikator chranenych instanci = varovani", function () {
+    var repo = scopeRepo();
+    var r1 = scopeRun(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-ROOT}" }] }], "cz10a");
+    ok(r1.code == "E_BLACKLIST" || r1.code == "E_ARGS", "koren: " + r1.code);
+    // volny balicek, ktery obsahuje chranenou vetev (audit pod Model - pouzij blacklist pod Volne)
+    var r2 = scopeRun(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-FREE}" }] }], "cz10b",
+        [{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-ONE}", name: "Jedinacek", note: "pod Volne" }] }]);
+    eq(r2.code, "E_BLACKLIST", JSON.stringify(r2).substring(0, 300)); contains(r2.problems[0].message, "podstrom");
+    // W2 b: volny prvek 14 na chranenem diagramu 101 -> provedeni E_BLACKLIST; bez vyskytu projde
+    var r3 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repo, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10c"); });
+    eq(r3.status, "ok", "prvek 14 na zadnem chranenem diagramu neni: " + JSON.stringify(r3).substring(0, 200));
+    var repoB = scopeRepo({ diagramObjects: [[101, 14]] });
+    var r4 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repoB, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10d"); });
+    eq(r4.code, "E_BLACKLIST", JSON.stringify(r4).substring(0, 300)); contains(r4.message, "CHRANENEM diagramu");
+    ok(repoB.GetElementByID(14) != null, "prvek nesmazan");
+    // W2 a: prichozi vazba se zdrojem v chranene casti (301: 11 -> 10) brani smazani prvku 10
+    var repoC = scopeRepo({ diagramObjects: [] });
+    var r5 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repoC, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE}" }] }, "cz10e"); });
+    eq(r5.code, "E_BLACKLIST"); contains(r5.message, "prichozi vazba");
+    // W2 c: klasifikator instanci v chranene casti = varovani (chovani EA zive)
+    var repoD = scopeRepo({ diagramObjects: [], classifierInstances: [[14, 11]] });
+    var r6 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, repoD, { op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, "cz10f"); });
+    eq(r6.status, "ok", JSON.stringify(r6).substring(0, 300)); ok(r6.warnings && /klasifikatorem 1 instanci/.test(r6.warnings[0]), JSON.stringify(r6.warnings));
+    // mazani vazby se zdrojem v chranene casti
+    var r7 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, scopeRepo(), { op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-BL}" }] }, "cz10g"); });
+    eq(r7.code, "E_BLACKLIST"); contains(r7.message, "zdroj konektoru");
+    var r8 = withScope(scopeBL(), function () { return B.FB_OpDelete.call(B, scopeRepo(), { op: "delete_from_model", targets: [{ type: "Connector", guid: "{CN-IN}" }] }, "cz10h"); });
+    eq(r8.status, "ok", "vazba z volneho zdroje do chraneneho cile se mazat smi: " + JSON.stringify(r8).substring(0, 200));
+});
+t("CZ-10b FB-CZ-10b (W1): uklid automatickych baselines vynecha a vykaze kandidaty v chranenych balickach", function () {
+    var repo = scopeRepo();
+    var old = "FB-AUTO milos s20260101-1 2026-01-01 10:00:00";
+    var newer = "FB-AUTO milos s20260102-1 2026-01-02 10:00:00";
+    repo._sqlRules.unshift({ re: /FROM t_document d WHERE/i, rows: [
+        { DocID: "{B-BL}", ElementID: "{PKG-BL}", Version: old, DocDate: "2026-01-01 10:00:00", DocName: "FBT-CHRANENE" },
+        { DocID: "{B-BL2}", ElementID: "{PKG-BL}", Version: newer, DocDate: "2026-01-02 10:00:00", DocName: "FBT-CHRANENE" },
+        { DocID: "{B-FREE}", ElementID: "{PKG-FREE}", Version: old, DocDate: "2026-01-01 10:00:00", DocName: "Volne" },
+        { DocID: "{B-FREE2}", ElementID: "{PKG-FREE}", Version: newer, DocDate: "2026-01-02 10:00:00", DocName: "Volne" },
+        { DocID: "{B-AUD}", ElementID: SC_AUDIT_GUID, Version: old, DocDate: "2026-01-01 10:00:00", DocName: "#AI-LOG" },
+        { DocID: "{B-AUD2}", ElementID: SC_AUDIT_GUID, Version: newer, DocDate: "2026-01-02 10:00:00", DocName: "#AI-LOG" }] });
+    var cfg = B.FB_BaselineConfig.call(B, repo).cfg; cfg.cleanup.keepLastK = 1; cfg.cleanup.maxAgeDays = 1;
+    var parsed = B.FB_BaselineName.call(B, "parse", old, "FB-AUTO ");
+    ok(parsed != null, "jmeno mocku musi projit filtrem FB_BaselineName");
+    var r = withScope(scopeBL(), function () { return B.FB_BaselineCleanup.call(B, repo, cfg, "report", false, new Date().getTime()); });
+    eq(r["protected"], 2, "2 kandidati v chranenych balickach (blacklist + audit) vynechani: " + JSON.stringify(r).substring(0, 400));
+    eq(r.candidates.length, 1); eq(r.candidates[0].pkgGuid, "{PKG-FREE}");
+    contains(r.text, "Vynechano 2 kandidatu v chranenych balickach");
+});
+t("CZ-11 FB-CZ-11: implicitni ochrana - balicek add-inu a balicek auditu (dedicne) i bez blacklistu; audit bridge se dal zapisuje; koren: mazani E_ARGS, prejmenovani E_BLACKLIST, podbalicek pod korenem projde (okno), zapis do podbalicku korene projde (B1)", function () {
+    var repo = scopeRepo();
+    var EMPTY = [{ repo: "EAEXAMPLE.QEA", blacklist: [] }];
+    var r1 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-ADDIN}" }] }], "cz11a", EMPTY);
+    eq(r1.code, "E_BLACKLIST", "balicek add-inu: " + JSON.stringify(r1).substring(0, 300)); contains(r1.problems[0].message, "addin");
+    var r2 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": SC_AUDIT_GUID }] }], "cz11b", EMPTY);
+    eq(r2.code, "E_BLACKLIST", "balicek auditu: " + JSON.stringify(r2).substring(0, 300)); contains(r2.problems[0].message, "audit");
+    ok(r2.audit && typeof r2.audit.aiLogGuid == "string", "audit bridge se dal zapisuje (FB_Audit mimo kontrolu)");
+    var r3 = scopeRun(repo, [{ op: "create_or_update_package", packages: [{ guid: "{PKG-ROOT}", name: "Prejmenovany koren" }] }], "cz11c", EMPTY);
+    eq(r3.code, "E_BLACKLIST", "prejmenovani korene: " + JSON.stringify(r3).substring(0, 300)); contains(r3.problems[0].message, "KOREN");
+    var r3x = withScope(EMPTY, function () { return B.FB_OpPackage.call(B, repo, { op: "create_or_update_package", packages: [{ guid: "{PKG-ROOT}", name: "X" }] }, "cz11cx"); });
+    eq(r3x.code, "E_BLACKLIST", "druha obrana pri provedeni"); eq(repo.GetPackageByID(1).Name, "Model");
+    var r4 = scopeRun(repo, [{ op: "delete_from_model", targets: [{ type: "Package", guid: "{PKG-ROOT}" }] }], "cz11d", EMPTY);
+    ok(r4.code == "E_ARGS" || r4.code == "E_BLACKLIST", "mazani korene: " + r4.code);
+    var r5 = scopeRun(repo, [{ op: "create_or_update_package", packages: [{ parent: "{PKG-ROOT}", name: "Novy pod korenem" }] }], "cz11e", EMPTY);
+    eq(r5.status, "confirm_required", "novy balicek pod korenem = okno: " + JSON.stringify(r5).substring(0, 300));
+    contains(r5.risk.riskReasons.join("; "), "pod korenem modelu");
+    var r6 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-FREE}" }] }], "cz11f", EMPTY);
+    eq(r6.status, "done", "zapis do podbalicku korene bez jine ochrany projde: " + JSON.stringify(r6).substring(0, 300));
+    ok(!r6.risk.riskReasons.join("; ").match(/pod korenem/), "zadne okno kvuli koreni");
+    // bez elementu AICodeBridge v modelu (mock) implicitni ochrana add-inu neplati, konfigurace neni vadna
+    var c = scopeCfgOk(scopeRepo({ noBridge: true }), EMPTY);
+    eq(c.problems.length, 0); eq(c.implicit.length, 1);
+});
+t("CZ-12 FB-CZ-12: vazby - zdroj chraneny -> cil volny projde (O11 = c); zdroj volny -> cil chraneny jen s allowIncomingRefs (vychozi true); oba chranene E_BLACKLIST; zmena/smazani vazby chraneneho zdroje E_BLACKLIST i kdyby 'aspon jeden konec' prosel (I9); presmerovani zdroje do chranene casti E_BLACKLIST", function () {
+    var repo = scopeRepo();
+    function conn(c, id, scope) { return withScope(scope || scopeBL(), function () { return B.FB_OpConnectors.call(B, repo, { op: "create_or_update_connectors", connectors: [c] }, id); }); }
+    var a = conn({ source: "{EL-BL}", target: "{EL-FREE}", type: "Realization" }, "cz12a");
+    eq(a.status, "ok", "zdroj chraneny -> cil volny (krok 4b katalogu): " + JSON.stringify(a).substring(0, 300));
+    var b = conn({ source: "{EL-FREE}", target: "{EL-BL}", type: "Dependency" }, "cz12b");
+    eq(b.status, "ok", "volny -> chraneny s vychozim allowIncomingRefs true: " + JSON.stringify(b).substring(0, 300));
+    var c = conn({ source: "{EL-FREE}", target: "{EL-BL}", type: "Dependency" }, "cz12c", scopeBL(false));
+    eq(c.code, "E_BLACKLIST", "allowIncomingRefs: false: " + JSON.stringify(c).substring(0, 300)); contains(c.message, "allowIncomingRefs");
+    var d = conn({ source: "{EL-BL}", target: "{EL-BL-SUB}", type: "Dependency" }, "cz12d");
+    eq(d.code, "E_BLACKLIST", "oba konce chranene"); contains(d.message, "oba konce");
+    var cn = repo.GetConnectorByID(301);
+    var e = conn({ guid: "{CN-BL}", name: "prejmenovana" }, "cz12e");
+    eq(e.code, "E_BLACKLIST", "update vazby chraneneho zdroje: " + JSON.stringify(e).substring(0, 300)); eq(cn.Name, "", "vazba beze zmeny");
+    var f = conn({ guid: "{CN-FREE}", source: "{EL-BL}" }, "cz12f");
+    eq(f.code, "E_BLACKLIST", "presmerovani zdroje do chranene casti"); contains(f.message, "novy zdroj"); eq(repo.GetConnectorByID(302).ClientID, 10, "vazba beze zmeny");
+    var g = conn({ guid: "{CN-FREE}", target: "{EL-BL}" }, "cz12g");
+    eq(g.status, "ok", "presmerovani cile do chranene vetve s allowIncomingRefs true projde: " + JSON.stringify(g).substring(0, 200));
+    var g2 = conn({ guid: "{CN-FREE}", target: "{EL-BL}" }, "cz12g2", scopeBL(false));
+    eq(g2.code, "E_BLACKLIST", "presmerovani cile s allowIncomingRefs false");
+    var h = conn({ guid: "{CN-IN}", name: "x" }, "cz12h");
+    eq(h.status, "ok", "update vazby s volnym zdrojem a chranenym cilem projde: " + JSON.stringify(h).substring(0, 200));
+    // P2 chyta totez predem
+    var p = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ guid: "{CN-BL}", name: "x" }] }], "cz12p");
+    eq(p.code, "E_BLACKLIST"); contains(p.problems[0].message, "zdroj existujici vazby");
+    var p2 = scopeRun(scopeRepo(), [{ op: "create_or_update_connectors", connectors: [{ source: "{EL-FREE}", target: "{EL-BL}", type: "Dependency" }] }], "cz12p2", scopeBL(false));
+    eq(p2.code, "E_BLACKLIST"); contains(p2.problems[0].message, "allowIncomingRefs");
+    // zpravy: tataz pravidla (update + rebuild)
+    var m = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ guid: "{CN-BL}", name: "m" }] }, "cz12m"); });
+    eq(m.code, "E_BLACKLIST", JSON.stringify(m).substring(0, 200));
+    var m2 = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ source: "{EL-BL}", target: "{EL-FREE}", name: "m" }] }, "cz12m2"); });
+    eq(m2.status, "ok", "zprava z chraneneho zdroje do volneho cile: " + JSON.stringify(m2).substring(0, 200));
+    // find_or_create_referencing_sr: vazba SR -> operace v chranene vetvi podle allowIncomingRefs
+    var sr = scopeRun(scopeRepo(), [{ op: "find_or_create_referencing_sr", targetPackage: "{PKG-FREE}", operation: 501, packageName: "SR" }], "cz12sr", scopeBL(false));
+    eq(sr.code, "E_BLACKLIST", JSON.stringify(sr).substring(0, 300)); contains(sr.problems[0].message, "SR -> operace");
+});
+t("CZ-14 FB-CZ-14: klon - zdroj v chranene casti nebo zdroj obsahujici chranenou vetev -> E_BLACKLIST, zadny klon ve zdroji; cil v chranene casti -> E_BLACKLIST (W5, O4 = a)", function () {
+    var repo = scopeRepo();
+    var before = repo.GetPackageByID(900).Elements.Count;
+    var a = withScope(scopeBL(), function () { return B.FB_OpCloneElements.call(B, repo, { op: "clone_elements", elements: ["{EL-BL}"], "package": "{PKG-FREE}" }, "cz14a"); });
+    eq(a.code, "E_BLACKLIST", "zdroj chraneny, cil volny: " + JSON.stringify(a).substring(0, 200)); contains(a.message, "zdroj klonu"); eq(repo.GetPackageByID(900).Elements.Count, before, "zadny klon ve zdroji");
+    var b = withScope(scopeBL(), function () { return B.FB_OpCloneElements.call(B, repo, { op: "clone_elements", elements: ["{EL-FREE}"], "package": "{PKG-BL}" }, "cz14b"); });
+    eq(b.code, "E_BLACKLIST", "cil chraneny"); contains(b.message, "cil klonu");
+    var c = withScope(scopeBL(), function () { return B.FB_OpClonePackage.call(B, repo, { op: "clone_package", "package": "{PKG-BL-SUB}" }, "cz14c"); });
+    eq(c.code, "E_BLACKLIST", "zdroj balicku v chranene casti");
+    var d = withScope(scopeBL(), function () { return B.FB_OpClonePackage.call(B, repo, { op: "clone_package", "package": "{PKG-ROOT}" }, "cz14d"); });
+    eq(d.code, "E_BLACKLIST", "zdroj obsahuje chranenou vetev / koren: " + JSON.stringify(d).substring(0, 200));
+    var d2 = scopeRun(scopeRepo(), [{ op: "clone_package", "package": "{PKG-FREE}" }], "cz14d2", [{ repo: "EAEXAMPLE.QEA", blacklist: [{ pkg: "{PKG-ONE}", name: "Jedinacek", note: "pod Volne" }] }]);
+    eq(d2.code, "E_BLACKLIST", "P2: zdroj obsahuje chranenou vetev: " + JSON.stringify(d2).substring(0, 300)); contains(d2.problems[0].message, "podstrom");
+    var e = withScope(scopeBL(), function () { return B.FB_OpCloneElements.call(B, repo, { op: "clone_elements", elements: ["{EL-FREE}"] }, "cz14e"); });
+    eq(e.status, "ok", "volny zdroj bez cile projde: " + JSON.stringify(e).substring(0, 200));
+});
+t("CZ-15 FB-CZ-15: diagramy - umisteni chraneneho prvku na volny diagram projde (meni se jen diagram); apply_classifier_stereotypes na chraneny prvek E_BLACKLIST; zapis na chraneny diagram E_BLACKLIST", function () {
+    var repo = scopeRepo();
+    var a = withScope(scopeBL(), function () { return B.FB_OpPlaceElements.call(B, repo, { op: "place_elements_on_diagram", diagram: "{DG-FREE}", elementPlacements: [{ element: "{EL-BL}", x: 10, y: 10 }] }, "cz15a"); });
+    eq(a.status, "ok", "chraneny prvek na volnem diagramu: " + JSON.stringify(a).substring(0, 300));
+    var p = scopeRun(scopeRepo(), [{ op: "place_elements_on_diagram", diagram: "{DG-FREE}", elementPlacements: [{ element: "{EL-BL}" }] }], "cz15p");
+    ok(p.code != "E_BLACKLIST", "P2 nesmi blokovat prvek na volnem diagramu: " + p.code);
+    var b = scopeRun(scopeRepo(), [{ op: "apply_classifier_stereotypes", diagram: "{DG-FREE}", elementIDs: ["{EL-BL}"] }], "cz15b");
+    eq(b.code, "E_BLACKLIST", JSON.stringify(b).substring(0, 300));
+    var c = scopeRun(scopeRepo(), [{ op: "layout_connectors", diagram: "{DG-BL}", style: "x" }], "cz15c");
+    eq(c.code, "E_BLACKLIST");
+});
+t("CZ-16 FB-CZ-16 (W7): jmeno v zapisove operaci s vic shodami -> E_AMBIGUOUS s guids[] + candidates[{guid, path}], nic se neprovede; velikost pismen neni shoda; cteci operace bere prvni + varovani", function () {
+    var repo = scopeRepo();
+    var r = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "Dvojnik" }] }], "cz16a");
+    eq(r.code, "E_AMBIGUOUS", JSON.stringify(r).substring(0, 400));
+    eq(r.problems[0].guids.length, 3); eq(r.problems[0].candidates.length, 3);
+    ok(/^Model\.Dvojnik$|^Model\.Volne\.Dvojnik$/.test(r.problems[0].candidates[0].path), "kandidat s plnou cestou: " + r.problems[0].candidates[0].path);
+    ok(r.problems[0].guids.indexOf("{PKG-DUP-C}") < 0, "'dvojnik' (jina velikost pismen) NENI shoda (W7)");
+    eq(r.results[0].status, "skipped");
+    var r2 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "dvojnik" }] }], "cz16b");
+    eq(r2.status, "done", "presne jedna shoda 'dvojnik' projde: " + JSON.stringify(r2).substring(0, 300));
+    eq(r2.resolved[0].guid, "{PKG-DUP-C}", "resolved[] nese skutecny GUID (FB-CZ-18)"); eq(r2.resolved[0].fullPath, "Model.Volne.dvojnik");
+    // prvek jmenem
+    var r3 = scopeRun(repo, [{ op: "create_or_update_attributes", element: "Dvojprvek", attributes: [{ name: "a" }] }], "cz16c");
+    eq(r3.code, "E_AMBIGUOUS"); eq(r3.problems[0].candidates.length, 2);
+    // druha obrana pri provedeni: resolver vraci null + E_AMBIGUOUS (FB_ResolveFail)
+    var r4 = withScope(scopeBL(), function () { return B.FB_OpAttributes.call(B, repo, { op: "create_or_update_attributes", element: "Dvojprvek", attributes: [{ name: "a" }] }, "cz16d"); });
+    ok(r4.code == "E_AMBIGUOUS" || r4.code == "E_NOT_FOUND", "provedeni: " + r4.code);
+    var pkg = B.FB_ResolvePkg.call(B, repo, "Dvojnik");
+    ok(pkg == null && B._fbResolveErr && B._fbResolveErr.code == "E_AMBIGUOUS" && B._fbResolveErr.candidates.length == 3, "FB_ResolvePkg strict: " + JSON.stringify(B._fbResolveErr));
+    var pkgR = B.FB_ResolvePkg.call(B, repo, "Dvojnik", "read");
+    ok(pkgR != null && /odpovida 3 balickum/.test("" + B._fbResolveWarn), "cteni: prvni shoda + varovani: " + B._fbResolveWarn);
+    var rr = scopeRun(repo, [{ op: "get_packages_information", packages: ["Dvojnik"] }], "cz16e");
+    eq(rr.status, "done", "cteci operace jmenem projde: " + JSON.stringify(rr).substring(0, 300));
+    ok(rr.results[0].warnings && /odpovida 3 balickum/.test(rr.results[0].warnings[0]), "cteni nese varovani: " + JSON.stringify(rr.results[0].warnings));
+});
+t("CZ-17 FB-CZ-17: cesta {path} od korene i od balicku (from); vic sourozencu = E_AMBIGUOUS; neexistujici uroven = E_NOT_FOUND s nejhlubsi nalezenou urovni a jmeny podbalicku", function () {
+    var repo = scopeRepo();
+    var r = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Model", "Volne", "Jedinacek"] } }] }], "cz17a");
+    eq(r.status, "done", JSON.stringify(r).substring(0, 400));
+    eq(r.resolved[0].guid, "{PKG-ONE}"); eq(r.resolved[0].fullPath, "Model.Volne.Jedinacek"); eq(r.resolved[0].ref.path.join("/"), "Model/Volne/Jedinacek");
+    var r2 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Jedinacek"], from: "{PKG-FREE}" } }] }], "cz17b");
+    eq(r2.status, "done", JSON.stringify(r2).substring(0, 400)); eq(r2.resolved[0].guid, "{PKG-ONE}");
+    var r3 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Model", "Volne", "Neni"] } }] }], "cz17c");
+    eq(r3.code, "E_NOT_FOUND", JSON.stringify(r3).substring(0, 400)); eq(r3.problems[0].found, "Model.Volne");
+    ok(r3.problems[0].children.indexOf("Jedinacek") >= 0, "jmena podbalicku nejhlubsi urovne: " + r3.problems[0].children.join(","));
+    var r4 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Model", "Volne", "Dvojnik"] } }] }], "cz17d");
+    eq(r4.code, "E_AMBIGUOUS", "dva sourozenci Dvojnik pod Volne: " + JSON.stringify(r4).substring(0, 300)); eq(r4.problems[0].candidates.length, 2);
+    var r4b = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Volne"] } }] }], "cz17d2");
+    eq(r4b.status, "done", "koren 'Volne' (7) od korene je jednoznacny (Volne pod Model se nepocita): " + JSON.stringify(r4b).substring(0, 300)); eq(r4b.resolved[0].guid, "{PKG-FREE-TWIN}");
+    var r5 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Model", "FBT-CHRANENE"] } }] }], "cz17e");
+    eq(r5.code, "E_BLACKLIST", "cesta do chranene casti: " + JSON.stringify(r5).substring(0, 300));
+    var r6 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Model", "volne"] } }] }], "cz17f");
+    eq(r6.code, "E_NOT_FOUND", "velikost pismen rozhoduje (W7): " + JSON.stringify(r6).substring(0, 200));
+    // provedeni: FB_ResolvePkg umi cestu i $N ve from (FB_Main resolveRefs) - prime volani
+    var pkg = B.FB_ResolvePkg.call(B, repo, { path: ["Model", "Volne"] });
+    ok(pkg != null && pkg.PackageID == 2, "FB_ResolvePkg s cestou");
+    var r7 = scopeRun(repo, [{ op: "create_or_update_package", packages: [{ parent: { path: ["Model", "Volne"] }, name: "Novy" }] }, { op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Novy"], from: "$0" } }] }], "cz17g");
+    ok(r7.status == "done" || r7.status == "confirm_required", "cesta s from = $N se dohleda az pri provedeni: " + JSON.stringify(r7).substring(0, 300));
+});
+t("CZ-06 FB-CZ-06: FB_WriteScope je chraneny konfiguracni element (zasah davkou = BLOCKED, B4) stejne jako FB_AccessGroups; vsech 5 konfiguraci nese tutez identitu repozitare", function () {
+    var repo = scopeRepo();
+    var r = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "FB_WriteScope", type: "Class", "package": "{PKG-FREE}" }] }], "cz06a");
+    eq(r.code, "E_RISK_BLOCKED", JSON.stringify(r).substring(0, 300));
+    var r2 = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "FB_AccessGroups", type: "Class", "package": "{PKG-FREE}" }] }], "cz06b");
+    eq(r2.code, "E_RISK_BLOCKED");
+    var ids = {};
+    [["FB_Config", B.FB_Config], ["FB_OpsAllowed", B.FB_OpsAllowed], ["FB_RiskPolicy", B.FB_RiskPolicy], ["FB_AccessGroups", B.FB_AccessGroups], ["FB_WriteScope", FB_WRITESCOPE_LIVE]].forEach(function (c) {
+        c[1].call(B).forEach(function (e) { ids[("" + e.repo).toUpperCase()] = (ids[("" + e.repo).toUpperCase()] || 0) + 1; });
+    });
+    for (var k in ids) { eq(ids[k], 5, "identita '" + k + "' musi byt ve vsech 5 konfiguracich (je " + ids[k] + "x)"); }
+});
+t("CZ-21 FB-CZ-21 (W3): vyjimka EA uprostred elements[] (E_PERMISSION) -> odpoved vyjmenuje polozky, ktere probehly (items, partial: true), QC a vypis zmen probehly", function () {
+    var repo = scopeRepo();
+    var free = repo.GetPackageByID(2);
+    var n = 0;
+    free.Elements.AddNew = function (name, type) {
+        n++;
+        if (n == 3) { throw new Error("Cannot create new Class. The parent package is locked by Project Security."); }
+        var it = mkElement({ name: name, type: type }); free.Elements._items.push(it); return it;
+    };
+    var qcRan = 0, logRan = 0;
+    var oQ = B.FB_QcRun, oL = B.FB_LogChanges;
+    B.FB_QcRun = function () { qcRan++; return { status: "ok", checks: 0, findings: [] }; };
+    B.FB_LogChanges = function () { logRan++; return 0; };
+    try {
+        var r = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "A", type: "Class", "package": "{PKG-FREE}" }, { name: "B", type: "Class", "package": "{PKG-FREE}" }, { name: "C", type: "Class", "package": "{PKG-FREE}" }] }], "cz21");
+        eq(r.status, "error"); eq(r.results[0].code, "E_PERMISSION", JSON.stringify(r.results[0]).substring(0, 300));
+        eq(r.results[0].partial, true); eq(r.results[0].items.length, 2, "dve polozky probehly pred vyjimkou");
+        eq(r.results[0].items[0].name, "A"); eq(r.results[0].items[1].name, "B");
+        contains(r.results[0].message, "probehlo 2 polozek");
+        eq(qcRan, 1, "QC bezi i pri okc == 0 s partial"); eq(logRan, 1, "vypis zmen bezi");
+    } finally { B.FB_QcRun = oQ; B.FB_LogChanges = oL; }
+});
+t("CZ-03 FB-CZ-03: blacklist a implicitni ochrana plati i pri vypnute EA security (O2 = b): chraneny cil E_BLACKLIST, volny cil projde; zadny E_SECURITY_OFF ani requireSecurity v kodu", function () {
+    var repo = scopeRepo({ securityEnabled: false });
+    var a = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-BL-SUB}" }] }], "cz03a");
+    eq(a.code, "E_BLACKLIST");
+    var b = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-FREE}" }] }], "cz03b");
+    eq(b.status, "done", JSON.stringify(b).substring(0, 300));
+    var all = L.files.map(function (f) { return fs.readFileSync(path.join(SRC, f), "utf8"); }).join("\n");
+    ok(all.indexOf("E_SECURITY_OFF") < 0 && all.indexOf("requireSecurity") < 0, "nestavi se (O2 = b)");
+    ok(all.indexOf("autoZone") < 0, "zona bez potvrzeni se nestavi (O7 = b)");
+});
+t("CZ-18 FB-CZ-18: potvrzovaci okno ukazuje plnou cestu cile zadaneho cestou/jmenem", function () {
+    var repo = scopeRepo();
+    var r = scopeRun(repo, [{ op: "delete_from_model", targets: [{ type: "Element", guid: "{EL-FREE2}" }] }, { op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": { path: ["Model", "Volne", "Jedinacek"] } }] }], "cz18");
+    eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 300));
+    var txt = "" + B.FB_ConfirmSummary.call(B, r);
+    contains(txt, "Model.Volne.Jedinacek", "plna cesta cile zadaneho cestou v okne: " + txt.substring(0, 400));
+});
+t("CZ-28 FB-CZ-28: E_BLACKLIST rika, ve ktere chranene vetvi cil lezi (plna cesta + note) a co delat", function () {
+    var r = scopeRun(scopeRepo(), [{ op: "create_or_update_elements", elements: [{ guid: "{EL-BL-SUB}", name: "N" }] }], "cz28");
+    eq(r.code, "E_BLACKLIST");
+    var m = r.problems[0].message;
+    contains(m, "Model.FBT-CHRANENE.Podbalicek.PodPrvek"); contains(m, "'Model.FBT-CHRANENE'"); contains(m, "test blacklistu"); contains(m, "jiny cil");
+    eq(r.problems[0].branch.path, "Model.FBT-CHRANENE"); eq(r.problems[0].branch.note, "test blacklistu");
+});
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

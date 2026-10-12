@@ -80,7 +80,7 @@
 // QEAX (K8-doma, security model; Z260904-6): TAZ politika jako eaexample
 // (sdilena mapa DEV_CLASSES + tytez prahy) - testuji se vrstvy 2 a 3
 // autorizace, ne risk gate. Identita doplnena 6b 2026-09-09 (viz
-// FB_Whitelist); repo bez polozky = fail-closed ELEVATED (W9).
+// FB_WriteScope); repo bez polozky = fail-closed ELEVATED (W9).
 var DEV_CLASSES = {
           // --- LOW (par. 4: bezny pracovni den bez dialogu) ---
           "create_element":                  "LOW",
@@ -132,7 +132,7 @@ var DEV_BLOCK   = { deleteTargets: 100, writeOps: 500, updatedExisting: 100,
 var DEV_BASELINE = { subtreeMax: 5000, maxBaselineElements: 10000, // shadow
                      maxBaselinePackages: 5, probeBudgetMs: 500, probeBudgetTotalMs: 2000,
                      useCte: false, freshWithinMin: 15, sessionMaxHours: 12,
-                     requireRecoveryForUpdates: false, sessionBaseline: "auto",
+                     requireRecoveryForUpdates: false, sessionBaseline: "off", // "auto" nema v rezimu blacklist cil (Z261004b-10, FB-CZ-25)
                      autoPrefix: "FB-AUTO ", cleanupEveryHours: 24,
                      cleanup: { mode: "report", keepLastK: 3, maxAgeDays: 14,
                                 maxDeletesPerRun: 20, maxDeletesAnomaly: 200,

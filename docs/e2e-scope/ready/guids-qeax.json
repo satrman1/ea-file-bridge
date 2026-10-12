@@ -1,0 +1,112 @@
+{
+ "0.0": {
+  "name": "FBT-CHRANENE",
+  "guid": "{54223CC8-A8DB-4a25-8488-171D3F546349}",
+  "id": 714
+ },
+ "0.1": {
+  "name": "FBT-VOLNE",
+  "guid": "{931C997C-FD2F-4043-BACD-4B4D42C24DBE}",
+  "id": 715
+ },
+ "1.0": {
+  "name": "FBT-CHRANENE-SUB",
+  "guid": "{B05197A3-3354-43f6-8A17-98B2431BD983}",
+  "id": 716
+ },
+ "2.0": {
+  "name": "CHR-Prvek",
+  "guid": "{B4F10BFC-E14D-4b3d-8A7E-0D042326032C}",
+  "id": 3793
+ },
+ "2.1": {
+  "name": "CHR-SubPrvek",
+  "guid": "{534F77F3-F00B-4566-84EC-D2072E17FAE5}",
+  "id": 3794
+ },
+ "2.2": {
+  "name": "CHR-Klasifikator",
+  "guid": "{24503B7C-5952-43bc-B14F-289D67EA6328}",
+  "id": 3795
+ },
+ "3.0": {
+  "name": "VOL-Prvek",
+  "guid": "{C570897A-E1C2-4778-8E45-EA8D0D0CACE0}",
+  "id": 3796
+ },
+ "3.1": {
+  "name": "VOL-Prvek2",
+  "guid": "{07573080-2415-4a64-A09E-5E1E7C9A7E3C}",
+  "id": 3797
+ },
+ "3.2": {
+  "name": "VOL-Smazat",
+  "guid": "{708D45C6-FF01-46ef-96D3-1EF13C5A791F}",
+  "id": 3798
+ },
+ "3.3": {
+  "name": "VOL-Klasifikator",
+  "guid": "{605B7A51-B330-4ee8-9932-0E9F2208A103}",
+  "id": 3799
+ },
+ "3.4": {
+  "name": "VOL-Instance",
+  "guid": "{EC36591E-D094-4a40-B988-CBA424AC108F}",
+  "id": 3800
+ },
+ "4.0": {
+  "name": "CHR-Instance",
+  "guid": "{BF3E8622-F8BA-4485-B8B9-88080AD6E6F1}",
+  "id": 3801
+ },
+ "5.0": {
+  "name": null,
+  "guid": "{1AC539C9-5696-4429-886C-BAF22E72DE3F}",
+  "id": 1860
+ },
+ "5.1": {
+  "name": null,
+  "guid": "{54AD57FE-E287-4189-B343-73306708E13A}",
+  "id": 1861
+ },
+ "5.2": {
+  "name": null,
+  "guid": "{3F1B3D79-DF68-442d-9103-76BA837301DC}",
+  "id": 1862
+ },
+ "5.3": {
+  "name": null,
+  "guid": "{110E0EED-1813-48ed-B0A4-608ED84F7FD5}",
+  "id": 1863
+ },
+ "6.0": {
+  "name": "CHR-Diagram",
+  "guid": "{2E1F3AB1-D288-4736-8108-295B63D9002E}",
+  "id": 779
+ },
+ "6.1": {
+  "name": "VOL-Diagram",
+  "guid": "{A4874058-0C61-4eb3-86EE-54481F8F55C4}",
+  "id": 780
+ },
+ "7.0": {
+  "name": null,
+  "guid": "{B4F10BFC-E14D-4b3d-8A7E-0D042326032C}",
+  "id": null
+ },
+ "7.1": {
+  "name": null,
+  "guid": "{708D45C6-FF01-46ef-96D3-1EF13C5A791F}",
+  "id": null
+ },
+ "8.0": {
+  "name": null,
+  "guid": "{C570897A-E1C2-4778-8E45-EA8D0D0CACE0}",
+  "id": null
+ },
+ "8.1": {
+  "name": null,
+  "guid": "{B4F10BFC-E14D-4b3d-8A7E-0D042326032C}",
+  "id": null
+ }
+}

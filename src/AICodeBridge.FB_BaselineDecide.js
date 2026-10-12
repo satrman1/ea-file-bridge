@@ -7,7 +7,11 @@
 //                    FB_Main az PO potvrzeni, tesne pred prvni zapisovou op
 //          "guided"  NAVADENA CESTA (radek 4b): bez pre-image se nezapisuje;
 //                    confirm_required + strojova kontrola cerstve RUCNI
-//                    baseline nad predkem cile uvnitr whitelistu
+//                    baseline nad cilem nebo jeho predkem az ke KORENI modelu
+//                    vcetne (cil zapisu v1.1 kap. 5.9/1, B1 - ochrana uzlu
+//                    korene hledani nezastavi); neznamy rozsah = nad
+//                    nejblizsim spolecnym predkem dohledanych cilu, bez cile
+//                    nad polem davky baselineRoot (kap. 5.9/2, B3)
 //          "refuse"  E_NO_BASELINE (radek 4a): destruktivni podtrida bez
 //                    moznosti zalohy pri requireRecoveryForUpdates
 //   confirmReasons  duvody, ktere VYNUCUJI confirm_required (i u LOW davky)
@@ -72,12 +76,13 @@ if (sizeOk && scope.packages.length > 0) {
     out.reason = metricsOk ? "pod prahem" : "metriky nespoctany";
     out.lines.push("Zaloha pred zapisem: " + pkgList().join(", "));
     for (var q = 0; q < scope.packages.length; q++) {
-        if (scope.packages[q].parentOutOfWhitelist === true) {
-            // T6-28: rodic korenove whitelist package je mimo whitelist -> baseline
-            // jde jen nad mazany package sam; EA ji pri USPESNEM smazani package
-            // smaze s nim (spike 2026-09-07) - chrani tedy jen nedokoncene mazani
-            var pw = "parentOutOfWhitelist - zaloha nekryje smazany uzel: rodic balicku '" + (scope.packages[q].path || scope.packages[q].name)
-                + "' je mimo whitelist, baseline vznikne jen nad mazanym balickem a pri uspesnem smazani ZANIKNE s nim. Chces-li navrat, udelej PRED potvrzenim XMI export balicku v EA.";
+        if (scope.packages[q].parentOverThreshold === true) {
+            // T6-28 (cil zapisu kap. 5.9/3): rodic mazaneho balicku je nad prahem
+            // velikosti (nebo chraneny) -> baseline jde jen nad mazany package sam;
+            // EA ji pri USPESNEM smazani package smaze s nim (spike 2026-09-07) -
+            // chrani tedy jen nedokoncene mazani
+            var pw = "parentOverThreshold - zaloha nekryje smazany uzel: rodic balicku '" + (scope.packages[q].path || scope.packages[q].name)
+                + "' je nad prahem velikosti (nebo chraneny), baseline vznikne jen nad mazanym balickem a pri uspesnem smazani ZANIKNE s nim. Chces-li navrat, udelej PRED potvrzenim XMI export balicku v EA.";
             out.confirmReasons.push(pw);
             out.lines.push("POZOR: " + pw);
         }
@@ -152,15 +157,13 @@ function freshManualOn(pkgObj) {
     return null;
 }
 function coveredBy(startPkgId) {
-    // jde od package nahoru; zkouma jen packages UVNITR whitelistu
+    // jde od package nahoru az ke koreni modelu VCETNE (B1: predci povoleneho
+    // cile nejsou v dedicne ochrane nikdy; ochrana uzlu korene hledani nezastavi)
     var cur = startPkgId, guard = 0;
     while (cur && cur > 0 && guard++ < 60) {
         var po = null;
         try { po = Repository.GetPackageByID(cur); } catch (eP) { po = null; }
         if (!po) { return null; }
-        var inWl = false;
-        try { inWl = (self.FB_CheckWrite(Repository, po) == null); } catch (eW) { inWl = false; }
-        if (!inWl) { return null; }
         var nm = freshManualOn(po);
         if (nm != null) {
             var pth = "" + po.Name;
@@ -178,22 +181,50 @@ for (k2 = 0; scope && k2 < scope.packages.length; k2++) {
     if (cv) { found.push(cv.name + " nad " + cv.path); } else { missing.push(scope.packages[k2].path || scope.packages[k2].name); }
 }
 if (!scope || scope.unknown === true) {
-    // cil neznamy -> kryje jen rucni baseline nad korenem whitelistovane vetve
-    var wl = [], rid = "";
-    try { wl = this.FB_Whitelist(); rid = ("" + this.FB_RepoId(Repository)).toUpperCase(); } catch (eWl) { wl = []; }
-    var anyRoot = false;
-    for (var w = 0; w < wl.length; w++) {
-        if (rid.indexOf(("" + wl[w].repo).toUpperCase()) < 0) { continue; }
-        var rp = null;
-        try { rp = Repository.GetPackageByGuid("" + wl[w].pkg); } catch (eRp) { rp = null; }
-        if (!rp) { continue; }
-        anyRoot = true;
-        var rn = freshManualOn(rp);
-        var rpth = "" + rp.Name;
-        try { rpth = "" + self.FB_ElementPath(Repository, "package", rp); } catch (eRpa) { }
-        if (rn != null) { found.push(rn + " nad " + rpth); } else { missing.push(rpth + " (koren whitelistu - cil davky nelze urcit)"); }
+    // rozsah neznamy (B3 iii-v): rucni baseline se hleda nad NEJBLIZSIM
+    // SPOLECNYM PREDKEM vsech dohledanych cilu davky (a dal nahoru ke koreni);
+    // bez dohledaneho cile nad balickem z pole davky baselineRoot
+    function ancestorsOf(pkgId) {
+        var chain = [], cur = pkgId, g = 0;
+        while (cur && cur > 0 && g++ < 60) {
+            chain.push(cur);
+            var po = null;
+            try { po = Repository.GetPackageByID(cur); } catch (eP) { po = null; }
+            if (!po) { break; }
+            try { cur = po.ParentID; } catch (eQ) { cur = 0; }
+        }
+        return chain; // od cile ke koreni
     }
-    if (!anyRoot) { missing.push("(zadna whitelistovana vetev pro tento repozitar)"); }
+    var anchor = 0, anchorWhy = "";
+    var ids = [];
+    for (var sp = 0; scope && sp < scope.packages.length; sp++) { if (scope.packages[sp].id > 0) { ids.push(scope.packages[sp].id); } }
+    if (ids.length > 0) {
+        var chains = [];
+        for (var ci = 0; ci < ids.length; ci++) { chains.push(ancestorsOf(ids[ci])); }
+        // spolecny predek = prvni prvek retezu prvniho cile, ktery je ve vsech ostatnich
+        for (var a = 0; a < chains[0].length && anchor == 0; a++) {
+            var cand = chains[0][a], inAll = true;
+            for (var c2 = 1; c2 < chains.length && inAll; c2++) {
+                var hit = false;
+                for (var x = 0; x < chains[c2].length; x++) { if (chains[c2][x] == cand) { hit = true; break; } }
+                if (!hit) { inAll = false; }
+            }
+            if (inAll) { anchor = cand; }
+        }
+        anchorWhy = (ids.length == 1) ? "dohledany cil davky" : "nejblizsi spolecny predek " + ids.length + " dohledanych cilu";
+    } else if (scope && scope.baselineRoot && scope.baselineRoot.id > 0) {
+        anchor = scope.baselineRoot.id;
+        anchorWhy = "baselineRoot z davky";
+    }
+    if (anchor > 0) {
+        var cvA = coveredBy(anchor);
+        var apth = "" + anchor;
+        try { var apo = Repository.GetPackageByID(anchor); if (apo) { apth = "" + self.FB_ElementPath(Repository, "package", apo); } } catch (eAp) { }
+        if (cvA) { found.push(cvA.name + " nad " + cvA.path + " (" + anchorWhy + ")"); }
+        else { missing.push(apth + " (" + anchorWhy + " - rozsah davky nelze urcit presne, rucni baseline nad nim nebo nad jeho predkem)"); }
+    } else {
+        missing.push("(zadny cil davky nebyl dohledan - uved pole davky baselineRoot = GUID balicku, nad kterym je rucni baseline)");
+    }
 }
 out.manual = { ok: (missing.length == 0 && found.length > 0), found: found, missing: missing };
 var cr = "bez pre-image - " + sizeWhy + "; " + (out.manual.ok

@@ -1,7 +1,7 @@
 // AICodeBridge.FB_QcConfig()
 // QC kontroly per repozitar pro ACK zapisovych davek (FB_QcRun, zadani
 // iterace 4 par. 3.4). Parovani pres FB_RepoId (case-insensitive
-// podretezec - stejna mechanika jako FB_Config/FB_Whitelist).
+// podretezec - stejna mechanika jako FB_Config/FB_WriteScope).
 // !! SQL VYHRADNE nad overenymi standardnimi sloupci (lekce par. 6a/3:
 // neznamy sloupec na .qea = modalni dialog EA = viselec) a bez
 // dialektovych funkci (bezi na SQLite i MS SQL).

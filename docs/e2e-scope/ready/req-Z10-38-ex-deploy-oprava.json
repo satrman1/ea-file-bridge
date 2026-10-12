@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-38-ex-deploy-oprava",
+ "repo": "EAEXAMPLE.QEA",
+ "ops": [
+  { "op": "deploy_src" }
+ ]
+}

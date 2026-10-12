@@ -14,18 +14,19 @@ if (!op || !op.elements || Object.prototype.toString.call(op.elements) != "[obje
 var targetPkg = null;
 if (op["package"]) {
     targetPkg = this.FB_ResolvePkg(Repository, op["package"]);
-    if (targetPkg == null) { return { op: "clone_elements", status: "error", code: "E_NOT_FOUND", message: "Cilovy package nenalezen: " + op["package"] }; }
+    if (targetPkg == null) { return this.FB_ResolveFail("clone_elements", "Cilovy package nenalezen: " + ((op["package"] && op["package"].path) ? "path " + op["package"].path.join(".") : op["package"]), null); }
     var chkT = this.FB_CheckWrite(Repository, targetPkg);
-    if (chkT != null) { return { op: "clone_elements", status: "error", code: chkT.code, message: chkT.message }; }
+    if (chkT != null) { return { op: "clone_elements", status: "error", code: chkT.code, message: "cil klonu: " + chkT.message }; }
 }
 var items = [];
+this._fbOpProgress = { items: items }; // W3
 for (var i = 0; i < op.elements.length; i++) {
     var el = this.FB_ResolveEl(Repository, op.elements[i]);
-    if (el == null) { return { op: "clone_elements", status: "error", code: "E_NOT_FOUND", message: "elements[" + i + "]: element nenalezen (" + op.elements[i] + ")", items: items }; }
-    if (targetPkg == null) {
-        var chkS = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
-        if (chkS != null) { return { op: "clone_elements", status: "error", code: chkS.code, message: "elements[" + i + "]: " + chkS.message, items: items }; }
-    }
+    if (el == null) { return this.FB_ResolveFail("clone_elements", "elements[" + i + "]: element nenalezen (" + op.elements[i] + ")", items); }
+    // CIL ZAPISU (kap. 5.5, W5, O4 = a): zdroj se kontroluje VZDY - Element.Clone()
+    // zapisuje klon VEDLE zdroje (ve zdrojovem balicku) a teprve pak se presouva
+    var chkS = this.FB_CheckWriteEl(Repository, el);
+    if (chkS != null) { return { op: "clone_elements", status: "error", code: chkS.code, message: "elements[" + i + "] (zdroj klonu): " + chkS.message, items: items }; }
     var cl = null;
     try {
         cl = el.Clone();

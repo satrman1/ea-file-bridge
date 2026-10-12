@@ -1,0 +1,23 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-13-w2c-klasifikator",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Element",
+     "guid": "{605B7A51-B330-4ee8-9932-0E9F2208A103}"
+    }
+   ]
+  },
+  {
+   "op": "get_elements_information",
+   "elements": [
+    "{BF3E8622-F8BA-4485-B8B9-88080AD6E6F1}",
+    "{EC36591E-D094-4a40-B988-CBA424AC108F}"
+   ]
+  }
+ ]
+}

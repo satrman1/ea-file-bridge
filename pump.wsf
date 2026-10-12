@@ -38,6 +38,7 @@ End Function
 //    potvrzeni prezije restart pumpy i EA).
 //  - rejected\ nove i pro E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky).
 //  - 2026-09-20 (Baseline politika par. 7): rejected\ i pro E_NO_BASELINE;
+//  - 2026-10-12 (cil zapisu, Z261004b-10): rejected\ i pro E_BLACKLIST a E_SCOPE_CONFIG;
 //    konzole rozlisuje "chybi rucni baseline" od re-klasifikace metrik.
 // v0.13 (lekce E2E VS Code 2026-09-07, N5): jedina instance - zamek
 //    requests\.pump.lock drzeny po dobu behu; druhy start vypise
@@ -256,10 +257,14 @@ function processFile(repo, bridge, file) {
         // + E_RISK_CONFIRM (podvrzene potvrzeni v obsahu davky, B1)
         // + E_NO_BASELINE (Baseline politika par. 7: pre-image nelze poridit -
         //   nic se neprovedlo; stejne razeni jako adaptery v src/)
+        //   + E_BLACKLIST / E_SCOPE_CONFIG (cil zapisu v1.1 kap. 5.3, Z261004b-10:
+        //   zakazany cil / vadna konfigurace - nic se neprovedlo, audit zapsan)
         rejected = (respText.indexOf("\"code\":\"E_PARSE\"") >= 0)
             || (respText.indexOf("\"code\":\"E_RISK_BLOCKED\"") >= 0)
             || (respText.indexOf("\"code\":\"E_RISK_CONFIRM\"") >= 0)
-            || (respText.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0);
+            || (respText.indexOf("\"code\":\"E_NO_BASELINE\"") >= 0)
+            || (respText.indexOf("\"code\":\"E_BLACKLIST\"") >= 0)
+            || (respText.indexOf("\"code\":\"E_SCOPE_CONFIG\"") >= 0);
     }
 
     writeUtf8(DIR_RES + "\\" + responseName(name), respText);

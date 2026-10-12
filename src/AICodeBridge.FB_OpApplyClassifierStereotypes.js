@@ -23,7 +23,7 @@ try {
     else { dg = Repository.GetDiagramByID(parseInt(dref, 10)); }
 } catch (eD) { dg = null; }
 if (dg == null) { return { op: "apply_classifier_stereotypes", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + op.diagram }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, dg, "diagram");
 if (chk != null) { return { op: "apply_classifier_stereotypes", status: "error", code: chk.code, message: chk.message }; }
 var filter = null;
 if (op.elementIDs && Object.prototype.toString.call(op.elementIDs) == "[object Array]" && op.elementIDs.length > 0) {
@@ -31,6 +31,7 @@ if (op.elementIDs && Object.prototype.toString.call(op.elementIDs) == "[object A
     for (var fi = 0; fi < op.elementIDs.length; fi++) { filter["" + parseInt(op.elementIDs[fi], 10)] = 1; }
 }
 var items = [], warns = [], changedCount = 0;
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < dg.DiagramObjects.Count; i++) {
     var dobj = dg.DiagramObjects.GetAt(i);
     var el;
@@ -53,7 +54,7 @@ for (var i = 0; i < dg.DiagramObjects.Count; i++) {
     var newStereo = "" + cls.Stereotype;
     var changed = false;
     // whitelist na package elementu (lifeline muze lezet jinde nez diagram)
-    var chkE = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+    var chkE = this.FB_CheckWriteEl(Repository, el);
     if (chkE != null) {
         return { op: "apply_classifier_stereotypes", status: "error", code: chkE.code, message: "element " + el.ElementID + ": " + chkE.message, items: items };
     }

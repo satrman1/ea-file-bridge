@@ -1,0 +1,19 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-17-klony",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "clone_elements",
+   "elements": [
+    "{B4F10BFC-E14D-4b3d-8A7E-0D042326032C}"
+   ],
+   "package": "{931C997C-FD2F-4043-BACD-4B4D42C24DBE}"
+  },
+  {
+   "op": "clone_package",
+   "package": "{54223CC8-A8DB-4a25-8488-171D3F546349}",
+   "name": "FBT-CHRANENE-klon"
+  }
+ ]
+}

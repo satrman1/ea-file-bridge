@@ -5,9 +5,21 @@
 // (w: true) MUSI mit polozku - hlida test/harness.js (vzor validace classes
 // ve FB_RiskGate); operace bez polozky = `unknown` (fail-closed, T6-29).
 //
-// Vraci { packages:[{id, guid, name, path, why[], parentOutOfWhitelist}],
+// Vraci { packages:[{id, guid, name, path, why[], parentOverThreshold}],
 //         unknown, unknownWhy[], overLimit, volumeUnknown, destructive,
-//         destructiveOps[], missingScope[], normalized: true, ms }.
+//         destructiveOps[], missingScope[], baselineRoot, normalized: true, ms }.
+// CIL ZAPISU - rezim blacklist (Z261004b-10, zadani cil zapisu v1.1 kap. 5.9, B3):
+//   - update konektoru dle guid/ID: konce se dohledaji jednim SELECT nad
+//     t_connector -> rozsah znamy (package zdroje), uz ne "unknown"
+//   - $N na jinou nez create vetev: pro zalohu se vezme balicek cile
+//     PREDCHOZI operace (je znam z jeji definice - dollarPkg)
+//   - delete package: rodic je "povoleny" vzdy (dedicna ochrana predka = cil
+//     by byl chraneny), ale zaloha nad nim jen kdyz projde velikostni sondou
+//     FB_SubtreeCount (subtreeMax) - a to i pri thresholdsShadow: true (I13;
+//     precedens FB_SessionStart); jinak baseline nad mazanym balickem samym +
+//     parentOverThreshold (varianta T6-28: zaloha zanikne se smazanym uzlem)
+//   - baselineRoot: pole davky pro navadenou cestu bez dohledaneho cile
+//     (FB_BaselineDecide); kontroluje se jako cil (FB_CheckWrite)
 //   packages       normalizovana mnozina (potomek predka v mnozine se slouci
 //                  do predka; NIKDY spolecny predek dvou sourozencu)
 //   unknown        aspon jeden cil, jehoz package nelze odvodit -> davka se
@@ -36,7 +48,7 @@
 //               (apply_classifier_stereotypes prepisuje Type/Stereotype prvku
 //               na diagramu - ty mohou lezet jinde nez diagram; nalez M2)
 //   diagrams    package diagramu per polozka (diagrams[].diagram)
-//   delete      dle typu cile (package -> RODIC, vyjimka mimo whitelist)
+//   delete      dle typu cile (package -> RODIC, vyjimka rodic nad prahem velikosti)
 //   deleteTag   package vlastnika tagu
 //   move        OBE packages (zdroj i cil)
 //   clonePkg    rodic zdrojoveho package (klon vznika vedle zdroje)
@@ -99,9 +111,9 @@ var pk = {}, pkOrder = [];        // Package_ID -> { id, why[] , pow }
 function addPkgId(id, why, pow) {
     var n = parseInt(id, 10);
     if (isNaN(n) || n <= 0) { unk(why + ": package nezjisten"); return; }
-    if (!pk[n]) { pk[n] = { id: n, why: [], parentOutOfWhitelist: false }; pkOrder.push(n); }
+    if (!pk[n]) { pk[n] = { id: n, why: [], parentOverThreshold: false }; pkOrder.push(n); }
     if (pk[n].why.length < 6) { pk[n].why.push(why); }
-    if (pow === true) { pk[n].parentOutOfWhitelist = true; }
+    if (pow === true) { pk[n].parentOverThreshold = true; }
 }
 function esc(s) { return ("" + s).replace(/'/g, "''"); }
 function rows(sql) {
@@ -116,8 +128,10 @@ function isArr(v) { return Object.prototype.toString.call(v) == "[object Array]"
 function blank(v) { return v === null || typeof v == "undefined" || ("" + v) == ""; }
 // --- $N reference: OWN jen na CREATE vetev zapisove operace teto davky;
 // vse ostatni (cteci op, update vetev, match/dedup, dopredna) = ne-vlastni
-// -> package neznamy (T6-27). Zamerne konzervativnejsi zrcadlo
-// FB_RiskGate.classifyDollar - odchylka smi vest jen k `unknown`.
+// (T6-27). Zamerne konzervativnejsi zrcadlo FB_RiskGate.classifyDollar -
+// odchylka smi vest jen k `unknown`. B3 (Z261004b-10): u ne-vlastniho $N se
+// pro ZALOHU vezme balicek cile predchozi operace, je-li znam z jeji definice
+// (dollarPkg) - rozsah je pak znamy, ne "unknown".
 var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
 function dollarOwn(ref, opIdx) {
     var m = refRe.exec("" + ref);
@@ -139,12 +153,95 @@ function dollarOwn(ref, opIdx) {
     if (rn == "create_element" || rn == "clone_package" || rn == "clone_elements") { return true; }
     return false;
 }
+// balicek cile predchozi operace, na kterou miri ne-vlastni $N (B3): > 0 = znam
+function dollarPkg(ref, opIdx) {
+    var m = refRe.exec("" + ref);
+    if (!m) { return 0; }
+    var idx = parseInt(m[1], 10);
+    var it = (typeof m[2] != "undefined" && m[2] !== "" && m[2] !== null) ? parseInt(m[2], 10) : 0;
+    if (idx >= opIdx) { return 0; }
+    var rop = req.ops[idx] || {};
+    var rn = "" + (rop.op || "?");
+    var x, pr;
+    if (rn == "create_or_update_elements") {
+        x = (rop.elements || [])[it]; if (!x) { return 0; }
+        if (x.guid || x.elementID) { return elPkgRaw(x.guid || x.elementID); }
+        if (x.dedupKey) { var rd = rows("SELECT o.Package_ID FROM t_object o INNER JOIN t_objectproperties p ON p.Object_ID = o.Object_ID WHERE p.Property = 'ai.dedup' AND p.Value = '" + esc(x.dedupKey) + "'"); return (rd != null && rd.length == 1) ? parseInt(rd[0].Package_ID, 10) : 0; }
+        if (x.owningElement) { return elPkgRaw(x.owningElement); }
+        pr = pkgRowRaw(x["package"]); return pr ? pr.id : 0;
+    }
+    if (rn == "create_or_update_package") {
+        var pl = isArr(rop.packages) ? rop.packages : [rop]; x = pl[it]; if (!x) { return 0; }
+        if (x.guid || x.packageID) { pr = pkgRowRaw(x.guid || x.packageID); return pr ? pr.id : 0; }
+        pr = pkgRowRaw(x.parent); return pr ? pr.id : 0;
+    }
+    if (rn == "create_or_update_connectors") {
+        x = (rop.connectors || [])[it]; if (!x) { return 0; }
+        if (x.guid || x.connectorID) { return connSrcPkg(x.guid, x.connectorID); }
+        return elPkgRaw(x.source);
+    }
+    if (rn == "create_or_update_diagram") {
+        x = (rop.diagrams || [])[it]; if (!x) { return 0; }
+        var dr2 = x.diagram || x.diagramID || x.guid;
+        if (dr2) { return dgmPkgRaw(dr2); }
+        if (x.owningElement) { return elPkgRaw(x.owningElement); }
+        pr = pkgRowRaw(x["package"]); return pr ? pr.id : 0;
+    }
+    if (rn == "move_elements") {
+        x = (rop.elements || [])[it];
+        var mp = (x !== null && typeof x == "object" && !blank(x["package"])) ? x["package"] : rop["package"];
+        pr = pkgRowRaw(mp); return pr ? pr.id : 0;
+    }
+    return 0;
+}
+// "raw" resolvery bez $N logiky (pro dollarPkg): Package_ID nebo 0
+function elPkgRaw(ref) {
+    if (blank(ref) || refRe.test("" + ref)) { return 0; }
+    var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr;
+    if (t.charAt(0) == "{") { rr = rows("SELECT Package_ID FROM t_object WHERE ea_guid = '" + esc(t) + "'"); }
+    else if (/^[0-9]+$/.test(t)) { rr = rows("SELECT Package_ID FROM t_object WHERE Object_ID = " + parseInt(t, 10)); }
+    else { rr = rows("SELECT Package_ID FROM t_object WHERE Name = '" + esc(t) + "'"); }
+    return (rr != null && rr.length == 1) ? parseInt(rr[0].Package_ID, 10) : 0;
+}
+function pkgRowRaw(ref) {
+    if (blank(ref) || refRe.test("" + ref)) { return null; }
+    if (ref !== null && typeof ref == "object" && isArr(ref.path)) {
+        var tr = null; try { tr = self.FB_TargetCache(Repository, "package", ref); } catch (eTp) { tr = null; }
+        return tr ? { own: false, id: tr.id, parent: tr.parentId } : null;
+    }
+    var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr;
+    if (t.charAt(0) == "{") { rr = rows("SELECT Package_ID, Parent_ID FROM t_package WHERE ea_guid = '" + esc(t) + "'"); }
+    else if (/^[0-9]+$/.test(t)) { rr = rows("SELECT Package_ID, Parent_ID FROM t_package WHERE Package_ID = " + parseInt(t, 10)); }
+    else { rr = rows("SELECT Package_ID, Parent_ID FROM t_package WHERE Name = '" + esc(t) + "'"); }
+    if (rr == null || rr.length != 1) { return null; }
+    return { own: false, id: parseInt(rr[0].Package_ID, 10), parent: parseInt(rr[0].Parent_ID, 10) };
+}
+function dgmPkgRaw(ref) {
+    if (blank(ref) || refRe.test("" + ref)) { return 0; }
+    var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr;
+    if (t.charAt(0) == "{") { rr = rows("SELECT Package_ID FROM t_diagram WHERE ea_guid = '" + esc(t) + "'"); }
+    else if (/^[0-9]+$/.test(t)) { rr = rows("SELECT Package_ID FROM t_diagram WHERE Diagram_ID = " + parseInt(t, 10)); }
+    else { rr = rows("SELECT Package_ID FROM t_diagram WHERE Name = '" + esc(t) + "'"); }
+    return (rr != null && rr.length == 1) ? parseInt(rr[0].Package_ID, 10) : 0;
+}
+// konce konektoru dle guid/ID jednim SELECT (B3 i): package ZDROJE nebo 0
+function connSrcPkg(guid, id) {
+    var rc = null;
+    if (!blank(guid) && !refRe.test("" + guid)) { rc = rows("SELECT Start_Object_ID FROM t_connector WHERE ea_guid = '" + esc(guid) + "'"); }
+    else if (!blank(id) && /^[0-9]+$/.test("" + id)) { rc = rows("SELECT Start_Object_ID FROM t_connector WHERE Connector_ID = " + parseInt(id, 10)); }
+    if (rc == null || rc.length != 1) { return 0; }
+    return elPkgRaw("" + rc[0].Start_Object_ID);
+}
 // resolvery -> Package_ID nebo 0 (nezjisteno)
 function elPkg(ref, ctx, opIdx) {
     if (blank(ref)) { unk(ctx + ": chybi cil"); return -1; }
     var own = dollarOwn(ref, opIdx);
     if (own === true) { return 0; }       // prvek teto davky - neni co zalohovat
-    if (own === false) { unk(ctx + ": $N odkaz na existujici/nejisty prvek (" + ref + ")"); return -1; }
+    if (own === false) {
+        var dpE = dollarPkg(ref, opIdx);  // B3: balicek cile predchozi operace
+        if (dpE > 0) { return dpE; }
+        unk(ctx + ": $N odkaz na existujici/nejisty prvek (" + ref + ")"); return -1;
+    }
     var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr;
     if (t.charAt(0) == "{") { rr = rows("SELECT Package_ID FROM t_object WHERE ea_guid = '" + esc(t) + "'"); }
     else if (/^[0-9]+$/.test(t)) { rr = rows("SELECT Package_ID FROM t_object WHERE Object_ID = " + parseInt(t, 10)); }
@@ -158,7 +255,17 @@ function pkgRow(ref, ctx, opIdx) {
     if (blank(ref)) { unk(ctx + ": chybi package"); return null; }
     var own = dollarOwn(ref, opIdx);
     if (own === true) { return { own: true }; }
-    if (own === false) { unk(ctx + ": $N odkaz na existujici/nejisty package (" + ref + ")"); return null; }
+    if (own === false) {
+        var dpP = dollarPkg(ref, opIdx);
+        if (dpP > 0) { var dpr = pkgRowRaw("" + dpP); if (dpr) { return dpr; } }
+        unk(ctx + ": $N odkaz na existujici/nejisty package (" + ref + ")"); return null;
+    }
+    if (ref !== null && typeof ref == "object" && isArr(ref.path)) {
+        // cesta { path, from } (cil zapisu kap. 5.7) - pres FB_TargetCache
+        var prow = pkgRowRaw(ref);
+        if (prow == null) { unk(ctx + ": cesta " + ref.path.join(".") + " nenalezena"); return null; }
+        return prow;
+    }
     var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr;
     if (t.charAt(0) == "{") { rr = rows("SELECT Package_ID, Parent_ID FROM t_package WHERE ea_guid = '" + esc(t) + "'"); }
     else if (/^[0-9]+$/.test(t)) { rr = rows("SELECT Package_ID, Parent_ID FROM t_package WHERE Package_ID = " + parseInt(t, 10)); }
@@ -170,7 +277,11 @@ function dgmPkg(ref, ctx, opIdx) {
     if (blank(ref)) { unk(ctx + ": chybi diagram"); return -1; }
     var own = dollarOwn(ref, opIdx);
     if (own === true) { return 0; }
-    if (own === false) { unk(ctx + ": $N odkaz na existujici/nejisty diagram (" + ref + ")"); return -1; }
+    if (own === false) {
+        var dpD = dollarPkg(ref, opIdx);
+        if (dpD > 0) { return dpD; }
+        unk(ctx + ": $N odkaz na existujici/nejisty diagram (" + ref + ")"); return -1;
+    }
     var t = ("" + ref).replace(/^\s+|\s+$/g, ""), rr;
     if (t.charAt(0) == "{") { rr = rows("SELECT Package_ID FROM t_diagram WHERE ea_guid = '" + esc(t) + "'"); }
     else if (/^[0-9]+$/.test(t)) { rr = rows("SELECT Package_ID FROM t_diagram WHERE Diagram_ID = " + parseInt(t, 10)); }
@@ -182,11 +293,18 @@ function dgmPkg(ref, ctx, opIdx) {
 }
 function addEl(ref, ctx, opIdx, why) { var p = elPkg(ref, ctx, opIdx); if (p > 0) { addPkgId(p, why); } }
 function addDgm(ref, ctx, opIdx, why) { var p = dgmPkg(ref, ctx, opIdx); if (p > 0) { addPkgId(p, why); } }
-function inWhitelist(pkgId) {
+// rodic mazaneho balicku: zaloha nad nim jen kdyz (a) neni chraneny a (b)
+// projde velikostni sondou - i ve stinovem rezimu prahu (kap. 5.9/3, I13)
+function parentOk(pkgId) {
     try {
         var po = Repository.GetPackageByID(pkgId);
         if (!po) { return false; }
-        return self.FB_CheckWrite(Repository, po) == null;
+        if (self.FB_CheckWrite(Repository, po) != null) { return false; }
+        var maxEl = (cfg && typeof cfg.subtreeMax == "number") ? cfg.subtreeMax : 5000;
+        var pr = null;
+        try { pr = self.FB_SubtreeCount(Repository, pkgId, cfg, (cfg && typeof cfg.probeBudgetTotalMs == "number") ? cfg.probeBudgetTotalMs : 2000); } catch (ePr) { pr = null; }
+        if (!pr || pr.status != "ok") { return false; } // neznama velikost = jako nad prahem
+        return pr.elements <= maxEl;
     } catch (eW) { return false; }
 }
 
@@ -250,8 +368,11 @@ for (i = 0; i < req.ops.length; i++) {
         for (j = 0; j < lst.length; j++) {
             var c = lst[j] || {};
             if (c.guid || c.connectorID) {
-                // par. 4.2: update dle guid - gate endpointy neresolvuje -> unknown
-                unk(ctx + ".connectors[" + j + "]: update konektoru dle guid/ID - endpointy se neresolvuji");
+                // B3 (i): konce dle guid/ID jednim SELECT nad t_connector -> package zdroje
+                var csp = (refRe.test("" + (c.guid || c.connectorID))) ? 0 : connSrcPkg(c.guid, c.connectorID);
+                if (csp > 0) { addPkgId(csp, name + " (update konektoru - package zdroje)"); }
+                else if (refRe.test("" + (c.guid || c.connectorID))) { var cdp = dollarPkg(c.guid || c.connectorID, i); if (cdp > 0) { addPkgId(cdp, name + " (update konektoru pres $N)"); } else if (dollarOwn(c.guid || c.connectorID, i) !== true) { unk(ctx + ".connectors[" + j + "]: $N odkaz na nejisty konektor"); } }
+                else { unk(ctx + ".connectors[" + j + "]: konektor '" + (c.guid || c.connectorID) + "' nenalezen - konce neresolvovany"); }
             } else if (c.dedupKey) {
                 var rck = rows("SELECT c.Start_Object_ID FROM t_connector c INNER JOIN t_connectortag t ON t.ElementID = c.Connector_ID WHERE t.Property = 'ai.dedup' AND t.VALUE = '" + esc(c.dedupKey) + "'");
                 if (rck == null || rck.length > 1) { unk(ctx + ".connectors[" + j + "]: dedupKey '" + c.dedupKey + "' " + (rck == null ? "nelze dohledat" : "neni jednoznacny")); }
@@ -333,8 +454,8 @@ for (i = 0; i < req.ops.length; i++) {
                 // -> cilovy package sam + parentOutOfWhitelist (T6-28)
                 var dp = pkgRow(dref, dctx, i);
                 if (dp && !dp.own) {
-                    if (dp.parent > 0 && inWhitelist(dp.parent)) { addPkgId(dp.parent, name + " (package -> rodic)"); }
-                    else { addPkgId(dp.id, name + " (package; rodic mimo whitelist)", true); }
+                    if (dp.parent > 0 && parentOk(dp.parent)) { addPkgId(dp.parent, name + " (package -> rodic)"); }
+                    else { addPkgId(dp.id, name + " (package; rodic nad prahem velikosti nebo chraneny)", true); }
                 }
             } else if (ty == "CONNECTOR") {
                 var rc = null;
@@ -401,13 +522,13 @@ function hasAncestorInSet(id) {
 var out = [];
 for (i = 0; i < pkOrder.length; i++) {
     var id = pkOrder[i];
-    // package s parentOutOfWhitelist se neslucuje (je to korenovy pracovni package)
+    // package s parentOverThreshold se neslucuje (zaloha patri jemu samemu)
     var anc = hasAncestorInSet(id);
     if (anc) {
         if (pk[anc].why.length < 6) { pk[anc].why.push("kryje i potomka " + id); }
         continue;
     }
-    var item = { id: id, guid: "", name: "", path: "", why: pk[id].why, parentOutOfWhitelist: pk[id].parentOutOfWhitelist };
+    var item = { id: id, guid: "", name: "", path: "", why: pk[id].why, parentOverThreshold: pk[id].parentOverThreshold };
     try {
         var pobj = Repository.GetPackageByID(id);
         if (pobj) {
@@ -418,7 +539,16 @@ for (i = 0; i < pkOrder.length; i++) {
     out.push(item);
 }
 var overLimit = out.length > maxPk;
+// baselineRoot (kap. 5.9/2): balicek pro navadenou cestu, kdyz neni dohledan zadny cil
+var blRoot = null;
+if (req && !blank(req.baselineRoot)) {
+    var brr = pkgRowRaw(req.baselineRoot);
+    if (brr) {
+        blRoot = { id: brr.id, guid: "", path: "" };
+        try { var bro = Repository.GetPackageByID(brr.id); if (bro) { blRoot.guid = "" + bro.PackageGUID; blRoot.path = "" + self.FB_ElementPath(Repository, "package", bro); } } catch (eBr) { }
+    } else { unk("baselineRoot '" + req.baselineRoot + "' nenalezen"); }
+}
 return { packages: out, unknown: unknownWhy.length > 0, unknownWhy: unknownWhy,
          overLimit: overLimit, maxBaselinePackages: maxPk, volumeUnknown: volumeUnknown,
          destructive: destructive, destructiveOps: destructiveOps, missingScope: missingScope,
-         normalized: true, ms: (new Date().getTime() - t0) };
+         baselineRoot: blRoot, normalized: true, ms: (new Date().getTime() - t0) };

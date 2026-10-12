@@ -49,7 +49,7 @@ var el = this.FB_ResolveEl(Repository, op.element);
 if (el == null) {
     return { op: "create_or_update_constraints", status: "error", code: "E_NOT_FOUND", message: "Element nenalezen: " + op.element };
 }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, el);
 if (chk != null) { return { op: "create_or_update_constraints", status: "error", code: chk.code, message: chk.message }; }
 // --- validace CELE davky pred prvnim zapisem (zadne parcialni mazani) ---
 var defs = [];
@@ -66,6 +66,7 @@ for (var v = 0; v < op.constraints.length; v++) {
     defs.push({ name: "" + dv.name, type: nt, notes: (typeof dv.notes != "undefined" ? "" + dv.notes : null), status: (typeof dv.status != "undefined" ? "" + dv.status : null) });
 }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 // --- deterministicky rebuild: smazat vsechny existujici constrainty ---
 var removed = 0;
 try {

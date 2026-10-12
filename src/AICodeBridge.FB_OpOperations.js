@@ -19,9 +19,10 @@ if (!op || !op.element || !op.operations || Object.prototype.toString.call(op.op
 }
 var el = this.FB_ResolveEl(Repository, op.element);
 if (el == null) { return { op: "create_or_update_operations", status: "error", code: "E_NOT_FOUND", message: "Element nenalezen: " + op.element }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, el);
 if (chk != null) { return { op: "create_or_update_operations", status: "error", code: chk.code, message: chk.message }; }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.operations.length; i++) {
     var o = op.operations[i];
     var m = null, created = false, j;

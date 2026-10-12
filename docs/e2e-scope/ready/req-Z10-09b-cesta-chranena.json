@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-09b-cesta-chranena", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "name": "CHR-Cestou", "type": "Class", "package": { "path": ["FBT-CHRANENE-SUB"], "from": "{54223CC8-A8DB-4a25-8488-171D3F546349}" } } ] } ] }

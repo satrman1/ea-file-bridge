@@ -69,11 +69,31 @@
 //    1x za session -> warning v res.
 //  - Dohledani cilu davky na jednom miste: FB_TargetCache (mezipamet jednoho
 //    volani sdilena P2, Risk Gate i zalohou).
+// v0.17 (CIL ZAPISU - rezim blacklist, Z261004b-10, zadani cil zapisu v1.1):
+//  - FB_WriteScope misto FB_Whitelist: kam se NESMI (blacklist dedicne na
+//    podstrom + implicitni ochrana balicku add-inu a auditu); jinak rozhoduje
+//    EA security (E_PERMISSION / E_LOCKED). Kontrola cile (FB_CheckWrite /
+//    FB_CheckWriteEl, osa balicku + osa vlastniku) bezi PREDEM v P2 fazi 2
+//    (FB_ScopePrecheck: E_SCOPE_CONFIG, E_BLACKLIST - obe auditovane,
+//    E_AMBIGUOUS / E_NOT_FOUND u jmen a cest) a znovu pri provedeni nad
+//    skutecnym objektem (druha obrana). Jediny zakazany cil = nic, ani zaloha.
+//  - Adresace cestou { path: [...], from? } a striktni jmena (presna shoda v JS,
+//    W7); odpoved nese resolved[] (GUID + plna cesta ke kazdemu odkazu jmenem
+//    nebo cestou, FB-CZ-18).
+//  - Polozky operace pri vyjimce (W3): handler vede prubeh v
+//    this._fbOpProgress.items; pri vyjimce (E_PERMISSION / E_LOCKED / jina)
+//    je FB_Main pripoji k vysledku (items, partial: true) a QC + vypis zmen
+//    bezi i pri okc == 0.
 var resp = { protocol: "eafb/0.2", id: "", status: "error", results: [] };
 var self = this;
 // mezipamet cilu JEDNOHO volani (FB_TargetCache): vynulovat, aby se stav
 // nepropasoval mezi davkami pod pumpou (EA runtime ho stejne nedrzi)
-this._fbTargetCache = { el: {}, pkg: {}, dgm: {}, queries: 0 };
+this._fbTargetCache = { el: {}, pkg: {}, dgm: {}, amb: {}, err: {}, queries: 0 };
+// konfigurace cile zapisu (FB_WriteScopeCfg) = tatez mezipamet jednoho volani
+// (Z261004b-10): vynulovat, aby smazany/prejmenovany chraneny balicek nebo nova
+// konfigurace po deploy_src platily od dalsi davky
+this._fbScopeCfg = null;
+this._fbOpProgress = null;
 function pad2m(x) { return (x < 10 ? "0" : "") + x; }
 function nowTextM() {
     var d = new Date();
@@ -558,6 +578,8 @@ if (writesInBatch > 0) {
     try { pre2 = this.FB_Precheck(Repository, req, REG, "targets", resp.repository); }
     catch (ePre2) { pre2 = { ok: true, problems: [] }; }
     if (pre2 && pre2.ok === false) { return emitPrecheck(pre2); }
+    // odkazy zadane jmenem nebo cestou -> skutecny GUID a plna cesta (FB-CZ-18)
+    if (pre2 && pre2.resolved && pre2.resolved.length > 0) { resp.resolved = pre2.resolved; }
 }
 if (writesInBatch > 0) {
     // W8 pres soubor (par. 1a/5): EA runtime nedrzi this._fb* mezi invokacemi
@@ -796,7 +818,7 @@ function emitNoBaseline(why) {
     resp.code = "E_NO_BASELINE";
     resp.message = "Baseline politika: " + why + ". Nic nebylo provedeno. Co s tim: (1) udelej v EA rucni baseline nad balickem cile "
         + "(Ctrl+Alt+B -> New Baseline, jmeno bez prefixu FB-AUTO) a davku posli znovu, (2) pracuj v mensim balicku, "
-        + "(3) pri E_WHITELIST / zamcenem balicku se obrat na spravce. Davku NEDEL na mensi jen kvuli obejiti teto kontroly.";
+        + "(3) pri E_BLACKLIST / zamcenem balicku se obrat na spravce; (4) kdyz neni dohledan zadny cil (navadena cesta bez spolecneho predka), uved pole davky baselineRoot = GUID balicku, nad kterym je rucni baseline. Davku NEDEL na mensi jen kvuli obejiti teto kontroly.";
     resp.results = [];
     for (var nb = 0; nb < req.ops.length; nb++) {
         resp.results.push({ op: "" + (req.ops[nb] && req.ops[nb].op ? req.ops[nb].op : "?"), status: "skipped" });
@@ -852,7 +874,7 @@ if (writesInBatch > 0 && blPlan != null && blDec != null && blDec.action == "cre
     resp.baseline.elapsedMs = new Date().getTime() - blT0;
 }
 // --- provedeni davky (stop-on-error) ---
-var okc = 0, errc = 0, failed = false, comExc = false;
+var okc = 0, errc = 0, failed = false, comExc = false, partialItems = false;
 for (var i = 0; i < req.ops.length; i++) {
     var op = req.ops[i];
     var name = "" + (op && op.op ? op.op : "?");
@@ -877,6 +899,7 @@ for (var i = 0; i < req.ops.length; i++) {
             r = { op: name, status: "error", code: "E_ARGS", message: "" + eRef.message };
         }
         if (refsOk) {
+            this._fbOpProgress = null; // W3: handler si prubeh zalozi sam ({ items })
             try {
                 r = this[reg.fn](Repository, op, reqId);
                 if (!r) { r = { op: name, status: "error", code: "E_EXCEPTION", message: "Operace nevratila vysledek." }; }
@@ -892,7 +915,19 @@ for (var i = 0; i < req.ops.length; i++) {
                     r = { op: name, status: "error", code: "E_EXCEPTION", message: "" + e2.message };
                     comExc = true; // skutecna vyjimka z EA/COM -> W8 (FB-PU-28: jen tady)
                 }
+                // W3 (cil zapisu kap. 5.8): polozky rozpracovane operace se neztrati -
+                // odpoved vyjmenuje, co pred vyjimkou PROBEHLO (partial: true)
+                try {
+                    var prog = this._fbOpProgress;
+                    if (prog && prog.items && Object.prototype.toString.call(prog.items) == "[object Array]" && prog.items.length > 0) {
+                        r.items = prog.items;
+                        r.partial = true;
+                        r.message = "" + r.message + " | pred chybou probehlo " + prog.items.length + " polozek (vycet v items, partial: true) - zbytek operace se neprovedl";
+                        partialItems = true;
+                    }
+                } catch (ePg) { }
             }
+            this._fbOpProgress = null;
         }
     }
     resp.results.push(r);
@@ -912,7 +947,7 @@ for (var pdI = 0; pdI < resp.results.length; pdI++) {
         for (var pdJ = 0; pdJ < pdR.items.length; pdJ++) { if (pdR.items[pdJ].deleted === true) { partialDel = true; } }
     }
 }
-if (writesInBatch > 0 && (okc > 0 || partialDel)) {
+if (writesInBatch > 0 && (okc > 0 || partialDel || partialItems)) {
     try { resp.qc = this.FB_QcRun(Repository, req, resp); }
     catch (eQc) { resp.qc = { status: "nedobehlo", reason: "FB_QcRun selhal: " + eQc.message, checks: 0, findings: [] }; }
     // pozorovatelnost (Miloš UX): vypis zmen s teckovou cestou do Output tabu
@@ -973,10 +1008,11 @@ if (writesInBatch > 0) {
         var clr = this.FB_BaselineCleanupHook(Repository);
         if (clr != null) {
             resp.cleanup = clr;
-            if (clr.anomaly || clr.candidates > 0) {
+            if (clr.anomaly || clr.candidates > 0 || clr["protected"] > 0) {
                 if (!resp.warnings) { resp.warnings = []; }
                 resp.warnings.push("Uklid automatickych baselines [" + clr.mode + "]: kandidatu " + clr.candidates
                     + (clr.mode == "delete" ? ", smazano " + clr.deleted : ", smazal bych " + clr.planned)
+                    + (clr["protected"] > 0 ? ", vynechano v chranenych balickach " + clr["protected"] : "")
                     + (clr.anomaly ? " - ANOMALIE, nemaze se nic" : "") + " (detail: Output tab AI Bridge; menu AI Bridge -> Uklid automatickych baselines)");
             }
         }

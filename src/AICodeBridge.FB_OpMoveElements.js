@@ -38,9 +38,13 @@
 //
 // IDEMPOTENCE: element uz v cilovem package = noop (moved: false), zadny
 // zapis. Opakovane spusteni davky je bezpecne (par. 5a).
-// WHITELIST: kontroluje se ZDROJOVY i CILOVY package (presun je zapis do
-// obou vetvi). Validace CELE davky probehne PRED prvnim zapisem - zadny
-// castecny presun pri E_ARGS/E_NOT_FOUND/E_WHITELIST.
+// CIL ZAPISU (rezim blacklist, zadani v1.1 kap. 5.5, I6, Z261004b-10):
+// kontroluje se ZDROJ (prvek vc. osy vlastniku), CILOVY package a PREDEM cely
+// VLASTNENY podstrom (child elementy pres ParentID + diagramy vlastnene prvky)
+// bez stropu 12 urovni - potomek nebo diagram v chranene casti = E_BLACKLIST
+// pred prvnim presunem; podstrom hlubsi nez MAX_DEPTH urovni nebo vetsi nez
+// MAX_NODES uzlu = E_BLACKLIST "presun po castech" (nikdy tichy presun).
+// Validace CELE davky probehne PRED prvnim zapisem - zadny castecny presun.
 // Vysledek: items = [{guid, id, name, moved, fromPackageID, fromPackage,
 // toPackageID, toPackage, children, childrenFixed, diagrams, diagramsFixed}],
 // readback (SQL Package_ID - kontrola, kde prvky po davce skutecne jsou).
@@ -53,6 +57,37 @@ if (!op.elements || Object.prototype.toString.call(op.elements) != "[object Arra
 var self = this;
 var withChildren = (typeof op.withChildren == "undefined") ? true : (op.withChildren ? true : false);
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3
+var MAX_DEPTH = 60, MAX_NODES = 5000;
+function qrows(sql) { try { return self.FB_XmlRows(Repository.SQLQuery(sql)); } catch (eQ) { return null; } }
+function scope(kind, id) { try { return self.FB_ScopeCheck(Repository, kind, "" + id); } catch (eS) { return { code: "E_EXCEPTION", message: "kontrola cile selhala: " + eS.message }; } }
+// predbezny pruchod vlastnenym podstromem (SQL po urovnich, zadne Automation
+// objekty): vraci null (ok) nebo { code, message }
+function subtreeCheck(rootEl, idx) {
+    var level = ["" + rootEl.ElementID], all = ["" + rootEl.ElementID], depth = 0;
+    while (level.length > 0) {
+        if (depth++ >= MAX_DEPTH) { return { code: "E_BLACKLIST", message: "elements[" + idx + "]: vlastneny podstrom je hlubsi nez " + MAX_DEPTH + " urovni - bridge ho nedokaze predem zkontrolovat; presun po castech" }; }
+        var rc = qrows("SELECT Object_ID, Name FROM t_object WHERE ParentID IN (" + level.join(",") + ")");
+        if (rc == null) { return { code: "E_EXCEPTION", message: "elements[" + idx + "]: vlastneny podstrom nelze precist (SQL) - fail-closed, nic nepresunuto" }; }
+        var next = [];
+        for (var c = 0; c < rc.length; c++) {
+            var cid = parseInt(rc[c].Object_ID, 10);
+            var sr = scope("element", cid);
+            if (sr != null && sr.code != "E_NOT_FOUND") { return { code: sr.code, message: "elements[" + idx + "]: vlastneny potomek '" + rc[c].Name + "' (" + cid + ") lezi v chranene casti - presun by ho vzal s sebou. " + sr.message }; }
+            next.push("" + cid); all.push("" + cid);
+            if (all.length > MAX_NODES) { return { code: "E_BLACKLIST", message: "elements[" + idx + "]: vlastneny podstrom ma vic nez " + MAX_NODES + " prvku - presun po castech" }; }
+        }
+        level = next;
+    }
+    var rd = qrows("SELECT Diagram_ID, Name FROM t_diagram WHERE ParentID IN (" + all.join(",") + ")");
+    if (rd == null) { return { code: "E_EXCEPTION", message: "elements[" + idx + "]: vlastnene diagramy nelze precist (SQL) - fail-closed, nic nepresunuto" }; }
+    for (var d = 0; d < rd.length; d++) {
+        var did = parseInt(rd[d].Diagram_ID, 10);
+        var dr = scope("diagram", did);
+        if (dr != null && dr.code != "E_NOT_FOUND") { return { code: dr.code, message: "elements[" + idx + "]: vlastneny diagram '" + rd[d].Name + "' (" + did + ") lezi v chranene casti - presun by ho vzal s sebou. " + dr.message }; }
+    }
+    return null;
+}
 
 // --- validace CELE davky pred prvnim zapisem ---
 var plan = [];
@@ -76,30 +111,35 @@ for (var v = 0; v < op.elements.length; v++) {
     }
     var el = this.FB_ResolveEl(Repository, elRef);
     if (el == null) {
-        return { op: "move_elements", status: "error", code: "E_NOT_FOUND", message: "elements[" + v + "]: element nenalezen (" + elRef + ")" };
+        return this.FB_ResolveFail("move_elements", "elements[" + v + "]: element nenalezen (" + elRef + ")", null);
     }
     var tgt = this.FB_ResolvePkg(Repository, pkgRef);
     if (tgt == null) {
-        return { op: "move_elements", status: "error", code: "E_NOT_FOUND", message: "elements[" + v + "]: cilovy package nenalezen (" + pkgRef + ")" };
+        var pl = (pkgRef !== null && typeof pkgRef == "object" && pkgRef.path) ? ("path " + pkgRef.path.join(".")) : ("" + pkgRef);
+        return this.FB_ResolveFail("move_elements", "elements[" + v + "]: cilovy package nenalezen (" + pl + ")", null);
     }
-    // whitelist: zdroj i cil
+    // cil zapisu: zdroj (prvek vc. vlastniku), cil, vlastneny podstrom
     var src = null;
     try { src = Repository.GetPackageByID(el.PackageID); } catch (eSrc) { src = null; }
-    var chkS = this.FB_CheckWrite(Repository, src);
+    var chkS = this.FB_CheckWriteEl(Repository, el);
     if (chkS != null) {
-        return { op: "move_elements", status: "error", code: chkS.code, message: "elements[" + v + "] (zdrojovy package): " + chkS.message };
+        return { op: "move_elements", status: "error", code: chkS.code, message: "elements[" + v + "] (zdroj presunu): " + chkS.message };
     }
     var chkT = this.FB_CheckWrite(Repository, tgt);
     if (chkT != null) {
         return { op: "move_elements", status: "error", code: chkT.code, message: "elements[" + v + "] (cilovy package): " + chkT.message };
+    }
+    var chkSub = subtreeCheck(el, v);
+    if (chkSub != null) {
+        return { op: "move_elements", status: "error", code: chkSub.code, message: chkSub.message };
     }
     plan.push({ idx: v, el: el, tgt: tgt, srcId: el.PackageID, srcName: (src ? "" + src.Name : "") });
 }
 
 // --- presun vlastneneho podstromu (child elementy + jejich diagramy) ---
 function moveOwned(el, pkgId, depth, stat) {
-    if (depth > 12) {
-        stat.warns.push("vlastneny podstrom je hlubsi nez 12 urovni - hloubeji se uz nedorovnavalo");
+    if (depth > MAX_DEPTH) {
+        stat.warns.push("vlastneny podstrom je hlubsi nez " + MAX_DEPTH + " urovni - hloubeji se uz nedorovnavalo");
         return;
     }
     try {
@@ -113,7 +153,8 @@ function moveOwned(el, pkgId, depth, stat) {
             var chBlocked = null;
             try { chBlocked = self.FB_CheckWrite(Repository, Repository.GetPackageByID(ch.PackageID)); } catch (eCw) { chBlocked = { message: eCw.message }; }
             if (chBlocked != null) {
-                stat.warns.push("potomek '" + ch.Name + "' lezi mimo whitelist (" + chBlocked.message + ") - bridge ho neprepisuje; over rucne, kam ho posunula kaskada EA");
+                // druha obrana (predbezny pruchod subtreeCheck by to mel chytit driv)
+                stat.warns.push("potomek '" + ch.Name + "' lezi v chranene casti (" + chBlocked.message + ") - bridge ho neprepisuje; over rucne, kam ho posunula kaskada EA");
                 continue;
             }
             try {
@@ -137,7 +178,7 @@ function moveDiagrams(el, pkgId, stat) {
             var dgBlocked = null;
             try { dgBlocked = self.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID)); } catch (eCwD) { dgBlocked = { message: eCwD.message }; }
             if (dgBlocked != null) {
-                stat.warns.push("diagram '" + dg.Name + "' lezi mimo whitelist (" + dgBlocked.message + ") - bridge ho neprepisuje");
+                stat.warns.push("diagram '" + dg.Name + "' lezi v chranene casti (" + dgBlocked.message + ") - bridge ho neprepisuje");
                 continue;
             }
             try {

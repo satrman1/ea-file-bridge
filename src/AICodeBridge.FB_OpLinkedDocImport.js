@@ -19,12 +19,13 @@ for (var ci = 0; ci < cfgs.length; ci++) {
 if (cfg == null || !cfg.baseDir) { cfg = { baseDir: this.FB_ResolveBaseDir(Repository) }; }
 var fso = this.FB_ComObj("Scripting.FileSystemObject");
 var items = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.documents.length; i++) {
     var d = op.documents[i];
     if (!d || !d.element) { return { op: "import_element_linked_documents", status: "error", code: "E_ARGS", message: "documents[" + i + "]: chybi element.", items: items }; }
     var el = this.FB_ResolveEl(Repository, d.element);
     if (el == null) { return { op: "import_element_linked_documents", status: "error", code: "E_NOT_FOUND", message: "documents[" + i + "]: element nenalezen.", items: items }; }
-    var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+    var chk = this.FB_CheckWriteEl(Repository, el);
     if (chk != null) { return { op: "import_element_linked_documents", status: "error", code: chk.code, message: "documents[" + i + "]: " + chk.message, items: items }; }
     var path = "";
     if (d.rtf_b64) {

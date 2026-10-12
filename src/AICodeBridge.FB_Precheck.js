@@ -13,9 +13,10 @@
 //                   aby uzivatel bez write pristupu dostal svou chybu, ne
 //                   chybu konfigurace), cil zadany GUIDem existuje
 //                   (FB_TargetCache - tatez mezipamet pak slouzi Risk Gate;
-//                   jen zapisove operace). SEM doplni vlakno
-//                   Z261004b-10 blacklist, nejednoznacna jmena a cesty
-//                   (zadani cile zapisu v1.1 kap. 5.3).
+//                   jen zapisove operace); CIL ZAPISU (Z261004b-10,
+//                   FB_ScopePrecheck): E_SCOPE_CONFIG, E_BLACKLIST (obe
+//                   auditovane), E_AMBIGUOUS / E_NOT_FOUND u jmen a cest
+//                   (zadani cile zapisu v1.1 kap. 5.3, 5.7); resolved[].
 // Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,
 // code, message, suggestions? } ], audit: bool }. Jedna chyba se SEZNAMEM VSECH
 // problemu; nic se neprovede, zadne okno, zadna zaloha. audit = true jen pro
@@ -26,8 +27,9 @@
 // Textova pole (notes, text, sql...) se nekontroluji - EA v nich formatuje
 // znackami jako <b>.
 var self = this;
-var AUDIT_CODES = { }; // napr. "E_BLACKLIST": 1 (Z261004b-10)
+var AUDIT_CODES = { "E_BLACKLIST": 1, "E_SCOPE_CONFIG": 1 }; // Z261004b-10: pokus o zapis do chranene casti / vadna konfigurace se auditu (kap. 5.3, odchylka od pravidla 1 KONCEPCE oken)
 var problems = [];
+var resolvedOut = [];
 var ph = ("" + (phase || "shape")).toLowerCase();
 function prob(opIdx, pth, code, msg, extra) {
     var p = { op: opIdx, path: pth, code: code, message: msg };
@@ -43,7 +45,8 @@ var guidRe = /^\{[^{}<>]{3,}\}$/; // tvar {…} = odkaz GUIDem (stejne kriterium
 var ID_KEYS = { guid: "?", elementID: "element", packageID: "package", diagramID: "diagram", connectorID: "",
                 "package": "package", parent: "package", targetPackage: "package", scope: "package",
                 owningElement: "element", element: "element", source: "element", target: "element",
-                classifier: "element", diagram: "diagram", baseline: "", repo: "", operation: "", id: "" };
+                classifier: "element", diagram: "diagram", baseline: "", repo: "", operation: "", id: "",
+                from: "package", baselineRoot: "package" }; // from = vychozi balicek cesty {path, from} (kap. 5.7)
 // pole, jejichz retezcove polozky jsou odkazy na cile
 var REF_ARRAYS = { elements: "element", elementIDs: "element", diagrams: "diagram", packages: "package",
                    connectors: "", connectorIDs: "" };
@@ -351,15 +354,24 @@ if (ph == "targets") {
             prob(t2.op, t2.path, "E_ARGS", "cil " + t2.guid + " (" + t2.kind + ") v modelu neexistuje - zkontroluj GUID (ping/find_*), neposilej davku znovu beze zmeny");
         }
     }
+    // --- cil zapisu (Z261004b-10): blacklist, konfigurace, jmena a cesty ---
+    var scopeRes = null;
+    try { scopeRes = this.FB_ScopePrecheck(Repository, req, reg); }
+    catch (eSc) { scopeRes = { problems: [{ op: -1, path: "FB_WriteScope", code: "E_SCOPE_CONFIG", message: "FB_ScopePrecheck selhal: " + eSc.message + " - fail-closed" }], resolved: [] }; }
+    if (scopeRes && scopeRes.problems) { for (var sp = 0; sp < scopeRes.problems.length; sp++) { problems.push(scopeRes.problems[sp]); } }
+    if (scopeRes && scopeRes.resolved && scopeRes.resolved.length > 0) { resolvedOut = scopeRes.resolved; }
 }
 // ===================== vysledek =====================
-if (problems.length == 0) { return { ok: true, problems: [] }; }
-var code = "E_ARGS", audit = false, firstMsg = problems[0].message;
+if (problems.length == 0) { return { ok: true, problems: [], resolved: resolvedOut }; }
+// kod davky = nejzavaznejsi z problemu (poradi: konfigurace > chranena cast >
+// neznama operace > zakazana operace > nejednoznacnost > nenalezeno > tvar)
+var ORDER = { "E_SCOPE_CONFIG": 7, "E_BLACKLIST": 6, "E_REPO": 6, "E_UNKNOWN_OP": 5, "E_OP_FORBIDDEN": 4, "E_AMBIGUOUS": 3, "E_NOT_FOUND": 2, "E_ARGS": 1 };
+var code = "E_ARGS", audit = false, firstMsg = problems[0].message, best = 0;
 for (var p2 = 0; p2 < problems.length; p2++) {
-    if (problems[p2].code == "E_UNKNOWN_OP") { code = "E_UNKNOWN_OP"; }
-    else if (problems[p2].code == "E_OP_FORBIDDEN" && code != "E_UNKNOWN_OP") { code = "E_OP_FORBIDDEN"; }
-    if (AUDIT_CODES[problems[p2].code] == 1) { audit = true; code = problems[p2].code; }
+    var rank = ORDER[problems[p2].code] || 1;
+    if (rank > best) { best = rank; code = problems[p2].code; }
+    if (AUDIT_CODES[problems[p2].code] == 1) { audit = true; }
 }
-return { ok: false, code: code, audit: audit, problems: problems,
+return { ok: false, code: code, audit: audit, problems: problems, resolved: resolvedOut,
     message: "Predbezna kontrola davky: " + problems.length + (problems.length == 1 ? " problem" : (problems.length < 5 ? " problemy" : " problemu"))
         + " - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: " + problems[0].path + ": " + firstMsg };

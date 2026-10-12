@@ -1,0 +1,33 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-14-vazby-ok",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{B4F10BFC-E14D-4b3d-8A7E-0D042326032C}",
+     "target": "{07573080-2415-4a64-A09E-5E1E7C9A7E3C}",
+     "type": "Dependency",
+     "name": "chr-src->vol2 (O11=c)"
+    },
+    {
+     "source": "{07573080-2415-4a64-A09E-5E1E7C9A7E3C}",
+     "target": "{534F77F3-F00B-4566-84EC-D2072E17FAE5}",
+     "type": "Dependency",
+     "name": "vol2->chr-sub (O3=a prichozi)"
+    }
+   ]
+  },
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Connector",
+     "guid": "{54AD57FE-E287-4189-B343-73306708E13A}"
+    }
+   ]
+  }
+ ]
+}

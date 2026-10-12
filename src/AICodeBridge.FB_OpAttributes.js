@@ -18,9 +18,10 @@ if (!op || !op.element || !op.attributes || Object.prototype.toString.call(op.at
 }
 var el = this.FB_ResolveEl(Repository, op.element);
 if (el == null) { return { op: "create_or_update_attributes", status: "error", code: "E_NOT_FOUND", message: "Element nenalezen: " + op.element }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(el.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, el);
 if (chk != null) { return { op: "create_or_update_attributes", status: "error", code: chk.code, message: chk.message }; }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 for (var i = 0; i < op.attributes.length; i++) {
     var a = op.attributes[i];
     var attr = null, created = false, j;

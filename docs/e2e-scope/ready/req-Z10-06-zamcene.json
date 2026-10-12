@@ -1,0 +1,6 @@
+{ "protocol": "eafb/0.2", "id": "Z10-06-zamcene", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_elements", "elements": [
+   { "guid": "{C570897A-E1C2-4778-8E45-EA8D0D0CACE0}", "notes": "FB-CZ-21: update pred zamkem (zaloha FBT-VOLNE)" },
+   { "name": "VOL-PredZamkem", "type": "Class", "package": "{931C997C-FD2F-4043-BACD-4B4D42C24DBE}" },
+   { "name": "ZAM-Prvek", "type": "Class", "package": "{4AE4571B-0C2A-4393-A4D0-A6F8F4CCA6C0}" },
+   { "name": "VOL-PoZamku", "type": "Class", "package": "{931C997C-FD2F-4043-BACD-4B4D42C24DBE}" } ] } ] }

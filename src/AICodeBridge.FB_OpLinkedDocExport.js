@@ -21,7 +21,7 @@ if (!fso.FolderExists(cfg.baseDir + "\\responses")) { fso.CreateFolder(cfg.baseD
 if (!fso.FolderExists(docsDir)) { fso.CreateFolder(docsDir); }
 var items = [];
 for (var i = 0; i < op.elements.length; i++) {
-    var el = this.FB_ResolveEl(Repository, op.elements[i]);
+    var el = this.FB_ResolveEl(Repository, op.elements[i], "read"); // cteni (cil zapisu kap. 5.7)
     if (el == null) { return { op: "export_element_linked_documents", status: "error", code: "E_NOT_FOUND", message: "elements[" + i + "]: element nenalezen (" + op.elements[i] + ")", items: items }; }
     var rtf = "";
     try { rtf = "" + el.GetLinkedDocument(); } catch (e) { rtf = ""; }

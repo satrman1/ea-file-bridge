@@ -12,10 +12,19 @@ if (!op || !op["package"]) {
     return { op: "clone_package", status: "error", code: "E_ARGS", message: "Povinne: package." };
 }
 var pkg = this.FB_ResolvePkg(Repository, op["package"]);
-if (pkg == null) { return { op: "clone_package", status: "error", code: "E_NOT_FOUND", message: "Package nenalezen: " + op["package"] }; }
-// klon vznika ve stejnem rodici -> whitelist na zdrojovy package (jeho vetev)
+if (pkg == null) { return this.FB_ResolveFail("clone_package", "Package nenalezen: " + ((op["package"] && op["package"].path) ? "path " + op["package"].path.join(".") : op["package"]), null); }
+// CIL ZAPISU (kap. 5.5, W5, O4 = a): zdroj VZDY - zdroj v chranene casti nebo
+// zdroj, ktery chranenou vetev OBSAHUJE -> E_BLACKLIST; klon vznika v rodici
+// zdroje (Package.Clone()), rodic korene je "zadny" -> klon korene odmitnut
 var chk = this.FB_CheckWrite(Repository, pkg);
-if (chk != null) { return { op: "clone_package", status: "error", code: chk.code, message: chk.message }; }
+if (chk != null) { return { op: "clone_package", status: "error", code: chk.code, message: "zdroj klonu: " + chk.message }; }
+var scfg = null;
+try { scfg = this.FB_WriteScopeCfg(Repository); } catch (eCfg) { scfg = null; }
+var inside = (scfg && scfg.ancestorIds) ? scfg.ancestorIds["" + pkg.PackageID] : null;
+if (inside && inside.length > 0) {
+    return { op: "clone_package", status: "error", code: "E_BLACKLIST", message: "zdroj klonu '" + pkg.Name + "' obsahuje chranenou vetev (" + inside.join(", ") + ") - klon by ji zkopiroval; pozadej cloveka o jiny zdroj" };
+}
+if (!pkg.ParentID) { return { op: "clone_package", status: "error", code: "E_BLACKLIST", message: "zdroj klonu '" + pkg.Name + "' je koren modelu - klon korene se nedela (ochrana uzlu)" }; }
 // --- kvota: pocet elementu v podstromu (rekurzivne pres t_package, jen cteni) ---
 var total = 0, pkgCount = 0;
 var queue = [pkg.PackageID];

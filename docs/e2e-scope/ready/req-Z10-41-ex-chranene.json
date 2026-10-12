@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-41-ex-chranene", "repo": "EAEXAMPLE.QEA", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "name": "CHR-Novy", "type": "Class", "package": { "path": ["Example Model", "FBT-CHRANENE"] } } ] } ] }

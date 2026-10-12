@@ -15,11 +15,11 @@
 //   3. KAM smi zapisovat = EA security balickove skupiny / @F002_Write
 //      (plati i pres API; bridge jen preklada chybu - FB_InterpretError,
 //      E_PERMISSION/E_LOCKED). Bridge tuto vrstvu ZAMERNE nedrzi.
-//   4. Co smi AI KANAL = FB_Whitelist (AI-sandbox) + FB_OpsAllowed
+//   4. Co smi AI KANAL = FB_WriteScope (blacklist, Z261004b-10) + FB_OpsAllowed
 //      (whitelist operaci) - per kanal, ne per user.
 //
 // Polozka: { repo, writeGroups: ["nazev skupiny", ...] }
-//   repo:        podretezec identity dle FB_RepoId (jako FB_Whitelist)
+//   repo:        podretezec identity dle FB_RepoId (jako FB_WriteScope)
 //   writeGroups: nazvy EA security skupin (t_secgroup.GroupName,
 //                case-insensitive); clen ASPON JEDNE = smi write ficury.
 //
@@ -41,7 +41,7 @@
 //   Milos rucne v EA (Configure > Security > Users/Groups) v kroku K5 a
 //   prirazuje si sebe; A2 = vyrazeni ze skupiny + PLNY restart EA (cache
 //   FB_UserAccess per session). Identita doplnena 6b 2026-09-09 (viz
-//   FB_Whitelist). Bez teto polozky = fail-closed read.
+//   FB_WriteScope). Bez teto polozky = fail-closed read.
 return [
     { repo: "EAEXAMPLE.QEA", writeGroups: ["EAFB Write"] },
     { repo: "EA17_Yoga_QEA2.qeax", writeGroups: ["EAFB Write"] }

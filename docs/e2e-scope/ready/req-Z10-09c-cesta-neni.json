@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "Z10-09c-cesta-neni", "repo": "EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "name": "X", "type": "Class", "package": { "path": ["Groups", "FBT-Neexistuje"] } } ] } ] }

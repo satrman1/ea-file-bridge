@@ -37,7 +37,7 @@ try {
     var r = this.FB_BaselineCleanup(Repository, cfg, mode, false, now);
     return { mode: r.mode, total: r.total, candidates: r.candidates.length, planned: r.planned, deleted: r.deleted.length,
              failed: r.failed.length, remaining: r.remaining, anomaly: r.anomaly, orphans: r.orphans, runs: runs + 1, firstRun: first,
-             note: r.note };
+             "protected": (typeof r["protected"] == "number") ? r["protected"] : 0, note: r.note };
 } catch (eH) {
     try { this.Log(Repository, "FB uklid baselines: selhal (" + eH.message + ") - davky se to netyka"); } catch (eL) { }
     return null;

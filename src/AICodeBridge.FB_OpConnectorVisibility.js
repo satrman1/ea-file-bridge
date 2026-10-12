@@ -14,7 +14,7 @@ try {
     else if (/^[0-9]+$/.test(ref)) { dg = Repository.GetDiagramByID(parseInt(ref, 10)); }
 } catch (eG) { dg = null; }
 if (dg == null) { return { op: "change_connector_visibility", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + ref }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, dg, "diagram");
 if (chk != null) { return { op: "change_connector_visibility", status: "error", code: chk.code, message: chk.message }; }
 var want = {};
 for (var i = 0; i < op.connectorIDs.length; i++) { want[parseInt(op.connectorIDs[i], 10)] = 1; }

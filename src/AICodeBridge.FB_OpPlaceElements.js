@@ -23,9 +23,10 @@ try {
     else if (/^[0-9]+$/.test(ref)) { dg = Repository.GetDiagramByID(parseInt(ref, 10)); }
 } catch (eG) { dg = null; }
 if (dg == null) { return { op: "place_elements_on_diagram", status: "error", code: "E_NOT_FOUND", message: "Diagram nenalezen: " + ref }; }
-var chk = this.FB_CheckWrite(Repository, Repository.GetPackageByID(dg.PackageID));
+var chk = this.FB_CheckWriteEl(Repository, dg, "diagram");
 if (chk != null) { return { op: "place_elements_on_diagram", status: "error", code: chk.code, message: chk.message }; }
 var items = [];
+this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 var auto = 0; // poradove cislo auto-pozicovanych elementu (mrizka)
 for (var i = 0; i < pls.length; i++) {
     var p = pls[i];

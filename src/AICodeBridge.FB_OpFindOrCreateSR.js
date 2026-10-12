@@ -93,6 +93,20 @@ if (targetPkg == null) {
 }
 var chk = this.FB_CheckWrite(Repository, targetPkg);
 if (chk != null) { return { op: "find_or_create_referencing_sr", status: "error", code: chk.code, message: chk.message }; }
+// CIL ZAPISU (kap. 5.5): vazba SR -> operace = prichozi vazba do balicku vlastnika
+// operace; chranena vetev s allowIncomingRefs: false ji odmita (O3 = a)
+try {
+    var ownRows = this.FB_XmlRows(Repository.SQLQuery("SELECT Object_ID FROM t_operation WHERE ea_guid = '" + methGuid.replace(/'/g, "''") + "'"));
+    if (ownRows.length == 1) {
+        var ownChk = this.FB_ScopeCheck(Repository, "element", "" + ownRows[0].Object_ID);
+        if (ownChk != null && ownChk.code == "E_BLACKLIST" && ownChk.branch && ownChk.branch.allowIncomingRefs === false) {
+            return { op: "find_or_create_referencing_sr", status: "error", code: "E_BLACKLIST", message: "vlastnik operace lezi v chranene vetvi s allowIncomingRefs: false - vazba SR -> operace do ni neni povolena. " + ownChk.message };
+        }
+        if (ownChk != null && ownChk.code != "E_BLACKLIST" && ownChk.code != "E_NOT_FOUND") {
+            return { op: "find_or_create_referencing_sr", status: "error", code: ownChk.code, message: ownChk.message };
+        }
+    }
+} catch (eOw) { }
 var createdDiagrams = [], createdElements = [], createdConnectors = [];
 // *** Service package ***
 var svcPkg = targetPkg.Packages.AddNew("" + op.packageName, "");

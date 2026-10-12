@@ -1,0 +1,9 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-01-kontrola-parametru",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  { "op": "ping" },
+  { "op": "query", "sql": "SELECT o.Name AS operace, p.Pos, p.Name AS parametr FROM t_operation o LEFT JOIN t_operationparams p ON p.OperationID = o.OperationID WHERE o.Object_ID IN (SELECT Object_ID FROM t_object WHERE Name = 'AICodeBridge' AND Stereotype = 'JavascriptAddin') ORDER BY o.Name, p.Pos" }
+ ]
+}

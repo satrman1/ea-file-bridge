@@ -17,7 +17,7 @@
 //    neznama vetev) -> fail-closed ELEVATED.
 //  - B4: jakykoli target davky = konfiguracni element bridge (AICodeBridge,
 //    FB_RiskPolicy, FB_OpsAllowed, FB_Config, FB_ScaffoldConfig; nad ramec
-//    zadani navic FB_Whitelist - tez konfiguracni sekce) -> BLOCKED.
+//    zadani navic FB_WriteScope - tez konfiguracni sekce) -> BLOCKED.
 //  - W5: prekroceni rozpoctu budgetMs -> fail-closed ELEVATED "metriky
 //    nespocitany"; nikdy LOW bez spocitanych metrik.
 //  - W8: prvni zapisova davka po E_EXCEPTION predchozi davky v teze session
@@ -126,7 +126,8 @@ function checkBudget() {
 // --- B4: chranene konfiguracni elementy bridge ---
 var PROT = { "AICODEBRIDGE": 1, "FB_RISKPOLICY": 1, "FB_OPSALLOWED": 1,
              "FB_CONFIG": 1, "FB_SCAFFOLDCONFIG": 1, "FB_WHITELIST": 1,
-             "FB_ACCESSGROUPS": 1 }; // FB_AccessGroups = iterace 5 (A)
+             "FB_ACCESSGROUPS": 1, "FB_WRITESCOPE": 1 }; // FB_AccessGroups = iterace 5 (A);
+             // FB_WriteScope = cil zapisu (Z261004b-10); FB_WHITELIST zustava (pozustatek v modelu)
 var bridgeGuid = "", bridgeId = -1;
 try {
     var br = this.FB_XmlRows(Repository.SQLQuery(
@@ -153,13 +154,16 @@ function guardResolved(res, ctx) {
 // jen standardni sloupce). Rozpocet gate se kontroluje PRED dotazem; cil uz
 // dohledany predbeznou kontrolou se nedotazuje znovu. ---
 function resolveVia(kind, ref) {
-    var t = ("" + ref).replace(/^\s+|\s+$/g, "");
+    // cesta { path: [...], from? } (cil zapisu kap. 5.7) jde do FB_TargetCache jako objekt
+    var isPath = (ref !== null && typeof ref == "object" && Object.prototype.toString.call(ref.path) == "[object Array]");
+    var t = isPath ? ("path:" + ref.path.join("\u0001") + "|" + ("" + (ref.from === null || typeof ref.from == "undefined" ? "" : ref.from)))
+                   : ("" + ref).replace(/^\s+|\s+$/g, "");
     var C = self._fbTargetCache;
     var bucket = (C && typeof C == "object") ? ((kind == "package") ? C.pkg : ((kind == "diagram") ? C.dgm : C.el)) : null;
     if (bucket && typeof bucket[t] != "undefined") { return bucket[t]; }
     if (checkBudget()) { return "BUDGET"; }
     var r = null;
-    try { r = self.FB_TargetCache(Repository, kind, t); } catch (eTc) { r = null; }
+    try { r = self.FB_TargetCache(Repository, kind, isPath ? ref : t); } catch (eTc) { r = null; }
     return r;
 }
 function resolveElement(ref) { return resolveVia("element", ref); }
@@ -277,6 +281,7 @@ function touchElement(ref, ctx, countUpdate, addPackages) {
     guardResolved(res, ctx);
     addEl(res.guid);
     pushName(tgtNames, "e", res.name);
+    if (!(("" + ref).charAt(0) == "{" || /^[0-9]+$/.test("" + ref))) { pushPath("element", res.id, res.name); } // cil jmenem: plna cesta v okne (FB-CZ-18)
     if (addPackages && res.pkgId > 0) { addPkg("p" + res.pkgId); }
     if (countUpdate) { updatedExisting++; }
     // pravidlo 3: prvek zalozeny touto session pumpy = vlastni (metriky
@@ -300,11 +305,15 @@ function touchPackage(ref, ctx, countUpdate) {
     guardRaw(ref, ctx);
     var res = resolvePackage(ref);
     if (res == "BUDGET") { return; }
-    if (res == null) { elevate("Neresolvovatelny package '" + ref + "' (" + ctx + ") - fail-closed"); return; }
+    var lbl = (ref !== null && typeof ref == "object" && ref.path) ? ("path " + ref.path.join(".") + (ref.from ? " od " + ref.from : "")) : ("" + ref);
+    if (res == null) { elevate("Neresolvovatelny package '" + lbl + "' (" + ctx + ") - fail-closed"); return; }
     if (PROT[("" + res.name).toUpperCase()] == 1) { block("Target package '" + res.name + "' (" + ctx + ") = konfiguracni jmeno bridge - BLOCKED (B4)"); }
     if (countUpdate) { updatedExisting++; }
     addPkg("p" + res.id);
     pushName(pkgNames, "p", res.name);
+    // cil zadany cestou nebo jmenem: okno ukaze plnou cestu (cil zapisu FB-CZ-18)
+    var byPathOrName = (ref !== null && typeof ref == "object") || !(("" + ref).charAt(0) == "{" || /^[0-9]+$/.test("" + ref));
+    if (byPathOrName) { pushPath("package", res.id, res.name); }
     return { res: res };
 }
 // vraci { own: bool } - cizi (ne-vlastni) diagram jde do foreignDiagrams
@@ -418,7 +427,12 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
                 createOps++;
                 if (p.matchByName) { updatedExisting++; updatedExistingApprox++; }
                 if (p.name) { guardRaw(p.name, "packages[" + j + "].name"); }
-                touchPackage(p.parent, "packages[" + j + "].parent", false);
+                var tpr = touchPackage(p.parent, "packages[" + j + "].parent", false);
+                // cil zapisu kap. 5.3 krok 4 (B1, O5 = a): koren modelu je chraneny jako
+                // uzel - novy balicek primo pod korenem = duvod okna (ELEVATED)
+                if (tpr && tpr.res && tpr.res.parentId === 0) {
+                    elevate("Novy balicek '" + (p.name || "?") + "' primo pod korenem modelu '" + tpr.res.name + "' (packages[" + j + "].parent) - struktura nejvyssi urovne, vyzaduje potvrzeni");
+                }
             }
         }
     } else if (name == "create_or_update_connectors") {

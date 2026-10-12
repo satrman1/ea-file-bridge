@@ -1,6 +1,6 @@
 // AICodeBridge.FB_OpsAllowed()
 // WHITELIST OPERACI executoru (iterace 3, K4) - konfiguracni sekce vedle
-// whitelistu packages (FB_Whitelist). Nahrada domaci MCP mechaniky
+// cile zapisu (FB_WriteScope - blacklist, Z261004b-10). Nahrada domaci MCP mechaniky
 // -enableDelete / -enableEdit: co tady neni povolene, executor odmitne
 // s E_OP_FORBIDDEN, i kdyby package whitelist prosel.
 //
@@ -11,7 +11,7 @@
 //     allow/deny. deny ma prednost pred allow. "*" v allow = vsechny.
 //   - Repozitar bez polozky = ZADNA zapisova operace (fail-secure).
 //   - Zmena tohoto souboru = zmena kodu v modelu = auditovatelna udalost
-//     (baseline), stejne jako u FB_Whitelist.
+//     (baseline), stejne jako u FB_WriteScope.
 //
 // Doporuceni pro banku (politika P1, emr-zapis-pravidla.md par. 12a+12g):
 //   { repo: "<TEST-DB>", allow: ["*"],
@@ -25,7 +25,7 @@
 //   VRSTVA 2 (clenstvi v EA skupine -> E_ADDIN_ACCESS) a VRSTVA 3 (balickova
 //   prava EA -> FB_InterpretError), ne whitelist operaci. deploy_src je
 //   potreba pro K6 (prepnuti receptions na lokalni SignalGUID). Identita
-//   doplnena 6b 2026-09-09 (viz FB_Whitelist).
+//   doplnena 6b 2026-09-09 (viz FB_WriteScope).
 return [
     { repo: "EAEXAMPLE.QEA", allow: ["*"], deny: [] },
     { repo: "EA17_Yoga_QEA2.qeax", allow: ["*"], deny: [] }

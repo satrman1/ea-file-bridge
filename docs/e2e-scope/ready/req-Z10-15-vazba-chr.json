@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-15-vazba-chr",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "guid": "{1AC539C9-5696-4429-886C-BAF22E72DE3F}",
+     "name": "pokus o prejmenovani chr->vol"
+    }
+   ]
+  }
+ ]
+}

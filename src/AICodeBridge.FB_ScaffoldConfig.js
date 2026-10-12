@@ -1,7 +1,7 @@
 // AICodeBridge.FB_ScaffoldConfig()
 // Konfigurace SCAFFOLDU find_or_create_referencing_sr per repozitar
 // (parovani pres FB_RepoId, case-insensitive podretezec - stejna mechanika
-// jako FB_Config/FB_Whitelist):
+// jako FB_Config/FB_WriteScope):
 //   repo:        podretezec identity repozitare dle FB_RepoId
 //   unsortedPkg: "{GUID}" package, kde vznikaji nove service packages
 //                (v bance #UNSORTED; operace umi cil prebit argumentem

@@ -17,28 +17,29 @@ r.repository = "" + this.FB_RepoId(Repository);
 r.connection = "" + Repository.ConnectionString;
 r.time = "" + d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate())
     + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
-// --- whitelist: FB_Whitelist drzi { repo, pkg } (holy GUID) a muze nest
-// radky vice repozitaru -> filtr na pripojeny repozitar (substring,
-// case-insensitive, I4). Nedohledatelna polozka se vypise jako GUID
-// s poznamkou, NIKDY se tise nezahodi (par. 4.5).
-r.whitelist = [];
+// --- cil zapisu (rezim blacklist, Z261004b-10, kap. 5.11): blok writeScope
+// misto pole whitelist[] (zanika): stav EA security (informativne), blacklist
+// (GUID, jmeno, plna cesta, note, found, allowIncomingRefs), implicitni ochrany
+// s cestou, stav konfigurace (vady = E_SCOPE_CONFIG). Lidske vety doladuje
+// Z261004b-11 (FB-CZ-27); nedohledatelna polozka se vypise s found: false,
+// NIKDY se tise nezahodi (par. 4.5).
+r.writeScope = { mode: "blacklist", securityEnabled: false, repoKnown: false, blacklist: [], implicit: [], problems: [], warnings: [] };
+try { r.writeScope.securityEnabled = (Repository.IsSecurityEnabled === true); } catch (eSe) { }
 try {
-    var wl = this.FB_Whitelist();
-    var ridU = ("" + r.repository).toUpperCase();
-    for (var wi = 0; wi < wl.length; wi++) {
-        if (ridU.indexOf(("" + wl[wi].repo).toUpperCase()) < 0) { continue; }
-        var item = { guid: "" + wl[wi].pkg, name: "", path: "" };
-        var pkg = null;
-        try { pkg = this.FB_ResolvePkg(Repository, wl[wi].pkg); } catch (ePk) { pkg = null; }
-        if (pkg !== null && typeof pkg != "undefined" && pkg) {
-            item.name = "" + pkg.Name;
-            item.path = "" + this.FB_ElementPath(Repository, "package", pkg); // plna cesta (par. 4.2/I5)
-        } else {
-            item.note = "package nedohledatelna v pripojenem repozitari";
-        }
-        r.whitelist.push(item);
+    this._fbScopeCfg = null; // ping = cerstve cteni konfigurace
+    var ws = this.FB_WriteScopeCfg(Repository);
+    r.writeScope.repoKnown = ws.repoKnown;
+    for (var wi = 0; wi < ws.blacklist.length; wi++) {
+        var w = ws.blacklist[wi];
+        r.writeScope.blacklist.push({ guid: w.pkg, name: w.name, path: w.path, note: w.note, found: w.found, allowIncomingRefs: w.allowIncomingRefs });
     }
-} catch (eWl) { r.whitelistError = "" + eWl.message; }
+    for (var ii = 0; ii < ws.implicit.length; ii++) {
+        var im = ws.implicit[ii];
+        r.writeScope.implicit.push({ kind: im.kind, guid: im.guid, name: im.name, path: im.path, note: im.note });
+    }
+    r.writeScope.problems = ws.problems;
+    r.writeScope.warnings = ws.warnings;
+} catch (eWl) { r.writeScope.error = "" + eWl.message; }
 // --- riskPolicy (KONCEPCE potvrzovaci okna pravidlo 7, Z261004b-3): agent si
 // na zacatku prace precte tridy operaci a prahy a predem rekne cloveku,
 // ktera davka bude chtit potvrzeni. Jen hodnoty politiky (zadne GUIDy).

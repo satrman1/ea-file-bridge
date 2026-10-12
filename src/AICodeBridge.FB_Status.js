@@ -11,24 +11,23 @@ lines.push("");
 lines.push("Repozitar (identita): " + rid);
 lines.push("Pripojeni: " + Repository.ConnectionString);
 lines.push("");
-lines.push("ZAPIS je povolen JEN do techto balicku (a cele vetve pod nimi):");
-var wl = [];
-try { wl = this.FB_Whitelist(); } catch (eWL) { wl = []; }
-var ridU = rid.toUpperCase();
-var any = 0;
-for (var i = 0; i < wl.length; i++) {
-    var w = wl[i];
-    if (ridU.indexOf(("" + w.repo).toUpperCase()) < 0) { continue; }
-    var pth = "?";
-    try {
-        var pkg = Repository.GetPackageByGuid("" + w.pkg);
-        if (pkg) { pth = self.FB_ElementPath(Repository, "package", pkg); }
-    } catch (eW) { }
-    lines.push("  - " + pth + "   [" + w.pkg + "]");
-    any++;
-}
-if (any == 0) {
-    lines.push("  (ZADNY - pro tento repozitar neni whitelist -> vsechny zapisy budou odmitnuty, E_REPO)");
+// cil zapisu (rezim blacklist, Z261004b-10): kam bridge NESMI; jinak rozhoduje
+// EA security (zamky). Lidske vety doladuje Z261004b-11 (FB-CZ-27).
+var ws = null;
+try { this._fbScopeCfg = null; ws = this.FB_WriteScopeCfg(Repository); } catch (eWs) { ws = null; }
+var secOn = false;
+try { secOn = (Repository.IsSecurityEnabled === true); } catch (eSe) { }
+lines.push("ZAPIS: rezim blacklist - bridge pise kamkoli, kam smi uzivatel podle EA security (" + (secOn ? "zapnuta" : "VYPNUTA") + "), KROME techto vetvi:");
+if (ws == null || !ws.repoKnown) {
+    lines.push("  (repozitar nema polozku ve FB_WriteScope -> vsechny zapisy budou odmitnuty, E_REPO)");
+} else {
+    for (var i = 0; i < ws.blacklist.length; i++) {
+        var w = ws.blacklist[i];
+        lines.push("  - " + (w.found ? w.path : (w.name || "?") + " (NENALEZEN)") + "   [" + w.pkg + "]" + (w.note ? "  " + w.note : ""));
+    }
+    if (ws.blacklist.length == 0) { lines.push("  (blacklist je prazdny)"); }
+    for (var k = 0; k < ws.implicit.length; k++) { lines.push("  - " + (ws.implicit[k].path || ws.implicit[k].name) + "   (bridge chrani sam sebe: " + ws.implicit[k].note + ")"); }
+    if (ws.problems.length > 0) { lines.push("  CHYBA KONFIGURACE (E_SCOPE_CONFIG, zapisy zastavene): " + ws.problems.join(" | ")); }
 }
 lines.push("");
 lines.push("CTENI (dotazy SELECT / get_*) je povoleno kdekoli v modelu.");

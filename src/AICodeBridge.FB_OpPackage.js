@@ -22,20 +22,27 @@ if (!list || list.length == 0) {
     return { op: "create_or_update_package", status: "error", code: "E_ARGS", message: "Povinne: packages (pole) nebo primo name/parent." };
 }
 var items = [], warns = [];
+this._fbOpProgress = { items: items }; // W3
 for (var i = 0; i < list.length; i++) {
     var p = list[i];
     var pkg = null, created = false, matchedBy = "";
     if (p.guid || p.packageID) {
         pkg = this.FB_ResolvePkg(Repository, p.guid || p.packageID);
-        if (pkg == null) { return { op: "create_or_update_package", status: "error", code: "E_NOT_FOUND", message: "packages[" + i + "]: package nenalezen.", items: items }; }
+        if (pkg == null) { return this.FB_ResolveFail("create_or_update_package", "packages[" + i + "]: package nenalezen (" + (p.guid || p.packageID) + ").", items); }
         var chkU = this.FB_CheckWrite(Repository, pkg);
         if (chkU != null) { return { op: "create_or_update_package", status: "error", code: chkU.code, message: "packages[" + i + "]: " + chkU.message, items: items }; }
+        // ochrana uzlu korene (cil zapisu kap. 5.3 krok 4, B1, O5 = a): prejmenovani
+        // ani jiny update korene modelu bridge nedela
+        if (!pkg.ParentID) {
+            return { op: "create_or_update_package", status: "error", code: "E_BLACKLIST",
+                message: "packages[" + i + "]: balicek '" + pkg.Name + "' je KOREN modelu - prejmenovani ani zmena korene neni povolena (ochrana uzlu); zalozeni podbalicku pod korenem jde pres potvrzeni.", items: items };
+        }
     } else {
         if (!p.name || !p.parent) {
             return { op: "create_or_update_package", status: "error", code: "E_ARGS", message: "packages[" + i + "]: create vyzaduje name a parent.", items: items };
         }
         var parent = this.FB_ResolvePkg(Repository, p.parent);
-        if (parent == null) { return { op: "create_or_update_package", status: "error", code: "E_NOT_FOUND", message: "packages[" + i + "]: parent nenalezen (" + p.parent + ")", items: items }; }
+        if (parent == null) { return this.FB_ResolveFail("create_or_update_package", "packages[" + i + "]: parent nenalezen (" + ((p.parent && p.parent.path) ? "path " + p.parent.path.join(".") : p.parent) + ")", items); }
         var chkC = this.FB_CheckWrite(Repository, parent);
         if (chkC != null) { return { op: "create_or_update_package", status: "error", code: chkC.code, message: "packages[" + i + "]: " + chkC.message, items: items }; }
         if (p.matchByName) {

@@ -1,0 +1,14 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-16-move-chr",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "move_elements",
+   "package": "{54223CC8-A8DB-4a25-8488-171D3F546349}",
+   "elements": [
+    "{07573080-2415-4a64-A09E-5E1E7C9A7E3C}"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "Z10-18-diagram-ok",
+ "repo": "EA17_Yoga_QEA2.qeax",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "{A4874058-0C61-4eb3-86EE-54481F8F55C4}",
+   "elementPlacements": [
+    {
+     "element": "{534F77F3-F00B-4566-84EC-D2072E17FAE5}",
+     "x": 400,
+     "y": 300
+    }
+   ]
+  }
+ ]
+}

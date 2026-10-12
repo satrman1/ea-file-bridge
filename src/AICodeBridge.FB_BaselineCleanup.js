@@ -7,7 +7,10 @@
 //   force true = z MENU pod dohledem: bez stropu maxDeletesPerRun (strop
 //                anomalie plati vzdy)
 // Vraci { mode, requestedMode, total, candidates[], planned, deleted[],
-//         failed[], remaining, anomaly, orphans, note, text }.
+//         failed[], remaining, anomaly, orphans, protected, note, text }.
+// CIL ZAPISU (Z261004b-10, W1): kandidat, jehoz balicek (ElementID = GUID) je
+// na blacklistu nebo v dedicne implicitni ochrane (audit, add-in), se
+// VYNECHA a vykaze (protected: N v reportu i v Output) - uklid je zapis.
 //
 // PET POJISTEK (par. 6.3):
 //  1. filtr = CELOTVAROVA shoda jmena (FB_BaselineName "parse" - tentyz regex
@@ -70,14 +73,34 @@ for (var i = 0; i < rows.length; i++) {
     groups[gk].push({ guid: "" + rows[i].DocID, pkgGuid: "" + rows[i].ElementID, pkgName: "" + (rows[i].DocName || ""),
                       name: "" + rows[i].Version, login: p.login, time: p.time, ms: p.ms });
 }
-var cand = [];
+var cand = [], protectedN = 0, protectedShown = [];
+var protCache = {};
+function pkgProtected(pkgGuid) {
+    var key = ("" + pkgGuid).toUpperCase();
+    if (typeof protCache[key] != "undefined") { return protCache[key]; }
+    var r = null;
+    try { r = self.FB_ScopeCheck(Repository, "package", "" + pkgGuid); } catch (eS) { r = { code: "E_EXCEPTION", message: "" + eS.message }; }
+    // nenalezeny balicek (osirela baseline) neni chraneny; E_REPO/E_SCOPE_CONFIG = fail-closed (nemazat)
+    var p = (r != null && r.code != "E_NOT_FOUND") ? r : null;
+    protCache[key] = p;
+    return p;
+}
 for (var g = 0; g < gKeys.length; g++) {
     var lst = groups[gKeys[g]];
     lst.sort(function (a, b) { return b.ms - a.ms; }); // nejnovejsi prvni
     for (var k = keepK; k < lst.length; k++) {
-        if ((now - lst[k].ms) > maxAge * 86400000) { cand.push(lst[k]); }
+        if ((now - lst[k].ms) > maxAge * 86400000) {
+            var pr = pkgProtected(lst[k].pkgGuid);
+            if (pr != null) {
+                protectedN++;
+                if (protectedShown.length < 10) { protectedShown.push((lst[k].pkgName || lst[k].pkgGuid) + " | " + lst[k].name + " (" + pr.code + ")"); }
+                continue;
+            }
+            cand.push(lst[k]);
+        }
     }
 }
+res["protected"] = protectedN;
 cand.sort(function (a, b) { return a.ms - b.ms; }); // nejstarsi prvni
 res.candidates = cand;
 // osirele (package uz neexistuje) - jen do reportu, levna pojistka
@@ -144,17 +167,21 @@ for (var s = 0; s < show.length && s < 40; s++) {
 if (show.length > 40) { L.push("  ... a dalsich " + (show.length - 40)); }
 for (var f = 0; f < res.failed.length && f < 10; f++) { L.push("  ! NESMAZANO " + res.failed[f].name + ": " + res.failed[f].why); }
 if (res.orphans > 0) { L.push("Osirele automaticke baselines (package uz neexistuje): " + res.orphans + " - jen hlaseni."); }
+if (protectedN > 0) {
+    L.push("Vynechano " + protectedN + " kandidatu v chranenych balickach (blacklist / audit / add-in) - uklid do chranene casti nezapisuje:");
+    for (var ps = 0; ps < protectedShown.length; ps++) { L.push("  - " + protectedShown[ps]); }
+}
 res.text = L.join("\n");
 try { this.Log(Repository, res.text.replace(/\n/g, " | ")); } catch (eLg) { }
 // audit: kazde MAZANI; report jen kdyz ma co hlasit (best-effort - cteci
 // uzivatel do #AI-LOG zapsat nemusi smet)
-if (res.deleted.length > 0 || res.failed.length > 0 || res.anomaly || (res.mode == "report" && cand.length > 0)) {
+if (res.deleted.length > 0 || res.failed.length > 0 || res.anomaly || protectedN > 0 || (res.mode == "report" && cand.length > 0)) {
     try {
         var dN = new Date(now);
         var aid = "uklid-baselines-" + dN.getFullYear() + (dN.getMonth() < 9 ? "0" : "") + (dN.getMonth() + 1) + (dN.getDate() < 10 ? "0" : "") + dN.getDate()
             + "-" + (dN.getHours() < 10 ? "0" : "") + dN.getHours() + (dN.getMinutes() < 10 ? "0" : "") + dN.getMinutes();
         res.auditGuid = "" + this.FB_Audit(Repository, aid, "uklid baselines [" + res.mode + "]: kandidatu " + cand.length + ", smazano " + res.deleted.length
-            + ", selhalo " + res.failed.length + (res.anomaly ? ", ANOMALIE" : ""), res.text);
+            + ", selhalo " + res.failed.length + (protectedN > 0 ? ", vynechano chranenych " + protectedN : "") + (res.anomaly ? ", ANOMALIE" : ""), res.text);
     } catch (eAu) { }
 }
 return res;
