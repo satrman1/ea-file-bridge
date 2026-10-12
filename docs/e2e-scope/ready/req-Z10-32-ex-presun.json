@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "Z10-32-ex-presun", "repo": "EAEXAMPLE.QEA", "ops": [
+ { "op": "find_elements_by_name", "name": "AICodeBridge" },
+ { "op": "find_packages_by_name", "name": "EA File Bridge" } ] }

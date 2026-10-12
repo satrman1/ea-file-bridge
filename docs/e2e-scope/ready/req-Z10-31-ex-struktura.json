@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "Z10-31-ex-struktura", "repo": "EAEXAMPLE.QEA", "ops": [
+ { "op": "find_packages_by_name", "name": "#AI-LOG" },
+ { "op": "find_packages_by_name", "name": "EA Addins" },
+ { "op": "find_packages_by_name", "name": "#FB-TEST" },
+ { "op": "find_elements_by_name", "name": "AICodeBridge" } ] }

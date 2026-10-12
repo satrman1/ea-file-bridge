@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z10-30-ping-ex", "repo": "EAEXAMPLE.QEA", "ops": [ { "op": "ping" } ] }
