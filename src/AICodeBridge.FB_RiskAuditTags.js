@@ -16,6 +16,16 @@ try {
     if (risk.riskReasons && risk.riskReasons.length > 0) {
         this.SetTag(el, "ai.risk.reasons", ("" + risk.riskReasons.join("; ")).substring(0, 250));
     }
+    // v0.19 (KONCEPCE pravidlo 9, Z261004b-6): STABILNI KODY duvodu - kalibrace
+    // oken seskupuje podle kodu, ne podle textu (texty se smi menit, kody ne)
+    if (risk.reasonItems && risk.reasonItems.length > 0) {
+        var codes = [], seenC = {};
+        for (var rc = 0; rc < risk.reasonItems.length; rc++) {
+            var cc = "" + ((risk.reasonItems[rc] && risk.reasonItems[rc].code) || "");
+            if (cc != "" && seenC[cc] != 1) { seenC[cc] = 1; codes.push(cc); }
+        }
+        if (codes.length > 0) { this.SetTag(el, "ai.risk.codes", codes.join(";").substring(0, 250)); }
+    }
     var m = risk.metrics;
     if (m != null) {
         this.SetTag(el, "ai.risk.metrics",

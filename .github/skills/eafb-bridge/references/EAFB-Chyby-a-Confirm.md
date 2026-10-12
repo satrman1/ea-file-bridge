@@ -11,6 +11,7 @@ Zápisové dávky prochází deterministickým **Risk Gate** (prahy a třídy op
   - **Co dělej:** jednou větou řekni člověku, co čeká a kde (`res.since` říká od kdy), a **čekej bez časového limitu**. Nepřeposílej pod novým id, nic neopravuj, neduplikuj. Potřebuješ-li dávku opravit, řekni člověku, ať dá Ne, a pošli opravenou s novým id.
   - **Vždy ELEVATED:** mazání (`delete_*`), přesuny (`move_elements`), klonování (`clone_*`), rebuild scénářů / zpráv / constraintů / requirements, přepisy linked dokumentů, nový balíček přímo pod kořenem modelu, mazání s kaskádou do chráněné části. Okno je u nich normální chod, ne známka chyby.
   - **Naváděná cesta zálohy:** `confirm_required` s důvodem „bez pre-image…" = bridge zálohu pořídit nemůže; člověk pořídí v EA ruční baseline nad balíčkem cíle (nebo jeho předkem) a dávku potvrdí znovu — bez ní se neprovede.
+  - **Druhé kolo:** když po potvrzení přijde znovu `confirm_required`, nese `confirm.round {why, no}`: `baseline-missing` (člověk potvrdil, ale ruční záloha stále chybí — nic se neprovedlo), `metrics-changed` (model se mezitím změnil) nebo `summary-mismatch` (souhrn v `res` neodpovídal modelu — **nikdy `res` neupravuj**, bridge ho před provedením ověřuje a okno ukáže pravdivý souhrn). Ve všech případech jen čekej; nic neposílej.
   - Čekající dávka starší než 8 hodin vyprší (`E_RISK_EXPIRED`, `rejected`) — je-li zápis stále potřeba, nová dávka s novým id.
 - **BLOCKED** → `E_RISK_BLOCKED` (chat ACK `EAFB BLOKOVANO <id>`). Tvrdý stop, žádný override z tvé strany. Ohlas uživateli; cesta ven je jen změna politiky nebo ruční práce v EA (jeho věc).
 
@@ -22,7 +23,7 @@ Chyby **dávky** (nic se neprovedlo, všechny operace `skipped`) vs. chyby **ope
 
 | Kód | Význam a co s tím |
 |---|---|
-| `E_PARSE` | Nevalidní JSON / chybí `ops`. Oprav strukturu, pošli novou dávku s novým id. |
+| `E_PARSE` | Nevalidní JSON / chybí `ops`. `message` říká **co a kde** (znak od 1, řádek:sloupec, 40 znaků okolí; `parse.position`) — typicky čárka navíc před `]` nebo `}`. Oprav strukturu, pošli novou dávku s novým id. |
 | `E_REPO` | Deklarace `repo` nesedí na připojený repozitář — odpověď ho **pojmenuje**: oprav pole `repo` na tuto hodnotu a pošli dávku znovu s novým id (člověku jednou větou). Varianty: repozitář nemá položku v konfiguraci cíle zápisu (zápisy nejdou, ohlas správci); „EA má otevřený jiný projekt než při startu pumpy" → požádej člověka o restart pumpy. Nic se neprovedlo. |
 | `E_UNKNOWN_OP` | Neznámá operace — `problems[]` nese `suggestions[]` nejbližších názvů. Oprav název, nové id. Je to chyba dávky, ne bridge. |
 | `E_ARGS` | Chyba v dávce z předběžné kontroly: `problems[] {op, path, code, message}` vyjmenuje **všechny** problémy najednou (chybějící pole, prázdný seznam, zástupný text v identifikačním poli, `$N` dopředu, cíl zadaný GUIDem v modelu neexistuje, `$N` na výsledek bez `guid` — „použij `$0[0]`"). **Oprav všechno z `problems[]` sám**, nové id. Žádné okno, žádná záloha. |
@@ -42,6 +43,8 @@ Chyby **dávky** (nic se neprovedlo, všechny operace `skipped`) vs. chyby **ope
 | `E_NO_BASELINE` | Destruktivní dávka, ke které bridge nemůže pořídit zálohu (a politika ji vyžaduje). Konečný stav — nic se neprovedlo. Řeší člověk: ruční baseline v EA nad balíčkem cíle, menší balíček, nebo správce. **Neřeš rozdělením dávky**; po ruční záloze nová dávka s novým id. |
 | `E_PERMISSION` | EA security nepustila zápis do cílového balíčku (práva uživatele, ne chyba bridge). Položky před chybou proběhly (`items`, `partial: true`) — vyjmenuj je člověku; práva řeší člověk / správce, nebo cílit jinam. |
 | `E_LOCKED` | Cílový prvek/balíček je zamčený (EA locking). Totéž: řekni, co je zamčené a co proběhlo; zámek řeší člověk. (Vazby zámky nehlídají.) |
+| `E_FILE` | Chyba souboru nebo složky (složka výměny, `responses\images`, práva, místo na disku) — **není** to EA security ani zámek. `message` nese původní hlášku. Ohlas člověku (složku/práva řeší on nebo správce); další zápisová dávka půjde oknem (pojistka po výjimce). |
+| `E_DB_RETRY` | Dočasná chyba databáze (deadlock, timeout, spojení). Pošli dávku znovu s novým id; když se opakuje, ohlas správci databáze. Položky před chybou proběhly (`items`, `partial`). |
 | `E_SQL_READONLY` | Jiný dotaz než SELECT/WITH. |
 | `E_SQL` | Dotaz v EA selhal (neexistující sloupec/tabulka, syntaxe) — `message` = hláška EA (může chybět), `sql` = dotaz, `raw` = začátek odpovědi EA. Oprav dotaz (ověř sloupce), pošli znovu; EA k tomu otevřela modální dialog, který člověk odklikne. **Prázdný výsledek NENÍ `E_SQL`** — je to `ok`/`rowCount: 0` + warning. |
 | `E_EXCEPTION` | Neočekávaná výjimka v EA/COM — **není to chyba tvé dávky**. Ohlas člověku, ať zkontroluje Output tab; další zápisová dávka půjde oknem (pojistka po pádu). |

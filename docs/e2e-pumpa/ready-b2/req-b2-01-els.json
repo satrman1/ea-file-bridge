@@ -1,0 +1,1 @@
+{"protocol":"eafb/0.2","id":"b2-01-els","repo":"EAEXAMPLE.QEA","ops":[{"op":"query","sql":"SELECT o.Object_ID, o.Name, o.Object_Type, o.Package_ID, o.ea_guid FROM t_object o WHERE o.Package_ID IN (1084,1081,1080,1059,1056,1058,1073,1075) AND o.Object_Type <> 'Package' ORDER BY o.Package_ID, o.Object_ID"}]}

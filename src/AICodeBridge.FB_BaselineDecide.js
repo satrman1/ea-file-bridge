@@ -176,9 +176,15 @@ function coveredBy(startPkgId) {
 }
 var found = [], missing = [];
 var k2;
+// N-E2E-5 (Z261004b-6): tataz rucni baseline nad spolecnym predkem kryje vice
+// balicku davky - do okna jen jednou (klic = jmeno baseline + balicek, kde lezi)
+var foundSeen = {};
 for (k2 = 0; scope && k2 < scope.packages.length; k2++) {
     var cv = coveredBy(scope.packages[k2].id);
-    if (cv) { found.push(cv.name + " nad " + cv.path); } else { missing.push(scope.packages[k2].path || scope.packages[k2].name); }
+    if (cv) {
+        var fk = cv.name + "\u0001" + cv.path;
+        if (foundSeen[fk] != 1) { foundSeen[fk] = 1; found.push(cv.name + " nad " + cv.path); }
+    } else { missing.push(scope.packages[k2].path || scope.packages[k2].name); }
 }
 if (!scope || scope.unknown === true) {
     // rozsah neznamy (B3 iii-v): rucni baseline se hleda nad NEJBLIZSIM

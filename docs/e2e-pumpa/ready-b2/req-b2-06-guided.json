@@ -1,0 +1,7 @@
+{"protocol":"eafb/0.2","id":"b2-06-guided","repo":"EAEXAMPLE.QEA","ops":[{"op":"create_or_update_elements","elements":[
+ {"guid":"{8A1E676D-6CF6-4bfb-A5FE-775761C4EEEF}","notes":"B2 test druheho kola - neprovede se"},
+ {"guid":"{A5FE7757-61C4-EEEF-A1B3-E1C5A0999C89}","notes":"B2 test druheho kola - neprovede se"},
+ {"guid":"{73A46459-E3D6-4413-BEE8-557E45E17F1A}","notes":"B2 test druheho kola - neprovede se"},
+ {"guid":"{3E6ADEF3-8F23-43da-B5C5-99EF82770B6D}","notes":"B2 test druheho kola - neprovede se"},
+ {"guid":"{2B98FFEC-E6DB-4848-A2BA-4EB19B700FC7}","notes":"B2 test druheho kola - neprovede se"},
+ {"guid":"{009372C4-D60C-4bf5-9D98-BB38D82CC620}","notes":"B2 test druheho kola - neprovede se"}]}]}

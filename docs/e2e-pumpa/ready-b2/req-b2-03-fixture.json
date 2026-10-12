@@ -1,0 +1,11 @@
+{"protocol":"eafb/0.2","id":"b2-03-fixture","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"create_or_update_package","packages":[{"name":"B2 Mazani","parent":"{07475E42-13BC-4182-B01E-AB46EDA94BBE}","notes":"fixture Z261004b-6 - smazat oknem"}]},
+ {"op":"create_or_update_elements","elements":[
+   {"name":"B2 Trida A","type":"Class","package":"$0"},
+   {"name":"B2 Trida B","type":"Class","package":"$0"},
+   {"name":"B2 Trida C","type":"Class","package":"$0"}]},
+ {"op":"create_or_update_package","packages":[{"name":"B2 Podbalicek","parent":"$0"}]},
+ {"op":"create_or_update_elements","elements":[{"name":"B2 Trida D","type":"Class","package":"$2"}]},
+ {"op":"create_or_update_diagram","diagrams":[{"name":"B2 Diagram","type":"Logical","package":"$0"}]},
+ {"op":"create_or_update_connectors","connectors":[{"source":"$1[0]","target":"$1[1]","type":"Association"}]}
+]}

@@ -55,7 +55,7 @@ if (!gk.dlDir) {
 }
 // W8: otviraci baseline JESTE PRED prvnim stouchnutim
 var sess = "";
-try { sess = "" + this.FB_SessionStart(Repository); }
+try { sess = ("" + this.FB_SessionStart(Repository)).replace(/\r?\n/g, " | "); } // v0.19: hlaseni je po radcich, do PS retezce jeden radek
 catch (eS) { sess = "session baseline selhal: " + eS.message; }
 // kanon vratneho z modelu
 var src = "";

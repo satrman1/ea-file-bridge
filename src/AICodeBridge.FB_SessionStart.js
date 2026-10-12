@@ -22,6 +22,10 @@
 // "pumpa je starsi nez kod v modelu" (typicky vendorovana kopie ve workspace
 // po zmene pumpy bez refreshe). Otisk = sha256 souboru pumpy (stejna hodnota
 // jako PUMP-VERSION workspace, docs\WORKSPACE-METODIKY.md kap. 2).
+// FB-PU-05 / FB-UI-14 (v0.19, Z261004b-6): hlaseni PO RADCICH, varovani
+// (POZOR / CHYBA / Upozorneni) PRVNI, hlavicka s datem; konzole pumpy i Output
+// tab dostanou kazdou cast na vlastnim radku (driv jeden radek slepeny " | ",
+// varovani daleko za okrajem okna).
 var PUMP_REQUIRED = "0.6"; // nejnizsi verze pumpy, se kterou tento kod pocita (requests\processing\, stavovy soubor)
 var self = this;
 var ridRaw = "" + this.FB_RepoId(Repository);
@@ -41,7 +45,9 @@ try { st = this.FB_ScopeText(Repository); } catch (eSt) { st = null; }
 if (st == null) {
     parts.push("POZOR: konfiguraci cile zapisu (FB_WriteScope) nelze precist - zapisy skonci E_SCOPE_CONFIG");
 } else {
-    parts.push(st.sentence);
+    // jedna veta FB_ScopeText (ping, menu) - v hlaseni session po castech na radky (FB-UI-14)
+    var stParts = ("" + st.sentence).split(" | ");
+    for (var sp = 0; sp < stParts.length; sp++) { parts.push(stParts[sp]); }
     if (st.problems.length > 0) { parts.push("CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG - vsechny zapisy zastavene, cteni bezi; opravny kanal = davka jen s deploy_src): " + st.problems.join(" | ")); }
     if (st.warnings.length > 0) { parts.push("Upozorneni: " + st.warnings.join(" | ")); }
 }
@@ -73,6 +79,15 @@ if (typeof WScript != "undefined") {
     } catch (ePu) { parts.push("Verzi pumpy nelze zjistit: " + ePu.message); }
 }
 parts.push("Session baseline se nedela (sessionBaseline off). Zalohy se poridi automaticky az pred prvnim zapisem - vzdy nad konkretnim balickem, ne nad celou vetvi.");
-var out = parts.join(" | ");
-this.Log(Repository, out);
-return out;
+// --- poradi: varovani prvni, pak informace; kazda cast = vlastni radek ---
+var warnL = [], infoL = [];
+for (var pi = 0; pi < parts.length; pi++) {
+    var ln = "" + parts[pi];
+    if (/^(POZOR|CHYBA|Upozorneni|WARN)\b/.test(ln)) { warnL.push(ln); } else { infoL.push(ln); }
+}
+function pad2s(x) { return (x < 10 ? "0" : "") + x; }
+var dS = new Date();
+var head = "==== AI Bridge pripraven - " + dS.getDate() + ". " + (dS.getMonth() + 1) + ". " + dS.getFullYear() + " " + dS.getHours() + ":" + pad2s(dS.getMinutes()) + " ====";
+var lines = [head].concat(warnL).concat(infoL);
+for (var li = 0; li < lines.length; li++) { this.Log(Repository, lines[li]); }
+return lines.join("\n");

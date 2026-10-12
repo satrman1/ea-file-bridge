@@ -168,7 +168,11 @@ this._fbConfirmCtx = {
     timestamp: nowText(),
     since: ("" + (resObj.since || "")),
     prevMetrics: (risk ? risk.metrics : null),
-    prevLevel: (risk ? "" + risk.riskLevel : "")
+    prevLevel: (risk ? "" + risk.riskLevel : ""),
+    // v0.19 (FB-PU-21): souhrn, ktery clovek videl v okne - FB_Main ho porovna
+    // s cerstve spocitanym (otisk), ne jen metriky; cislo kola pro FB-PU-19
+    prevSummary: (risk ? risk.summary : null),
+    prevRound: (resObj.confirm && resObj.confirm.round && typeof resObj.confirm.round.no == "number") ? resObj.confirm.round.no : 1
 };
 var out = "";
 try {

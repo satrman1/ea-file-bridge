@@ -37,6 +37,11 @@ if (risk.confirm) {
 if (risk.riskReasons && risk.riskReasons.length > 0) {
     s += " | duvody: " + risk.riskReasons.join("; ");
 }
+if (risk.reasonItems && risk.reasonItems.length > 0) {
+    var kc = [];
+    for (var ki = 0; ki < risk.reasonItems.length; ki++) { if (risk.reasonItems[ki] && risk.reasonItems[ki].code) { kc.push("" + risk.reasonItems[ki].code); } }
+    if (kc.length > 0) { s += " | kody: " + kc.join(","); }
+}
 // Baseline politika par. 4.6/7: radek o zaloze (restore manifest v Notes auditu)
 if (bl) {
     s += " | baseline=" + (bl.decision || "?") + (bl.reason ? " (" + bl.reason + ")" : "");

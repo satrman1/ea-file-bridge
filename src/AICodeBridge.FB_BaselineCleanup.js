@@ -151,7 +151,31 @@ if (wantDelete && !res.anomaly && res.planned > 0) {
     res.remaining = cand.length - res.deleted.length;
 }
 // --- text (Output tab / dialog / audit) ---
-var L = [];
+// N-E2E-6 (v0.19, Z261004b-6; Milos 11. 10.: "vubec netusim, co maze"): PRVNI
+// radek je lidska veta - kolik automatickych zaloh kterych balicku, starsich
+// nez kolik dni, kolik novejsich zustane, rucni se nemazou. GUIDy a loginy az
+// pod carou (res.textDetail) - dialog z menu je neukazuje, Output tab ano.
+var pkgSeen = {}, pkgList = [];
+for (var pn = 0; pn < cand.length; pn++) {
+    var pnm = "" + (cand[pn].pkgName || "");
+    if (pnm == "") { try { var pko = Repository.GetPackageByGuid(cand[pn].pkgGuid); if (pko) { pnm = "" + pko.Name; cand[pn].pkgName = pnm; } } catch (ePn) { } }
+    if (pnm == "") { pnm = "" + cand[pn].pkgGuid; }
+    if (pkgSeen[pnm] != 1) { pkgSeen[pnm] = 1; pkgList.push(pnm); }
+}
+var keptN = res.total - cand.length - protectedN; if (keptN < 0) { keptN = 0; }
+function plC(n, one, few, many) { return n + " " + (n == 1 ? one : ((n >= 2 && n <= 4) ? few : many)); }
+var human;
+if (cand.length == 0) {
+    human = "Neni co uklizet: v modelu je " + plC(res.total, "automaticka zaloha", "automaticke zalohy", "automatickych zaloh") + " a zadna neni starsi nez " + maxAge + " dni mimo " + keepK + " nejnovejsich na balicek a uzivatele. Rucni zalohy se nemazou nikdy.";
+} else {
+    var verb = (res.mode == "delete") ? (res.deleted.length > 0 ? "Smazal jsem " + plC(res.deleted.length, "automatickou zalohu", "automaticke zalohy", "automatickych zaloh") : "Nesmazal jsem nic (" + plC(cand.length, "kandidat", "kandidati", "kandidatu") + ")")
+                                       : (res.anomaly ? "NEMAZU NIC - " + plC(cand.length, "kandidat", "kandidati", "kandidatu") + " je nad stropem anomalie" : "Smazu " + plC(res.planned, "automatickou zalohu", "automaticke zalohy", "automatickych zaloh"));
+    human = verb + (pkgList.length == 1 ? " balicku \"" + pkgList[0] + "\"" : " v " + plC(pkgList.length, "balicku", "balicich", "balicich") + " (" + pkgList.slice(0, 6).join(", ") + (pkgList.length > 6 ? ", ..." : "") + ")")
+        + " starsich nez " + maxAge + " dni; " + plC(keptN, "novejsi zustane", "novejsi zustanou", "novejsich zustane") + " (vzdy aspon " + keepK + " nejnovejsi na balicek a uzivatele); rucni zalohy se nemazou."
+        + (res.remaining > 0 && !res.anomaly ? " Dalsich " + res.remaining + " prijde na radu v dalsich bezich." : "")
+        + (protectedN > 0 ? " " + plC(protectedN, "kandidat", "kandidati", "kandidatu") + " v chranenych balickach vynechavam." : "");
+}
+var L = [human];
 L.push("Uklid automatickych baselines [" + res.mode + (force === true ? ", z menu" : "") + "]: v modelu " + res.total + " automatickych baselines, kandidatu "
     + cand.length + " (starsi nez " + maxAge + " dni A mimo " + keepK + " nejnovejsich per balicek+uzivatel).");
 if (res.note != "") { L.push(res.note); }
@@ -171,8 +195,13 @@ if (protectedN > 0) {
     L.push("Vynechano " + protectedN + " kandidatu v chranenych balickach (blacklist / audit / add-in) - uklid do chranene casti nezapisuje:");
     for (var ps = 0; ps < protectedShown.length; ps++) { L.push("  - " + protectedShown[ps]); }
 }
+res.textHuman = human;
+res.textDetail = L.slice(1).join("\n");
 res.text = L.join("\n");
-try { this.Log(Repository, res.text.replace(/\n/g, " | ")); } catch (eLg) { }
+try {
+    // Output tab: po radcich (veta pro cloveka prvni, detail pod ni)
+    for (var lo = 0; lo < L.length; lo++) { this.Log(Repository, (lo == 0 ? "FB uklid zaloh: " : "  ") + L[lo]); }
+} catch (eLg) { }
 // audit: kazde MAZANI; report jen kdyz ma co hlasit (best-effort - cteci
 // uzivatel do #AI-LOG zapsat nemusi smet)
 if (res.deleted.length > 0 || res.failed.length > 0 || res.anomaly || protectedN > 0 || (res.mode == "report" && cand.length > 0)) {

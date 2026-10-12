@@ -54,13 +54,26 @@
 //    vlastnim prvkem jsou LOW, pokud nic jineho neeskaluje (prahy, mazani,
 //    W8...). $N na create vetev teze davky je vlastni i bez klice (B3).
 //    Prahy se NEMENI (pravidlo 8).
+// v0.19 (balik B2 texty, Z261004b-6; KONCEPCE pravidla 2, 4, 9; FB-PU-20):
+//  - kazdy duvod nese STABILNI KOD (reasonItems[] = { code, text, args }):
+//    riskReasons[] zustava technicky text pro res/audit, FB_ConfirmSummary
+//    sklada vetu pro cloveka z kodu (FB_ReasonText), audit dostava tag
+//    ai.risk.codes - kalibrace oken seskupuje podle kodu, ne textu;
+//  - summary.deletes[] = co se SMAZE se skutecnym rozsahem (balicek vcetne
+//    N prvku/diagramu pres FB_SubtreeCount, prvek vcetne vnorenych, konektor
+//    A -> B, atribut Trida.x, diagram, tag) - zvlast od summary.targets
+//    (ostatni zmeny); mazane cile uz do targets nepatri (FB-PU-20 b);
+//  - summary.actions[] = per operace co a nad cim (vety "Co se stane" v okne);
+//  - summary.targetsMore / packagesMore = kolik jmen je nad stropem 12.
 var self = this;
 var t0 = new Date().getTime();
-var reasons = [], reasonSeen = {};
+var reasons = [], reasonSeen = {}, reasonItems = [];
 var level = 1; // 1=LOW 2=ELEVATED 3=BLOCKED
-function addReason(msg) { if (reasonSeen[msg] != 1) { reasonSeen[msg] = 1; reasons.push(msg); } }
-function elevate(msg) { if (level < 2) { level = 2; } addReason(msg); }
-function block(msg) { level = 3; addReason(msg); }
+function addReason(msg, code, args) {
+    if (reasonSeen[msg] != 1) { reasonSeen[msg] = 1; reasons.push(msg); reasonItems.push({ code: "" + (code || "OTHER"), text: msg, args: args || {} }); }
+}
+function elevate(msg, code, args) { if (level < 2) { level = 2; } addReason(msg, code, args); }
+function block(msg, code, args) { level = 3; addReason(msg, code, args); }
 
 // --- politika: nacteni + fail-closed validace (W9) ---
 var pol = null, polWhy = "";
@@ -96,7 +109,7 @@ if (polValid) {
         }
     }
 }
-if (!polValid) { elevate("Politika nevalidni (" + polWhy + ") - fail-closed W9: zadny auto-write"); }
+if (!polValid) { elevate("Politika nevalidni (" + polWhy + ") - fail-closed W9: zadny auto-write", "POLICY_INVALID", { why: polWhy }); }
 // --- pravidlo 3: vlastni prvky/diagramy teto session (jen s platnou politikou a klicem) ---
 var ownLow = (polValid && pol.ownSessionLow === true);
 var ownSet = (ownLow && self._fbOwnGuids && typeof self._fbOwnGuids == "object") ? self._fbOwnGuids : null;
@@ -110,11 +123,11 @@ try {
     var blc = this.FB_BaselineConfig(Repository);
     if (blc && blc.valid === false) {
         blValid = false;
-        elevate("Baseline politika nevalidni (" + blc.why + ") - fail-closed W14: zadny auto-write");
+        elevate("Baseline politika nevalidni (" + blc.why + ") - fail-closed W14: zadny auto-write", "BASELINE_POLICY_INVALID", { why: "" + blc.why });
     }
 } catch (eBlc) {
     blValid = false;
-    elevate("FB_BaselineConfig selhal: " + eBlc.message + " - fail-closed W14");
+    elevate("FB_BaselineConfig selhal: " + eBlc.message + " - fail-closed W14", "BASELINE_POLICY_INVALID", { why: "" + eBlc.message });
 }
 var budget = (polValid && typeof pol.budgetMs == "number") ? pol.budgetMs : 8000;
 var budgetHit = false;
@@ -137,16 +150,16 @@ try {
 function guardRaw(ref, ctx) {
     var u = ("" + ref).replace(/^\s+|\s+$/g, "").toUpperCase();
     if (u == "") { return; }
-    if (PROT[u] == 1) { block("Target '" + ref + "' (" + ctx + ") = konfiguracni element bridge - BLOCKED (B4)"); return; }
-    if (bridgeGuid != "" && u == bridgeGuid) { block("Target " + ref + " (" + ctx + ") = element AICodeBridge - BLOCKED (B4)"); return; }
-    if (bridgeId >= 0 && /^[0-9]+$/.test(u) && parseInt(u, 10) == bridgeId) { block("Target " + ref + " (" + ctx + ") = element AICodeBridge - BLOCKED (B4)"); }
+    if (PROT[u] == 1) { block("Target '" + ref + "' (" + ctx + ") = konfiguracni element bridge - BLOCKED (B4)", "CONFIG_TARGET", { ref: "" + ref, ctx: ctx }); return; }
+    if (bridgeGuid != "" && u == bridgeGuid) { block("Target " + ref + " (" + ctx + ") = element AICodeBridge - BLOCKED (B4)", "CONFIG_TARGET", { ref: "AICodeBridge", ctx: ctx }); return; }
+    if (bridgeId >= 0 && /^[0-9]+$/.test(u) && parseInt(u, 10) == bridgeId) { block("Target " + ref + " (" + ctx + ") = element AICodeBridge - BLOCKED (B4)", "CONFIG_TARGET", { ref: "AICodeBridge", ctx: ctx }); }
 }
 function guardResolved(res, ctx) {
     if (res == null) { return; }
     if (PROT[("" + res.name).toUpperCase()] == 1
         || (bridgeGuid != "" && ("" + res.guid).toUpperCase() == bridgeGuid)
         || (bridgeId >= 0 && res.id == bridgeId)) {
-        block("Target '" + res.name + "' (" + ctx + ") = konfiguracni element bridge - BLOCKED (B4)");
+        block("Target '" + res.name + "' (" + ctx + ") = konfiguracni element bridge - BLOCKED (B4)", "CONFIG_TARGET", { ref: "" + res.name, ctx: ctx });
     }
 }
 
@@ -181,13 +194,86 @@ function addEl(k) { if (elSet[k] != 1) { elSet[k] = 1; elCount++; } }
 function addPkg(k) { if (pkgSet[k] != 1) { pkgSet[k] = 1; pkgCount++; } }
 function addForeignDgm(k) { if (dgmSet[k] != 1) { dgmSet[k] = 1; dgmCount++; } }
 // --- souhrn pro potvrzovaci UI (V2, I6: dialog zobrazuje konkretni davku) ---
-var opCounts = {}, tgtNames = [], pkgNames = [], dgmNames = [], nameSeen = {};
+var opCounts = {}, tgtNames = [], pkgNames = [], dgmNames = [], nameSeen = {}, nameMore = { e: 0, p: 0, d: 0 };
+// v0.19: inDelete = dotyk cile z delete_from_model -> jmeno NEJDE do targets
+// (ostatni zmeny), ale do summary.deletes se skutecnym rozsahem (FB-PU-20)
+var inDelete = false;
+var actions = [], curAct = null;
+function actAdd(field, nm) {
+    if (curAct == null || nm === null || typeof nm == "undefined" || ("" + nm) == "") { return; }
+    var arr = curAct[field];
+    for (var ai = 0; ai < arr.length; ai++) { if (arr[ai] == ("" + nm)) { return; } }
+    if (arr.length < 12) { arr.push("" + nm); } else { curAct[field + "More"] = (curAct[field + "More"] || 0) + 1; }
+}
 function pushName(arr, prefix, nm) {
+    if (inDelete) { return; }
     var k = prefix + ":" + nm;
     if (nameSeen[k] == 1) { return; }
     nameSeen[k] = 1;
     if (arr.length < 12) { arr.push("" + nm); }
-    else if (arr.length == 12) { arr.push("..."); }
+    else { nameMore[prefix]++; if (arr.length == 12) { arr.push("..."); } }
+}
+// --- co se SMAZE: druh + skutecny rozsah (FB-PU-20 a, c; pravidlo 4) ---
+var deletes = [];
+function fullPath(kind, id, nm) {
+    var pth = "";
+    try { pth = "" + self.FB_ElementPath(Repository, kind, id); } catch (ePth) { pth = ""; }
+    if (pth == "" || pth == "?") { pth = ""; }
+    return pth;
+}
+function addDelete(d) { if (deletes.length < 40) { deletes.push(d); } else { deletes[39].more = (deletes[39].more || 0) + 1; } }
+function deleteScopePackage(res) {
+    // rozsah balicku = podstrom (FB_SubtreeCount; best-effort, kratky rozpocet)
+    var d = { kind: "package", name: "" + res.name, path: fullPath("package", res.id, res.name), scopeKnown: false };
+    try {
+        var sc = self.FB_SubtreeCount(Repository, res.id, { probeBudgetMs: 1500, withDiagrams: true }, 1500);
+        if (sc && sc.status == "ok") { d.scopeKnown = true; d.elements = sc.elements; d.diagrams = sc.diagrams; d.packages = (sc.packages > 0 ? sc.packages - 1 : 0); }
+    } catch (eSc) { }
+    addDelete(d);
+}
+function deleteScopeElement(res) {
+    var d = { kind: "element", name: "" + res.name, type: "" + (res.type || ""), path: fullPath("element", res.id, res.name), scopeKnown: true, children: 0 };
+    try {
+        var cr = self.FB_XmlRows(Repository.SQLQuery("SELECT COUNT(*) AS c FROM t_object WHERE ParentID = " + parseInt(res.id, 10)));
+        if (cr.length == 1) { d.children = parseInt(cr[0].c, 10) || 0; } else { d.scopeKnown = false; }
+    } catch (eCh) { d.scopeKnown = false; }
+    addDelete(d);
+}
+function deleteScopeConnector(ref) {
+    var d = { kind: "connector", ref: "" + ref, label: "", scopeKnown: false };
+    try {
+        var cn = (("" + ref).charAt(0) == "{") ? Repository.GetConnectorByGuid("" + ref) : Repository.GetConnectorByID(parseInt(ref, 10));
+        if (cn) {
+            var a = null, b = null;
+            try { a = Repository.GetElementByID(cn.ClientID); } catch (eA) { a = null; }
+            try { b = Repository.GetElementByID(cn.SupplierID); } catch (eB) { b = null; }
+            d.type = "" + (cn.Type || ""); d.name = "" + (cn.Name || "");
+            d.label = (a ? "" + a.Name : "?") + " -> " + (b ? "" + b.Name : "?");
+            d.scopeKnown = true;
+            if (a) { addEl("" + a.ElementGUID); }
+        }
+    } catch (eCn) { }
+    addDelete(d);
+}
+function deleteScopeOwned(kind, ref, opName) {
+    // atribut / operace / parametr: "Trida.x" pres vlastnika (SQL jen cteni)
+    var d = { kind: kind, ref: "" + ref, label: "", scopeKnown: false };
+    try {
+        var tbl = (kind == "attribute") ? "t_attribute" : "t_operation";
+        var idc = (kind == "attribute") ? "ID" : "OperationID";
+        var rr = self.FB_XmlRows(Repository.SQLQuery("SELECT Object_ID, Name FROM " + tbl + " WHERE " + idc + " = " + parseInt(ref, 10)));
+        if (rr.length == 1) {
+            var ow = null;
+            try { ow = Repository.GetElementByID(parseInt(rr[0].Object_ID, 10)); } catch (eOw) { ow = null; }
+            d.name = "" + (rr[0].Name || "");
+            d.owner = ow ? "" + ow.Name : "";
+            d.label = (ow ? "" + ow.Name : "?") + "." + (d.name != "" ? d.name : ("id " + ref));
+            if (kind == "parameter" && opName) { d.label += "(" + opName + ")"; }
+            d.scopeKnown = true;
+            if (ow) { addEl("" + ow.ElementGUID); }
+        }
+    } catch (eAt) { }
+    addDelete(d);
 }
 // --- PLNE TECKOVE CESTY mazanych / presouvanych cilu (nalez Milose
 // 2026-08-31, E2E T7-05 "MLA": dialog neukazal, KDE prvek lezi). Stejny
@@ -195,6 +281,7 @@ function pushName(arr, prefix, nm) {
 // delete_from_model + move_elements (zasahy do struktury); best-effort,
 // nikdy nespadne - je to popisek pro cloveka. Do summary.paths.
 var tgtPaths = [], pathSeen = {};
+function pushPathDel(kind, id, nm) { var keep = inDelete; inDelete = false; pushPath(kind, id, nm); inDelete = keep; }
 function pushPath(kind, id, nm) {
     if (!id || id <= 0) { return; }
     var k = kind + ":" + id;
@@ -258,14 +345,15 @@ function classifyDollar(m) {
 // countUpdate: pocitat updatedExisting; addPackages: pocitat package targetu
 function touchElement(ref, ctx, countUpdate, addPackages) {
     if (ref === null || typeof ref == "undefined" || ("" + ref) == "") {
-        elevate("Chybejici target (" + ctx + ") - fail-closed");
+        elevate("Chybejici target (" + ctx + ") - fail-closed", "TARGET_MISSING", { ctx: ctx });
         return { own: false };
     }
     var m = refRe.exec("" + ref);
     if (m) {
         var kind = classifyDollar(m);
+        actAdd("targets", "" + ref);
         if (kind == "OWN") { return { own: true }; }
-        if (kind == "UNCERTAIN") { elevate("$N reference '" + ref + "' (" + ctx + ") s nejistym puvodem - fail-closed B3"); }
+        if (kind == "UNCERTAIN") { elevate("$N reference '" + ref + "' (" + ctx + ") s nejistym puvodem - fail-closed B3", "REF_UNCERTAIN", { ref: "" + ref, ctx: ctx }); }
         if (countUpdate) { updatedExisting++; }
         addEl("$:" + ref); // identita znama az za behu; package se nezapocita (viz hlavicka)
         return { own: false };
@@ -274,14 +362,15 @@ function touchElement(ref, ctx, countUpdate, addPackages) {
     var res = resolveElement(ref);
     if (res == "BUDGET") { return { own: false }; }
     if (res == null) {
-        elevate("Neresolvovatelny target '" + ref + "' (" + ctx + ") - fail-closed");
+        elevate("Neresolvovatelny target '" + ref + "' (" + ctx + ") - fail-closed", "TARGET_UNRESOLVED", { ref: "" + ref, ctx: ctx });
         if (countUpdate) { updatedExisting++; }
         return { own: false };
     }
     guardResolved(res, ctx);
     addEl(res.guid);
+    actAdd("targets", res.name);
     pushName(tgtNames, "e", res.name);
-    if (!(("" + ref).charAt(0) == "{" || /^[0-9]+$/.test("" + ref))) { pushPath("element", res.id, res.name); } // cil jmenem: plna cesta v okne (FB-CZ-18)
+    if (!inDelete && !(("" + ref).charAt(0) == "{" || /^[0-9]+$/.test("" + ref))) { pushPath("element", res.id, res.name); } // cil jmenem: plna cesta v okne (FB-CZ-18)
     if (addPackages && res.pkgId > 0) { addPkg("p" + res.pkgId); }
     if (countUpdate) { updatedExisting++; }
     // pravidlo 3: prvek zalozeny touto session pumpy = vlastni (metriky
@@ -290,14 +379,15 @@ function touchElement(ref, ctx, countUpdate, addPackages) {
 }
 function touchPackage(ref, ctx, countUpdate) {
     if (ref === null || typeof ref == "undefined" || ("" + ref) == "") {
-        elevate("Chybejici package (" + ctx + ") - fail-closed");
+        elevate("Chybejici package (" + ctx + ") - fail-closed", "TARGET_MISSING", { ctx: ctx });
         return;
     }
     var m = refRe.exec("" + ref);
     if (m) {
         var kind = classifyDollar(m);
+        actAdd("packages", "" + ref);
         if (kind == "OWN") { return; } // zapis do package vytvoreneho touto davkou
-        if (kind == "UNCERTAIN") { elevate("$N reference '" + ref + "' (" + ctx + ") s nejistym puvodem - fail-closed B3"); }
+        if (kind == "UNCERTAIN") { elevate("$N reference '" + ref + "' (" + ctx + ") s nejistym puvodem - fail-closed B3", "REF_UNCERTAIN", { ref: "" + ref, ctx: ctx }); }
         if (countUpdate) { updatedExisting++; }
         addPkg("$:" + ref);
         return;
@@ -306,37 +396,40 @@ function touchPackage(ref, ctx, countUpdate) {
     var res = resolvePackage(ref);
     if (res == "BUDGET") { return; }
     var lbl = (ref !== null && typeof ref == "object" && ref.path) ? ("path " + ref.path.join(".") + (ref.from ? " od " + ref.from : "")) : ("" + ref);
-    if (res == null) { elevate("Neresolvovatelny package '" + lbl + "' (" + ctx + ") - fail-closed"); return; }
-    if (PROT[("" + res.name).toUpperCase()] == 1) { block("Target package '" + res.name + "' (" + ctx + ") = konfiguracni jmeno bridge - BLOCKED (B4)"); }
+    if (res == null) { elevate("Neresolvovatelny package '" + lbl + "' (" + ctx + ") - fail-closed", "TARGET_UNRESOLVED", { ref: lbl, ctx: ctx }); return; }
+    if (PROT[("" + res.name).toUpperCase()] == 1) { block("Target package '" + res.name + "' (" + ctx + ") = konfiguracni jmeno bridge - BLOCKED (B4)", "CONFIG_TARGET", { ref: "" + res.name, ctx: ctx }); }
     if (countUpdate) { updatedExisting++; }
     addPkg("p" + res.id);
+    actAdd("packages", res.name);
     pushName(pkgNames, "p", res.name);
     // cil zadany cestou nebo jmenem: okno ukaze plnou cestu (cil zapisu FB-CZ-18)
     var byPathOrName = (ref !== null && typeof ref == "object") || !(("" + ref).charAt(0) == "{" || /^[0-9]+$/.test("" + ref));
-    if (byPathOrName) { pushPath("package", res.id, res.name); }
+    if (byPathOrName && !inDelete) { pushPath("package", res.id, res.name); }
     return { res: res };
 }
 // vraci { own: bool } - cizi (ne-vlastni) diagram jde do foreignDiagrams
 function touchDiagram(ref, ctx) {
     if (ref === null || typeof ref == "undefined" || ("" + ref) == "") {
-        elevate("Chybejici diagram (" + ctx + ") - fail-closed");
+        elevate("Chybejici diagram (" + ctx + ") - fail-closed", "TARGET_MISSING", { ctx: ctx });
         return { own: false };
     }
     var m = refRe.exec("" + ref);
     if (m) {
         var kind = classifyDollar(m);
+        actAdd("diagrams", "" + ref);
         if (kind == "OWN") { return { own: true }; }
-        if (kind == "UNCERTAIN") { elevate("$N reference '" + ref + "' (" + ctx + ") s nejistym puvodem - fail-closed B3"); }
+        if (kind == "UNCERTAIN") { elevate("$N reference '" + ref + "' (" + ctx + ") s nejistym puvodem - fail-closed B3", "REF_UNCERTAIN", { ref: "" + ref, ctx: ctx }); }
         addForeignDgm("$:" + ref);
         return { own: false };
     }
     var res = resolveDiagram(ref);
     if (res == "BUDGET") { return { own: false }; }
     if (res == null) {
-        elevate("Neresolvovatelny diagram '" + ref + "' (" + ctx + ") - fail-closed");
+        elevate("Neresolvovatelny diagram '" + ref + "' (" + ctx + ") - fail-closed", "TARGET_UNRESOLVED", { ref: "" + ref, ctx: ctx });
         addForeignDgm("?:" + ref);
         return { own: false };
     }
+    actAdd("diagrams", res.name);
     if (isOwn(res.guid)) {
         // pravidlo 3: diagram zalozeny touto session pumpy neni cizi
         pushName(dgmNames, "d", res.name);
@@ -352,7 +445,7 @@ function touchDiagram(ref, ctx) {
 // --- W8: prvni zapisova davka po vyjimce/zotaveni predchozi davky ---
 try {
     if (this._fbPrevExc === true) {
-        elevate("Predchozi davka skoncila vyjimkou/zotavenim - prvni zapisova davka jde ELEVATED (W8)");
+        elevate("Predchozi davka skoncila vyjimkou/zotavenim - prvni zapisova davka jde ELEVATED (W8)", "PREV_EXCEPTION", {});
     }
 } catch (eW8) { }
 
@@ -363,51 +456,61 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
     var o = req.ops[opIndex];
     var name = "" + (o && o.op ? o.op : "?");
     var rg = reg[name];
+    inDelete = false; curAct = null;
     if (!rg) {
         writeOps++;
-        elevate("Neznama operace '" + name + "' - fail-closed (exekuci zastavi E_UNKNOWN_OP)");
+        elevate("Neznama operace '" + name + "' - fail-closed (exekuci zastavi E_UNKNOWN_OP)", "UNKNOWN_OP", { op: name });
+        actions.push({ op: name, unknown: true, items: 0, targets: [], packages: [], diagrams: [], pairs: [] });
         continue;
     }
     if (!rg.w) { continue; } // cteci operace mimo gate
     opCounts[name] = (opCounts[name] ? opCounts[name] + 1 : 1); // souhrn UI
+    // akce pro okno: jedna polozka per operace (stejne op za sebou se slucuji)
+    curAct = null;
+    for (var ax = 0; ax < actions.length; ax++) { if (actions[ax].op == name && !actions[ax].unknown) { curAct = actions[ax]; break; } }
+    if (curAct == null) { curAct = { op: name, items: 0, create: 0, update: 0, targets: [], packages: [], diagrams: [], pairs: [] }; actions.push(curAct); }
+    inDelete = (name == "delete_from_model" || name == "delete_taggedvalue_from_model");
     // pravidlo 3: u scenarios/constraints/requirements se trida ELEVATED
     // uplatni az podle cile (vlastni prvek teze session = bez eskalace)
     var ownClassDefer = false;
     if (polValid) {
         var klass = pol.classes[name];
-        if (klass == "BLOCKED") { block("Operace '" + name + "' je politikou klasifikovana BLOCKED"); }
+        if (klass == "BLOCKED") { block("Operace '" + name + "' je politikou klasifikovana BLOCKED", "CLASS_BLOCKED", { op: name }); }
         else if (klass == "ELEVATED") {
             if (ownSet != null && (name == "create_or_update_scenarios" || name == "create_or_update_constraints" || name == "create_or_update_requirements")) {
                 ownClassDefer = true;
             } else {
-                elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED");
+                elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED", "CLASS_ELEVATED", { op: name });
             }
         }
     }
     var j, lst;
     if (name == "create_element") {
-        writeOps++; createOps++;
+        writeOps++; createOps++; curAct.items++; curAct.create++;
+        if (o.name) { actAdd("targets", o.name); }
         if (o.name) { guardRaw(o.name, "create_element.name"); }
         touchPackage(o["package"], "create_element.package", false);
     } else if (name == "create_or_update_elements") {
         lst = o.elements || [];
-        if (lst.length == 0) { elevate("create_or_update_elements bez elements - E_ARGS pri exekuci"); }
+        if (lst.length == 0) { elevate("create_or_update_elements bez elements - E_ARGS pri exekuci", "EMPTY_LIST", { op: name }); }
         for (j = 0; j < lst.length; j++) {
             var e = lst[j] || {};
-            writeOps++;
+            writeOps++; curAct.items++;
             if (e.guid || e.elementID) {
+                curAct.update++;
                 var tr = touchElement(e.guid || e.elementID, "elements[" + j + "]", true, true);
                 if (e.type) {
                     if (tr.res) {
                         if (("" + tr.res.type) != ("" + e.type)) {
-                            elevate("Update elementu se zmenou type ('" + tr.res.type + "' -> '" + e.type + "') - W2b");
+                            elevate("Update elementu se zmenou type ('" + tr.res.type + "' -> '" + e.type + "') - W2b", "TYPE_CHANGE", { from: "" + tr.res.type, to: "" + e.type, target: "" + tr.res.name });
                         }
                     } else if (!tr.own) {
-                        elevate("Update s polem type bez moznosti porovnat typ - fail-closed W2b");
+                        elevate("Update s polem type bez moznosti porovnat typ - fail-closed W2b", "TYPE_UNVERIFIED", {});
                     }
                 }
             } else {
-                createOps++;
+                createOps++; curAct.create++;
+                if (typeof e.name != "undefined" && e.name !== null && ("" + e.name) != "") { actAdd("targets", e.name); }
                 if (e.matchByName || e.dedupKey) { updatedExisting++; updatedExistingApprox++; } // konzervativne: muze byt UPDATE
                 if (typeof e.name != "undefined" && e.name !== null && ("" + e.name) != "") {
                     guardRaw(e.name, "elements[" + j + "].name");
@@ -420,46 +523,50 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         lst = (o.packages && Object.prototype.toString.call(o.packages) == "[object Array]") ? o.packages : [o];
         for (j = 0; j < lst.length; j++) {
             var p = lst[j] || {};
-            writeOps++;
+            writeOps++; curAct.items++;
             if (p.guid || p.packageID) {
+                curAct.update++;
                 touchPackage(p.guid || p.packageID, "packages[" + j + "]", true);
             } else {
-                createOps++;
+                createOps++; curAct.create++;
                 if (p.matchByName) { updatedExisting++; updatedExistingApprox++; }
-                if (p.name) { guardRaw(p.name, "packages[" + j + "].name"); }
+                if (p.name) { guardRaw(p.name, "packages[" + j + "].name"); actAdd("targets", p.name); }
                 var tpr = touchPackage(p.parent, "packages[" + j + "].parent", false);
                 // cil zapisu kap. 5.3 krok 4 (B1, O5 = a): koren modelu je chraneny jako
                 // uzel - novy balicek primo pod korenem = duvod okna (ELEVATED)
                 if (tpr && tpr.res && tpr.res.parentId === 0) {
-                    elevate("Novy balicek '" + (p.name || "?") + "' primo pod korenem modelu '" + tpr.res.name + "' (packages[" + j + "].parent) - struktura nejvyssi urovne, vyzaduje potvrzeni");
+                    elevate("Novy balicek '" + (p.name || "?") + "' primo pod korenem modelu '" + tpr.res.name + "' (packages[" + j + "].parent) - struktura nejvyssi urovne, vyzaduje potvrzeni", "ROOT_PACKAGE", { name: "" + (p.name || "?"), root: "" + tpr.res.name });
                 }
             }
         }
     } else if (name == "create_or_update_connectors") {
         lst = o.connectors || [];
-        if (lst.length == 0) { elevate("create_or_update_connectors bez connectors - E_ARGS pri exekuci"); }
+        if (lst.length == 0) { elevate("create_or_update_connectors bez connectors - E_ARGS pri exekuci", "EMPTY_LIST", { op: name }); }
         for (j = 0; j < lst.length; j++) {
             var c = lst[j] || {};
-            writeOps++;
+            writeOps++; curAct.items++;
             if (c.guid || c.connectorID) {
-                updatedExisting++;
+                updatedExisting++; curAct.update++;
                 addEl("conn:" + (c.guid || c.connectorID));
             } else {
-                createOps++;
+                createOps++; curAct.create++;
                 if (c.match || c.dedupKey) { updatedExisting++; updatedExistingApprox++; }
-                touchElement(c.source, "connectors[" + j + "].source", false, false);
-                touchElement(c.target, "connectors[" + j + "].target", false, false);
+                var tcs = touchElement(c.source, "connectors[" + j + "].source", false, false);
+                var tct = touchElement(c.target, "connectors[" + j + "].target", false, false);
+                if (curAct.pairs.length < 12) {
+                    curAct.pairs.push(((tcs && tcs.res) ? tcs.res.name : ("" + c.source)) + " -> " + ((tct && tct.res) ? tct.res.name : ("" + c.target)) + (c.type ? " (" + c.type + ")" : ""));
+                } else { curAct.pairsMore = (curAct.pairsMore || 0) + 1; }
             }
         }
     } else if (name == "create_or_update_attributes" || name == "create_or_update_operations") {
         lst = (name == "create_or_update_attributes" ? o.attributes : o.operations) || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         touchElement(o.element, name + ".element", true, true);
         if (name == "create_or_update_operations") {
             for (j = 0; j < lst.length; j++) {
                 var oo = lst[j] || {};
                 if (oo.parameters && Object.prototype.toString.call(oo.parameters) == "[object Array]" && oo.parameters.length > 0) {
-                    elevate("create_or_update_operations s parameters = deterministicky rebuild parametru - W2a");
+                    elevate("create_or_update_operations s parameters = deterministicky rebuild parametru - W2a", "OPS_PARAMS", {});
                     break;
                 }
             }
@@ -467,45 +574,60 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
     } else if (name == "create_or_update_messages") {
         touchDiagram(o.diagram, "messages.diagram");
         lst = o.messages || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         for (j = 0; j < lst.length; j++) {
             var mg = lst[j] || {};
             if (mg.source) { touchElement(mg.source, "messages[" + j + "].source", false, false); }
             if (mg.target) { touchElement(mg.target, "messages[" + j + "].target", false, false); }
         }
         if (o.rebuild === true || o.rebuild === "true") {
-            elevate("create_or_update_messages s rebuild:true - V2d rebuild maze Sequence konektory diagramu");
+            elevate("create_or_update_messages s rebuild:true - V2d rebuild maze Sequence konektory diagramu", "MSG_REBUILD", {}); curAct.rebuild = true;
         }
     } else if (name == "delete_from_model") {
         lst = o.targets || [];
         for (j = 0; j < lst.length; j++) {
             var dt = lst[j] || {};
-            deleteTargets++; writeOps++;
+            deleteTargets++; writeOps++; curAct.items++;
             var dty = ("" + (dt.type || "")).toUpperCase();
             var dref = dt.guid || dt.id;
             if (dty == "ELEMENT") {
                 var tde = touchElement(dref, "delete.targets[" + j + "]", false, true);
-                if (tde && tde.res) { pushPath("element", tde.res.id, tde.res.name); }
+                if (tde && tde.res) { pushPathDel("element", tde.res.id, tde.res.name); deleteScopeElement(tde.res); }
+                else if (checkBudget()) { addDelete({ kind: "element", ref: "" + dref, scopeKnown: false }); }
+                else if (!(tde && tde.own)) { addDelete({ kind: "element", ref: "" + dref, scopeKnown: false, unresolved: true }); }
             } else if (dty == "PACKAGE") {
                 var tdp = touchPackage(dref, "delete.targets[" + j + "]", false);
-                if (tdp && tdp.res) { pushPath("package", tdp.res.id, tdp.res.name); }
+                if (tdp && tdp.res) { pushPathDel("package", tdp.res.id, tdp.res.name); deleteScopePackage(tdp.res); }
+                else { addDelete({ kind: "package", ref: "" + dref, scopeKnown: false, unresolved: true }); }
             }
-            else if (dty == "DIAGRAM") { touchDiagram(dref, "delete.targets[" + j + "]"); }
-            else if (typeof dref != "undefined" && dref !== null) { guardRaw(dref, "delete.targets[" + j + "]"); }
+            else if (dty == "DIAGRAM") {
+                var tdd = touchDiagram(dref, "delete.targets[" + j + "]");
+                if (tdd && tdd.res) { addDelete({ kind: "diagram", name: "" + tdd.res.name, path: fullPath("diagram", tdd.res.id, tdd.res.name), scopeKnown: true }); }
+                else { addDelete({ kind: "diagram", ref: "" + dref, scopeKnown: false, unresolved: !(tdd && tdd.own) }); }
+            }
+            else if (dty == "CONNECTOR") { if (typeof dref != "undefined" && dref !== null) { guardRaw(dref, "delete.targets[" + j + "]"); } deleteScopeConnector(dref); }
+            else if (dty == "ATTRIBUTE") { deleteScopeOwned("attribute", dref, ""); }
+            else if (dty == "OPERATION") { deleteScopeOwned("operation", dref, ""); }
+            else if (dty == "PARAMETER") { deleteScopeOwned("parameter", dref, "" + (dt.name || "")); }
+            else if (typeof dref != "undefined" && dref !== null) { guardRaw(dref, "delete.targets[" + j + "]"); addDelete({ kind: ("" + (dt.type || "?")).toLowerCase(), ref: "" + dref, scopeKnown: false }); }
+            else { addDelete({ kind: ("" + (dt.type || "?")).toLowerCase(), ref: "", scopeKnown: false }); }
         }
-        if (lst.length == 0) { elevate("delete_from_model bez targets - E_ARGS pri exekuci"); }
+        if (lst.length == 0) { elevate("delete_from_model bez targets - E_ARGS pri exekuci", "EMPTY_LIST", { op: name }); }
     } else if (name == "delete_taggedvalue_from_model") {
         lst = o.targets || [];
         deleteTargets += (lst.length > 0 ? lst.length : 1);
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         for (j = 0; j < lst.length; j++) {
             var dtv = lst[j] || {};
             if (dtv.guid || dtv.id) { guardRaw(dtv.guid || dtv.id, "deleteTag.targets[" + j + "]"); }
+            var tvOwner = "";
+            try { if (dtv.guid || dtv.id) { var tvr = resolveElement(dtv.guid || dtv.id); if (tvr && tvr != "BUDGET") { tvOwner = "" + tvr.name; } } } catch (eTv) { }
+            addDelete({ kind: "tag", name: "" + (dtv.name || ""), owner: tvOwner, label: (tvOwner != "" ? tvOwner + "." : "") + (dtv.name || "?") + (dtv.type ? " (" + dtv.type + ")" : ""), scopeKnown: (tvOwner != "") });
         }
     } else if (name == "remove_elements_from_diagram") {
         touchDiagram(o.diagram, "removeFromDiagram.diagram");
         lst = o.elementIDs || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         for (j = 0; j < lst.length; j++) { touchElement(lst[j], "removeFromDiagram.elementIDs[" + j + "]", false, false); }
     } else if (name == "create_baseline") {
         writeOps++;
@@ -515,19 +637,21 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         var bnRes = false;
         try { bnRes = (typeof o.name != "undefined" && o.name !== null && self.FB_BaselineNameReserved(Repository, "" + o.name) === true); }
         catch (eBn) { bnRes = true; } // nejistota = fail-closed
-        if (bnRes) { elevate("create_baseline se jmenem v rezervovanem prostoru automatickych baselines (prefix FB-AUTO) - B4; exekuce odmitne E_ARGS"); }
+        curAct.items++; if (o.name) { actAdd("targets", o.name); }
+        if (bnRes) { elevate("create_baseline se jmenem v rezervovanem prostoru automatickych baselines (prefix FB-AUTO) - B4; exekuce odmitne E_ARGS", "BASELINE_RESERVED", { name: "" + o.name }); }
     } else if (name == "clone_package") {
-        writeOps++; createOps++;
-        addReason("clone_package: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)");
+        writeOps++; createOps++; curAct.items++;
+        addReason("clone_package: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)", "CLONE_VOLUME", { op: name });
     } else if (name == "clone_elements") {
         lst = o.elements || [];
         writeOps += (lst.length > 0 ? lst.length : 1);
         createOps += (lst.length > 0 ? lst.length : 1);
+        curAct.items += lst.length;
         touchPackage(o["package"], "cloneElements.package", false);
-        addReason("clone_elements: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)");
+        addReason("clone_elements: objem klonu je znamy az pri exekuci (vykazan ve volume; kvotu kryje potvrzeni ELEVATED - migrace E_QUOTA par. 6.4)", "CLONE_VOLUME", { op: name });
     } else if (name == "import_element_linked_documents") {
         lst = o.documents || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         for (j = 0; j < lst.length; j++) {
             var dd = lst[j] || {};
             touchElement(dd.element, "importDocs.documents[" + j + "]", true, true);
@@ -537,36 +661,38 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         touchDiagram(o.diagram, "layoutConnectors.diagram");
     } else if (name == "change_connector_visibility") {
         lst = o.connectorIDs || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         touchDiagram(o.diagram, "connectorVisibility.diagram");
     } else if (name == "update_diagram_properties") {
         lst = o.diagrams || [];
-        if (lst.length == 0) { elevate("update_diagram_properties bez diagrams - E_ARGS pri exekuci"); }
+        if (lst.length == 0) { elevate("update_diagram_properties bez diagrams - E_ARGS pri exekuci", "EMPTY_LIST", { op: name }); }
         for (j = 0; j < lst.length; j++) {
             var ud = lst[j] || {};
-            writeOps++;
+            writeOps++; curAct.items++;
             var tdu = touchDiagram(ud.diagram, "diagramProps.diagrams[" + j + "]");
             if (!tdu.own) { updatedExisting++; }
         }
     } else if (name == "set_diagram_object_style") {
         lst = o.objects || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         touchDiagram(o.diagram, "objectStyle.diagram");
     } else if (name == "create_or_update_diagram") {
         lst = o.diagrams || [];
-        if (lst.length == 0) { elevate("create_or_update_diagram bez diagrams - E_ARGS pri exekuci"); }
+        if (lst.length == 0) { elevate("create_or_update_diagram bez diagrams - E_ARGS pri exekuci", "EMPTY_LIST", { op: name }); }
         for (j = 0; j < lst.length; j++) {
             var dg = lst[j] || {};
-            writeOps++;
+            writeOps++; curAct.items++;
             // FB_OpDiagram bere UPDATE vetev pres diagram | diagramID | guid -
             // cteni jen `diagram` delalo z updatu ciziho diagramu "create"
             // (nalez H1 oponentury Baseline politiky 2026-09-20)
             var dgRef = dg.diagram || dg.diagramID || dg.guid;
             if (dgRef) {
                 var tdg = touchDiagram(dgRef, "diagram.diagrams[" + j + "]");
+                curAct.update++;
                 if (!tdg.own) { updatedExisting++; }
             } else {
-                createOps++;
+                createOps++; curAct.create++;
+                if (dg.name) { actAdd("targets", dg.name); }
                 if (dg.owningElement) { touchElement(dg.owningElement, "diagram.diagrams[" + j + "].owningElement", false, true); }
                 else { touchPackage(dg["package"], "diagram.diagrams[" + j + "].package", false); }
             }
@@ -574,7 +700,7 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
     } else if (name == "place_elements_on_diagram") {
         touchDiagram(o.diagram, "place.diagram");
         lst = o.elementPlacements || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         for (j = 0; j < lst.length; j++) {
             var pl = lst[j] || {};
             touchElement(pl.element || pl.elementID, "place.elementPlacements[" + j + "]", false, false);
@@ -582,8 +708,8 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
     } else if (name == "move_elements") {
         // presun = zapis do ZDROJOVE i CILOVE vetve; oba packages se pocitaji
         lst = o.elements || [];
-        if (lst.length == 0) { elevate("move_elements bez elements - E_ARGS pri exekuci"); }
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        if (lst.length == 0) { elevate("move_elements bez elements - E_ARGS pri exekuci", "EMPTY_LIST", { op: name }); }
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         moveOps += (lst.length > 0 ? lst.length : 1);
         for (j = 0; j < lst.length; j++) {
             var mv = lst[j];
@@ -605,24 +731,24 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
                || name == "create_or_update_requirements") {
         lst = (name == "create_or_update_scenarios" ? o.scenarios
               : (name == "create_or_update_constraints" ? o.constraints : o.requirements)) || [];
-        writeOps += (lst.length > 0 ? lst.length : 1);
+        writeOps += (lst.length > 0 ? lst.length : 1); curAct.items += lst.length;
         var tsc = touchElement(o.element, name + ".element", true, true);
         if (ownClassDefer) {
             if (tsc && tsc.own) {
-                addReason("Operace '" + name + "' nad prvkem zalozenym touto session - bez okna (pravidlo 3, ownSessionLow)");
+                addReason("Operace '" + name + "' nad prvkem zalozenym touto session - bez okna (pravidlo 3, ownSessionLow)", "OWN_SESSION", { op: name });
             } else {
-                elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED (cizi prvek - prepis existujiciho obsahu)");
+                elevate("Operace '" + name + "' je politikou klasifikovana ELEVATED (cizi prvek - prepis existujiciho obsahu)", "CLASS_ELEVATED_FOREIGN", { op: name, target: (tsc && tsc.res) ? "" + tsc.res.name : "" });
             }
         }
     } else if (name == "apply_classifier_stereotypes") {
-        writeOps++;
+        writeOps++; curAct.items++;
         touchDiagram(o.diagram, "classifierStereotypes.diagram");
         lst = o.elementIDs || [];
         for (j = 0; j < lst.length; j++) { touchElement(lst[j], "classifierStereotypes.elementIDs[" + j + "]", false, false); }
     } else if (name == "find_or_create_referencing_sr") {
         // deklarovany objem scaffoldu: 1 pkg + 4 diagramy + 4 elementy + 3 vazby
         // (worst case; found=true vetev nezapisuje nic - fail-closed nadpocet)
-        writeOps += 12; createOps += 12;
+        writeOps += 12; createOps += 12; curAct.items++; curAct.create++;
         var tp = o.targetPackage;
         if (!tp) {
             try {
@@ -634,30 +760,41 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
             } catch (eSc) { tp = null; }
         }
         if (tp) { touchPackage(tp, "scaffold.targetPackage", false); }
-        else { elevate("find_or_create_referencing_sr bez targetPackage a bez FB_ScaffoldConfig - cil neznamy (fail-closed)"); }
+        else { elevate("find_or_create_referencing_sr bez targetPackage a bez FB_ScaffoldConfig - cil neznamy (fail-closed)", "TARGET_MISSING", { ctx: "scaffold.targetPackage" }); }
     } else if (name == "deploy_src") {
-        writeOps++;
+        writeOps++; curAct.items++;
+        // N-E2E-1: okno rekne "nasazeni kodu: N operaci" - pocet souboru src\ (best-effort, jen cteni slozky)
+        try {
+            var cfgD = self.FB_Config(), ridD = ("" + self.FB_RepoId(Repository)).toUpperCase(), srcDirD = "";
+            for (var cdi = 0; cdi < cfgD.length; cdi++) { if (ridD.indexOf(("" + cfgD[cdi].repo).toUpperCase()) >= 0) { srcDirD = "" + (cfgD[cdi].srcDir || ""); break; } }
+            if (srcDirD != "" && typeof Enumerator != "undefined") {
+                var fsoD2 = self.FB_ComObj("Scripting.FileSystemObject");
+                var fdD = fsoD2.GetFolder(srcDirD), fcD = new Enumerator(fdD.Files), nD = 0;
+                for (; !fcD.atEnd(); fcD.moveNext()) { if (/^AICodeBridge\..+\.js$/i.test("" + fcD.item().Name)) { nD++; } }
+                curAct.files = nD;
+            }
+        } catch (eDs) { }
         // cilem je vzdy element AICodeBridge; B4 target pravidlo se na deploy_src
         // NEaplikuje - deploy_src je prave ta chranena cesta zmeny konfigurace
         // (dev; v bance FB_OpsAllowed deny + politika BLOCKED)
     } else {
         // zapisova operace bez metrickeho pravidla = neznamy objem -> fail-closed
-        writeOps++;
-        elevate("Zapisova operace '" + name + "' bez metrickeho pravidla - fail-closed (neznamy objem)");
+        writeOps++; curAct.items++;
+        elevate("Zapisova operace '" + name + "' bez metrickeho pravidla - fail-closed (neznamy objem)", "NO_METRIC_RULE", { op: name });
     }
 }
 if (budgetHit || metricsIncomplete) {
-    elevate("Metriky nespocitany - prekrocen rozpocet " + budget + " ms (fail-closed W5)");
+    elevate("Metriky nespocitany - prekrocen rozpocet " + budget + " ms (fail-closed W5)", "BUDGET", { ms: budget });
 }
 
 // --- prahy politiky ---
 if (polValid) {
     // function expression, ne declaration - deklarace v bloku neni ES3
     var overB = function (v, key) {
-        if (v > pol.block[key]) { block("Prah BLOCKED prekrocen: " + key + " " + v + " > " + pol.block[key]); }
+        if (v > pol.block[key]) { block("Prah BLOCKED prekrocen: " + key + " " + v + " > " + pol.block[key], "THRESHOLD_BLOCKED", { key: key, value: v, limit: pol.block[key] }); }
     };
     var overE = function (v, key) {
-        if (v > pol.elevate[key]) { elevate("Prah ELEVATED prekrocen: " + key + " " + v + " > " + pol.elevate[key]); }
+        if (v > pol.elevate[key]) { elevate("Prah ELEVATED prekrocen: " + key + " " + v + " > " + pol.elevate[key], "THRESHOLD_ELEVATED", { key: key, value: v, limit: pol.elevate[key] }); }
     };
     overB(deleteTargets, "deleteTargets");
     overB(writeOps, "writeOps");
@@ -677,9 +814,12 @@ if (polValid) {
 return {
     riskLevel: (level == 3 ? "BLOCKED" : (level == 2 ? "ELEVATED" : "LOW")),
     riskReasons: reasons,
+    reasonItems: reasonItems, // v0.19: stabilni kody duvodu (FB_ReasonText, tag ai.risk.codes)
     policyValid: polValid,
     baselinePolicyValid: blValid,
-    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames, paths: tgtPaths },
+    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames, paths: tgtPaths,
+               targetsMore: nameMore.e, packagesMore: nameMore.p, diagramsMore: nameMore.d,
+               deletes: deletes, actions: actions },
     metrics: {
         writeOps: writeOps, createOps: createOps, updatedExisting: updatedExisting,
         deleteTargets: deleteTargets, affectedElements: elCount,

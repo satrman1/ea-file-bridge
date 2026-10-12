@@ -1,0 +1,1 @@
+{"protocol":"eafb/0.2","id":"b2-09-audit","repo":"EAEXAMPLE.QEA","ops":[{"op":"query","sql":"SELECT p.Property, p.Value FROM t_objectproperties p JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.ea_guid = '{2FBB6B87-18F1-4e34-8BC5-55F961A46704}' AND p.Property LIKE 'ai.risk%' ORDER BY p.Property"}]}

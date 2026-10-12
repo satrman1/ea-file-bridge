@@ -125,4 +125,9 @@ if (total == 0) {
     if (dcnt > 0) { return done("ok", "0 prvku, " + dcnt + " diagram(u) - zaloha kryje diagramy", 0, all.length, "iter"); }
     return done("unknown", "podstrom ma 0 prvku a 0 diagramu - prazdna package nebo falesna nula (B6)", 0, all.length, "iter");
 }
+// v0.19 (Z261004b-6, FB-PU-20): na vyzadani (cfg.withDiagrams === true, Risk Gate
+// u mazani balicku) se diagramy spocitaji i u neprazdneho podstromu - okno rika
+// "vcetne N prvku, M diagramu". Baseline politika volá bez priznaku (zadny
+// dotaz navic, chovani N-E2E-3 beze zmeny).
+if (cfg && cfg.withDiagrams === true) { try { var dcA = countDiagrams(all); if (dcA != null) { diagramsSeen = dcA; } } catch (eDa) { } }
 return done("ok", "", total, all.length, "iter");

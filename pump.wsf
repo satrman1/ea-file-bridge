@@ -64,7 +64,8 @@ End Function
 //    Enter nic neprovede; ikona upozorneni (48) u mazani, presunu, klonu a
 //    prepisu, jinak otaznik (32); veta o casovem limitu; JEDNA legenda
 //    tlacitek (z FB_ConfirmSummary - pumpa uz zadnou nepridava); faze
-//    waiting_confirm ve stavovem souboru; stari cekajici davky v okne.
+//    waiting_confirm ve stavovem souboru; stari cekajici davky v okne
+//    (od kodu v0.19 pise radek "Ceka od" FB_ConfirmSummary sam - Z261004b-6).
 //  - CEKAJICI DAVKY (pravidlo 6, FB-PU-15/-17): okno se vrati bez restartu,
 //    kdyz agent posle tentyz soubor znovu (FB_Main vrati stavajici res);
 //    pri startu FB_PendingSweep (expirovane -> rejected\ + audit, pumpa je
@@ -349,11 +350,16 @@ function promptConfirm(repo, bridge, pendPath, respText, ageInfo) {
             return needReload;
         }
         var sum = "";
-        try { sum = "" + bridge.FB_ConfirmSummary(r); } catch (eSm) { sum = "(souhrn nedostupny: " + eSm.message + ")"; }
+        // v0.19 kodu (Z261004b-6): FB_ConfirmSummary bere stari davky jako 2. parametr
+        // a radek "Ceka od" pise sam (kod v modelu starsi nez v0.19 ho nezna -> pumpa
+        // ho doplni; druhy parametr stary kod ignoruje)
+        try { sum = "" + bridge.FB_ConfirmSummary(r, (ageInfo && ageInfo.since) ? { since: "" + ageInfo.since, ageMin: ageInfo.ageMin } : null); } catch (eSm) { sum = "(souhrn nedostupny: " + eSm.message + ")"; }
         var title = "EA File Bridge - potvrzeni davky " + r.id;
         var age = "";
-        if (ageInfo && ageInfo.since) { age = "Ceka od " + ageInfo.since + (ageInfo.ageMin >= 0 ? " (" + ageInfo.ageMin + " min)" : "") + "\n"; }
-        else if (r.since) { age = "Ceka od " + r.since + "\n"; }
+        if (sum.indexOf("Ceka od ") < 0) {
+            if (ageInfo && ageInfo.since) { age = "Ceka od " + ageInfo.since + (ageInfo.ageMin >= 0 ? " (" + ageInfo.ageMin + " min)" : "") + "\n"; }
+            else if (r.since) { age = "Ceka od " + r.since + "\n"; }
+        }
         echo("--- CEKA NA TEBE: okno \"" + title + "\" (Ano = provest, Ne = zamitnout, Storno/timeout " + CONFIRM_TIMEOUT_S + " s = nechat cekat; Enter = Storno) ---");
         var lines = sum.split("\n");
         for (var li = 0; li < lines.length; li++) { echo("  " + lines[li]); }

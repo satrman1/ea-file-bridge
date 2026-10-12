@@ -52,21 +52,36 @@ else if (ItemName == "Uklid automatickych baselines (ukazat / provest)") {
         var cU = this.FB_BaselineConfig(Repository);
         var cfgU = cU.cfg;
         var repU = this.FB_BaselineCleanup(Repository, cfgU, "report", true);
-        outU = "" + repU.text;
+        // N-E2E-6 (v0.19): dialog zacina lidskou vetou (co se smaze, co zustane,
+        // rucni se nemazou); seznam balicek | zaloha az pod carou bez GUIDu a
+        // loginu; plny vypis (GUIDy, loginy) je v Output tabu AI Bridge
+        function cleanupDialogText(rU) {
+            var tx = "" + (rU.textHuman || rU.text);
+            var sh = rU.candidates.slice(0, rU.planned > 0 ? rU.planned : 0);
+            if (rU.mode == "delete") { sh = rU.deleted; }
+            if (sh.length > 0) {
+                tx += "\n----------------------------------------";
+                for (var si = 0; si < sh.length && si < 10; si++) { tx += "\n  " + (sh[si].pkgName || sh[si].pkgGuid) + "  |  " + sh[si].name; }
+                if (sh.length > 10) { tx += "\n  ... a dalsich " + (sh.length - 10); }
+            }
+            if (rU.failed && rU.failed.length > 0) { tx += "\n  ! nesmazano: " + rU.failed.length; }
+            tx += "\nPodrobny vypis (GUIDy, uzivatele) je v Output tabu AI Bridge.";
+            return tx;
+        }
+        outU = cleanupDialogText(repU);
         if (cU.valid === false) {
             // vadna politika = jen ukazat (s bezpecnymi defaulty), nikdy mazat (M3)
             outU += "\n\nPOZOR: sekce baseline ve FB_RiskPolicy je nevalidni (" + cU.why + ") - mazani z menu je vypnute, oprav politiku.";
         } else if (repU.candidates.length > 0 && !repU.anomaly) {
-            var ansU = Session.Prompt(outU + "\n\nANO = tyto baselines TED SMAZAT (nevratne)   |   NE / Storno = jen ukazat", 3);
+            var ansU = Session.Prompt(outU + "\n\nAno = tyto zalohy TED SMAZAT (nevratne)   |   Ne / Storno = jen ukazat, nic nemazat", 3);
             if (ansU == 3) {
                 var delU = this.FB_BaselineCleanup(Repository, cfgU, "delete", true);
-                outU = "" + delU.text;
+                outU = cleanupDialogText(delU);
             } else { outU = ""; }
         }
     } catch (eUk) { outU = "CHYBA uklidu baselines: " + eUk.message; }
     if (outU != "") {
-        try { Session.Output("[AI Bridge] " + outU); } catch (eOU) { }
-        Session.Prompt(outU, 0);
+        Session.Prompt(outU, 0); // detail uz v Output tabu zapsal FB_BaselineCleanup (po radcich)
     }
 }
 else if (ItemName == "Nav spike (test navigace)") {
