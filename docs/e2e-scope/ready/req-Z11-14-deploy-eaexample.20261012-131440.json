@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "Z11-14-deploy-eaexample", "repo": "EAEXAMPLE.QEA", "ops": [ { "op": "deploy_src" } ] }
