@@ -45,12 +45,39 @@ Pravidla kitu zrušená jen tam, kde je mechanismus v kódu (revize kap. 4): „
 
 Mimo scope (jen evidence): `Skilly/_shared/hitl-brany.md` ř. 50 „whitelistované území"; `M365/Bootstrap-Prompt-M365-Copilot.md` (srpnový, není v ZIPu) mluví o whitelistu; `Skilly/_vscode/skills/e2e-f0-f1/references/` beze změny.
 
-## 5. Živý tenký test ve VS Code
+## 5. Živý tenký test ve VS Code — 12. 10. 2026 16:10–16:19
 
-(doplní se po běhu)
+Prostředí: VS Code nad `C:\GIT\ea-file-bridge` (čerstvý `.github\` z buildu), agent `sa-analytik`, Claude Opus 5; EA `EAExample.qea`, pumpa v0.5 z repa, vybraný balíček `#FB-TEST`. Úloha: kostra UC „Hodnoť knihu" + scénáře + constrainty, cíl = výběr ve stromu; jednu dávku s překlepem (`create_or_update_scenarious` + `{GUID-UC}`) vhodil Claude jako `req-20261012-hwqn-07.json`.
+
+**Průběh (9 dávek, 1 okno, 0 opravných kol od člověka):**
+
+| # | Dávka | Co | Výsledek |
+|---|---|---|---|
+| 01 | `ping` | kotva, `writeScope` + `riskPolicy` | done |
+| 02 | `get_selected_context` | cíl z výběru, `writeCheck.ok = true` | done |
+| 03–04 | recon (`get_packages_information`, `query` s `LIMIT`) | našel existující `UC-95006` téhož UC → **nezaložil duplikát**, nabídl 3 varianty, Miloš zvolil 2 (nový `UC-95007`) | done |
+| 05 | `query` | GUIDy požadavků DEMO-9105x pro traceabilitu | done |
+| 06 | kostra: package + UC/UCR/Boundary + 2 diagramy + 5 vazeb + umístění + kompozit (řetěz `$N`, bez `matchByName`) | věta **„Zapíšu do: Example Model.Model Based Add-Ins.EA Addins.#FB-TEST"** ✅; ELEVATED (`writeOps 22 > 20`, čistý create bez zálohy) → agent řekl „potvrď Ano v okně pumpy (hash 9fea…)", **čekal**, neposlal znovu; Miloš klikl Ano | done 7/7 |
+| 07 | překlep (Claude) | `E_UNKNOWN_OP` (`suggestions`) + `E_ARGS` (zástupný text) — oba problémy najednou, bez okna | error |
+| 08 | agent: opravená dávka s novým id — scénáře BE + EF, 4 constrainty, 3 BRU | **opravil obojí sám**, neptal se, neoznačil to za chybu bridge; bridge sám pořídil `FB-AUTO` baseline nad `UC-95007`; **bez okna** (pravidlo 3 `ownSessionLow` — prvek téže session) | done 3/3, 0 warningů |
+| 09 | zpětné čtení | shrnutí s GUIDy, confidence flags, ruční kroky | done |
+
+**Kit se osvědčil v:** kontrolní kód, ping jako kotva, cíl z výběru + `writeCheck`, „Zapíšu do:", idempotence (nezaložil duplikát), recon s `LIMIT`, čtení stavů `res` (agent si `res` čte sám, nikdy nechtěl obsah po člověku), čekání u `confirm_required` bez přeposlání, oprava `E_ARGS`/`E_UNKNOWN_OP` z `problems[]` bez zásahu člověka, žádný `create_baseline` od agenta, GUIDy z výsledku do další dávky, `$N` v řetězu.
+
+**Nálezy (agent udělal špatně / kit to má říct líp):**
+
+- **N-KIT-1 (střední):** Agent oznámil „dávka 08 čeká na tvůj klik Ano v okně pumpy" **dřív, než přečetl `res`** — předpověděl ELEVATED (scénáře = rebuild), ve skutečnosti prošla bez okna (`ownSessionLow`). Pak se opravil. Kit: „o okně mluv až podle `status: confirm_required` v `res`, ne podle odhadu" → doplnit do oddílu Pumpa (věta C jen po přečtení stavu).
+- **N-KIT-2 (nízká):** Na začátku práce agent **neřekl** člověku `writeScope.summary` ani „která dávka bude chtít potvrzení" (kit Rytmus práce bod 1); odhad LOW/ELEVATED u dávky 06 byl navíc špatně (čekal LOW, bylo 22 > 20). Kit to má, agent to přeskočil — zvážit přesun do tvrdých pravidel SKILL.md.
+- **N-KIT-3 (nízká):** Agent nepustil `reload_diagrams` / `layout_connectors` po zápisu a vykázal to jako ruční krok — pravidlo §8 instrukcí má, ale v jedné dávce s kostrou by šlo. Metodika, ne kit bridge.
+- **N-KIT-4 (info):** Agent zkusil číst `requests\req-…-07.json` po zpracování (soubor už byl v `processed\` s časovým sufixem) → „Path does not exist". Neškodilo (četl `res`). Kit může říct, že zpracovaná dávka je v `requests\processed\<jméno>.<čas>.json`.
+- **N-KIT-5 (info):** Agent sáhl do `docs\` repa pro vzory dávek (e2e-iterace5, e2e-baseline/ready) — v repu bridge to jde, ve workspace `ai-transfer` ty složky nejsou. Není chyba kitu; pro bankovní workspace neplatí.
+
+Spotřeba: 9 dávek (≤ 10), 1 ELEVATED, 0 opravných od člověka, 1 opravná od agenta (záměrně vyvolaná). Vzniklý obsah `UC-95007` v `#FB-TEST` zůstává (fixture pro další běhy; úklid ruční).
 
 ## 6. Co zbývá Milošovi
 
 - Push `C:\GIT\ea-file-bridge` (commit `20d055b` + commit VYSLEDKY).
 - Nahrát na SharePoint AI_CONTEXT: `EA-FILE-BRIDGE/` všechny 4 soubory (`EA Bridge Expert.md` = bankovní varianta, `EAFB-Pravidla-Agenta.md`, `EAFB-Operace-Registr.md`, `EAFB-Chyby-a-Confirm.md`), `LANGOSH/02-use-case-model/02-Use-Case-Model-Prompt.md` a `UC-Zapis-EMR.md` (UC-Pravidla-* beze změny). Vše v `M365/banka-kity-2026-10-12.zip`.
 - Odpovědi na otázky kap. 4.
+- Nálezy N-KIT-1 a N-KIT-2 zapracovat do kanonu (`Skilly\_vscode\…\EAFB-Pravidla-Agenta.md` oddíl Pumpa, `SKILL.md` tvrdá pravidla) + rebuild — samostatný malý krok, nebo přibalit k Z261004b-5.
+- `C:\GIT\ai-transfer`: `python tools\refresh-workspace.py --workspace C:\GIT\ai-transfer --profile doma --set full --kanon C:\Users\milos\CLAUDE\IT-ANALYSIS\Skilly` (workspace analytika má starý kit).
