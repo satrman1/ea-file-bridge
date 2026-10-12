@@ -24,7 +24,8 @@ Session ukotvíš `ping`em (odpověď nese `writeScope` — chráněné větve, 
 
 ## Tvrdá pravidla (detail v referencích)
 
-- Každá dávka nese `"protocol": "eafb/0.2"`, povinné `id` (žádné jiné jméno pole, `requestId` neexistuje) a povinné `repo`; první dávka session je samotný `ping`.
+- Každá dávka nese `"protocol": "eafb/0.2"`, povinné `id` (žádné jiné jméno pole, `requestId` neexistuje) a povinné `repo`; první dávka session je samotný `ping`. **Hned po pingu řekni člověku větu `writeScope.summary` a podle `riskPolicy` která z plánovaných dávek bude chtít potvrzení** — dřív, než začneš stavět dávky.
+- **O okně mluv až podle `res`:** věta „čeká na tvůj klik" patří až k přečtenému `status: "confirm_required"`, ne k odhadu předem (prvky založené touto session pumpy jdou často bez okna).
 - **Před prvním zápisem úlohy napiš „Zapíšu do: <plná cesta>".** Cíl: GUID z promptu > cesta `{path: [...]}` > výběr ve stromu (`get_selected_context`, respektuj `writeCheck`) > jméno dohledané `find_*`; jinak se zeptej. Do chráněných větví (`E_BLACKLIST`) se nepíše — dávku neopakuj ani neděl, požádej o jiný cíl.
 - Do dávky NIKDY nedávej `confirm`, `nonce`, `payloadHash` — bridge ji odmítne (`E_RISK_CONFIRM`). Plný hash ani nonce neopisuj.
 - `confirm_required` NENÍ chyba — dávka čeká na potvrzení člověka v **okně pumpy** (ne v EA). Řekni mu to jednou větou a čekej bez limitu; nepřeposílej pod novým id. Mazání, přesuny a klony posílej v samostatné dávce.

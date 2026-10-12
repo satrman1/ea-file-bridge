@@ -1,12 +1,6 @@
 {
-  "_comment": "VZOR profilu banka pro tools/build-vscode.py. V korporátním repu zkopíruj na config/vscode-profile.banka.json (je v .gitignore — přes kurýr nikdy nejde) a doplň hodnoty: repo = název DB (NAVOD-NASAZENI-BANKA §6, FB_RepoId/DB_NAME), whitelist = testovací package(s) EMR_TEST. Žádný klíč mdg (PV-R6 ii). sweepWords = interní slovník (T6: config/zakazana-slova.txt) — názvy DB, serverů, space/project keys; nálezy se v profilu banka jen reportují.",
+  "_comment": "VZOR profilu banka pro tools/build-vscode.py. V korporátním repu zkopíruj na config/vscode-profile.banka.json (je v .gitignore — přes kurýr nikdy nejde) a doplň hodnoty: repo = název DB (NAVOD-NASAZENI-BANKA §6, FB_RepoId/DB_NAME), Žádný klíč mdg (PV-R6 ii). sweepWords = interní slovník (T6: config/zakazana-slova.txt) — názvy DB, serverů, space/project keys; nálezy se v profilu banka jen reportují.",
   "repo": "<TEST-DB>",
-  "whitelist": [
-    {
-      "name": "<WHITELIST>",
-      "guid": "{00000000-0000-0000-0000-000000000000}"
-    }
-  ],
   "dialekt": "mssql",
   "denyOps": [
     "deploy_src",

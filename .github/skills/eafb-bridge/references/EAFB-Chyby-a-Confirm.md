@@ -23,7 +23,7 @@ Chyby **dávky** (nic se neprovedlo, všechny operace `skipped`) vs. chyby **ope
 | Kód | Význam a co s tím |
 |---|---|
 | `E_PARSE` | Nevalidní JSON / chybí `ops`. Oprav strukturu, pošli novou dávku s novým id. |
-| `E_REPO` | Deklarace `repo` nesedí na připojený repozitář (odpověď ho pojmenuje), repozitář nemá položku v konfiguraci cíle zápisu, nebo pumpa běží nad jiným projektem EA než při startu („restartuj pumpu"). Nic se neprovedlo. **Zastav se a ohlas** — `repo` neopravuj sám na to, co je zrovna připojeno; člověk potvrdí správný repozitář (nebo restartuje pumpu), pak nová dávka. |
+| `E_REPO` | Deklarace `repo` nesedí na připojený repozitář — odpověď ho **pojmenuje**: oprav pole `repo` na tuto hodnotu a pošli dávku znovu s novým id (člověku jednou větou). Varianty: repozitář nemá položku v konfiguraci cíle zápisu (zápisy nejdou, ohlas správci); „EA má otevřený jiný projekt než při startu pumpy" → požádej člověka o restart pumpy. Nic se neprovedlo. |
 | `E_UNKNOWN_OP` | Neznámá operace — `problems[]` nese `suggestions[]` nejbližších názvů. Oprav název, nové id. Je to chyba dávky, ne bridge. |
 | `E_ARGS` | Chyba v dávce z předběžné kontroly: `problems[] {op, path, code, message}` vyjmenuje **všechny** problémy najednou (chybějící pole, prázdný seznam, zástupný text v identifikačním poli, `$N` dopředu, cíl zadaný GUIDem v modelu neexistuje, `$N` na výsledek bez `guid` — „použij `$0[0]`"). **Oprav všechno z `problems[]` sám**, nové id. Žádné okno, žádná záloha. |
 | `E_OP_FORBIDDEN` | Zápisová operace není v tomto prostředí povolena. Ohlas — neobcházej; co tím nejde, je ruční krok člověka v EA. |

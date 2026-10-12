@@ -1,4 +1,4 @@
-build-vscode.py 1.2 — 2026-10-12
+build-vscode.py 1.3 — 2026-10-12
   kanon:    /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/CLAUDE/IT-ANALYSIS/Skilly
   šablony:  /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/CLAUDE/IT-ANALYSIS/Skilly/_vscode
   výstup:   /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/ea-file-bridge/.github
@@ -8,7 +8,6 @@ build-vscode.py 1.2 — 2026-10-12
 
 Substituce placeholderů:
   {{REPO}} → EAEXAMPLE.QEA
-  {{WHITELIST}} → #FB-TEST {CCD344F6-9EAA-44eb-BAA4-4952E48526B7}
   {{DIALEKT}} → sqlite
   {{DENY_OPS}} → žádné
   {{CONTEXT_NOTES}} → - Domácí prostředí: eaexample (SQLite), transport pumpa pump.wsf, bez EA security.
@@ -36,7 +35,7 @@ Skilly:
   kanon  skills/ea-sql-expert (7 souborů)
   kanon  skills/solution-architect (15 souborů)
   kanon  skills/ea-addin-developer (5 souborů)
-  šablona copilot-instructions.md (7455 B, limit 8192)
+  šablona copilot-instructions.md (7597 B, limit 8192)
   šablona agents/sa-analytik.agent.md
   šablona instructions/emr-zapis.instructions.md
   šablona instructions/mermaid.instructions.md
@@ -152,7 +151,7 @@ Přepisy odkazů (mimo strom skillu → kopie / ukazatel / „mimo workspace“)
 | skills/emr-konvence/references/sar-pravidla.md | ../../IDesign/SAR-Validace-SQL.md | `SAR-Validace-SQL.md` (mimo workspace — vyžádej od uživatele) | backtick |
 Backtick → markdown link uvnitř stromu skillu: 185
 
-Sweep B1 (T6; profil doma; GUID whitelistu a hodnoty profilu povoleny):
+Sweep B1 (T6; profil doma; hodnoty profilu povoleny):
   povoleno  81× — kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID (např. skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:26 BRU91001-1; skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:60 WF-101; skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:71 PREXXXXX-1)
   povoleno  13× — slovo password/token v próze bez přiřazení hodnoty (UC příklady Cockburn, DDL EA [Password]) — ne credential (např. copilot-instructions.md:26 token; skills/ea-sql-expert/references/EASchema_1558_SQLServer.sql:1921 Passw; skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md:67 token)
   povoleno   1× — syntetický příklad Jira klíče DEMO-nnnnn v kanonu (prevzeti-zadani) — ne reálný projekt (např. skills/prevzeti-zadani/SKILL.md:9 DEMO-27698)

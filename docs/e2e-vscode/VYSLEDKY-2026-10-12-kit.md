@@ -45,6 +45,17 @@ Pravidla kitu zrušená jen tam, kde je mechanismus v kódu (revize kap. 4): „
 
 Mimo scope (jen evidence): `Skilly/_shared/hitl-brany.md` ř. 50 „whitelistované území"; `M365/Bootstrap-Prompt-M365-Copilot.md` (srpnový, není v ZIPu) mluví o whitelistu; `Skilly/_vscode/skills/e2e-f0-f1/references/` beze změny.
 
+## 4a. Rozhodnutí Miloše 16:29 a provedení (16:30–16:45)
+
+1. `{{WHITELIST}}` + klíč `whitelist` **zrušeny**: `tools/build-vscode.py` 1.3 (placeholderů 5, profil s klíčem `whitelist` = FAIL, sweep povoluje implicitně jen `repo`), profily `doma` / `banka.example` bez klíče, fixtury testu, `test/build-vscode.test.py` 30/30 (nový `test_profile_whitelist_key_forbidden`), `docs/BUILD-VSCODE.md` v1.3.
+2. `E_REPO` **vráceno na samoopravu** (PROTOKOL §3a): odpověď pojmenuje připojený repozitář → agent opraví `repo` a pošle znovu s novým id; „jiný projekt než při startu pumpy" = požádat o restart pumpy. Pravidla agenta bod 2, tabulka kódů, copilot-instructions bod 3.
+3. Kit 03 LDM: rozhodnuto **beze změny** (nezapisuje do EA; zápisová fáze až bude potřeba, stejně jako u kitu 02).
+4. Changelog kanonu: nová sekce 3b v `Skilly/_shared/emr-zapis-changelog.md` (§6 P3, §12a, §12g, kit 12. 10.; otevřený bod §12c).
+5. §12c mikro-baselines — příští úklid kanonu (evidováno v changelogu 3b).
+6. Nálezy N-KIT-1 a N-KIT-2 **zapracovány**: Pravidla agenta oddíl Pumpa („O okně mluv až podle `res`"), SKILL.md tvrdá pravidla (věta `writeScope.summary` + odhad oken hned po pingu; okno až podle `res`), copilot-instructions bod 7.
+
+Rebuild `.github/` (103 souborů, verify 0), tři kopie EAFB shodné, ZIP `M365/banka-kity-2026-10-12.zip` přestavěn (stejný název, obsah = kanon 16:45).
+
 ## 5. Živý tenký test ve VS Code — 12. 10. 2026 16:10–16:19
 
 Prostředí: VS Code nad `C:\GIT\ea-file-bridge` (čerstvý `.github\` z buildu), agent `sa-analytik`, Claude Opus 5; EA `EAExample.qea`, pumpa v0.5 z repa, vybraný balíček `#FB-TEST`. Úloha: kostra UC „Hodnoť knihu" + scénáře + constrainty, cíl = výběr ve stromu; jednu dávku s překlepem (`create_or_update_scenarious` + `{GUID-UC}`) vhodil Claude jako `req-20261012-hwqn-07.json`.

@@ -87,7 +87,7 @@ class PositiveBuilds(Base):
         # substituce
         text = read(ci)
         self.assertIn("EAEXAMPLE.QEA", text)
-        self.assertIn("#FB-TEST {CCD344F6-9EAA-44eb-BAA4-4952E48526B7}", text)
+        self.assertNotIn("{{", text)
         self.assertIn("sqlite", text)
         self.assertNotIn("{{", text)
         # _shared → emr-konvence/references
@@ -412,6 +412,16 @@ class NegativeBuilds(Base):
         rc, log = self.broken(m)
         self.assertEqual(rc, 1)
         self.assertIn("NUL", log)
+
+    def test_profile_whitelist_key_forbidden(self):
+        p = self.cfg / "vscode-profile.doma.json"
+        prof = json.loads(read(p))
+        prof["whitelist"] = [{"name": "#FB-TEST", "guid": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"}]
+        write(p, json.dumps(prof, ensure_ascii=False, indent=2))
+        rc, log = run("--kanon", FIXTURE, "--out", self.tmp / "wl-out", "--profile", "doma",
+                      "--config-dir", self.cfg, "--set", "thin")
+        self.assertEqual(rc, 1)
+        self.assertIn("whitelist", log)
 
     def test_profile_mdg_key_forbidden(self):
         p = self.cfg / "vscode-profile.doma.json"

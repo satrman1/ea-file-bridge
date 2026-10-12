@@ -38,7 +38,7 @@ import shutil
 import sys
 from pathlib import Path
 
-BUILD_VERSION = "1.2"
+BUILD_VERSION = "1.3"
 
 # ---------------------------------------------------------------------------
 # Konstanty — sady skillů (Zadani-Portace-VSCode-v2.md kap. 5.1 + AK-1)
@@ -140,7 +140,7 @@ TEMPLATE_REQUIRED = [
 # `skills/emr-konvence/SKILL.md` — pokud chybí, build ji vygeneruje (kap. 4.4 bod 2)
 # a do logu napíše „šablona chybí".
 
-PLACEHOLDERS = ["REPO", "WHITELIST", "DIALEKT", "DENY_OPS", "CONTEXT_NOTES",
+PLACEHOLDERS = ["REPO", "DIALEKT", "DENY_OPS", "CONTEXT_NOTES",
                 "TERMINAL_RULES"]
 PLACEHOLDER_RE = re.compile(r"\{\{\s*([A-Z_]+)\s*\}\}")
 COPILOT_MAX_BYTES = 8192                            # kap. 4.1 / AK-1
@@ -275,9 +275,13 @@ def load_profile(config_dir, profile_name):
                          "a doplň hodnoty; soubor je v .gitignore)" % path)
     with open(str(path), "r", encoding="utf-8") as fh:
         prof = json.load(fh)
-    for key in ("repo", "whitelist", "dialekt", "denyOps"):
+    for key in ("repo", "dialekt", "denyOps"):
         if key not in prof:
             raise SystemExit("[FAIL] profil %s: chybí klíč '%s'" % (path.name, key))
+    if "whitelist" in prof:
+        raise SystemExit("[FAIL] profil %s: klíč 'whitelist' zanikl (bridge v0.17 — režim "
+                         "blacklist, cíl zápisu nese ping/výběr ve stromu); klíč smaž"
+                         % path.name)
     if "mdg" in prof:
         raise SystemExit("[FAIL] profil %s: klíč 'mdg' není povolen (PV-R6 ii — název "
                          "MDG profilu se nenahrazuje)" % path.name)
@@ -294,16 +298,10 @@ def load_profile(config_dir, profile_name):
 
 
 def substitutions(prof, terminal=False):
-    wl = []
-    for w in prof["whitelist"]:
-        name = w.get("name", "").strip()
-        guid = w.get("guid", "").strip()
-        wl.append(("%s %s" % (name, guid)).strip())
     deny = prof["denyOps"]
     notes = prof.get("contextNotes") or []
     return {
         "REPO": prof["repo"],
-        "WHITELIST": "; ".join(wl) if wl else "(žádný)",
         "DIALEKT": prof["dialekt"],
         "DENY_OPS": ", ".join(deny) if deny else "žádné",
         "CONTEXT_NOTES": "\n".join("- %s" % n for n in notes) if notes else "(žádné)",
@@ -851,11 +849,6 @@ class Build(object):
         words = [w for w in (self.prof.get("sweepWords") or []) if w and not w.startswith("<")]
         if words:
             rules.append(("db", re.compile("(?i)" + "|".join(re.escape(w) for w in words))))
-        allow_guids = set()
-        for w in self.prof["whitelist"]:
-            g = norm_guid(w.get("guid", ""))
-            if g:
-                allow_guids.add(g)
         allow_entries = []
         for a in self.prof.get("sweepAllow") or []:
             try:
@@ -863,8 +856,7 @@ class Build(object):
                                       a.get("scope", "match"), a.get("rule")))
             except (re.error, KeyError, TypeError) as e:
                 self.err("profil sweepAllow: neplatný záznam %r (%s)" % (a, e))
-        implicit = [self.prof["repo"]] + [w.get("name", "") for w in self.prof["whitelist"]]
-        implicit = [x for x in implicit if x]
+        implicit = [x for x in [self.prof["repo"]] if x]
 
         for rel in sorted(self.files.keys()):
             if not is_text_path(rel) or rel == MANIFEST_NAME:
@@ -875,10 +867,8 @@ class Build(object):
                     for m in rx.finditer(line):
                         found = m.group(0)
                         reason = None
-                        if rname == "guid" and norm_guid(found) in allow_guids:
-                            reason = "GUID whitelistu profilu"
-                        elif any(found in v or v in found for v in implicit):
-                            reason = "hodnota profilu (repo/whitelist)"
+                        if any(found in v or v in found for v in implicit):
+                            reason = "hodnota profilu (repo)"
                         else:
                             for arx, areason, scope, arule in allow_entries:
                                 if arule and arule != rname:
@@ -1011,7 +1001,7 @@ class Build(object):
         self.log("Backtick → markdown link uvnitř stromu skillu: %d" % self.linkified)
 
         self.log("")
-        self.log("Sweep B1 (T6; profil %s; GUID whitelistu a hodnoty profilu povoleny):"
+        self.log("Sweep B1 (T6; profil %s; hodnoty profilu povoleny):"
                  % self.prof["_name"])
         for reason in sorted(self.sweep_allowed):
             self.log("  povoleno %3d× — %s (např. %s)" % (

@@ -1,6 +1,6 @@
 # Analytik-agent
 
-Repo: {{REPO}}. Whitelist: {{WHITELIST}}. Dialekt SQL: {{DIALEKT}}. Deny: {{DENY_OPS}}.
+Repo: {{REPO}}. Dialekt SQL: {{DIALEKT}}. Deny: {{DENY_OPS}}.
 
 Kontext:
 {{CONTEXT_NOTES}}

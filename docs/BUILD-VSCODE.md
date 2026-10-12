@@ -4,13 +4,15 @@
 
 *v1.1 — 2026-09-11 (Z260911‑2): sekce **Sady** — `full` je od 11. 9. výchozí sada doma, `thin` zůstává pro E2E srovnání s bankou a pro rychlý smoke.*
 
+*v1.3 — 2026-10-12 (Z261004b-4): klíč profilu `whitelist` a placeholder `{{WHITELIST}}` **zanikly** (bridge v0.17 = režim blacklist; chráněné větve nese `FB_WriteScope` v modelu a ping, cíl zápisu = výběr ve stromu / cesta / GUID — kit je nenese). Profil s klíčem `whitelist` = FAIL; sweep povoluje implicitně jen hodnotu `repo`. build-vscode.py 1.3, placeholderů 5.*
+
 *v1.2 — 2026-09-11 (Z260911‑3): sekce **Terminál** — volitelná varianta s povoleným terminálem (PV-R8 ii, N-P8): klíč profilu `terminal`, přepínač `--terminal on|off`, placeholder `{{TERMINAL_RULES}}`, skilly `re-interface`/`mapovani-rozhrani` jen s terminálem. Výchozí build (terminal off) se tím mění jen o vynechání těchto dvou skillů. build-vscode.py 1.1.*
 
 ## Co to dělá
 
 `.github/` (Agent Skills `skills/`, agent `agents/`, `instructions/`, `copilot-instructions.md`, `skills-manifest.md`) je **build výstup**, ne zdroj. Zdroj = kanon `IT-ANALYSIS/Skilly/` (skilly + `_shared/`) a ručně psané šablony `IT-ANALYSIS/Skilly/_vscode/` (copilot-instructions, agent, instructions, skilly `eafb-bridge`, `emr-konvence`, `e2e-f0-f1`).
 
-Build v tomto pořadí: kopie skillů celou složkou (vendoring) → `_shared/` do `skills/emr-konvence/references/` → přepis odkazů mimo strom skillu (tabulka v logu) → backtick `references/x.md` → `[x](references/x.md)` → šablony se substitucí `{{REPO}}`, `{{WHITELIST}}`, `{{DIALEKT}}`, `{{DENY_OPS}}` (+ volitelně `{{CONTEXT_NOTES}}`) → validace (AK-2 name/description, AK-3 references odkázané a nic mimo strom, nenahrazený `{{…}}`, `copilot-instructions.md` ≤ 8 192 B, NUL bajty, konce souborů, marker `## 12.` v `emr-zapis-pravidla.md`) → sweep B1 (T6 regexy + názvy DB z profilu) → manifest se sha256. **Jediná chyba = nic se nezapíše.**
+Build v tomto pořadí: kopie skillů celou složkou (vendoring) → `_shared/` do `skills/emr-konvence/references/` → přepis odkazů mimo strom skillu (tabulka v logu) → backtick `references/x.md` → `[x](references/x.md)` → šablony se substitucí `{{REPO}}`, `{{DIALEKT}}`, `{{DENY_OPS}}` (+ volitelně `{{CONTEXT_NOTES}}`) → validace (AK-2 name/description, AK-3 references odkázané a nic mimo strom, nenahrazený `{{…}}`, `copilot-instructions.md` ≤ 8 192 B, NUL bajty, konce souborů, marker `## 12.` v `emr-zapis-pravidla.md`) → sweep B1 (T6 regexy + názvy DB z profilu) → manifest se sha256. **Jediná chyba = nic se nezapíše.**
 
 ## Sady (`--set`)
 
@@ -86,7 +88,6 @@ python tools\build-vscode.py --profile doma --out .github-term --verify
 | Klíč | doma | banka |
 |---|---|---|
 | `repo` | `EAEXAMPLE.QEA` | název DB (NAVOD-NASAZENI-BANKA §6) |
-| `whitelist[]` `{name, guid}` | `#FB-TEST {CCD344F6-…}` | testovací package(s) EMR_TEST |
 | `dialekt` | `sqlite` | `mssql` |
 | `denyOps[]` | `[]` | `deploy_src, delete_from_model, clone_package` |
 | `contextNotes[]` | volitelné věty do `{{CONTEXT_NOTES}}` | totéž |
@@ -94,7 +95,7 @@ python tools\build-vscode.py --profile doma --out .github-term --verify
 | `sweepAllow[]` | zdůvodněné výjimky sweepu | totéž |
 | `terminal` | `false` (výchozí; `true` = varianta s terminálem, sekce **Terminál**) | `false` |
 
-Klíč `mdg` je zakázaný (PV-R6 ii). `sweepAllow` = položky `{rule, pattern, scope: match|line, reason}` — každá výjimka nese důvod, přesně jak T6 B1 žádá („nález buď odstraň, nebo výslovně zdůvodni"). GUID whitelistu a hodnota `repo` jsou povolené implicitně.
+Klíč `mdg` je zakázaný (PV-R6 ii). `sweepAllow` = položky `{rule, pattern, scope: match|line, reason}` — každá výjimka nese důvod, přesně jak T6 B1 žádá („nález buď odstraň, nebo výslovně zdůvodni"). Hodnota `repo` je povolená implicitně.
 
 ## Sweep B1 a profily
 

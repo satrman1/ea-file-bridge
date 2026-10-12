@@ -6,4 +6,4 @@ user-invocable: true
 
 # e2e-f0-f1
 
-Kolo 1 ping ({{WHITELIST}}).
+Kolo 1 ping ({{REPO}}).

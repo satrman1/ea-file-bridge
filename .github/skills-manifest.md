@@ -4,13 +4,13 @@
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-10-12 + sha1 3ac0057cf7135ff2cda638273c2dd8fdd6fe8c2b |
+| Verze kanonu | 2026-10-12 + sha1 e9418360cd64bd8c1442ed7951a1744e4055153f |
 | Profil | doma |
 | Sada | full |
 | Terminál | off |
 | Skillů | 22 (kanon 19 + generované 3) |
 | Souborů | 102 |
-| build-vscode.py | 1.2 |
+| build-vscode.py | 1.3 |
 
 ## Skilly
 
@@ -47,7 +47,7 @@
 | Soubor | sha256 |
 |---|---|
 | agents/sa-analytik.agent.md | 0af997cfd4df886bf01bcb20da80cfdcca698b910e93750b5f131b7e79023d44 |
-| copilot-instructions.md | 8c10907b62cabf10acba4e23b8185c57a8cd500df645ef47b30616d4f1649a30 |
+| copilot-instructions.md | 8e9133be6845d094bdba91524ed16245bfa93c08b8f0c9a686230719b37d01f1 |
 | instructions/emr-zapis.instructions.md | 068cff9684d84544244316545bcbb87c0f34fc38622b0bea8ca21db8adaac4ae |
 | instructions/mermaid.instructions.md | f0f3219b9bd6c0f2dd9c5697e8c35a77361a629fc98e2290f22262bab99edca8 |
 | skills/e2e-f0-f1/SKILL.md | 8aa48779ecdd25eb8a45824a00c16fa2b0fe851be854ed42f2b7dd410644105d |
@@ -65,10 +65,10 @@
 | skills/ea-sql-expert/references/emr-specific-views-and-tables.md | c792fa1538b076ea4ed3e797eb5fd2ebcec5179f51d22d28e7e417c5f02ebde0 |
 | skills/ea-sql-expert/references/mermaid-rules.md | 66b1d0be2b464015d63a95524a8db888390dee8d1f148d53f360399a91bf176d |
 | skills/ea-sql-expert/references/sql-format-rules.md | e00ac0ce9a97ad459908f7d1efd0e2fae0913947e47a7af2f882937dd659ff3c |
-| skills/eafb-bridge/SKILL.md | d18a672bd6cb90592c8fb6894a42bba89b5d5d8d427203c336f1c28735b4c90a |
-| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | 25477547aa0b5704cfdf64efffbe415bbcae8ff30fdc9d861d12805ec8efdd30 |
+| skills/eafb-bridge/SKILL.md | f1f45679da9905ad312ab27a8be001c346e1e2a0678e4a1a198fd6e380fbf964 |
+| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | 10f9a1eb47a0bb8950144d47ea89efada96bf00034e868f411c218028bc42e0b |
 | skills/eafb-bridge/references/EAFB-Operace-Registr.md | afd0c1a3833a0dc68658a236591cd27e39e6f8f108d2c6969e77213f904c875f |
-| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | 73b80703b305a213743dbb76aedc4f5f88126a64d2358f3822d017b536956f1b |
+| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | f37a468b120579a57806490e8b214d581dc5cb6575d0f0774e19ea1fa6d46950 |
 | skills/emr-konvence/SKILL.md | 38d57317cb3e09a2526f602016bd9160f8d02eece23b69f1a13aa07d93461280 |
 | skills/emr-konvence/references/emr-bridge-protokol.md | 995fcc95bad10a997cb28be5e6feb79f796da6b44271bf6a033759f8e8f1479f |
 | skills/emr-konvence/references/emr-zapis-pravidla.md | f46e220151afb9d705c6921b9d1d74649edf51571b291f774652a8be5445358d |

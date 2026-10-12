@@ -1,12 +1,6 @@
 {
-  "_comment": "Profil doma pro tools/build-vscode.py — demo hodnoty eaexample (veřejné, už jsou v src/). Commituje se. Žádný klíč mdg (PV-R6 ii). sweepAllow = výslovně zdůvodněné neškodné nálezy sweepu B1 (T6): rule = na který regex se výjimka vztahuje, scope match = celý nález, scope line = celý řádek.",
+  "_comment": "Profil doma pro tools/build-vscode.py — demo hodnoty eaexample (veřejné, už jsou v src/). Commituje se. Žádný klíč mdg (PV-R6 ii) ani whitelist (zanikl v0.17 — blacklist žije v modelu, FB_WriteScope). sweepAllow = výslovně zdůvodněné neškodné nálezy sweepu B1 (T6): rule = na který regex se výjimka vztahuje, scope match = celý nález, scope line = celý řádek.",
   "repo": "EAEXAMPLE.QEA",
-  "whitelist": [
-    {
-      "name": "#FB-TEST",
-      "guid": "{CCD344F6-9EAA-44eb-BAA4-4952E48526B7}"
-    }
-  ],
   "dialekt": "sqlite",
   "denyOps": [],
   "contextNotes": [
