@@ -1,6 +1,12 @@
-// AICodeBridge.FB_Audit(Repository, reqId, summary, requestText)
+// AICodeBridge.FB_Audit(Repository, reqId, summary, requestText, human)
 // Audit element za kazdou davku do package #AI-LOG. Vraci GUID auditu,
 // nebo "" kdyz cilova package neexistuje (bridge kvuli tomu nesmi spadnout).
+// TVAR NOTES (vzor FB-UI-06, Z261004b-12): nahore vety pro cloveka (`human`
+// z FB_AuditText), pod nimi oddelovac a STROJOVY ZAZNAM `summary` DOSLOVA
+// BEZE ZMENY (cte ho tag `result`, hledani i harness - nikdy ho "neuklizet"
+// jako duplicitu), dole `--- request ---` + text davky. Parametr `human`
+// pribyl po v0.20 - cte se VYHRADNE pres typeof (FB-PU-01, PROTOKOL kap. 11);
+// bez nej (stary volajici) Notes zacinaji strojovym zaznamem jako dosud.
 // CIL AUDITU (od 2026-09-09, nalez N-K8-3 ziveho K8 QEAX):
 //   1) FB_Config polozka repozitare ma `auditPkg` = GUID package -> audit jde
 //      VYHRADNE tam (jmeno se nekontroluje). Kdyz GUID v modelu neni ->
@@ -44,8 +50,10 @@ if (cfgGuid != "") {
     }
     pkg = Repository.GetPackageByGuid(guids[0]);
 }
+var hum = (typeof human != "undefined" && human !== null) ? ("" + human) : "";
 var el = pkg.Elements.AddNew("FB " + reqId, "Artifact");
-el.Notes = summary + "\n\n--- request ---\n" + requestText;
+el.Notes = (hum != "" ? hum + "\n\n--- strojovy zaznam (beze zmeny) ---\n" : "")
+    + summary + "\n\n--- request ---\n" + requestText;
 el.Update();
 this.SetTag(el, "ai.channel", "eafb");
 this.SetTag(el, "ai.request", "" + reqId);

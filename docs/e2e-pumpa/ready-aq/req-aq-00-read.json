@@ -1,0 +1,3 @@
+{"protocol":"eafb/0.2","id":"aq-00-read","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"query","sql":"SELECT Package_ID, Name, ea_guid FROM t_package WHERE Name IN ('FBT-VOLNE','#AI-LOG') LIMIT 10"}
+]}

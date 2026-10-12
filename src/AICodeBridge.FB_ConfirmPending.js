@@ -110,7 +110,9 @@ if (!isApprove) {
         risk: risk, results: [] };
     try {
         var reqTextRej = readText(p);
-        var agR = this.FB_Audit(Repository, reqId, rejSummary, reqTextRej);
+        var humR = ""; // FB-UI-06: vety pro cloveka nad strojovym zaznamem (best-effort)
+        try { humR = "" + this.FB_AuditText("E_RISK_REJECTED", rejResp, risk, null, null, { id: reqId, total: (resObj.results ? resObj.results.length : 0), ok: 0, err: 0, writes: -1 }); } catch (eHr) { humR = ""; }
+        var agR = this.FB_Audit(Repository, reqId, rejSummary, reqTextRej, humR);
         rejResp.audit = { aiLogGuid: agR };
         this.FB_RiskAuditTags(Repository, agR, risk);
     } catch (eA1) { rejResp.audit = { aiLogGuid: "", warning: "Audit selhal: " + eA1.message }; }
@@ -154,7 +156,9 @@ if (freshHash != ("" + resObj.confirm.payloadHash)) {
         message: "Obsah davky se zmenil mezi klasifikaci a potvrzenim - potvrzeni je vazane na payload (CR par. 7). Nic nebylo provedeno; soubor presunut do rejected\\. Novou verzi davky posli jako novy soubor do requests\\.",
         risk: risk, results: [] };
     try {
-        var agI = this.FB_Audit(Repository, reqId, intSummary, (bytes === null ? readText(p) : this.FB_Utf8Decode(bytes)));
+        var humI = "";
+        try { humI = "" + this.FB_AuditText("E_RISK_INTEGRITY", intResp, risk, null, null, { id: reqId, total: (resObj.results ? resObj.results.length : 0), ok: 0, err: 0, writes: -1 }); } catch (eHi) { humI = ""; }
+        var agI = this.FB_Audit(Repository, reqId, intSummary, (bytes === null ? readText(p) : this.FB_Utf8Decode(bytes)), humI);
         intResp.audit = { aiLogGuid: agI };
         this.FB_RiskAuditTags(Repository, agI, risk);
     } catch (eA2) { intResp.audit = { aiLogGuid: "", warning: "Audit selhal: " + eA2.message }; }

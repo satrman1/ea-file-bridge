@@ -529,7 +529,9 @@ function emitPrecheck(pre) {
     if (pre.audit) {
         // hak pro kody, ktere se auditu (E_BLACKLIST, Z261004b-10); ostatni P2 chyby ne
         try {
-            var agP = self.FB_Audit(Repository, reqId, "error " + pre.code + ": " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + pre.message, "" + reqText);
+            var humP = ""; // FB-UI-06: vety pro cloveka nad strojovym zaznamem (best-effort)
+            try { humP = "" + self.FB_AuditText("" + pre.code, resp, null, null, null, { id: reqId, total: req.ops.length, ok: 0, err: 0, writes: writesInBatch, message: pre.message }); } catch (eHp) { humP = ""; }
+            var agP = self.FB_Audit(Repository, reqId, "error " + pre.code + ": " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + pre.message, "" + reqText, humP);
             resp.audit = { aiLogGuid: agP };
         } catch (eAp) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + eAp.message }; }
     }
@@ -653,8 +655,10 @@ if (writesInBatch > 0) {
             resp.results.push({ op: "" + (req.ops[ai2] && req.ops[ai2].op ? req.ops[ai2].op : "?"), status: "skipped" });
         }
         try {
+            var humA = "";
+            try { humA = "" + this.FB_AuditText("E_ADDIN_ACCESS", resp, null, null, null, { id: reqId, total: req.ops.length, ok: 0, err: 0, writes: writesInBatch, message: resp.message }); } catch (eHa) { humA = ""; }
             var agA = this.FB_Audit(Repository, reqId,
-                "error E_ADDIN_ACCESS: " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + resp.message, "" + reqText);
+                "error E_ADDIN_ACCESS: " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + resp.message, "" + reqText, humA);
             resp.audit = { aiLogGuid: agA };
         } catch (e3a) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3a.message }; }
         this.Log(Repository, "FB " + reqId + " -> E_ADDIN_ACCESS (" + (acc ? acc.login : "?") + ": " + (acc ? acc.reason : "?") + ")");
@@ -745,7 +749,9 @@ if (writesInBatch > 0) {
         }
         var bSummary = "error E_RISK_BLOCKED: " + req.ops.length + " ops (0 ok, nic neprovedeno)" + this.FB_RiskNote(risk);
         try {
-            var agB = this.FB_Audit(Repository, reqId, bSummary, "" + reqText);
+            var humB = "";
+            try { humB = "" + this.FB_AuditText("E_RISK_BLOCKED", resp, risk, null, null, { id: reqId, total: req.ops.length, ok: 0, err: 0, writes: writesInBatch, message: resp.message }); } catch (eHb) { humB = ""; }
+            var agB = this.FB_Audit(Repository, reqId, bSummary, "" + reqText, humB);
             resp.audit = { aiLogGuid: agB };
             this.FB_RiskAuditTags(Repository, agB, risk);
         } catch (e3b) {
@@ -949,7 +955,9 @@ function emitNoBaseline(why) {
     if (confirmedRun && risk) { risk.confirm = { required: true, confirmedByUser: true, channel: "" + ctx.channel, timestamp: nowTextM() }; }
     var nbSummary = "error E_NO_BASELINE: " + req.ops.length + " ops (0 ok, nic neprovedeno) - " + why + self.FB_RiskNote(risk, resp.baseline);
     try {
-        var agN = self.FB_Audit(Repository, reqId, nbSummary, "" + reqText);
+        var humN = "";
+        try { humN = "" + self.FB_AuditText("E_NO_BASELINE", resp, risk, resp.baseline, null, { id: reqId, total: req.ops.length, ok: 0, err: 0, writes: writesInBatch, message: why }); } catch (eHn) { humN = ""; }
+        var agN = self.FB_Audit(Repository, reqId, nbSummary, "" + reqText, humN);
         resp.audit = { aiLogGuid: agN };
         self.FB_RiskAuditTags(Repository, agN, risk, resp.baseline);
     } catch (e3n) { resp.audit = { aiLogGuid: "", warning: "Audit selhal: " + e3n.message }; }
@@ -1119,6 +1127,16 @@ if (writesInBatch > 0 && (okc > 0 || partialDel || partialItems)) {
     catch (eQc) { resp.qc = { status: "nedobehlo", reason: "FB_QcRun selhal: " + eQc.message, checks: 0, findings: [] }; }
     // pozorovatelnost (Miloš UX): vypis zmen s teckovou cestou do Output tabu
     try { this.FB_LogChanges(Repository, resp); } catch (eLc) { }
+    // FB-UI-11 (Z261004b-12): vysledek kontroly kvality SLOVY do Outputu -
+    // jeden radek za blokem zmen (+ az 3 prvky nalezu s markerem (el:ID) pro
+    // dvojklik); chat ACK (FB_ChatRender.qcLine) se tim NEMENI
+    try {
+        var qcT = this.FB_QcText(resp.qc);
+        if (qcT && qcT.line) {
+            this.Log(Repository, "FB " + reqId + " - " + qcT.line);
+            for (var qs = 0; qs < qcT.samples.length; qs++) { this.Log(Repository, qcT.samples[qs].text, qcT.samples[qs].navId); }
+        }
+    } catch (eQt) { }
     // iterace 5 (B-V2): posledni zapisova davka pro Add-in Search FB_Changes
     // (prazdny SearchText = tato davka); in-memory pro pumpu + state soubor
     // pro EA runtime (par. 1a/5 - this._fb* tam neprezije invokaci)
@@ -1127,7 +1145,12 @@ if (writesInBatch > 0 && (okc > 0 || partialDel || partialItems)) {
 var summary = resp.status + ": " + req.ops.length + " ops (" + okc + " ok, " + errc + " chyb)"
     + this.FB_RiskNote(risk, resp.baseline);
 try {
-    var ag = this.FB_Audit(Repository, reqId, summary, "" + reqText);
+    // FB-UI-06 (Z261004b-12): vety pro cloveka vcetne vysledku kontroly kvality -
+    // konecny audit se sklada az PO FB_QcRun (resp.qc existuje), strojovy
+    // zaznam `summary` jde do Notes beze zmeny a do tagu result
+    var humF = "";
+    try { humF = "" + this.FB_AuditText("final", resp, risk, resp.baseline, resp.qc, { id: reqId, total: req.ops.length, ok: okc, err: errc, writes: writesInBatch }); } catch (eHf) { humF = ""; }
+    var ag = this.FB_Audit(Repository, reqId, summary, "" + reqText, humF);
     resp.audit = { aiLogGuid: ag };
     this.FB_RiskAuditTags(Repository, ag, risk, resp.baseline);
 } catch (e3) {

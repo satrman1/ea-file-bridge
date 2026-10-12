@@ -1,0 +1,3 @@
+{"protocol":"eafb/0.2","id":"aq-02-low","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"create_or_update_elements","elements":[{"name":"AQ Prvek auditu","type":"Class","package":"{07475E42-13BC-4182-B01E-AB46EDA94BBE}","notes":"fixture Z261004b-12 - LOW davka, audit s vetami"}]}
+]}

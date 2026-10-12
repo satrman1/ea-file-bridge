@@ -1,0 +1,4 @@
+{"protocol":"eafb/0.2","id":"aq-04-read","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"query","sql":"SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Name IN ('FB aq-02-low','FB aq-03-notes','FB aq-01-deploy') AND o.Object_Type = 'Artifact' LIMIT 5"},
+ {"op":"query","sql":"SELECT o.Name, p.Property, p.Value FROM t_objectproperties p JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.Name IN ('FB aq-02-low','FB aq-03-notes') AND o.Object_Type = 'Artifact' LIMIT 40"}
+]}

@@ -175,7 +175,10 @@ for (var i = 0; i < files.length; i++) {
         fso.MoveFile(f.path, (rejected ? DIR_REJ : DIR_PROC) + "\\" + stamped);
     }
     if (rejected) { rej++; } else { done++; }
-    names.push(f.name + (rejected ? " (ODMITNUTO)" : ""));
+    // FB-UI-11 (Z261004b-12): vysledek kontroly kvality slovy v souhrnu dialogu
+    var qcHuman = "";
+    try { var qcT = this.FB_QcText(this.FB_JsonParse(respText).qc); if (qcT && qcT.line) { qcHuman = " - " + qcT.line; } } catch (eQt) { qcHuman = ""; }
+    names.push(f.name + (rejected ? " (ODMITNUTO)" : "") + qcHuman);
     this.Log(Repository, "FB GUI fallback: " + f.name + (rejected ? " ODMITNUTO" : " zpracovano"));
 }
 // drive cekajici davky v pending\ (napr. po restartu EA - bezstavovost):

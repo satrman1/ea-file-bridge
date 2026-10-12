@@ -6156,6 +6156,198 @@ t("B2-op pravidlo: kazdy novy kod odpovedi je v FB_ReasonText/ChatRender neutral
     contains(txt, "E_SQL_UNBOUNDED");
 });
 
+
+// ===========================================================================
+// Z261004b-12 (FB-UI-06 / FB-UI-11): audit Notes = vety pro cloveka NAD
+// strojovym zaznamem (beze zmeny), QC slovy do Outputu a dialogu.
+// Riziko z UI-Vystupy kap. 3.6: nekdo "uklidi" strojovy radek jako duplicitu
+// -> test (a) hlida, ze summary je v Notes DOSLOVA a tag result == summary(0,250).
+// ===========================================================================
+var UI06_MARK = "\n\n--- strojovy zaznam (beze zmeny) ---\n";
+function ui06Spy(fn) {
+    // zachyti argumenty vsech volani FB_Audit (vcetne 5. `human`), audit sam nebezi
+    var calls = [], oA = B.FB_Audit;
+    B.FB_Audit = function (Repository, reqId, summary, requestText, human) { calls.push({ id: "" + reqId, summary: "" + summary, human: (typeof human == "undefined") ? undefined : ("" + human) }); return "{AUDIT-SPY}"; };
+    try { fn(); } finally { B.FB_Audit = oA; }
+    return calls;
+}
+t("UI-06 (a): LOW done -> Notes = vety / oddelovac / strojovy zaznam DOSLOVA / request; tag result == summary.substring(0, 250), NE vety", function () {
+    var tags = {}, oS = B.SetTag; B.SetTag = function (e, n, v) { tags[n] = "" + v; };
+    var hold = {};
+    try { var r = lowWriteWithAudit("ui06-a", hold); } finally { B.SetTag = oS; }
+    eq(r.resp.status, "done", JSON.stringify(r.resp).substring(0, 300));
+    eq(r.audit.Elements.Count, 1, "audit vznikl");
+    var notes = "" + r.audit.Elements.GetAt(0).Notes;
+    var iMark = notes.indexOf(UI06_MARK), iReq = notes.indexOf("\n\n--- request ---\n");
+    ok(iMark > 0 && iReq > iMark, "poradi: vety, oddelovac, strojovy zaznam, request: " + notes.substring(0, 400));
+    var summary = notes.substring(iMark + UI06_MARK.length, iReq);
+    ok(/^done: 1 ops \(1 ok, 0 chyb\) \| risk=LOW writeOps=1/.test(summary), "strojovy zaznam beze zmeny: " + summary.substring(0, 120));
+    eq(tags["result"], summary.substring(0, 250), "tag result = prvnich 250 znaku STROJOVEHO zaznamu, ne vet");
+    ok(!/^Davka/.test(tags["result"]), "tag result nezacina vetou pro cloveka");
+    var human = notes.substring(0, iMark);
+    contains(human, "Davka ui06-a skoncila USPESNE: 1 z 1 operace provedeno.", "vysledek prvni vetou");
+    contains(human, "Uroven rizika: bez potvrzeni.", "LOW slovy");
+    ok(!/Proc potvrzeni/.test(human), "u LOW se duvody nevypisuji");
+    contains(human, "Zaloha:", "veta o zaloze");
+    contains(human, "Kontrola kvality:", "veta o kontrole kvality (konecny audit az PO FB_QcRun)");
+    ok(!/risk=|writeOps=|payloadHash=/.test(human), "nad oddelovacem zadne kody strojoveho radku");
+});
+t("UI-06 (a2): FB_Audit bez 5. parametru (stary volajici / signatura z modelu v0.20) -> Notes zacinaji strojovym zaznamem jako dosud", function () {
+    var repo = auditRepo([{ Package_ID: "9", ea_guid: "{A9}" }], "");
+    var p9 = repo._addPackage({ id: 9, name: "#AI-LOG", guid: "{A9}" });
+    try { B.FB_Audit.call(B, repo, "t-au-old", "done: 1 ops | risk=LOW", "{}"); } finally { repo._restore(); }
+    var notes = "" + p9.Elements.GetAt(0).Notes;
+    ok(notes.indexOf("done: 1 ops | risk=LOW\n\n--- request ---\n{}") === 0, "bez human = puvodni tvar: " + notes);
+    ok(notes.indexOf("strojovy zaznam") < 0, "zadny oddelovac bez vet");
+    // signatura z modelu v0.20 (4 parametry) nad novym telem = totez (typeof)
+    var repo2 = auditRepo([{ Package_ID: "9", ea_guid: "{A9b}" }], "");
+    var p9b = repo2._addPackage({ id: 9, name: "#AI-LOG", guid: "{A9b}" });
+    try {
+        withModelSignatures({ FB_Audit: ["Repository", "reqId", "summary", "requestText"] }, null, function () { B.FB_Audit.call(B, repo2, "t-au-old2", "done: x", "{}"); });
+    } finally { repo2._restore(); }
+    ok(("" + p9b.Elements.GetAt(0).Notes).indexOf("done: x\n\n--- request ---") === 0, "signatura v0.20 bez human nespadne");
+});
+t("UI-06 (b1): ELEVATED confirm_required -> potvrzeno v pumpe -> vety: vyzadovala potvrzeni, Potvrdil uzivatel v okne pumpy, Proc potvrzeni vetami (ne kody), zaloha jmenem", function () {
+    b1Reset(); var repo = blRepo();
+    var oD = B.FB_OpDelete; B.FB_OpDelete = function () { return { op: "delete_from_model", status: "ok", items: [{ id: 104, deleted: true, type: "Class", name: "ElC" }] }; };
+    var calls;
+    try {
+        calls = ui06Spy(function () {
+            withPump(function () {
+                var r1 = pumpRun(repo, DEL_C, "ui06-b1");
+                eq(r1.status, "confirm_required", JSON.stringify(r1).substring(0, 300));
+                var r2 = pumpConfirm(repo, r1, "ui06-b1", true);
+                eq(r2.status, "done", JSON.stringify(r2).substring(0, 300));
+            });
+        });
+    } finally { B.FB_OpDelete = oD; }
+    ok(calls.length >= 1, "konecny audit volan");
+    var c = calls[calls.length - 1];
+    ok(typeof c.human == "string" && c.human != "", "human predan: " + JSON.stringify(c));
+    contains(c.human, "Davka ui06-b1 skoncila USPESNE: 1 z 1 operace provedeno.");
+    contains(c.human, "Uroven rizika: vyzadovala potvrzeni. Potvrdil uzivatel v okne pumpy 20");
+    contains(c.human, "Proc potvrzeni: Mazani a odebirani nejde vzit zpet jednim krokem, proto ho vzdy potvrzuje clovek.");
+    ok(!/CLASS_ELEVATED|confirmChannel=|confirmedByUser=/.test(c.human), "zadne kody ani klice strojoveho radku ve vetach");
+    contains(c.human, "Zaloha: 'FB-AUTO ", "zaloha jmenem");
+    contains(c.summary, "confirmationRequired=true confirmedByUser=true confirmChannel=pumpa", "strojovy zaznam beze zmeny");
+});
+t("UI-06 (b2): ELEVATED zamitnuta v dialogu EA -> vety: Davku ZAMITL uzivatel v dialogu EA, nic se nezapsalo; zaloha se neporizovala", function () {
+    blReset(); var repo = blRepo();
+    var calls = ui06Spy(function () {
+        var r = runFile(repo, DEL_C, "ui06-b2");
+        eq(r.status, "confirm_required");
+        var r2 = JSON.parse(asEaRuntime(function () { return B.FB_ConfirmPending.call(B, repo, r.confirm.pendingPath, r.confirm.nonce, r.confirm.payloadHash, "gui", false); }));
+        eq(r2.code, "E_RISK_REJECTED");
+    });
+    eq(calls.length, 1, "audit zamitnuti volan jednou");
+    contains(calls[0].human, "Davku ui06-b2 ZAMITL uzivatel v dialogu EA. Nic se nezapsalo.");
+    contains(calls[0].human, "Uroven rizika: vyzadovala potvrzeni. Zamitl uzivatel v dialogu EA 20");
+    contains(calls[0].human, "Zaloha: neporizovala se (nic se nezapsalo).");
+    ok(!/Kontrola kvality/.test(calls[0].human), "u zamitnute davky zadna QC veta");
+    contains(calls[0].summary, "rejected E_RISK_REJECTED:", "strojovy zaznam beze zmeny");
+});
+t("UI-06 (b3): E_BLACKLIST z P2 -> vety: ODMITNUTA pred zapisem, cil v chranene casti, Duvod z predbezne kontroly, uroven rizika nehodnocena", function () {
+    var repo = scopeRepo();
+    var calls = ui06Spy(function () {
+        var r = scopeRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "N", type: "Class", "package": "{PKG-BL-SUB}" }] }], "ui06-b3");
+        eq(r.code, "E_BLACKLIST", JSON.stringify(r).substring(0, 200));
+    });
+    eq(calls.length, 1);
+    contains(calls[0].human, "Davka ui06-b3 byla ODMITNUTA pred zapisem: cil lezi v chranene casti modelu (1 operace). Nic se nezapsalo.");
+    contains(calls[0].human, "Duvod: ");
+    contains(calls[0].human, "Uroven rizika: nehodnoceno");
+    ok(calls[0].summary.indexOf("error E_BLACKLIST: 1 ops (0 ok, nic neprovedeno)") === 0, "strojovy zaznam beze zmeny: " + calls[0].summary.substring(0, 80));
+});
+t("UI-06 (b4): E_RISK_INTEGRITY (pending soubor zmenen po oknu) -> vety: obsah se zmenil, potvrzeni neplati; strojovy zaznam beze zmeny", function () {
+    blReset(); var repo = blRepo();
+    var calls = ui06Spy(function () {
+        var r = runFile(repo, DEL_C, "ui06-b4");
+        eq(r.status, "confirm_required");
+        memFs.files[r.confirm.pendingPath] = memFs.files[r.confirm.pendingPath].replace("\"id\":104", "\"id\":103");
+        var r2 = confirmFile(repo, r, "ui06-b4", true);
+        eq(r2.code, "E_RISK_INTEGRITY", JSON.stringify(r2).substring(0, 200));
+    });
+    eq(calls.length, 1);
+    contains(calls[0].human, "Davka ui06-b4 byla ODMITNUTA: obsah davky se zmenil mezi oknem a potvrzenim, potvrzeni proto neplati. Nic se nezapsalo.");
+    contains(calls[0].human, "Potvrdil uzivatel v okne bridge");
+    contains(calls[0].human, "Potvrzeni neplati: obsah davky se mezitim zmenil.");
+    contains(calls[0].summary, "error E_RISK_INTEGRITY:");
+    contains(calls[0].summary, "integrityFailed=true");
+});
+t("UI-06 (b5): vsech 7 volajicich FB_Audit v src preda 5. parametr human (FB_Main 5x, FB_ConfirmPending 2x)", function () {
+    var m = srcOf("FB_Main"), c = srcOf("FB_ConfirmPending");
+    var reA = /FB_Audit\(Repository, reqId,\s*[^;]*?, hum[A-Za-z]+\);/g;
+    eq((m.match(reA) || []).length, 5, "FB_Main: 5 volani s human");
+    eq((c.match(reA) || []).length, 2, "FB_ConfirmPending: 2 volani s human");
+    eq((m.match(/FB_Audit\(/g) || []).length, 5, "FB_Main nema jine volani FB_Audit");
+    eq((c.match(/FB_Audit\(/g) || []).length, 2, "FB_ConfirmPending nema jine volani FB_Audit");
+    contains(srcOf("FB_Audit"), 'typeof human != "undefined"', "FB_Audit cte human jen pres typeof (FB-PU-01)");
+    // konecny audit ve FB_Main az PO FB_QcRun (resp.qc existuje)
+    ok(m.indexOf("resp.qc = this.FB_QcRun(") < m.indexOf('this.FB_AuditText("final"'), "poradi FB_QcRun -> konecny audit");
+});
+t("UI-11 (c1): FB_QcText - ctyri stavy slovy; nalez nese popis kontroly a pocet, prvky s markerem (el:ID)", function () {
+    eq(B.FB_QcText.call(B, null).line, "", "null -> nic");
+    eq(B.FB_QcText.call(B, { status: "ciste", checks: 3, findings: [] }).line, "Kontrola kvality: ciste (3 kontroly, bez nalezu).");
+    eq(B.FB_QcText.call(B, { status: "ciste", checks: 1, findings: [] }).line, "Kontrola kvality: ciste (1 kontrola, bez nalezu).");
+    eq(B.FB_QcText.call(B, { status: "ciste", checks: 7, findings: [] }).line, "Kontrola kvality: ciste (7 kontrol, bez nalezu).");
+    var n = B.FB_QcText.call(B, { status: "nalez", checks: 2, findings: [{ id: "QC-DEMO-001", desc: "Element bez jmena v dotcenych packages", count: 2, sample: [{ Object_ID: "77", Name: "" }, { Object_ID: "78", Name: "X" }] }] });
+    eq(n.line, "Kontrola kvality: NALEZ - Element bez jmena v dotcenych packages (QC-DEMO-001, 2x). Zapis probehl; kontrola hlida cele dotcene balicky, nalez nemusi pochazet z teto davky.");
+    eq(n.samples.length, 2); eq(n.samples[0].navId, 77); contains(n.samples[0].text, "(el:77)"); contains(n.samples[1].text, "\"X\"");
+    eq(B.FB_QcText.call(B, { status: "nedobehlo", checks: 0, findings: [], reason: "kontrola selhala - QC-1: SQL" }).line, "Kontrola kvality neprobehla: kontrola selhala - QC-1: SQL - zapis tim neni dotcen.");
+    eq(B.FB_QcText.call(B, { status: "bez_kontrol", checks: 0, findings: [], reason: "pro tento repozitar nejsou definovane QC kontroly" }).line, "Kontrola kvality: bez kontrol - pro tento repozitar nejsou definovane QC kontroly.");
+});
+t("UI-11 (c2): FB_Main pise QC vetu do Outputu za blok zmen (ciste / nalez s prvky / nedobehlo / bez_kontrol); chat ACK qcLine beze zmeny", function () {
+    var states = [
+        { qc: { status: "ciste", checks: 2, findings: [] }, re: /Kontrola kvality: ciste \(2 kontroly, bez nalezu\)\./ },
+        { qc: { status: "nalez", checks: 1, findings: [{ id: "QC-X", desc: "Prvek bez jmena", count: 1, sample: [{ Object_ID: "501", Name: "" }] }] }, re: /Kontrola kvality: NALEZ - Prvek bez jmena \(QC-X, 1x\)\./, sample: /\(el:501\)/ },
+        { qc: { status: "nedobehlo", checks: 0, findings: [], reason: "kontrola selhala - QC-X: chyba SQL" }, re: /Kontrola kvality neprobehla: kontrola selhala - QC-X: chyba SQL - zapis tim neni dotcen\./ },
+        { qc: { status: "bez_kontrol", checks: 0, findings: [], reason: "zadna kontrola se netykala teto zmeny (scope balicku neznamy)" }, re: /Kontrola kvality: bez kontrol - zadna kontrola se netykala teto zmeny/ }
+    ];
+    var oQ = B.FB_QcRun;
+    for (var i = 0; i < states.length; i++) {
+        var st = states[i];
+        B.FB_QcRun = function () { return st.qc; };
+        var hold = {};
+        try { var r = lowWriteWithAudit("ui11-c2-" + i, hold); } finally { B.FB_QcRun = oQ; }
+        eq(r.resp.status, "done");
+        var qcLines = hold.repo._output.filter(function (o) { return st.re.test(o.text); });
+        eq(qcLines.length, 1, "stav " + st.qc.status + ": radek v Outputu; vystup: " + hold.repo._output.map(function (o) { return o.text; }).join(" || ").substring(0, 600));
+        // poradi: blok zmen (FB_LogChanges) PRED QC radkem
+        var iChg = -1, iQc = -1;
+        for (var k = 0; k < hold.repo._output.length; k++) {
+            if (iChg < 0 && /zmeny v modelu/.test(hold.repo._output[k].text)) { iChg = k; }
+            if (st.re.test(hold.repo._output[k].text)) { iQc = k; }
+        }
+        ok(iChg >= 0 && iQc > iChg, "QC radek az za blokem zmen (" + iChg + " < " + iQc + ")");
+        if (st.sample) {
+            var sm = hold.repo._output.filter(function (o) { return st.sample.test(o.text); });
+            eq(sm.length, 1, "prvek nalezu s markerem (el:ID)"); eq(sm[0].id, 501, "navigacni id prvku");
+        }
+        // chat ACK: tvar pro model beze zmeny (FB_ChatRender.qcLine)
+        var ack = chat({ protocol: "eafb/0.2", id: "x", status: "done", results: [], qc: st.qc });
+        if (st.qc.status == "ciste") { contains(ack, " | QC ciste (2 kontrol)"); }
+        if (st.qc.status == "nalez") { contains(ack, " | QC NALEZ: QC-X (1x) - detail v res souboru (zapis PROBEHL, QC neni chyba zapisu)"); }
+        if (st.qc.status == "bez_kontrol") { contains(ack, " | QC: bez kontrol pro tuto zmenu"); }
+        if (st.qc.status == "nedobehlo") { contains(ack, " | QC neproveden (chyba kontroly: "); }
+        ok(ack.indexOf("Kontrola kvality") < 0, "veta pro cloveka NENI v ACK");
+    }
+});
+t("UI-11 (c3): QC veta v dialogu schranky (nad ACK) a v souhrnu GUI fallbacku - zdroj pouziva FB_QcText; do schranky jde ACK beze zmeny", function () {
+    var ci = srcOf("FB_ClipboardImport"), pf = srcOf("FB_ProcessFolder");
+    contains(ci, "this.FB_QcText(obj ? obj.qc : null)", "schranka: FB_QcText");
+    ok(ci.indexOf("var putBack = clipWrite(chat);") < ci.indexOf("qcHuman"), "do schranky jde `chat` (ACK) - QC veta se sklada az po clipWrite");
+    contains(ci, 'return "Davka " + id2 + " zpracovana. " + wrapNote + qcHuman + "\\n\\n" + chat', "veta nad ACK v dialogu");
+    contains(pf, "names.push(f.name + (rejected ? \" (ODMITNUTO)\" : \"\") + qcHuman);", "GUI fallback: veta v souhrnu");
+    // FB_ChatRender beze zmeny vuci v0.20 (ACK cte model)
+    ok(srcOf("FB_ChatRender").indexOf("Kontrola kvality") < 0, "ChatRender bez vety pro cloveka");
+});
+t("UI-06/11: texty bez diakritiky v novych zdrojich (spike S1 nerozhodnut)", function () {
+    ["FB_AuditText", "FB_QcText"].forEach(function (n) {
+        var src = srcOf(n);
+        ok(!/[À-ſ]/.test(src), n + ": zadna diakritika ve zdroji");
+    });
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

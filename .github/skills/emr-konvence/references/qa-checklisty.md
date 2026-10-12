@@ -100,14 +100,75 @@ Bez QC protějšku (obsahová vrstva, kterou SQL kontroly neumí): 4 (čistota s
 
 Zapisuje se do `/Projects/<Projekt>/#QA` — **Artifact** element per běh (✅ P2 2026-07-02, [emr-zapis-pravidla](emr-zapis-pravidla.md) §6), tagged values: sada, datum, výsledek (pass/fail), počty B/W/I; nálezy v notes.
 
+### Vzor notes QA reportu (FB‑UI‑01, ✅ Z261004b-12 2026-10-12; návrh `UI-Vystupy-EA-File-Bridge.md` (mimo workspace — vyžádej od uživatele) kap. 3.1)
+
+Člověk v reportu hledá tři věci: *prošlo to?*, *co mám řešit?*, *kde to je?* Notes proto drží tento tvar (odrážky a tučné řádky jsou formátování Notes v EA — bez něj vzor funguje stejně, jen s prázdnými řádky):
+
+```
+Výsledek: VYHOVUJE | VYHOVUJE S VÝHRADAMI | NEVYHOVUJE — <N> blokujících nálezů, <N> varování, <N> informací.
+Sada <F1> před bránou <G1> · <datum> · <plná cesta scope bez GUIDu>
+
+CO ŘEŠIT PŘED BRÁNOU
+• Blokující — <co je špatně> (kontrola <č.>).
+  Kde: <plná cesta prvku>
+  Návrh: <konkrétní náprava>
+• …
+
+VAROVÁNÍ (zůstávají, se zdůvodněním)
+• <co> (kontrola <č.>). Kde: <cesta>. Záměr/Náprava: <jedna věta>.
+• …
+
+CO STROJ OVĚŘIL A PROŠLO
+<název kontroly> (<č.>) · <název kontroly> (<č.>) · … Celkem <N> z <M> kontrol bez nálezu.
+
+RUČNÍ KROKY PRO ČLOVĚKA
+• <krok>
+
+— technický detail —
+Scope: <cesta> {GUID}
+Zpětné čtení: dávky <id>, <id>. Trasovací vazby <ID>.
+Informace (I): <výčet>.
+Poznámka k běhu: <odchylky dotazů, neaplikovatelné kontroly>.
+```
+
+Pravidla vzoru (tvrdá — hlídá bod checklistu „report dodržuje vzor" v `emr-qa/SKILL.md`):
+
+1. **První řádek = verdikt slovy + počty rozepsané slovy**, ne `B=2, W=3`. Verdikt z číselníku `VYHOVUJE` (žádný B ani W) · `VYHOVUJE S VÝHRADAMI` (žádný B, aspoň jeden W) · `NEVYHOVUJE` (aspoň jeden B); mapuje se na tagged value `vysledek` = `pass` · `pass-s-varováními` · `fail` (hodnota z číselníku, věta patří do notes).
+2. **Nálezy nahoře, řazené podle závažnosti** (B, pak W), ne podle čísla kontroly; číslo kontroly v závorce na konci řádku. Každý nález = co · kde (plná cesta) · návrh.
+3. **Prošlé (zelené) kontroly sbalené na konci jedním odstavcem** — jmenovitě, ale bez rozpisu důkazů.
+4. **GUIDy, čísla dávek, ID vazeb a poznámky k běhu až pod čáru „technický detail"**; nad čarou vždy plná cesta místo GUIDu.
+5. **I nálezy** jen pod čarou (nebo v tagged value `pocet-I`), ne mezi nálezy k řešení.
+
 ## QA verdikt jako filtr brány (WP3, ✅ 2026-07-17, `Zadani-levnejsi-review.md`)
 
 Plný QA report do `#QA` zůstává beze změny (audit). **Do gate package** ([hitl-brany](hitl-brany.md), sekce 2) jde ale jen filtrovaná podoba — report přestává být dokument ke čtení:
 
 - **B nálezy rozepsané** (checklist bod, místo s plnou Path referencí, návrh nápravy),
 - **nevyřešené W** — pouze ty, u nichž producent doložil zdůvodnění, proč zůstávají (W bez zdůvodnění se řeší před bránou),
-- **„co stroj ověřil"** — sbalený jednořádkový souhrn per sada (`Sada F1: 12/12 kontrol pass`), zelené kontroly se **nerozepisují**,
+- **„co stroj ověřil"** — sbalený jednořádkový souhrn per sada, zelené kontroly se **nerozepisují**,
 - I nálezy se do gate package nedávají vůbec (jsou v plném reportu v `#QA`).
+
+**Tvar sekce 2 gate package „Kontrola kvality — co musíš rozhodnout"** (FB‑UI‑02, ✅ Z261004b-12 2026-10-12; návrh `UI-Vystupy-EA-File-Bridge.md` (mimo workspace — vyžádej od uživatele) kap. 3.2) — sekce říká reviewerovi, o čem rozhoduje, ne co všechno stroj kontroloval:
+
+```
+2. Kontrola kvality — co musíš rozhodnout
+
+Stroj ověřil <M> kontrol sady <F1>. <N> prošlo bez nálezu, <N> nálezy brání schválení, <N> varování zůstávají se zdůvodněním.
+
+Brání schválení (<N>)
+  1. <co je špatně, celou větou, s názvem prvku>.
+     Kde: <plná cesta>
+     Návrh: schválit s podmínkou „<podmínka>", nebo vrátit.
+  2. …
+
+Zůstává se zdůvodněním (<N>)
+  • <co> — <zdůvodnění producenta jednou větou>.
+  • …
+
+Plný report: <název QA report Artifactu> v package #QA.
+```
+
+Pravidla: první odstavec = jedna věta s počty slovy (nahrazuje strojový tvar `Sada F1: 12/12 kontrol pass`); položky „Brání schválení" číslované a každá s návrhem rozhodnutí (schválit s podmínkou / vrátit); žádné GUIDy ani ID vazeb — ty jsou v plném reportu; prázdná skupina se vynechá („Brání schválení" se nevypisuje, když je 0 B).
 
 ## Přijímání pravidel z review nálezů (WP5, ✅ 2026-07-17) — postup pro správce metodiky
 

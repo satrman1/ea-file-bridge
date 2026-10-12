@@ -4,7 +4,7 @@
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-10-12 + sha1 3d9611ad894d73f1c2d7b016e496758623f53646 |
+| Verze kanonu | 2026-10-12 + sha1 8d429949466cf0a82d97c6fc34497d9efde5cd9a |
 | Profil | doma |
 | Sada | full |
 | Terminál | off |
@@ -74,10 +74,10 @@
 | skills/emr-konvence/references/emr-zapis-pravidla.md | f46e220151afb9d705c6921b9d1d74649edf51571b291f774652a8be5445358d |
 | skills/emr-konvence/references/hitl-brany.md | 83cef52cac1c7f9bf1cd40f7c580fd17d4ec3c2d5dcf058be102dc0025c650fe |
 | skills/emr-konvence/references/ir-format.md | 95293df0162ccbbf9b8a0d5aba51ae60c698c49eab79215a070a6d330b13193f |
-| skills/emr-konvence/references/qa-checklisty.md | 5dc6e7e972bb63927840476cfff05b5508ad0dc2685a4ee66bc004e12848d14f |
+| skills/emr-konvence/references/qa-checklisty.md | e146586fd4a62f369258938f826fde10c7cca8fc84692523cbc638c2d3d2a9ce |
 | skills/emr-konvence/references/qc-verzovani.sql | ed03933752967007ed35fc6c7594a7274686108f11bfd591981e4a412acc3057 |
 | skills/emr-konvence/references/sar-pravidla.md | 24ba1c60cd818b1a5653ceb1a0edff41e468f699d9949c4c4cfe8ad7a16ffd5e |
-| skills/emr-qa/SKILL.md | 3591b5d5b2301b45e6c2638c0668c02614995185eb9cf007f2238eca79b08d44 |
+| skills/emr-qa/SKILL.md | 0753b68f217a5fae4133218c71ebdd55dd97fd092d13cc93a2660ed40edf3abf |
 | skills/emr-scaffold/SKILL.md | 88e7d3c5f68cd7dddb08221fd6a45080400a07c1a01717342641e5a2a39a3e39 |
 | skills/katalog-komponent/SKILL.md | edd60d52dff91d582af82e0f4e9ca02a3b00203438cfd26a1e69c935ae1349ad |
 | skills/logicka-obrazovka/SKILL.md | 1f4895913fcbc1329bdcfe6712ad51f6811d9d7150997b7a067a76ea61f60728 |

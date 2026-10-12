@@ -251,7 +251,11 @@ try {
     chat = "" + this.FB_ChatRender(obj);
 } catch (eCh) { chat = "EAFB: chat rendering selhal (" + eCh.message + ") - plna odpoved v res-" + id2 + ".json"; }
 var putBack = clipWrite(chat);
-return "Davka " + id2 + " zpracovana. " + wrapNote + "\n\n" + chat
+// FB-UI-11 (Z261004b-12): vysledek kontroly kvality slovy NAD ACK (jen v
+// dialogu pro cloveka; do schranky jde ACK beze zmeny - FB-UI-12 se tu nedela)
+var qcHuman = "";
+try { var qcT = this.FB_QcText(obj ? obj.qc : null); if (qcT && qcT.line) { qcHuman = "\n" + qcT.line; } } catch (eQt) { qcHuman = ""; }
+return "Davka " + id2 + " zpracovana. " + wrapNote + qcHuman + "\n\n" + chat
     + "\n\n" + (putBack
         ? "Chat verze je ve schrance (overeno zpetnym ctenim) - prepni do Copilota a dej Ctrl+V."
         : "(Vlozeni do schranky se NEZDARILO - ve schrance je porad puvodni text; zkopiruj text vyse rucne, plna odpoved je v res-" + id2 + ".json.)");

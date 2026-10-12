@@ -1,0 +1,5 @@
+{"protocol":"eafb/0.2","id":"aq-06-read","repo":"EAEXAMPLE.QEA","ops":[
+ {"op":"query","sql":"SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Name = 'FB aq-05-delete' AND o.Object_Type = 'Artifact' LIMIT 5"},
+ {"op":"query","sql":"SELECT p.Property, p.Value FROM t_objectproperties p JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.Name = 'FB aq-05-delete' AND o.Object_Type = 'Artifact' AND p.Property IN ('result','ai.risk.confirm','ai.risk.codes') LIMIT 10"},
+ {"op":"query","sql":"SELECT COUNT(*) AS c FROM t_object WHERE Object_ID = 11905"}
+]}
