@@ -1,6 +1,6 @@
 # WORKSPACE-METODIKY — roztržení bridge (produkt správce) a metodiky (workspace analytika)
 
-Verze 1.0 · 2026-09-11 · vlákno Z260911‑4 · realizuje PV-R5 (b) ze `IT-ANALYSIS/Zadani-Portace-VSCode-v2.md` kap. 6 · rozhodnutí Miloše 10. 9.: „když bude pumpa funkční, git repo bridge už nebude potřeba a můžu ji volat z jiného repa, kde bude E2E metodika“.
+Verze 1.1 · 2026-10-12 (vlákno Z261004b‑8: provozní návod analytika ve workspace, `baseDir` pod pumpou, `journal/` v `.gitignore`, pumpa v0.6) · verze 1.0 · 2026-09-11 · vlákno Z260911‑4 · realizuje PV-R5 (b) ze `IT-ANALYSIS/Zadani-Portace-VSCode-v2.md` kap. 6 · rozhodnutí Miloše 10. 9.: „když bude pumpa funkční, git repo bridge už nebude potřeba a můžu ji volat z jiného repa, kde bude E2E metodika“.
 
 ## 1. Co je co
 
@@ -9,7 +9,7 @@ Verze 1.0 · 2026-09-11 · vlákno Z260911‑4 · realizuje PV-R5 (b) ze `IT-ANA
 | `ea-file-bridge` (`C:\GIT\ea-file-bridge`, kurýr `satrman1/ea-file-bridge`) | **produkt pro správce** | správce bridge (Miloš) | `src/` (kód executoru), `pump.wsf`, `scripts/`, `tools/` (build kitu, refresh workspace), `test/`, `docs/`, `config/vscode-profile.*` |
 | `ai-transfer` (`C:\GIT\ai-transfer`, kurýr `satrman1/ai-transfer`) | **workspace repo metodiky** — to, ve kterém analytik pracuje ve VS Code | každý analytik | `.github/` (kit Agent Skills z buildu), **kopie** `pump.wsf` + `PUMP-VERSION`, `requests/`, `responses/`, `zadani/`, kontext repa `.example`, `tools/banka-dosad` |
 
-Workspace na bridge repu **nezávisí**: všechno, co z bridge potřebuje, do něj přiteče nástrojem `tools/refresh-workspace.py` a zůstane tam jako vendorovaná kopie s dokladem původu (`.github/skills-manifest.md`, `PUMP-VERSION`). Analytik nikdy nepotřebuje `src/`, harness ani build tool.
+Workspace na bridge repu **nezávisí**: všechno, co z bridge potřebuje, do něj přiteče nástrojem `tools/refresh-workspace.py` a zůstane tam jako vendorovaná kopie s dokladem původu (`.github/skills-manifest.md`, `PUMP-VERSION`). Analytik nikdy nepotřebuje `src/`, harness ani build tool. **Pod pumpou nezávisí workspace ani na `FB_Config.baseDir`:** od v0.16 (FB-PU-35) jde stav bridge (`state-*.txt`), `journal\`, obrázky `responses\images\` i index čekajících dávek do složky pumpy, tedy do workspace — `baseDir` z konfigurace platí jen pro schránku a GUI fallback.
 
 ## 2. Rozhodnutí: jak dostat pumpu do workspace
 
@@ -21,7 +21,7 @@ Pumpa (`pump.wsf`) čte `requests\` a `responses\` **vedle sebe** — `BASE = fs
 | Bankovní stanice | jeden strom = korporátní workspace repo; správce nasadí, analytik klikne | dvojí umístění (kurýrní klon bridge + workspace) → dvě cesty, dva `.gitignore`, dvě místa, kde vzniká `requests\`; přesně ten drift, který kurýrní lekce 14. 8. zakazují („hardcoded cesty vyrábějí trvalý drift“) |
 | Konzistence s pravidly | vendoring + manifest (banka-repo-struktura, 27. 7.: „update skillu je vědomý akt“) — pumpa se chová jako vendorovaný skill | výjimka z pravidla pro jeden soubor |
 | Zastaralost | zjistitelná strojově: `PUMP-VERSION` (sha256 + verze + commit) × pumpa v bridge (`--check`) | zjistitelná jen tím, že běží „nějaká“ pumpa z „nějakého“ klonu |
-| Bezpečnost | pumpa ve workspace dělá totéž co v bridge (kód z modelu, whitelist v modelu) — kopie nic neotevírá | totéž, ale okno pumpy ukazuje cestu k jinému repu než k dávkám → chyby obsluhy typu „která `requests\`?“ (N-B-8 rodina) |
+| Bezpečnost | pumpa ve workspace dělá totéž co v bridge (kód i konfigurace cíle zápisu z modelu) — kopie nic neotevírá | totéž, ale okno pumpy ukazuje cestu k jinému repu než k dávkám → chyby obsluhy typu „která `requests\`?“ (N-B-8 rodina) |
 | Cena | 17 kB duplicitní soubor + jeden řádek v refresh nástroji | úprava `pump.wsf` (argumenty, validace cesty), nová chyba v bootstrapu bank |
 
 **Jak se pumpa aktualizuje:** jen nástrojem `tools/refresh-workspace.py` z repa bridge (build + kopie + `PUMP-VERSION` + skeleton) — nikdy ručním kopírováním. Po refreshi analytik/správce commitne workspace (`chore(workspace): refresh z bridge <datum>`), do banky to jde kurýrem jako každá verze.
@@ -41,20 +41,21 @@ Pozn.: verze v hlavičce pumpy byla od iterace 4b `v0.5` a nezvyšovala se s ka�
 | Cesta | Původ | Do gitu | Poznámka |
 |---|---|---|---|
 | `.github/copilot-instructions.md`, `agents/sa-analytik.agent.md`, `instructions/*.instructions.md`, `skills/<22 skillů>/`, `skills-manifest.md` | build `tools/build-vscode.py --out <ws>\.github` (profil `doma`, sada `full`, terminál off) | ano — výstup profilu doma je veřejný (PV-R6 ii) | needitovat ručně; `skills-manifest.md` = doklad původu (verze kanonu sha1, sha256 každého souboru); bit-shodné s `.github/` v bridge z commitu `62b4b61` |
-| `pump.wsf` | kopie z bridge | ano | v0.5 (eafb/0.2), sha256 `5e37af20…` |
+| `pump.wsf` | kopie z bridge | ano | od 12. 10. 2026 v0.6 (eafb/0.2); sha256 v `PUMP-VERSION` (11. 9.: v0.5) |
+| `NAVOD-PUMPA-VSCODE.md` | kopie z bridge `docs/` (refresh 1.1+) | ano | provozní návod analytika — start, hlášky konzole, okno, věty A–F, restarty, úklid; needitovat ve workspace (`--verify` hlídá shodu s bridge) |
 | `PUMP-VERSION` | píše refresh | ano | verze, protokol, sha256, bytes, `bridge-commit 914f921`, `bridge-describe v0.14-9-g914f921`, `pump-commit cbb383c 2026-09-08`, datum |
 | `requests/.gitkeep`, `responses/.gitkeep` | refresh | ano (jen `.gitkeep`) | obsah v `.gitignore` (`requests/*`, `responses/*`, `.pump.lock`, `state-*.txt`) |
 | `zadani/DBK-hodnot-knihu-brd.md` | kopie z bridge `zadani/` | ano | vzor scénáře PV-R2 (tenký řez F0→F1); refresh do `zadani/` nesahá |
 | `EA-Repozitar-Kontext.example.md` | ručně (Z260911‑4) | ano | šablona: velké tabulky a jejich řády (N-B-3), root packages, šablony/vzory, MDG, verzování, číslování, omezení; kopie → `EA-Repozitar-Kontext.md` (doma) / `EA-Repozitar-Kontext-banka.md` (jen korp. repo) — přesně názvy, které kit čte (`eafb-bridge` SKILL, řádek o TOP N) |
 | `config/banka-hodnoty.example.json` | ručně | ano | vzor hodnot stanice pro `banka-dosad`; ostrý `config/banka-hodnoty.json` v `.gitignore` |
 | `tools/banka-dosad.py` + `.cmd` | ručně (domácí verze nástroje, který v bance 10. 9. napsal Copilot) | ano | `banka-ready\*.json` → dosazení `<TEST-DB>`, `<GUID-SANDBOX>`, `<GUID-AILOG>`, `<WRITE-GROUP>`, `<LOGIN>`, … z configu → `requests\`; fail-closed (config s `<…>` = stop; nenahrazený placeholder = dávka se neuloží; existující soubor v `requests\` se nepřepíše); zdroj → `banka-ready\dosazeno\` (dávka se nikdy nedosadí dvakrát) |
-| `.gitignore` | spravovaný blok píše refresh, řádky mimo blok zůstávají | ano | |
+| `.gitignore` | spravovaný blok píše refresh, řádky mimo blok zůstávají | ano | od refresh 1.1 blok kryje i `journal/` (restore manifesty se starými hodnotami z EA — pod pumpou leží ve workspace) |
 | `README.md` | ručně | ano | kontrakt: co je workspace, jak refresh, kurýrní pravidla, co je v `.gitignore` a proč |
 | `corbel-banka-2026-08-03-cisty.zip` | historie repa (kurýrní balík Corbel, commit `426ad13`) | zůstává | o přesunu rozhodne Miloš (návrh: samostatné repo nebo `docs/` v corbel-poc) |
 
-**Co ve workspace záměrně NENÍ:** `config/vscode-profile.*.json` (profil patří k build toolu — v bance do korporátního repa bridge, ne do workspace), `src/`, `scripts/`, `test/`, `krok0/`, `docs/` bridge. Kit skill `eafb-bridge` nese vlastní kopii registru operací a pravidel agenta, takže dokumentaci bridge analytik nepotřebuje.
+**Co ve workspace záměrně NENÍ:** `config/vscode-profile.*.json` (profil patří k build toolu — v bance do korporátního repa bridge, ne do workspace), `src/`, `scripts/`, `test/`, `krok0/`, `docs/` bridge. Kit skill `eafb-bridge` nese vlastní kopii registru operací a pravidel agenta, takže dokumentaci bridge analytik nepotřebuje — s jedinou výjimkou, provozním návodem `NAVOD-PUMPA-VSCODE.md`, který refresh kopíruje vedle pumpy (FB-PU-40).
 
-## 4. Nástroj `tools/refresh-workspace.py` (bridge repo, verze 1.0)
+## 4. Nástroj `tools/refresh-workspace.py` (bridge repo, verze 1.1)
 
 ```
 python tools\refresh-workspace.py --workspace C:\GIT\ai-transfer --profile doma --set full --kanon C:\Users\milos\CLAUDE\IT-ANALYSIS\Skilly [--terminal on|off] [--log <soubor>]
@@ -67,21 +68,23 @@ Dvojklik: `tools\refresh-workspace.cmd` (doma: workspace `C:\GIT\ai-transfer`, k
 | Krok | Co udělá | Idempotence |
 |---|---|---|
 | 1 build | `build-vscode.py --out <ws>\.github` s předanými `--profile/--set/--kanon/--terminal/--config-dir`; při chybě buildu se `.github/` nemění a nástroj končí 1 | otisk stromu před/po — „beze změny“, když kanon dal totéž |
-| 2 pumpa | kopie `pump.wsf` + `PUMP-VERSION` | zapisuje jen při rozdílu; `refreshed:` datum se nemění, dokud je stejná pumpa i commit |
+| 2 pumpa | kopie `pump.wsf` + `PUMP-VERSION` + `NAVOD-PUMPA-VSCODE.md` (od 1.1) | zapisuje jen při rozdílu; `refreshed:` datum se nemění, dokud je stejná pumpa i commit |
 | 3 skeleton | `requests/.gitkeep`, `responses/.gitkeep`, `zadani/.gitkeep` (jen je-li `zadani/` prázdná), spravovaný blok v `.gitignore` | blok se nahradí na místě, uživatelské řádky mimo blok zůstávají |
 
-Nesahá na obsah `zadani/`, `requests/`, `responses/`. Odmítne workspace, který neexistuje (exit 2 — naklonuj) nebo je samo repo bridge (exit 2). `--verify` = build verify (sha256 proti manifestu, mimo manifest, sweep, počty) + kontrola pumpy + skeleton; `--check` = jen pumpa. `--dry-run` nic nezapíše.
+Nesahá na obsah `zadani/`, `requests/`, `responses/`. Odmítne workspace, který neexistuje (exit 2 — naklonuj) nebo je samo repo bridge (exit 2). `--verify` = build verify (sha256 proti manifestu, mimo manifest, sweep, počty) + kontrola pumpy + návod = bridge (od 1.1) + skeleton; `--check` = jen pumpa. `--dry-run` nic nezapíše.
 
-Testy: `python test\refresh-workspace.test.py` — 15 testů (skeleton vč. netknutého obsahu, dry-run, idempotence 2. běhu, obnova poškozeného bloku `.gitignore`, `--check` aktuální / chybí / ruční editace / zastaralá + obnova, verify po refreshi / ruční editace `.github/` / bez refreshe, vstupy: neexistující workspace, workspace = bridge, bez kanonu). Fixture kanon = `test/fixtures/vscode-kanon/` (sdílená s `build-vscode.test.py`). Harness bridge (`node test\harness.js`) se nemění.
+Testy: `python test\refresh-workspace.test.py` — 16 testů (od 1.1 i kopie návodu, `journal/` v bloku a verify zastaralého návodu) (skeleton vč. netknutého obsahu, dry-run, idempotence 2. běhu, obnova poškozeného bloku `.gitignore`, `--check` aktuální / chybí / ruční editace / zastaralá + obnova, verify po refreshi / ruční editace `.github/` / bez refreshe, vstupy: neexistující workspace, workspace = bridge, bez kanonu). Fixture kanon = `test/fixtures/vscode-kanon/` (sdílená s `build-vscode.test.py`). Harness bridge (`node test\harness.js`) se nemění.
 
 ## 5. Kurýr a banka — dopad
 
-- **Doma:** `ai-transfer` jde na osobní GitHub (private, PAT `banka-transfer-readonly` ho už kryje od 29. 7.). Před každým commitem: `--verify` (sweep B1 nad `.github/` s `sweepAllow` profilu doma = 0 neošetřených) + slovník nad celým repem (`csob|kbc|.corp|@F0|emr_test`) = 0 mimo název MDG profilu `CSOB-ITAN` (PV-R6 ii: není citlivý). Push jen Miloš.
+- **Doma:** `ai-transfer` jde na osobní GitHub (private, PAT `banka-transfer-readonly` ho už kryje od 29. 7.). Před každým commitem: `--verify` (sweep B1 nad `.github/` s `sweepAllow` profilu doma = 0 neošetřených) + slovník nad celým repem (`csob|kbc|.corp|@F0|` + název testovací databáze banky) = 0 mimo název MDG profilu `CSOB-ITAN` (PV-R6 ii: není citlivý). Push jen Miloš.
 - **Banka příště (-5b a dál):** korporátní **workspace** repo = import `ai-transfer` (kopie bez `.git`) + `config/banka-hodnoty.json` + `EA-Repozitar-Kontext-banka.md` + `.github/` přestavěné profilem `banka`. Build profilem `banka` běží z **korporátního repa bridge** (`tools\refresh-workspace.py --workspace <korp. workspace> --profile banka --set thin --kanon <kanon>`), které zůstává jen správci; analytik dostane workspace. Dnešní stav „korporátní repo obsahuje obojí“ (protokol POC banka 10. 9.) se tím rozdělí — bridge korp. repo přestane být místem, kde analytik klikne pumpu.
 - **`banka-dosad`:** bankovní verze (Copilot, 10. 9.) se nahradí touto z kurýra při dalším pullu; config zůstává bankovní (gitignored), formát = plochý JSON `{"TEST-DB": "…", …}`. Rozdíl proti bankovní verzi ověřit v diffu (bankovní verze je mimo připojené složky — nemám ji).
 - **Nový bod v `NAVOD-NASAZENI-KLIKACI` (kandidát v1.2):** krok „workspace analytika“ = klon/import `ai-transfer` + refresh profilem banka; blok „Placeholdery“ odkazovat na `tools\banka-dosad.cmd` **ve workspace**, ne v bridge.
 
 ## 6. Test doma 15 min (Miloš — klikací)
+
+> **Historie (11. 9. 2026, pumpa v0.5, whitelist).** Texty okna v tabulce jsou tehdejší; dnešní hlášky pumpy v0.6 a co dělat: `NAVOD-PUMPA-VSCODE.md` kap. 2 (např. místo `Hotovo` jeden řádek `OK 1/1 req-<id>.json`, místo whitelistu `Zapis: blacklist …`).
 
 Cíl: důkaz, že workspace nezávisí na bridge repu. Bridge repo přitom **nemá** být otevřené ve VS Code ani z něj nesmí běžet pumpa.
 

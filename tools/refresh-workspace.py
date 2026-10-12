@@ -9,7 +9,8 @@ Co udělá (build):
   1. `tools/build-vscode.py --out <workspace>/.github` (kanon → Agent Skills, profil, sada);
   2. zkopíruje `pump.wsf` z tohoto repa do kořene workspace (vendorovaná kopie — pumpa čte
      `requests\\` / `responses\\` VEDLE SEBE, proto musí ležet ve workspace) a zapíše
-     `PUMP-VERSION` (verze z hlavičky pumpy, sha256, zdrojový commit bridge);
+     `PUMP-VERSION` (verze z hlavičky pumpy, sha256, zdrojový commit bridge) a vedle pumpy
+     provozní návod analytika `docs/NAVOD-PUMPA-VSCODE.md` (od 1.1, Z261004b-8 — FB-PU-40);
   3. založí skeleton: `requests/.gitkeep`, `responses/.gitkeep`, `zadani/.gitkeep`
      (jen je-li `zadani/` prázdná) a doplní spravovaný blok do `.gitignore`.
   Obsah `zadani/`, `requests/`, `responses/` se NIKDY nemění ani nemaže.
@@ -40,10 +41,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-REFRESH_VERSION = "1.0"
+REFRESH_VERSION = "1.1"
 PUMP_NAME = "pump.wsf"
 PUMP_VERSION_NAME = "PUMP-VERSION"
 GITHUB_DIR = ".github"
+# Provozní návod analytika pro pumpu (FB-PU-40): kopie z docs/ bridge do kořene workspace
+# vedle pump.wsf, stejné jméno; needitovat ve workspace (kontrola v --verify).
+NAVOD_NAME = "NAVOD-PUMPA-VSCODE.md"
 
 # Hlavička pumpy: `// EA File Bridge - pumpa v0.5 (eafb/0.2)`
 PUMP_HEADER_RE = re.compile(r"EA File Bridge\s*-\s*pumpa\s+v(\d+\.\d+)\s*\((eafb/[\d.]+)\)")
@@ -64,6 +68,8 @@ GITIGNORE_LINES = [
     ".pump.lock",
     "# perzistentni stav bridge (FB_StateFile), stanice-zavisly",
     "state-*.txt",
+    "# restore manifesty journalu (FB_Journal; pod pumpou baseDir = slozka pumpy) - stare hodnoty z EA",
+    "journal/",
     "# hodnoty banky pro tools/banka-dosad.py - jen v korporatnim repu, pres kuryr nikdy",
     "config/banka-hodnoty.json",
     "banka-ready/",
@@ -195,6 +201,7 @@ class Refresh(object):
         self.errors = []
         self.changed = []      # co se zapsalo (pro idempotenci a git status)
         self.pump_src = repo / PUMP_NAME
+        self.navod_src = repo / "docs" / NAVOD_NAME
         self.build_py = repo / "tools" / "build-vscode.py"
 
     def log(self, line=""):
@@ -254,13 +261,14 @@ class Refresh(object):
 
     def step_pump(self, today):
         self.log("")
-        self.log("2. Pumpa (vendorovaná kopie %s + %s):" % (PUMP_NAME, PUMP_VERSION_NAME))
+        self.log("2. Pumpa (vendorovaná kopie %s + %s + %s):" % (PUMP_NAME, PUMP_VERSION_NAME, NAVOD_NAME))
         if not self.pump_src.is_file():
             self.err("chybí zdroj pumpy: %s" % self.pump_src)
             return False
         text, version, sha = render_pump_version(self.repo, self.pump_src, today)
         self.log("  zdroj: %s (pumpa v%s, sha256 %s…)" % (self.pump_src, version, sha[:12]))
         self.write_if_changed(self.ws / PUMP_NAME, self.pump_src.read_bytes(), PUMP_NAME)
+        self.step_navod()
         # PUMP-VERSION: `refreshed` se mění jen když se změnila pumpa (idempotence dne nezávislá)
         pv_path = self.ws / PUMP_VERSION_NAME
         if pv_path.is_file():
@@ -270,6 +278,14 @@ class Refresh(object):
                 self.log("  beze změny: %s (stejná pumpa i commit)" % PUMP_VERSION_NAME)
                 return True
         self.write_if_changed(pv_path, text.encode("utf-8"), PUMP_VERSION_NAME)
+        return True
+
+    def step_navod(self):
+        """Provozní návod analytika vedle pumpy (FB-PU-40). Chybí-li v bridge, jen varování."""
+        if not self.navod_src.is_file():
+            self.log("  [WARN] návod %s v bridge chybí — do workspace se nekopíruje" % self.navod_src)
+            return True
+        self.write_if_changed(self.ws / NAVOD_NAME, self.navod_src.read_bytes(), NAVOD_NAME)
         return True
 
     def step_skeleton(self):
@@ -349,6 +365,24 @@ class Refresh(object):
                     rc = 1
         return rc
 
+    def check_navod(self):
+        """Návod ve workspace = návod v bridge (jinak refresh). Chybí v bridge = jen varování."""
+        self.log("")
+        self.log("Kontrola návodu (%s):" % NAVOD_NAME)
+        if not self.navod_src.is_file():
+            self.log("  [WARN] návod v bridge chybí (%s) — nekontroluji" % self.navod_src)
+            return True
+        ws_navod = self.ws / NAVOD_NAME
+        if not ws_navod.is_file():
+            self.err("%s ve workspace chybí — spusť refresh" % NAVOD_NAME)
+            return False
+        if ws_navod.read_bytes() != self.navod_src.read_bytes():
+            self.err("%s ve workspace se liší od bridge (zastaralý nebo ručně editovaný) — spusť refresh"
+                     % NAVOD_NAME)
+            return False
+        self.log("  aktuální: návod ve workspace = návod v bridge")
+        return True
+
     def check_skeleton(self):
         self.log("")
         self.log("Kontrola skeletonu:")
@@ -402,10 +436,11 @@ class Refresh(object):
         self.header("verify")
         self.verify_build()
         self.check_pump(freshness=True)
+        self.check_navod()
         self.check_skeleton()
         rc = self.finish(quiet=True)
         if rc == 0:
-            self.report[-1] = "[OK] verify prošel (.github/ dle manifestu, pumpa aktuální, skeleton)"
+            self.report[-1] = "[OK] verify prošel (.github/ dle manifestu, pumpa aktuální, návod, skeleton)"
         return rc
 
     def run_check(self):
@@ -459,7 +494,7 @@ def main(argv=None):
     ap.add_argument("--config-dir", default=str(repo / "config"),
                     help="složka s vscode-profile.<profil>.json (default <bridge>/config)")
     ap.add_argument("--verify", action="store_true",
-                    help="jen ověř: build-vscode --verify nad workspace + PUMP-VERSION + skeleton")
+                    help="jen ověř: build-vscode --verify nad workspace + PUMP-VERSION + návod + skeleton")
     ap.add_argument("--check", action="store_true",
                     help="jen porovnej PUMP-VERSION × pump.wsf (workspace × bridge); exit 0/1/2")
     ap.add_argument("--dry-run", action="store_true", help="nic nezapisuj (build dry-run)")

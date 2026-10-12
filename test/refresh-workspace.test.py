@@ -23,6 +23,7 @@ TOOL = REPO / "tools" / "refresh-workspace.py"
 FIXTURE = REPO / "test" / "fixtures" / "vscode-kanon"
 CONFIG = REPO / "config"
 PUMP = REPO / "pump.wsf"
+NAVOD = REPO / "docs" / "NAVOD-PUMPA-VSCODE.md"
 
 
 def run(*args):
@@ -107,6 +108,8 @@ class Skeleton(Base):
         self.assertRegex(pv["protocol"], r"^eafb/")
         self.assertIn("bridge-commit", pv)
         self.assertIn("refreshed", pv)
+        # provozní návod analytika vedle pumpy (1.1, FB-PU-40) = bit-shodná kopie
+        self.assertEqual(sha256(self.ws / "NAVOD-PUMPA-VSCODE.md"), sha256(NAVOD))
         # skeleton
         self.assertTrue((self.ws / "requests" / ".gitkeep").is_file())
         self.assertTrue((self.ws / "responses" / ".gitkeep").is_file())
@@ -118,7 +121,7 @@ class Skeleton(Base):
         gi = (self.ws / ".gitignore").read_text(encoding="utf-8")
         self.assertTrue(gi.startswith("# moje\n*.bak\n"), gi)
         for needle in ("requests/*", "!requests/.gitkeep", "responses/*", ".pump.lock",
-                       "config/banka-hodnoty.json", "state-*.txt"):
+                       "config/banka-hodnoty.json", "state-*.txt", "journal/"):
             self.assertIn(needle, gi)
 
     def test_prazdne_zadani_dostane_gitkeep(self):
@@ -223,6 +226,14 @@ class Verify(Base):
         rc, out = self.verify()
         self.assertEqual(rc, 1, out)
         self.assertIn("mimo manifest", out)
+
+    def test_verify_odhali_zastaraly_navod(self):
+        rc, out = self.refresh()
+        self.assertEqual(rc, 0, out)
+        (self.ws / "NAVOD-PUMPA-VSCODE.md").write_text("stary navod\n", encoding="utf-8")
+        rc, out = self.verify()
+        self.assertEqual(rc, 1, out)
+        self.assertIn("NAVOD-PUMPA-VSCODE.md ve workspace se liší", out)
 
     def test_verify_bez_refreshe(self):
         rc, out = self.verify()

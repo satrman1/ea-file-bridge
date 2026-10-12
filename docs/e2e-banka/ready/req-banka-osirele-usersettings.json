@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "spravce-osirele-usersettings",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT x.Type, x.Client, x.Supplier, u.UserLogin, g.GroupName FROM t_xrefsystem x LEFT JOIN t_object o ON o.ea_guid = x.Supplier LEFT JOIN t_secuser u ON u.UserID = x.Client LEFT JOIN t_secgroup g ON g.GroupID = x.Client WHERE x.Type IN ('UserSettings', 'GroupSettings') AND o.Object_ID IS NULL ORDER BY x.Supplier, x.Type, x.Client"
+  }
+ ]
+}

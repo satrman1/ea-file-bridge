@@ -6,8 +6,13 @@
 // (Method.Code) odpovidajicich operaci elementu AICodeBridge.
 // Spusteni: EA > Specialize > Scripting > novy skript typu JScript > vlozit
 // obsah > Run. Vysledek v System Output, zalozka Script.
-// Pro AKTIVACI v pumpe staci restart pumpy (kod se cte pri attachi);
-// reload projektu je potreba jen pro GUI cast add-inu (menu).
+// AKTIVACE (FB-PU-41, 2026-10-12): PLNY restart EA (File > Exit, spustit znovu)
+// - EA runtime (menu, schranka, dvojklik v Output tabu) nacita kod jen pri
+// startu EA, reload projektu NESTACI; pumpa v0.6 se po restartu EA pripoji
+// sama a kod nacte znovu (pumpu starsi nez v0.6 restartuj rucne).
+// POZOR: inject meni jen telo operaci - NEsrovnava jejich parametry (past
+// FB-PU-01) ani nezapisuje otisk kodu fb.code.*; novou operaci nezalozi.
+// Na nasazeni verze pouzij ITAN-Bootstrap File Bridge.js, inject je nouzovka.
 // ============================================================================
 
 // SRC_DIR se resi samo: zkusi obvykle cesty, jinak se zepta dialogem
@@ -106,7 +111,8 @@ function main() {
     if (newOps != "") {
         Session.Output("POZOR: v src jsou NOVE operace, ktere v modelu chybi: " + newOps + "- spust ITAN-Bootstrap File Bridge.js (idempotentni, doplni je).");
     }
-    Session.Output("DALSI KROK: restart pumpy (dvojklik pump.wsf). Reload projektu jen pro GUI cast add-inu.");
+    Session.Output("DALSI KROK: PLNY restart EA (File > Exit, spustit znovu) - reload projektu NESTACI. Pumpa v0.6 se po restartu EA pripoji sama a nacte novy kod; pumpu starsi nez v0.6 restartuj rucne (zavrit okno, dvojklik pump.wsf).");
+    Session.Output("POZOR: inject NEsrovnava parametry operaci (FB-PU-01) ani nezapisuje otisk kodu - meni-li se hlavicka nektere operace, spust misto nej ITAN-Bootstrap File Bridge.js.");
 }
 
 main();

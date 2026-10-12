@@ -12,7 +12,9 @@ Mezi dávkami je EA normálně použitelná — zamrzne jen na pár sekund, kdy�
 
 Tohle stačí udělat jedinkrát; po restartu EA už se to neztratí.
 
-**1. Nahrát nový kód do modelu.** Spusť pumpu (dvojklik na `pump.wsf`) a přes Copilota (nebo ručně do složky `requests`) pošli dávku `docs\e2e-iterace4\req-20260820-00-deploy.json`. V konzoli pumpy uvidíš, že se nahrálo šest nových věcí (`FB_Gatekeeper`, `FB_GatekeeperLaunch`, `FB_Process`, `FB_ChatRender`, `FB_QcRun`, `FB_QcConfig`) a přepsaly tři.
+**1. Nahrát nový kód do modelu.** *(Historický krok z 20. 8. 2026 — dnes kód vrátného nese každé nasazení bridge; krok 1 přeskoč a zkontroluj jen bod 1a.)* Spusť pumpu (dvojklik na `pump.wsf`) a přes Copilota (nebo ručně do složky `requests`) pošli dávku `docs\e2e-iterace4\req-20260820-00-deploy.json`. V konzoli pumpy uvidíš, že se nahrálo šest nových věcí (`FB_Gatekeeper`, `FB_GatekeeperLaunch`, `FB_Process`, `FB_ChatRender`, `FB_QcRun`, `FB_QcConfig`) a přepsaly tři.
+
+**1a. Povolit vrátného pro repozitář.** Od v0.20 (FB-PU-43) se položka menu ukáže a launcher spustí jen u repozitáře, který má ve `FB_Config` (`src\AICodeBridge.FB_Config.js`) klíč **`gatekeeper: true`** — doma ho má `EAEXAMPLE`; **v bance klíč nikdy**. Změna configu = nasazení + plný restart EA.
 
 **2. Zavřít a znovu otevřít EA** (úplně celé, ne jen projekt — jinak se nový kód a nové menu neprojeví).
 
@@ -32,7 +34,7 @@ Tím máš hotovo napořád.
 
 ### Zapnutí
 
-V EA: **Specialize → AI Bridge → Zapnout AI import režim (vratny)**.
+V EA: **Specialize → AI Bridge → Zapnout AI import rezim (vratny)**. EA se nejdřív zeptá **„Zapnout AI import rezim (vratny)? … Spusti se SKRYTY proces powershell.exe …"** — **Ano** = spustit, **Ne** = nic. (Bez `gatekeeper: true` položka v menu není; launcher by odpověděl „Vratny (AI import rezim) neni pro tento repozitar povolen …".)
 
 Objeví se malé **stavové okno** (drží se navrchu). Nahoře svítí zelené **ČEKAM NA DAVKU**. To je celé — režim běží.
 
@@ -60,7 +62,7 @@ Do Copilota se nikdy neposílá tajný kód potvrzení — jen krátký „otisk
 
 ### Vypnutí
 
-Klikni **Ukoncit rezim** (nebo zavři okno). Do schránky ti spadne **závěrečný souhrn** session (kolik dávek, co se stalo) — můžeš ho vložit do Copilota, mailu nebo JIRA. Vedle pumpy se navíc uloží soubor `session-log-…md`. Okno zmizí, režim skončil.
+Klikni **Ukoncit rezim** (nebo zavři okno). Do schránky ti spadne **závěrečný souhrn** session (kolik dávek, co se stalo) — můžeš ho vložit do Copilota, mailu nebo JIRA. Do složky výměny (`FB_Config.baseDir`, ukazuje ji **Stav bridge**) se navíc uloží soubor `session-log-…md`. Okno zmizí, režim skončil.
 
 ---
 
@@ -70,16 +72,16 @@ Klikni **Ukoncit rezim** (nebo zavři okno). Do schránky ti spadne **závěreč
 
 ## Když antivirus blokuje vrátného: ruční režim ze schránky (bez PowerShellu)
 
-Pokud nechceš (nebo nemůžeš kvůli antiviru) používat automatický režim, máš v tomtéž menu položku **Zpracuj dávku ze schránky (File Bridge)**. Funguje celá uvnitř EA, nic nespouští:
+Pokud nechceš (nebo nemůžeš kvůli antiviru) používat automatický režim, máš v tomtéž menu položku **Zpracovat davku ze schranky**. Funguje celá uvnitř EA, nic nespouští (podrobně `NAVOD-COPILOT-SCHRANKA.md`):
 
 1. V Copilotu klikni **Copy** na dávce.
-2. V EA: **Specialize → AI Bridge → Zpracuj dávku ze schránky (File Bridge)**.
+2. V EA: **Specialize → AI Bridge → Zpracovat davku ze schranky**.
 3. EA si samo přečte dávku ze schránky, zpracuje ji a **odpověď ti vloží zpět do schránky** (a ukáže ji v okně). Přepni do Copilota, **Ctrl+V**.
 4. U mazání/klonování se objeví dialog **Ano / Ne / Storno** — stejné potvrzení jako u automatického režimu, jen jako okénko EA.
 
-Rozdíl proti automatickému režimu: musíš na každou dávku kliknout do menu (není to samočinné). Zato to antivirus neřeší, protože se nespouští žádný PowerShell. Úplně stejně funguje i **Process requests (File Bridge)** — jen tam dávku místo Copy uložíš jako soubor do složky `requests`.
+Rozdíl proti automatickému režimu: musíš na každou dávku kliknout do menu (není to samočinné). Zato to antivirus neřeší, protože se nespouští žádný PowerShell. Úplně stejně funguje i **Zpracovat davky ze slozky (requests)** — jen tam dávku místo Copy uložíš jako soubor do složky `requests`. Obě položky při běžící pumpě nic neprovedou (`BEZI PUMPA …`).
 
-**Okno se vůbec neobjevilo (a antivirus mlčí).** Zkus zapnout režim s viditelnou konzolí: vytvoř vedle pumpy soubor `gk-config.json` s obsahem `{ "debug": true }` a zapni režim znovu — otevře se černé okno PowerShellu, kde uvidíš, kde se to zaseklo. (Pošli mi ten výpis.)
+**Okno se vůbec neobjevilo (a antivirus mlčí).** Zkus zapnout režim s viditelnou konzolí: vytvoř ve složce výměny (`FB_Config.baseDir`) soubor `gk-config.json` s obsahem `{ "debug": true }` a zapni režim znovu — otevře se černé okno PowerShellu, kde uvidíš, kde se to zaseklo. (Pošli mi ten výpis.)
 
 **Okno svítí „EA NEDOSTUPNA", i když EA běží.** Nejčastěji je EA spuštěná „jako správce" a vrátný ne (nebo naopak) — musí být oba stejně. Zavři obojí a spusť EA normálně.
 
@@ -88,3 +90,7 @@ Rozdíl proti automatickému režimu: musíš na každou dávku kliknout do menu
 **Odpověď říká „0 řádků".** To znamená jen „dotaz nic nevrátil", **ne** „data neexistují" — zvlášť když těsně předtím EA na chvíli zamrzla na nějakém dialogu. Radši si to ověř ještě jednou kontrolním dotazem.
 
 **Dávku jsem zkopíroval dvakrát (nebo přišla i přes Downloads).** Provede se **jen jednou** — vrátný si pamatuje, co už viděl.
+
+---
+
+Changelog: **2026-10-12** (vlákno Z261004b‑8, srovnání s kódem v0.21) — krok 1a `gatekeeper: true` a dotaz Ano/Ne před spuštěním (FB-PU-43), názvy položek menu podle `EA_GetMenuItems`, `session-log` a `gk-config.json` ve složce výměny (`baseDir`), `BEZI PUMPA`.

@@ -1,6 +1,6 @@
 # Nasazení EA File Bridge — klikací návod (bez terminálu)
 
-Verze **v1.4**, 2026-10-12 (vlákno Z261004b-5, pumpa **v0.6** — texty konzole 6.1, stavový soubor, `processing\`, výchozí Storno; v1.3 2026-10-12 vlákno Z261004b-11, cíl zápisu — režim **blacklist** místo whitelistu; v1.2 2026-10-10 vlákno Z261004b-1, pojistka nasazení FB-PU-01; v1.1 2026-09-10 vlákno Z260908-5, po živém nasazení v bance) · Kód: **v0.17 (cíl zápisu)** (`docs/PROTOKOL-EAFB.md`, registr **42 operací**, harness 519/519) · **Proveden: Miloš, v bance St 10. 9. 2026 — PASS s nálezy** (`docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`, tehdy v0.14 s whitelistem); v1.3 ještě v bance neproběhla — nasazení v bance je samostatný krok Miloše (zadání `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` v1.2)
+Verze **v1.5**, 2026-10-12 (vlákno Z261004b‑8, balík E — návody srovnané s kódem v0.21: tabulka restartů 4b, menu, start session po řádcích, okno podle FB-UI-08, audit, `E_SQL_UNBOUNDED`; v1.4 2026-10-12 vlákno Z261004b-5, pumpa **v0.6** — texty konzole 6.1, stavový soubor, `processing\`, výchozí Storno; v1.3 2026-10-12 vlákno Z261004b-11, cíl zápisu — režim **blacklist** místo whitelistu; v1.2 2026-10-10 vlákno Z261004b-1, pojistka nasazení FB-PU-01; v1.1 2026-09-10 vlákno Z260908-5, po živém nasazení v bance) · Kód: **v0.21** (`docs/PROTOKOL-EAFB.md`, registr **42 operací dávky**, v modelu **139 operací** AICodeBridge, harness 603/603) · **Proveden: Miloš, v bance St 10. 9. 2026 — PASS s nálezy** (`docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`, tehdy v0.14 s whitelistem); v1.3 ještě v bance neproběhla — nasazení v bance je samostatný krok Miloše (zadání `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` v1.2)
 
 > **Co tenhle soubor je.** Postup v pořadí, v jakém se to v bance skutečně klikne — od pullu kurýrního klonu po první ping. Žádný terminál: git jde přes **VS Code → Source Control**, kód do modelu přes **EA UI**, dávky přes **pumpu (dvojklik)** nebo **schránku (menu v EA)**.
 > **Co tenhle soubor NENÍ.** Není to protokol testu (ty jsou `docs/e2e-pumpa/PROTOKOL-E2E-PUMPA.md` a `docs/e2e-k8-qeax/PROTOKOL-K8.md`) ani plán fáze 2 POC (`docs/NAVOD-NASAZENI-BANKA.md`, který na tenhle návod odkazuje).
@@ -90,12 +90,12 @@ Kód executoru žije **jako operace elementu `AICodeBridge`** (stereotyp `Javasc
 
 ## 2.1 Copy / Paste Full Structure for Duplication
 
-- **CO:** zkopírovat celý element AICodeBridge se všemi ~105 operacemi.
+- **CO:** zkopírovat celý element AICodeBridge se všemi operacemi (12. 10. 2026: 139).
 - **KDE:** EA, Project Browser, zdrojový model.
 - **JAK:**
   1. Najdi element **AICodeBridge** → pravým → **Copy / Paste → Copy**.
   2. Otevři **`<TEST-DB>`** → pravým na cílový package (kam patří add-iny) → **Copy / Paste → Paste Element(s)…** → v dialogu zvol **Full Structure for Duplication** → **OK**.
-- **OČEKÁVANÝ VÝSLEDEK:** pod cílovým packagem je nový **AICodeBridge**; dvojklik → záložka **Operations** ukazuje řádově **130 operací** (`FB_Main`, `FB_WriteScope`, `EA_MenuClick`, `EA_GetMenuItems`…). Vendor add-iny, které v modelu už jsou, **nesahat**. **Od v0.17 musí být `AICodeBridge` v balíčku, kde kromě add-inů (elementy `JavascriptAddin`) nic jiného není — žádné podbalíčky, žádné cizí prvky** (bridge ten balíček implicitně chrání; cizí obsah = `E_SCOPE_CONFIG`, 5.2).
+- **OČEKÁVANÝ VÝSLEDEK:** pod cílovým packagem je nový **AICodeBridge**; dvojklik → záložka **Operations** ukazuje řádově **140 operací** (`FB_Main`, `FB_WriteScope`, `EA_MenuClick`, `EA_GetMenuItems`…). Vendor add-iny, které v modelu už jsou, **nesahat**. **Od v0.17 musí být `AICodeBridge` v balíčku, kde kromě add-inů (elementy `JavascriptAddin`) nic jiného není — žádné podbalíčky, žádné cizí prvky** (bridge ten balíček implicitně chrání; cizí obsah = `E_SCOPE_CONFIG`, 5.2).
 - **KDYŽ SELŽE:** pokračuj rovnou 2.2 a **zapiš, na čem to spadlo**.
 
 ## 2.2 ITAN-Bootstrap (kód z disku)
@@ -173,19 +173,38 @@ Kód executoru žije **jako operace elementu `AICodeBridge`** (stereotyp `Javasc
 - **CO:** aktivovat nově nasazený kód v EA runtime.
 - **KDE:** EA.
 - **JAK:** **File → Exit** (zavřít celou aplikaci, ne jen projekt) → spustit EA znovu → otevřít `<TEST-DB>`.
-- **OČEKÁVANÝ VÝSLEDEK:** v menu je **Specialize → AI Bridge** s položkami:
+- **OČEKÁVANÝ VÝSLEDEK:** v menu je **Specialize → AI Bridge** s položkami (`src\AICodeBridge.EA_GetMenuItems.js`, kód v0.20+):
   ```
   Zpracovat davku ze schranky
   Zpracovat davky ze slozky (requests)
-  Zapnout AI import rezim (vratny)
   ---
   Stav bridge (kam zapisuje / co cte)
+  Kontext vyberu do schranky (pro Copilota)
+  Uklid automatickych baselines (ukazat / provest)
   About AI Bridge
   ```
-  (Položka „Nav spike" se v bance nezobrazí — je vázaná na `navProbe: true` v `FB_Config`, který v bankovní položce **není**.)
-- **PROČ TO NEJDE OBEJÍT:** reload projektu **nestačí**. Kód pro EA runtime (menu, dvojklik v Output tabu, GUI fallback) se načítá jen při startu EA. Totéž platí po **každé** změně kódu nebo configů v modelu a po každé změně členství v security skupině (cache `FB_UserAccess` platí na session) — **a to i pro pumpu**: členství si cachuje i běžící pumpa (kód běží v jejím procesu), takže po změně skupiny **restartuj EA i pumpu** (K8 N-K8-8, banka: ping hlásil `read` i po přidání do skupiny, dokud se pumpa nerestartovala).
+  (Položka **„Zapnout AI import rezim (vratny)"** se ukáže jen u repozitáře s `gatekeeper: true` ve `FB_Config` — doma; **v bance ji nedávej** (5.1, FB-PU-43). Položka „Nav spike" jen s `navProbe: true` — v bankovní položce **není**.)
+- **PROČ TO NEJDE OBEJÍT:** reload projektu **nestačí**. Kód pro EA runtime (menu, schránka, dvojklik v Output tabu, GUI fallback) se načítá jen při startu EA. Totéž platí po **každé** změně kódu nebo configů v modelu a po každé změně členství v security skupině (cache `FB_UserAccess` platí na session) — **a to i pro pumpu**: členství si cachuje i běžící pumpa (kód běží v jejím procesu). **Pumpa v0.6** ztrátu EA pozná v každém průchodu smyčky, po restartu EA se připojí sama a kód (i paměť členství) načte znovu; **pumpu starší než v0.6 restartuj ručně** (K8 N-K8-8, banka 10. 9. s pumpou v0.5: ping hlásil `read` i po přidání do skupiny, dokud se pumpa nerestartovala). Co po které změně restartovat: **tabulka 4b**.
 - **KDYŽ MENU JE, ALE KLIK NIC NEDĚLÁ** a v Output tabu „AI Bridge“ je `Unhandled menu item: -AI Bridge` → reception `EA_MenuClick` má špatné parametry → spusť bootstrap v0.14+ (řádek `PX`) a restartuj (7.10).
 - **KDYŽ MENU MLČÍ:** viz troubleshooting 7.1.
+
+---
+
+# 4b. Co jsem změnil → co restartovat (od v1.5 — FB-PU-41)
+
+Jedna tabulka pro správce i analytika (tatáž je v `docs/NAVOD-PUMPA-VSCODE.md` kap. 5). Podle kódu: kód, konfigurace i paměť členství pro **kanál pumpy** žijí v procesu pumpy a načtou se při jejím připojení k EA; **menu, schránka, dvojklik v Output tabu a GUI fallback** žijí v procesu EA a načtou se jen při startu EA. *Plný restart EA* = File → Exit a spustit znovu; **File → Reload Current Project nestačí nikdy** (PROTOKOL §1a/3).
+
+| Co se změnilo | Co restartovat | Proč |
+|---|---|---|
+| Kód nebo configy nasazené **bootstrapem** (banka vždy, doma generálka) | **plný restart EA**; pumpa v0.6 se po něm připojí sama a kód načte znovu (starší pumpu restartuj ručně); pak kontrola parametrů 4a | pumpa čte kód při připojení (`pump.wsf` `loadBridge`), EA runtime při startu EA |
+| Kód nasazený **`deploy_src` pumpou** (jen doma) | pumpa nic — po potvrzené dávce kód načte sama (`deploy_src -> prenacitam kod z modelu`); menu, schránka, dvojklik v Output tabu: **plný restart EA** | N-B2O-1 (12. 10.): první schránkový pokus po `deploy_src` běžel podle starého kódu v EA |
+| Kód nahraný skriptem **ITAN-Inject** (nouzovka) | plný restart EA (pumpa v0.6 se připojí sama) | inject nesrovná parametry operací ani nezapíše otisk kódu — na nasazení verze vždy bootstrap |
+| **Nová položka v menu** AI Bridge (nová operace `EA_*` / změna `EA_GetMenuItems`) | plný restart EA | menu se staví při startu EA |
+| **Členství** ve skupinách EA security (`FB_AccessGroups`) | plný restart EA (pumpa v0.6 se připojí sama a paměť členství zahodí; kit věta F radí zavřít i pumpu — jistota) | cache `FB_UserAccess` v procesu EA i pumpy |
+| **Nová `pump.wsf`** (refresh workspace, nová verze pumpy) | restart pumpy (zavřít okno, dvojklik) | běžící pumpa se sama nevymění; zámek a stavový soubor jsou v `pump.wsf` |
+| V téže EA otevřen **jiný projekt** | restart pumpy | pumpa drží identitu repozitáře ze startu session → jinak každá dávka `E_REPO` „restartuj pumpu" (FB-PU-06) |
+| Spuštěná **druhá EA** | zavřít ji, restart pumpy | pumpa se připojí na první instanci (`GetObject(, "EA.App")`) |
+| EA spadla / zavřena uprostřed dávky | otevřít EA | pumpa v0.6 se připojí sama; nedokončenou dávku ohlásí `PRERUSENA` (`E_INTERRUPTED`), znovu ji neprovede |
 
 ---
 
@@ -221,7 +240,7 @@ Všech šest je zároveň **chráněný element** (`PROTOKOL-EAFB.md` §8 bod 8)
   { repo: "<TEST-DB>", baseDir: "<KORP>", srcDir: "<KORP>\\src\\", navProbe: false,
     auditPkg: "{<GUID-AILOG>}" }
   ```
-- **Pole:** `repo` = podřetězec identity repozitáře (u MS SQL **název databáze**, viz 5.2); `baseDir` = kořen výměnných složek — **v bance nastav na `<KORP>`**, aby schránkový kanál a *Stav bridge* ukazovaly tutéž složku, kterou čte pumpa (ta čte `requests\` **vedle `pump.wsf`** bez ohledu na baseDir; bez baseDir ukazuje EA default `%USERPROFILE%\Documents\EA-File-Bridge\…` a dávky pak končí ve špatné složce); `srcDir` = složka kanonu kódu; `navProbe: false` (spike menu do banky nepatří); **`auditPkg` = GUID package `<AI-LOG>` — od v0.14 povinný** (bez něj jde audit do první package jménem `#AI-LOG`; K8 N-K8-3).
+- **Pole:** `repo` = podřetězec identity repozitáře (u MS SQL **název databáze**, viz 5.2); `baseDir` = kořen výměnných složek — **v bance nastav na `<KORP>`**, aby schránkový kanál a *Stav bridge* ukazovaly tutéž složku, kterou čte pumpa (ta čte `requests\` **vedle `pump.wsf`** bez ohledu na baseDir; bez baseDir ukazuje EA default `%USERPROFILE%\Documents\EA-File-Bridge\…` a dávky pak končí ve špatné složce); `srcDir` = složka kanonu kódu; `navProbe: false` (spike menu do banky nepatří); **`auditPkg` = GUID package `<AI-LOG>` — od v0.14 povinný** (bez něj jde audit do první package jménem `#AI-LOG`; K8 N-K8-3); **`gatekeeper`** — v bance **klíč nedávej** (bez `gatekeeper: true` se položka vrátného v menu neukáže a launcher odmítne, FB-PU-43; doma `true`). Pod pumpou se `baseDir` nepoužívá: stav (`state-*.txt`), `journal\` a obrázky jdou do složky pumpy (v0.16, FB-PU-35).
 - **OČEKÁVANÝ VÝSLEDEK:** po bootstrapu a restartu ukáže menu **Stav bridge** správnou složku výměny.
 
 ## 5.2 `FB_WriteScope` — kam zápis NESMÍ (blacklist; od v0.17 místo `FB_Whitelist`)
@@ -265,14 +284,14 @@ Všech šest je zároveň **chráněný element** (`PROTOKOL-EAFB.md` §8 bod 8)
 - **JAK:** `{ repo: "<TEST-DB>", writeGroups: ["<WRITE-GROUP>"] }` — jméno skupiny ze 3.3.
 - **Chování:** EA security **vypnutá** → vše povoleno (vynucovat bez security nedává smysl). Security **zapnutá + repo bez položky** → fail-closed, žádné write fíčury. Security zapnutá + položka → vynucuje se členství; kdo má write, má i read.
 - **OČEKÁVANÝ VÝSLEDEK:** nečlen skupiny dostane na zápisovou dávku `E_ADDIN_ACCESS` s čitelnou hláškou a **nic se neprovede**; čtecí dávka mu projde.
-- **POZOR:** členství je **cachované na session** — po změně skupiny **plný restart EA i pumpy** (krok 4), jinak testuješ starý stav (banka 10. 9.: uživatel skupinu neměl → přidal → ping `read`, dokud neproběhl restart obou).
+- **POZOR:** členství je **cachované na session** — po změně skupiny **plný restart EA**; pumpa v0.6 se po něm připojí sama a cache zahodí, starší pumpu restartuj ručně (tabulka 4b). Jinak testuješ starý stav (banka 10. 9. s pumpou v0.5: uživatel skupinu neměl → přidal → ping `read`, dokud neproběhl restart obou).
 
 ## 5.5 `FB_RiskPolicy` — kdy se bridge ptá
 
 - **CO:** nastavit, která dávka projde bez dialogu a která vyžaduje potvrzení člověkem.
 - **KDE:** `<KORP>\src\AICodeBridge.FB_RiskPolicy.js`.
 - **JAK:** položka pro `<TEST-DB>` s mapou tříd (`classes`), prahy `elevate`/`block`, `budgetMs`, `hashMaxChars`. Proti dev položce **jeden rozdíl**: `"deploy_src": "BLOCKED"` (na dev je ELEVATED, protože tam je to jediná cesta nasazení kódu). Nejmenší funkční zápis (banka 10. 9.): před `return [` vlož `var BANK_CLASSES = {}; for (var bk in DEV_CLASSES) { BANK_CLASSES[bk] = DEV_CLASSES[bk]; } BANK_CLASSES["deploy_src"] = "BLOCKED";` a položku `{ repo: "<TEST-DB>", classes: BANK_CLASSES, elevate: DEV_ELEVATE, block: DEV_BLOCK, budgetMs: 8000, hashMaxChars: 2000000 }` — prahy shodné s domovem = srovnatelné E2E; ostrá politika je rozhodnutí P2+.
-- **Mechanika:** mapa tříd musí pokrývat **všech 25 zápisových operací**; prahy určují, kdy dávka skončí `confirm_required`. Výchozí ELEVATED prahy: `deleteTargets > 0`, `writeOps > 20`, `updatedExisting > 10`, `affectedPackages > 1`, `foreignDiagrams > 0`, `moveOps > 0`. `move_elements` je **ELEVATED vždy**, i pro jediný prvek (je to zásah do struktury a governance visí na package).
+- **Mechanika:** mapa tříd musí pokrývat **všech 27 zápisových operací** (registr `REG` ve `FB_Main`, příznak `w`); prahy určují, kdy dávka skončí `confirm_required`. Výchozí ELEVATED prahy: `deleteTargets > 0`, `writeOps > 20`, `updatedExisting > 10`, `affectedPackages > 1`, `foreignDiagrams > 0`, `moveOps > 0`. `move_elements` je **ELEVATED vždy**, i pro jediný prvek (je to zásah do struktury a governance visí na package).
 - **Fail-closed:** repozitář **bez politiky**, neúplná mapa, chybějící práh, pád gate nebo překročený rozpočet → **ELEVATED, nikdy LOW**.
 - **OČEKÁVANÝ VÝSLEDEK:** běžná pracovní dávka jede bez dialogu; mazání a hromadné zásahy se ptají.
 
@@ -312,16 +331,28 @@ Ping je **kotva session**: vrací identitu repozitáře, blok **`writeScope`** (
   2. Ulož dávku jako `req-banka-ping-01.json` do **`<KORP>\requests\`** (vedle `pump.wsf` — pumpa čte jen tu; *Stav bridge* ukazuje `baseDir` z 5.1, který má být totéž). V bance přes `banka-ready\` + `tools\banka-dosad.cmd` (viz Placeholdery).
   3. Počkej ~2 s.
 - **OČEKÁVANÝ VÝSLEDEK (pumpa v0.6):**
-  - **konzole pumpy** hlásí postupně: banner `=== EA File Bridge pumpa v0.6 (eafb/0.2) ===`, řádek `Stav: …\responses\pump-status.json | log: …\responses\pump-RRRR-MM-DD.log | zamek uzivatele: %LOCALAPPDATA%\EA-File-Bridge\pump.lock`, `Pripojeno na EA: <připojovací řetězec>` (to **není** identita repozitáře — tu nese řádek `Repozitar:` níže), **počet načtených operací** (`Code loader: ~135 operaci`), `Pumpa v0.6, otisk <12 znaků>` (sha256 souboru pumpy = `PUMP-VERSION` workspace), pak hlášení session: **`Repozitar: <TEST-DB>`** (pohledem zkontroluj, že je tam `<TEST-DB>`, ne `<PROD-DB>`) `| Zapis: blacklist (N chranenych vetvi) | EA security zapnuta | chraneno: <cesty> | bridge chrani i sam sebe: <cesty> | kaskady mazani do chranene casti: zakazane … | Otisk kodu v modelu: <12 znaků> (<N> souboru bez konfigurace, nasazeno <datum> bootstrap) | Pumpa v0.6, otisk <12 znaků> (<cesta>) | Session baseline se nedela …`** (od v0.17 bez session baseline); potom `Zpracovavam req-banka-ping-01.json ...` a **jeden výsledkový řádek** `OK 1/1 req-banka-ping-01.json` (u chyby `CHYBA op[N] <kód> req-…` nebo `CHYBA <kód> req-…`, u čekání na potvrzení `CEKA NA TEBE (okno potvrzeni) req-…`);
+  - **konzole pumpy** hlásí postupně: banner `=== EA File Bridge pumpa v0.6 (eafb/0.2) ===`, řádek `Stav: …\responses\pump-status.json | log: …\responses\pump-RRRR-MM-DD.log | zamek uzivatele: %LOCALAPPDATA%\EA-File-Bridge\pump.lock`, `Pripojeno na EA: <připojovací řetězec>` (to **není** identita repozitáře — tu nese řádek `Repozitar:` níže), **počet načtených operací** (`Code loader: ~139 operaci`), `Pumpa v0.6, otisk <12 znaků>` (sha256 souboru pumpy = `PUMP-VERSION` workspace), pak hlášení session **po řádcích** (od v0.19, FB-PU-05) — hlavička `==== AI Bridge pripraven - <datum čas> ====`, **pod ní nejdřív varování** (`POZOR …`, `CHYBA …`, `Upozorneni …`; žádné = v pořádku), pak informace:
+    ```
+    Repozitar: <TEST-DB>
+    Zapis: blacklist (N chranenych vetvi)
+    EA security zapnuta
+    chraneno: <cesty> [note]
+    bridge chrani i sam sebe: <cesta auditu>, <cesta add-inu>
+    kaskady mazani do chranene casti: zakazane, E_BLACKLIST (cascadeDelete = block)
+    Otisk kodu v modelu: <12 znaků> (<N> souboru bez konfigurace, nasazeno <datum> <kdo>)
+    Pumpa v0.6, otisk <12 znaků> (<cesta>)
+    Session baseline se nedela (sessionBaseline off). Zalohy se poridi automaticky az pred prvnim zapisem - …
+    ```
+    (pohledem zkontroluj, že `Repozitar:` je `<TEST-DB>`, ne `<PROD-DB>`); potom `Zpracovavam req-banka-ping-01.json ...` a **jeden výsledkový řádek** `OK 1/1 req-banka-ping-01.json` (u chyby `CHYBA op[N] <kód> req-…` nebo `CHYBA <kód> req-…`, u čekání na potvrzení `CEKA NA TEBE (okno potvrzeni) req-…`);
   - **`Otisk kodu v modelu`** musí být stejný, jaký hlásí `python tools\code-fingerprint.py` nad kurýrním klonem (správce) — jiný otisk = v modelu je jiný kód, než si myslíš (bootstrap z jiné pracovní kopie); `Otisk kodu v modelu: neni` = kód nasadil starý bootstrap (před v0.18) — spusť bootstrap znovu;
   - **`POZOR: pumpa vX.Y je starsi nez kod v modelu`** = vendorovaná kopie pumpy ve workspace zůstala stará — vyměň ji (`tools\refresh-workspace.py`); naopak **`STOP: kod v modelu je STARSI nez pumpa v0.6`** = pumpa v0.6 nad kódem před v0.18 dávky nebere — nasaď kód bootstrapem a pumpu restartuj;
   - v `responses\` vznikl **`pump-status.json`** (`phase: "idle"`, `repository`, `heartbeat`, `aliveUntil`, `lastResult`) a **`pump-<datum>.log`** se stejnými řádky jako konzole (log se dá číst bez okna; nic z něj nevynášej — nese cesty a identitu repozitáře);
   - v `responses\` je `res-banka-ping-01.json` se `"status": "done"`, `"repository"` = `<TEST-DB>` a v `results[0]` pole `echo`, `eaVersion`, **`writeScope{mode: "blacklist", securityEnabled, cascadeDelete, summary, blacklist[{guid, name, path, note, found, allowIncomingRefs}], implicit[], problems[], warnings[], agentNotes[]}`** (pole `whitelist[]` od v0.17 není) a **`access{level, securityEnabled, reason}`**;
-  - **Output tab „AI Bridge"** má jeden řádek `FB banka-ping-01 -> done: 1 ops (1 ok, 0 chyb)` (od v0.18 má řádek i každá dávka odmítnutá předčasně — `E_PARSE`, `E_REPO`, `E_ARGS`);
+  - **Output tab „AI Bridge"** má hlášení session (týž blok jako konzole) a jeden řádek `FB banka-ping-01 -> done: 1 ops (1 ok, 0 chyb)` (od v0.18 má řádek i každá dávka odmítnutá předčasně — `E_PARSE`, `E_REPO`, `E_ARGS`); u zápisové dávky navíc blok změn a pod ním řádek **`Kontrola kvality: ciste (N kontrol, bez nalezu).`** / `Kontrola kvality: NALEZ - …` / `Kontrola kvality neprobehla: … - zapis tim neni dotcen.` (v0.21, FB-UI-11);
   - **schránka se nezmění** a nikde není text `EAFB OK …`.
 - **DŮLEŽITÉ — to poslední je správně, ne chyba:** **pumpa chatovou verzi ACK nerenderuje** (zjištění E2E 4. 9. 2026, `docs/e2e-pumpa/PROTOKOL-E2E-PUMPA.md` P2). Identita výsledků je pro pumpu **výhradně v `res-*.json`**. Chat ACK dělá jen schránkový kanál (`FB_ClipboardImport`) a vrátný.
 - **Hláška „POZOR: repozitar nema polozku ve FB_WriteScope"** = konfigurace nesedí na připojený repozitář (špatný krok 5.2, nebo je v EA otevřený jiný projekt); **„CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG …)"** = položka je vadná (hláška říká co). **Zastav se a oprav**, nepokračuj.
-- **Další hlášky pumpy v0.6 a co dělat:** `Pumpa uz bezi (zamek requests\.pump.lock)` / `Pumpa uz bezi z JINE slozky: <cesta>` = nad jedním uživatelem smí běžet jen jedna pumpa — zavři tu druhou (okno se samo ukončí); `PRERUSENA req-…: davka byla prerusena uprostred zpracovani` = minulý běh pumpy skončil uprostřed dávky (zavřené okno, pád EA) — pumpa ji **neprovádí znovu**, dala `E_INTERRUPTED` a soubor do `rejected\`; zkontroluj Output tab a audit, agent pošle opravnou dávku s novým id; `VYPRSELA req-… -> rejected\` = čekající dávka starší než 8 h (`confirmMaxAgeMin`), `E_RISK_EXPIRED`, audit zapsán; `IGNORUJI <soubor>` = v `requests\` leží něco jiného než `req-*.json` — pumpa to nezpracuje ani nepřejmenuje; `CEKA req-… (Storno)` / `(timeout 300 s)` = dávka čeká v `pending\`, okno se vrátí, až agent pošle tentýž soubor znovu nebo po restartu pumpy; `NEPROVEDENO req-…: chybi cerstva rucni baseline` = udělej v EA ruční baseline nad uvedeným balíčkem (Ctrl+Alt+B, jméno bez `FB-AUTO`) a nech agenta poslat tentýž soubor znovu; `POZOR: operace FB_Main v modelu chybi` / `CHYBA code loaderu` = spusť bootstrap (kap. 2.2), nebo se obrať na správce.
+- **Další hlášky pumpy v0.6 a co dělat** (úplná tabulka pro analytika: `docs/NAVOD-PUMPA-VSCODE.md` kap. 2): `Pumpa uz bezi (zamek requests\.pump.lock)` / `Pumpa uz bezi z JINE slozky: <cesta>` = nad jedním uživatelem smí běžet jen jedna pumpa — zavři tu druhou (okno se samo ukončí); `PRERUSENA req-…: davka byla prerusena uprostred zpracovani` = minulý běh pumpy skončil uprostřed dávky (zavřené okno, pád EA) — pumpa ji **neprovádí znovu**, dala `E_INTERRUPTED` a soubor do `rejected\`; zkontroluj Output tab a audit, agent pošle opravnou dávku s novým id; `VYPRSELA req-… -> rejected\` = čekající dávka starší než 8 h (`confirmMaxAgeMin`), `E_RISK_EXPIRED`, audit zapsán; `IGNORUJI <soubor>` = v `requests\` leží něco jiného než `req-*.json` — pumpa to nezpracuje ani nepřejmenuje; `CEKA req-… (Storno)` / `(timeout 300 s)` = dávka čeká v `pending\`, okno se vrátí, až agent pošle tentýž soubor znovu nebo po restartu pumpy; `NEPROVEDENO req-…: chybi cerstva rucni baseline` = udělej v EA ruční baseline nad uvedeným balíčkem (Ctrl+Alt+B, jméno bez `FB-AUTO`) a nech agenta poslat tentýž soubor znovu; `POZOR: operace FB_Main v modelu chybi` / `CHYBA code loaderu` = spusť bootstrap (kap. 2.2), nebo se obrať na správce.
 
 ## 6.2 Schránkou
 
@@ -350,7 +381,7 @@ Ping je **kotva session**: vrací identitu repozitáře, blok **`writeScope`** (
 - [ ] `writeScope.cascadeDelete` = `block` (bankovní šablona)
 - [ ] `writeScope.securityEnabled` = `true` (jen informativní — bridge security nekontroluje; `false` by znamenalo, že jedinou hranicí zápisu je blacklist)
 - [ ] `access` odpovídá realitě (security zapnutá → `securityEnabled: true`; ty jsi členem `<WRITE-GROUP>` → write)
-- [ ] Code loader v konzoli pumpy hlásí ~130 operací (ne 16, ne 0); řádek `Zapis: blacklist …` na startu session říká totéž co `writeScope.summary`
+- [ ] Code loader v konzoli pumpy hlásí řádově 140 operací (12. 10. 2026: 139; ne 16, ne 0); řádek `Zapis: blacklist …` na startu session říká totéž co `writeScope.summary`
 
 Teprve pak má smysl pouštět zápisovou dávku. **Kontrola blacklistu naostro (doporučeno):** čtecí dávkou nic nezjistíš — pošli malý zápis (`create_or_update_package` s `parent` = `<PROTECTED-PKG-1>`) a očekávej `E_BLACKLIST` v předběžné kontrole (nic se neprovede, dávka v `rejected\`, audit v `<AI-LOG>`).
 
@@ -365,7 +396,7 @@ Jedna čtecí dávka (v repu `docs/e2e-banka/ready/req-banka-recon-03.json` jako
 - `SELECT Package_ID, Parent_ID FROM t_package WHERE Name = '#AI-LOG'` → kolik jich je (více = `auditPkg` nutný);
 - **záměrně prázdný dotaz** (`… WHERE Package_ID = -1`) → od `47fdbb2` `ok / rowCount 0 / warnings` (ne `E_SQL`).
 
-**Pravidlo pro každý dotaz v bance: `TOP N` nebo selektivní `WHERE`.** Neomezený `SELECT` nad velkou tabulkou (`t_seclocks` měla 10. 9. **1,45 M řádků**) nechá EA sestavovat XML minuty a pumpa visí na `Zpracovavam` — vypadá to jako pád (7.11).
+**Pravidlo pro každý dotaz v bance: `TOP N` nebo selektivní `WHERE`.** Neomezený `SELECT` nad velkou tabulkou (`t_seclocks` měla 10. 9. **přes milion řádků**) nechá EA sestavovat XML minuty a pumpa visí na `Zpracovavam` — vypadá to jako pád (7.11). Od v0.20 bridge takový dotaz nad známou velkou tabulkou **odmítne** (`E_SQL_UNBOUNDED`, nespustí se) a výsledek ostatních ořízne na `maxRows` (výchozí 500, `truncated: true`) — strop chrání odpověď, ne dobu běhu v EA (PROTOKOL §10).
 
 ---
 
@@ -386,7 +417,7 @@ Nejčastější příčina po přenosu z jiného modelu: **cizí `SignalGUID`**.
 ## 7.2 `E_ADDIN_ACCESS`
 
 - **Znamená:** nejsi členem žádné skupiny z `FB_AccessGroups.writeGroups` pro tento repozitář (vrstva 2), nebo repozitář nemá ve `FB_AccessGroups` položku (fail-closed).
-- **Řešení:** správce EA tě přidá do `<WRITE-GROUP>` → **PLNÝ restart EA i pumpy** (cache `FB_UserAccess` platí na session v obou runtime — bez restartu se změna neprojeví). Když skupina sedí a chyba trvá, chybí položka v configu → 5.4 + bootstrap + restart. Ping říká důvod v `access.reason`: „není členem“ vs. „repozitář nemá položku“ vs. „SQL selhal“ (= špatné jméno tabulky, viz dialog *SQL API Open FAILED*).
+- **Řešení:** správce EA tě přidá do `<WRITE-GROUP>` → **PLNÝ restart EA** (cache `FB_UserAccess` platí na session v obou runtime; pumpa v0.6 se po restartu EA připojí a načte znovu sama, starší pumpu restartuj — tabulka 4b). Když skupina sedí a chyba trvá, chybí položka v configu → 5.4 + bootstrap + restart. Ping říká důvod v `access.reason`: „není členem“ vs. „repozitář nemá položku“ vs. „SQL selhal“ (= špatné jméno tabulky, viz dialog *SQL API Open FAILED*).
 - **Čtecí dávka projde i tak** — to je kontrola, že jde o vrstvu 2 a ne o něco jiného.
 
 ## 7.3 `E_REPO`
@@ -424,21 +455,33 @@ Nejčastější příčina po přenosu z jiného modelu: **cizí `SignalGUID`**.
 
 Dávka klasifikovaná jako ELEVATED se **nezapíše** a čeká v `requests\pending\`. Pumpa ukáže popup Ano/Ne/Storno (od v0.6 je **výchozí tlačítko Storno** — Enter ani mezerník nic neprovedou; ikona upozornění u mazání, přesunu, klonu a přepisu; timeout 300 s = dávka čeká dál; v okně je i „Ceka od …" a věta o limitu), menu ukáže dialog EA (výchozí tlačítko nastavit neumí).
 
-Dialog je psaný lidsky, ne metrikami — nahoře **co se chystá**, pak **kde**, pak **proč se ptám**, technická patička (id, otisk = `hashPrefix`, počty) až dole. U mazání a přesunů nese od 4. 9. 2026 řádek s **plnou tečkovou cestou** cíle:
+Dialog je psaný lidsky, ne metrikami (od v0.19 vzor FB-UI-08, `FB_ConfirmSummary`) — nahoře **co se chystá**, pak **co se stane** větami (u mazání skutečný rozsah: balíček *včetně N prvků a diagramů*), **kde** (plná tečková cesta), **záloha**, **proč se ptám** (všechny důvody větami), **od kdy čeká**, jedna legenda tlačítek a technická patička (id, otisk = `hashPrefix`, počet zápisů, kódy důvodů) až dole. Tvar:
 ```
-Chysta se SMAZAT 1 prvek z modelu.
+AI chce SMAZAT 1 cil z modelu a potrebuje tvuj souhlas.
 
-Balicky: <jméno>
-Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
+Co se stane:
+  - <věta o operaci a cíli, u balíčku vcetne N prvku …>
+Kde (plna cesta mazaneho): <plná cesta>
+Zaloha: <řádek Baseline politiky>
+Proc se ptam:
+  - <věta z FB_ReasonText>
+
+Ceka od <datum čas> (N min)
+
+Provest?
+  Ano = provest ted  |  Ne = zahodit davku  |  Storno = nechat cekat, rozhodnu pozdeji
+(davka <id> | otisk <12 znaků>... | N zapisu | <kódy důvodů>)
 ```
+Druhé kolo (model nebo souhrn se mezitím změnil) začíná řádkem `ZNOVU K POTVRZENI - …` s důvodem.
 - **Než klikneš Ano:** cesta musí ležet tam, kde ji čekáš (porovnej s Project Browserem) a **nesmí** začínat cestou žádné chráněné větve z pingu (6.1) — to by ostatně dávka skončila `E_BLACKLIST` ještě před oknem. Při více cílech jsou cesty jako odrážky. Blok `POZOR - smazani sahne kaskadou EA do CHRANENE casti …` (jen při `cascadeDelete: "allow"`, v bance nikdy) vyjmenovává chráněné diagramy a instance, kterých se smazání dotkne — záloha je nekryje.
-- **Storno / timeout** = dávka **čeká dál** v `pending\`, přežije i restart EA a pumpy. Zamítnutí = `E_RISK_REJECTED`, dávka jde do `rejected\` a **zapíše se audit**.
+- **Storno / timeout** = dávka **čeká dál** v `pending\` (nejvýš `confirmMaxAgeMin` = 8 h, pak `E_RISK_EXPIRED`), přežije i restart EA a pumpy; okno se vrátí, až agent pošle tentýž soubor znovu, nebo po restartu pumpy. Zamítnutí = `E_RISK_REJECTED`, dávka jde do `rejected\` a **zapíše se audit**.
+- **Audit v `<AI-LOG>`** (od v0.21, PROTOKOL §8 bod 5): Artifact `FB <id>`, Notes začínají **větami pro člověka** („Davka <id> skoncila USPESNE: N z M operaci provedeno.", „Potvrdil uzivatel v okne pumpy <datum čas>.", „Proc potvrzeni: …", „Zaloha: …", „Kontrola kvality: …"), pod čarou `--- strojovy zaznam (beze zmeny) ---` a nakonec request. Tagy `ai.risk.*` slouží kalibraci oken (PROTOKOL §11).
 - **Nonce ani plný hash nikdy neopouštějí `res-*.json`** — do chatu jde maximálně `hashPrefix` (12 znaků). Kdyby ti někdo (nebo něco) tvrdilo opak, je to pokus o obejití potvrzení.
 
 ## 7.6 Prokliky z Output tabu nefungují
 
 - **KDE:** EA → **Start → All Windows → System Output** → záložka **AI Bridge**.
-- **CO tam má být:** po každé zápisové dávce blok `FB <id> - zmeny v modelu` s řádky `[vytvoreno|upraveno|smazano] "jméno" @ <tečková cesta>` a **markerem cíle** na konci: `(el:ID)` / `(pkg:ID)` / `(dgm:ID)`.
+- **CO tam má být:** po každé zápisové dávce blok `FB <id> - zmeny v modelu` s řádky `[vytvoreno|upraveno|smazano] "jméno" @ <tečková cesta>` a **markerem cíle** na konci: `(el:ID)` / `(pkg:ID)` / `(dgm:ID)`; za blokem řádek `Kontrola kvality: …` (u nálezu i s prvky `(el:ID)` — dvojklik naviguje).
 - **Dvojklik** na řádek označí prvek v Project Browseru — **podle typu**: element, package i diagram. Řádky scénářů, constraintů, requirementů a atributů skáčou na **vlastnící element**. **Smazané prvky navigační cíl nemají** (není kam skočit) — dvojklik na `[smazano]` neudělá nic a je to správně.
 - **Když se nic neděje:** (1) nejsi na záložce **AI Bridge** (jiné taby EA obsluhuje sama), (2) proběhl plný restart EA po nasazení kódu? (3) řádek nemá marker — zapiš přesný text řádku, patří to do evidence.
 
@@ -465,7 +508,9 @@ Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 | `E_SQL_READONLY` | `query` umí jen `SELECT`/`WITH`; veškerý zápis jde přes Automation API |
 | Windows: „Vyberte aplikaci pro .wsf" | Microsoft ® Windows Based Script Host |
 | Dvě EA běží zároveň | pumpa se připojí na **první** — zavři, co nepotřebuješ, a pumpu spusť znovu |
-| Pumpa i schránka zároveň | nikdy — oba čtou `requests\`. Před schránkou pumpu zavři |
+| Pumpa i schránka zároveň | nikdy — oba čtou `requests\`. Od v0.18 to hlídá kód: při běžící pumpě schránka i *Zpracovat davky ze slozky* nic neprovedou a napíšou `BEZI PUMPA v0.6 (<cesta>) - faze … Davky zpracovava pumpa …` — pumpu zavři, nebo dávku polož do `requests\` |
+| Schránka / menu se po `deploy_src` chová postaru | kód EA runtime se mění až plným restartem EA (N-B2O-1, tabulka 4b) |
+| `E_SQL_UNBOUNDED` | `query` bez `TOP`/`LIMIT`/`WHERE` nad velkou tabulkou — nespustil se; přidej omezení (7.11) |
 | Pumpa hlásí `POZOR: repozitar nema polozku ve FB_WriteScope` po startu | configy ještě nejsou v modelu (blok 5) — před configy je to očekávané; po nich = špatná identita v 5.2 |
 | Pumpa hlásí `CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG …)` po startu | vadná položka `FB_WriteScope` / chybějící `auditPkg` / cizí obsah v balíčku add-inu → 7.3b |
 | Zápis skončil `E_BLACKLIST`, ale cíl „přece není na blacklistu" | cíl je v podstromu chráněné větve, v balíčku auditu / add-inu, nebo ho vlastní chráněný prvek; u vazby jsou **oba** konce chráněné; u mazání kaskáda (`cascadeDelete: "block"`) → hláška říká kterou větev (7.3a) |
@@ -479,8 +524,8 @@ Kde (plna cesta mazaneho): <plná cesta>.<AI-SANDBOX>.<jméno>
 
 ## 7.11 Pumpa „visí“ na `Zpracovavam …`, EA reaguje, žádný dialog
 
-- **Příčina:** dotaz bez omezení nad velkou tabulkou (banka: `t_seclocks` 1,45 M řádků) — EA sestavuje XML výsledek minuty. Není to pád.
-- **Řešení:** zavři pumpu (křížek), přesuň soubor z `requests\` pryč (jinak si ho pumpa po startu vezme znovu), přepiš dotaz s `TOP N` / `WHERE`, spusť pumpu. Prevence: kontext repa v korporátním repu s řády velkých tabulek + pravidlo `TOP N` v kitu.
+- **Příčina:** dotaz bez omezení nad velkou tabulkou (banka: `t_seclocks` přes milion řádků) — EA sestavuje XML výsledek minuty. Není to pád.
+- **Řešení:** zavři pumpu (křížek) — pumpa v0.6 dávku při dalším startu ohlásí `PRERUSENA` a znovu ji **neprovede** (soubor leží v `requests\processing\`, po startu jde do `rejected\`); přepiš dotaz s `TOP N` / `WHERE`, spusť pumpu. Prevence: od v0.20 bridge dotaz bez omezení nad známou velkou tabulkou odmítne (`E_SQL_UNBOUNDED`); u ostatních tabulek zůstává kontext repa s řády velkých tabulek + pravidlo `TOP N` v kitu.
 
 ---
 
@@ -516,6 +561,8 @@ Bankovní kroky 1 (kurýrní klon), 3 (Manage Add-Ins), 5.1–5.6 (configy) a 6.
 
 ## Changelog
 
+- **v1.5 — 2026-10-12** (vlákno Z261004b‑8, balík E revize usability pumpy — FB-PU-41/-42): nová **4b „Co jsem změnil → co restartovat"** (jedna tabulka, tatáž v `NAVOD-PUMPA-VSCODE.md`); 4 menu podle `EA_GetMenuItems` (Kontext výběru, Úklid baselines, vrátný jen s `gatekeeper: true`) a restart pumpy v0.6 po restartu EA; 5.1 `gatekeeper` a `baseDir` pod pumpou; 5.4/7.2 restart po změně členství; 5.5 27 zápisových operací; 6.1 start session po řádcích (FB-PU-05) + řádek kontroly kvality v Outputu; 6.3/2.1 počet operací; 6.4/7.9/7.11 `E_SQL_UNBOUNDED`, `maxRows`, `PRERUSENA`, `BEZI PUMPA`, N-B2O-1; 7.5 okno podle FB-UI-08, expirace, audit Notes (v0.21); 7.6 QC řádek. Srovnáno proti `src\` v0.21 a `pump.wsf` v0.6.
+- **v1.4 — 2026-10-12** (vlákno Z261004b-5, pumpa v0.6): 6.1 texty konzole, stavový soubor, `processing\`, výchozí Storno, otisk kódu a pumpy, další hlášky pumpy.
 - **v1.3 — 2026-10-12** (vlákno Z261004b-11, cíl zápisu v0.17 — režim blacklist): Placeholdery `<PROTECTED-PKG-n>` místo `<AI-SANDBOX>`; 1.2 řádek `FB_WriteScope` místo `FB_Whitelist` v tabulce „Co v diffu ZACHOVAT"; 2.1 balíček add-inu bez cizího obsahu; 3.3 vrstva 4 = `FB_OpsAllowed` + blacklist a **důsledek standardního režimu security** (AI zapisuje i do cizích nezamčených balíčků; doporučení zamknout balíček add-inu a auditu); **5.2 přepsána** (`FB_WriteScope`: blacklist, `cascadeDelete`, implicitní ochrana, kontrola konfigurace, vazby „oba konce", zámky EA vazby nehlídají); 5.7 Stav bridge; 6 ping s `writeScope`; 6.1 start session bez session baseline; 6.2 segment `zapis:`; **6.3 nový checklist**; 7.3 `FB_WriteScope`; **nové 7.3a `E_BLACKLIST`, 7.3b `E_SCOPE_CONFIG`, 7.3c `E_AMBIGUOUS`, 7.3d `E_WHITELIST` zaniklo**; 7.5 kaskády v okně; 7.9 nové řádky; 8 poznámka k rozhodnutí 10. 10. (doma `deploy_src`). Zdroj: `IT-ANALYSIS/ZADANI-cil-zapisu-ea-file-bridge.md` v1.2, `docs/e2e-scope/VYSLEDKY-2026-10-12-jadro.md` a `-hlaseni.md`.
 - **v1.2 — 2026-10-10** (vlákno Z261004b-1, pojistka nasazení FB-PU-01 — živě doma): 2.2 očekávaný výstup s řádky `PX <operace>: (staré) -> (nové)`, `Parametry: P operaci srovnano` a varování / STOP při více elementech `AICodeBridge` (N-B-4); nový krok **4a Kontrola parametrů po nasazení** (čtecí dávka `docs/e2e-banka/ready/req-banka-kontrola-parametru.json`, 0 rozdílů, jinak nepokračovat); 5.7 odkaz na 4a; 7.10 obecná varianta pasti; nová kap. **8 Doma: nasazení jako v bance** (bootstrap, ne `deploy_src`). Zdroj: `IT-ANALYSIS/AUDIT-usability-pumpy-2026-10-04.md` kap. 3.1, `docs/e2e-nasazeni/VYSLEDKY-2026-10-10.md`.
 - **v1.1 — 2026-09-10** (vlákno Z260908-5, po živém nasazení v bance St 10. 9. — PASS s nálezy): blok 2 = jen bootstrap (Copy/Paste nepoužívat; bootstrap zakládá receptions i opravuje jejich parametry — řádky `RX`/`PX`), blok 3 sloupce Groups/Status Optional v security modelu, blok 4 + 5.4 + 7.2 restart **EA i pumpy** po změně členství, 5.1 `auditPkg` povinný + `baseDir = <KORP>`, 5.5 nejmenší bankovní RiskPolicy, 6.1 dávky do `<KORP>\requests\` přes `banka-dosad`, nová 6.4 čtecí recon + pravidlo `TOP N`, 7.7 prázdný výsledek ≠ `E_SQL` (od `47fdbb2`), nové 7.10 (Unhandled menu item) a 7.11 (pumpa visí na velkém SELECTu), placeholder `<GUID-AILOG>`. Zdroj: `docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`, `docs/e2e-k8-qeax/VYSLEDKY-2026-09-09.md`.

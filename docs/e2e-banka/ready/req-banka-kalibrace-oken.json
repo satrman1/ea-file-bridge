@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-kalibrace-oken",
+ "repo": "<TEST-DB>",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT q.uroven, q.kody, q.okno, COUNT(*) AS davek FROM (SELECT l.Value AS uroven, r.Value AS kody, CASE WHEN c.Value IS NULL THEN 'bez zaznamu' WHEN c.Value LIKE 'required=0%' THEN 'bez okna' WHEN c.Value LIKE '%confirmedByUser=1%' THEN 'potvrzeno' WHEN c.Value LIKE '%channel=expired%' THEN 'vyprselo' ELSE 'zamitnuto' END AS okno FROM t_object a INNER JOIN t_objectproperties r ON r.Object_ID = a.Object_ID AND r.Property = 'ai.risk.codes' LEFT JOIN t_objectproperties l ON l.Object_ID = a.Object_ID AND l.Property = 'ai.risk.level' LEFT JOIN t_objectproperties c ON c.Object_ID = a.Object_ID AND c.Property = 'ai.risk.confirm' WHERE a.Package_ID IN (SELECT Package_ID FROM t_package WHERE ea_guid = '<GUID-AILOG>') AND a.Object_Type = 'Artifact') q GROUP BY q.uroven, q.kody, q.okno ORDER BY q.kody, q.okno"
+  }
+ ]
+}

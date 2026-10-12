@@ -2,6 +2,8 @@
 
 Verze **v0.3**, revize 2026-09-04 (vlákno Z260904-5; původní text 2026-08-14) · Předpoklad: generálka doma kompletní (všech 6 předpokladů POC ✅, protokol vyhodnocení v0.5) · Cíl: tentýž tracer bullet proti testovacímu repozitáři **`<TEST-DB>`** s GitHub Copilotem jako driverem · **Aktualizace pro bridge v0.2:** identita repozitáře = název databáze (`FB_RepoId`), už NE connection string / název `.qea` zástupce — whitelist i `repo` v dávkách se píší jako `<TEST-DB>` a fungují na každé stanici (upgrade z v0.1 viz §6)
 
+> **Stav 12. 10. 2026 (vlákno Z261004b‑8):** fáze 2 POC **proběhla 10.–13. 9. 2026** (PASS s nálezy, `docs/e2e-banka/PROTOKOL-POC-BANKA-2026-09-10.md`). §2–§4 tohoto souboru jsou plán z doby whitelistu a session baseline — **pro nové nasazení platí `NAVOD-NASAZENI-KLIKACI.md` (v1.5, kód v0.21)**; tady zůstává historie plánu, identita repozitáře (§6) a rychlý troubleshooting startu pumpy (srovnaný s pumpou v0.6). Provoz pro analytika: `NAVOD-PUMPA-VSCODE.md`.
+
 > **⚠ Dělba se `NAVOD-NASAZENI-KLIKACI.md` (od 2026-09-04).** Tento soubor je **plán fáze 2 POC**: co se ověřuje, akceptační kritéria, upgrade whitelistu v0.1 → v0.2. **Klik po kliku** — pull a diff kurýrního klonu, přenos add-inu, Manage Add-Ins, restart EA, všech šest konfiguračních sekcí, první ping oběma kanály a troubleshooting — je v **[`NAVOD-NASAZENI-KLIKACI.md`](NAVOD-NASAZENI-KLIKACI.md)**, který pokrývá stav po iteracích 5–7. Kroky §2–§3 níže popisují stav k srpnu 2026 a **neznají** security vrstvy (`FB_AccessGroups`), `FB_OpsAllowed`, `FB_QcConfig` ani schránkový kanál — při skutečném nasazení jeď podle klikacího návodu a sem se vracej pro kritéria fáze 2 (§4) a upgrade (§6).
 
 > Placeholdery: `<TEST-DB>` / `<PROD-DB>` = skutečné názvy testovací a produkční databáze repozitáře. Do tohoto repa (GitHub) nepatří — reálné hodnoty viz interní poznámky projektu; dosazují se až lokálně při nasazení a necommitují se.
@@ -86,7 +88,7 @@ Přechod (~5 minut):
    ```js
    { repo: "<TEST-DB>", pkg: "{GUID-AI-SANDBOX}" }
    ```
-   `repo` se porovnává jako **podřetězec, case-insensitive** — stačí tedy rozlišující část názvu, ale **pozor na klony:** podřetězec `EMR_TEST` sedí i na `EMR_TEST_COPY`. Když v prostředí takové názvy existují, piš název celý. Lokální úprava, **necommituje se** do kurýrního repa (patří do evidence bankovních adaptací, kanál fáze E).
+   `repo` se porovnává jako **podřetězec, case-insensitive** — stačí tedy rozlišující část názvu, ale **pozor na klony:** podřetězec `<TEST-DB>` sedí i na `<TEST-DB>_COPY`. Když v prostředí takové názvy existují, piš název celý. Lokální úprava, **necommituje se** do kurýrního repa (patří do evidence bankovních adaptací, kanál fáze E).
 
 **3. Stejnou hodnotu dosaď i do ostatních konfiguračních sekcí** — `FB_Config`, `FB_OpsAllowed`, `FB_AccessGroups`, `FB_RiskPolicy`, `FB_QcConfig`. Všechny párují přes tutéž mechaniku; **nahraď je najednou**, jinak vznikne stav, kdy jedna sekce repozitář zná a druhá ne (a ta druhá jede fail-closed: bez položky ve `FB_OpsAllowed` neprojde žádný zápis, bez `FB_RiskPolicy` je každá dávka ELEVATED).
 
@@ -105,13 +107,16 @@ Přechod (~5 minut):
 | Příznak | Příčina → řešení |
 |---|---|
 | Konzole: „Cekam na bezici EA…" | EA neběží / nemá otevřený projekt → otevři `<TEST-DB>` |
-| „POZOR: … žádná whitelist položka (E_REPO)" | whitelist nesedí na připojený repozitář → zkontroluj krok 2.3 a KTERÝ projekt je v EA otevřený |
+| `POZOR: repozitar nema polozku ve FB_WriteScope - zapisy budou zamitnuty (E_REPO)` (do v0.16 „… žádná whitelist položka") | konfigurace cíle zápisu nesedí na připojený repozitář → klikací návod 5.2 a KTERÝ projekt je v EA otevřený |
+| `CHYBA konfigurace cile zapisu (E_SCOPE_CONFIG …)` | vadná položka `FB_WriteScope` / chybí `auditPkg` → klikací návod 7.3b |
 | Response `E_REPO` | dávka má jiné `repo` než připojený repozitář — správné chování ochrany; zkontroluj, co je otevřené |
-| „operace FB_Main v modelu chybí" | bootstrap neproběhl / jiný repozitář → krok 2.4 |
+| `POZOR: operace FB_Main v modelu chybi - spust bootstrap …` / `CHYBA code loaderu: …` | bootstrap neproběhl / jiný repozitář → klikací návod 2.2 |
+| `STOP: kod v modelu je STARSI nez pumpa v0.6 …` | kód v modelu je starší než v0.18 → bootstrap, plný restart EA (pumpa v0.6 se připojí sama) |
 | Windows dialog „Vyberte aplikaci pro .wsf" | zvol Microsoft ® Windows Based Script Host (není to blokace) |
 
 ## Changelog
 
+- 2026-10-12 — stavová poznámka nahoře (POC proběhl, platí klikací návod v1.5), troubleshooting podle pumpy v0.6 a kódu v0.21, příklad klonu bez interního názvu databáze (vlákno Z261004b‑8).
 - **v0.3 — 2026-09-04** (vlákno Z260904-5): dělba s novým `NAVOD-NASAZENI-KLIKACI.md` (tento soubor = plán fáze 2, klikací postup jinde); §6 přepsán na přesný postup zjištění a dosazení názvu databáze včetně pasti podřetězce u klonů a ostatních pěti konfiguračních sekcí; §2.4 opraven výstup bootstrapu (105 souborů místo „16 operací") a doplněny konfigurační sekce iterací 5–7; troubleshooting odkazuje na klikací návod.
 - **v0.2 — 2026-08-14**: identita repozitáře = název databáze (`FB_RepoId`) místo connection stringu / názvu `.qea` zástupce.
 - 2026-10-12 — datovaná poznámka v §6: whitelist zanikl (v0.17, `FB_WriteScope` blacklist), identita repozitáře platí dál (vlákno Z261004b-11).
