@@ -13,7 +13,7 @@ description: Destilát pravidel zápisu do EMR (§1–§6, §8, §11, §12); pln
 - Komponenty, interfacy, operace → `/Catalogues/Přehled komponent/Solution Artefacts` (master); nové návrhy **vždy** do `…Proposed`
 - Požadavky, traceabilita, QA reporty, Gate Records → `/Projects/<Projekt>` (`Business Requirements`, `#QA`, `#GATES`)
 
-Zapisuj jen do whitelistované větve z pingu; pracovní prostor (P3) — do ostré větve přesouvá člověk po bráně (`move_elements`, ELEVATED).
+Zapisuj kamkoli, kam tě pustí EA security, kromě chráněných větví z pingu (`writeScope`). Pracovní prostor (P3) drží kit, ne kód: před prvním zápisem úlohy napiš „Zapíšu do: <plná cesta>" (pracovní package projektu / `…Proposed`); do ostré větve přesouvá člověk po bráně (`move_elements`, ELEVATED).
 
 ## 2. Idempotence
 
@@ -54,9 +54,9 @@ Smazání z diagramu ≠ smazání z modelu. Před mazáním dopady (výskyt na 
 
 ## 12. Bezpečný AI zápis
 
-- **Asymetrie:** create ve whitelistu ✅; update vlastního AI-created ✅ + journal; update / delete **cizího** elementu, diagramu, konektoru existující↔existující ⛔ — jen dvoukolově: dry-run diff → schválení per GUID → snapshot + mikro-baseline → zápis. Nový konektor AI → existující ✅. `apply_baseline` nikdy; `clone_*` jen ve verzovacím cyklu.
+- **Asymetrie:** create mimo chráněné větve (pracovní prostor P3) povoleno; update vlastního AI-created povoleno + journal; update / delete **cizího** elementu, diagramu, konektoru existující↔existující zakázáno jako default — jen dvoukolově: dry-run diff → schválení per GUID → zápis (mikro-baseline pořídí bridge). Nový konektor AI → existující povoleno. `apply_baseline` nikdy; `clone_*` jen ve verzovacím cyklu.
 - **Razítka:** každý AI-created prvek nese TV `AI-Created=true`, `AI-Session`, `AI-Batch`, `AI-User`, `AI-Tool`, timestamp; schválený update cizího navíc `AI-Modified`.
-- **Mikro-baselines:** před prvním zápisem dávky do existující package `create_baseline(<package>, "AI-pre-<session>-<batch>")` nejmenší dotčené package (max ~5 per dávka); scaffold packages baseline nepotřebují. Výstup nese restore manifest.
+- **Mikro-baselines:** pořizuje bridge sám (Baseline politika) před prvním zápisem dávky, který mění nebo maže existující obsah — nad cílovým balíčkem; čistý create (scaffold) zálohu nepotřebuje. `create_baseline` před zápisem neposílej; nelze-li zálohu pořídit, pořídí ruční baseline člověk v EA. Výstup nese sekci `baseline{}`.
 - **Journal:** před schváleným updatem přečti cílový element (`get_elements_information`) a staré hodnoty ulož do session journalu — jediný zdroj pro revert.
 - **Objem:** vždy vykaž objem dávky; nad orientační úrovní (50 nových, 5 updatů, 3 packages, 10 diagramů) si vyžádej potvrzení.
 - **UNDO:** revert z journalu · mazání session přes razítka jen skriptem v EA, nikdy SQL DELETE · restore z baseline (správce).

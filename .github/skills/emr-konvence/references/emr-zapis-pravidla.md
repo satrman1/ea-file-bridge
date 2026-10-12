@@ -73,7 +73,7 @@ Artefakt na špatném místě = blokující nález (anti-pattern metodiky).
 - **P1 — stav artefaktu:** tagged value `SA-Status` ∈ {proposed, approved, baseline} **na úrovni package** (UC package, service package, LDM package). Ne na jednotlivých elementech — jedno místo pravdy, dotazovatelné SQL.
 - **P2 — Gate Records a QA reporty:** element typu **Artifact** per záznam v `/Projects/<Projekt>/#GATES` resp. `#QA`. Tagged values: `gate` (G0–G3 / sada QA), `datum`, `rozhodl`, `vysledek` (approved/rejected resp. pass/fail), detail v notes.
 - **contractAuthority:** tagged value na package rozhraní / service package, hodnoty `model` | `physical`. `model` = DTO/class model je zdroj pravdy (rozhraní navrhujeme a vlastníme → DTO modeluj); `physical` = existující XSD/JSON kontrakt je zdroj pravdy (DTO nanejvýš dočasný komunikační artefakt → jen odkaz, nemodelovat kopii). Bez TV rozhodni dle metodiky v2 §5.4.5 a TV navrhni doplnit.
-- **P3 — pracovní prostor:** skilly **nezapisují rovnou do ostrých větví**. Zápis jde do pracovního prostoru (obdoba `…Proposed` — pro katalog přímo `Solution Artefacts Proposed`, pro UC/LD pracovní package projektu), do ostré větve se artefakty přesouvají až po schválení příslušné HITL brány. Přesun provádí/potvrzuje člověk nebo skill na jeho explicitní pokyn.
+- **P3 — pracovní prostor:** skilly **nezapisují rovnou do ostrých větví**. Zápis jde do pracovního prostoru (obdoba `…Proposed` — pro katalog přímo `Solution Artefacts Proposed`, pro UC/LD pracovní package projektu), do ostré větve se artefakty přesouvají až po schválení příslušné HITL brány. Přesun provádí/potvrzuje člověk nebo skill na jeho explicitní pokyn. Pracovní prostor vynucuje kit (věta „Zapíšu do: <plná cesta>" před prvním zápisem úlohy) a zámky správce EMR, ne kód bridge — bridge pustí zápis kamkoli, kam uživatele pustí EA security, kromě chráněných větví (blacklist, 12a).
 
 ## 7. Operace AI kanálu (ea-file-bridge) a manuální kroky
 
@@ -213,8 +213,8 @@ Závazné pro každý zápis do **produkční** EMR (1M+ elementů); v demo/sand
 
 | Operace | Politika |
 |---|---|
-| Create ve whitelistované větvi (pracovní prostor §6/P3, `…Proposed`, projektové větve) | povoleno + razítko (12b) + vykázaný objem (12e) |
-| Create mimo whitelist | zamítnout; deny-list větví je navíc zamčen (12g) |
+| Create mimo chráněné větve (pracovní prostor §6/P3, `…Proposed`, projektové větve) | povoleno + razítko (12b) + vykázaný objem (12e) |
+| Create do chráněné větve (blacklist bridge: `FB_WriteScope` — dědičně na podstrom, k tomu balíček auditu a balíček add-inu; seed = deny-list z 12g) | bridge zamítne (`E_BLACKLIST`) už v předběžné kontrole; chráněné větve jsou navíc zamčené (12g) |
 | Update AI-created elementu (vlastní razítko) | povoleno + journal (12d) |
 | Update cizího elementu / cizího diagramu / konektor existující↔existující | zakázáno jako default; jen dvoukolově: **dry-run diff → schválení per GUID → snapshot + mikro-baseline → zápis**. Diff schvaluje **autor sám, s auditní stopou** — rozhodnutí se zapisuje do journalu/#AI-LOG |
 | Zásah do existujících GLOBAL VIEWS / survey diagramů | povolen **jen přes dry-run + schválení** jako každý jiný update cizího obsahu |
@@ -248,7 +248,7 @@ Kvóty se v této fázi **neaplikují jako tvrdý stop**. Orientační úrovně 
 
 ### 12g. Tvrdé ploty mimo dosah skillu (konfigurace, ne prompt)
 
-Skill s nimi počítá, ale nevynucuje je — jsou vynucené identitou a konfigurací: párové AI účty `<uzivatel>_AI` ve skupině `AI-Agents` (**max 5 pilotních uživatelů v P1**) → trigger log odliší AI zásahy zadarmo; defenzivní zámky na deny-list větvích — Catalogues master, `#Template structure`, šablony BA, root packages (zámky přiděluje **správce EMR**, formální admin skupina neexistuje; citlivé sdílené části modelu se hlídají takto); selektivní povolení **operací v executoru bridge** — whitelist operací vedle whitelistu packages (`apply_baseline` neimplementován trvale, delete operace vypnuty v P1); doma ekvivalentně povolení MCP tools per klient.
+Skill s nimi počítá, ale nevynucuje je — jsou vynucené identitou a konfigurací: párové AI účty `<uzivatel>_AI` ve skupině `AI-Agents` (**max 5 pilotních uživatelů v P1**) → trigger log odliší AI zásahy zadarmo; defenzivní zámky na deny-list větvích — Catalogues master, `#Template structure`, šablony BA, root packages (zámky přiděluje **správce EMR**, formální admin skupina neexistuje; citlivé sdílené části modelu se hlídají takto) — tentýž deny-list je **seed blacklistu bridge** (`FB_WriteScope`, 12a: balíčky podle GUID, ochrana dědičně na podstrom); selektivní povolení **operací v executoru bridge** — seznam povolených operací vedle blacklistu balíčků (`apply_baseline` neimplementován trvale, delete operace vypnuty v P1); doma ekvivalentně povolení MCP tools per klient.
 
 ## 13. Reference na kód (GitHub) — konvence `code-*` a `re-origin`
 

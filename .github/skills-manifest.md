@@ -1,10 +1,10 @@
 # skills-manifest — build výstup tools/build-vscode.py
 
-> vendored from IT-ANALYSIS/Skilly @ 2026-10-10 — needitovat ručně (lekce → kanon → rebuild; docs/BUILD-VSCODE.md)
+> vendored from IT-ANALYSIS/Skilly @ 2026-10-12 — needitovat ručně (lekce → kanon → rebuild; docs/BUILD-VSCODE.md)
 
 | Pole | Hodnota |
 |---|---|
-| Verze kanonu | 2026-10-10 + sha1 10eae2f3159d1ead4f0c69db7cff58f7419c8e05 |
+| Verze kanonu | 2026-10-12 + sha1 3ac0057cf7135ff2cda638273c2dd8fdd6fe8c2b |
 | Profil | doma |
 | Sada | full |
 | Terminál | off |
@@ -46,11 +46,11 @@
 
 | Soubor | sha256 |
 |---|---|
-| agents/sa-analytik.agent.md | 71d5aeb4545b02ec50e700951b18e6f8a0de00fc857adfb2e615cd2caa451ab3 |
-| copilot-instructions.md | 2211ead25b6708ec638e96745a29049cfe0b2c1c9de15475a8ecf87e366aae0d |
-| instructions/emr-zapis.instructions.md | 306a5d9c87903e956b3c558c9ee30a94dd147f063707c5780a6fe5cb6f94d40d |
+| agents/sa-analytik.agent.md | 0af997cfd4df886bf01bcb20da80cfdcca698b910e93750b5f131b7e79023d44 |
+| copilot-instructions.md | 8c10907b62cabf10acba4e23b8185c57a8cd500df645ef47b30616d4f1649a30 |
+| instructions/emr-zapis.instructions.md | 068cff9684d84544244316545bcbb87c0f34fc38622b0bea8ca21db8adaac4ae |
 | instructions/mermaid.instructions.md | f0f3219b9bd6c0f2dd9c5697e8c35a77361a629fc98e2290f22262bab99edca8 |
-| skills/e2e-f0-f1/SKILL.md | e5931ec13c776bd33ebab489b93a9f5166c6b62a0304aa4877875de3cefb6190 |
+| skills/e2e-f0-f1/SKILL.md | 8aa48779ecdd25eb8a45824a00c16fa2b0fe851be854ed42f2b7dd410644105d |
 | skills/e2e-f0-f1/references/UC-Pravidla-Identifikace.md | f2fca2f543401c9e1acdccc2b2f542e4705b4fa5b3bed5f6819bee78e66cbea3 |
 | skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md | f2b3e6764264dc33899169d499a026d5065d32e7739185bbfb71c5c7a2c6e951 |
 | skills/ea-addin-developer/SKILL.md | e6c9edd933e02b5a821c1feda5413447701cc5830456975f892504339f499ba7 |
@@ -65,13 +65,13 @@
 | skills/ea-sql-expert/references/emr-specific-views-and-tables.md | c792fa1538b076ea4ed3e797eb5fd2ebcec5179f51d22d28e7e417c5f02ebde0 |
 | skills/ea-sql-expert/references/mermaid-rules.md | 66b1d0be2b464015d63a95524a8db888390dee8d1f148d53f360399a91bf176d |
 | skills/ea-sql-expert/references/sql-format-rules.md | e00ac0ce9a97ad459908f7d1efd0e2fae0913947e47a7af2f882937dd659ff3c |
-| skills/eafb-bridge/SKILL.md | ede3f02eb745cd8a2017d03c028c8ea93f56ce376da749f1f58d69046f618341 |
-| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | b82c1e3b59e5babd411cf9e424fd191c5ff647c2de9b7e2cbfcb7ecef3fe8cc7 |
-| skills/eafb-bridge/references/EAFB-Operace-Registr.md | 608674753fff798dd5d4dc6d050b786d2911b5b47fe4197ef541883e920112d2 |
-| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | 0530ca1677e06eb5672d75cfbb0005a843a62f119c88c0ed945844894e23e83c |
+| skills/eafb-bridge/SKILL.md | d18a672bd6cb90592c8fb6894a42bba89b5d5d8d427203c336f1c28735b4c90a |
+| skills/eafb-bridge/references/EAFB-Chyby-a-Confirm.md | 25477547aa0b5704cfdf64efffbe415bbcae8ff30fdc9d861d12805ec8efdd30 |
+| skills/eafb-bridge/references/EAFB-Operace-Registr.md | afd0c1a3833a0dc68658a236591cd27e39e6f8f108d2c6969e77213f904c875f |
+| skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md | 73b80703b305a213743dbb76aedc4f5f88126a64d2358f3822d017b536956f1b |
 | skills/emr-konvence/SKILL.md | 38d57317cb3e09a2526f602016bd9160f8d02eece23b69f1a13aa07d93461280 |
 | skills/emr-konvence/references/emr-bridge-protokol.md | 995fcc95bad10a997cb28be5e6feb79f796da6b44271bf6a033759f8e8f1479f |
-| skills/emr-konvence/references/emr-zapis-pravidla.md | e8d5bdffce454146b4406640517719f7f5109474e9796e40221e0d460653254d |
+| skills/emr-konvence/references/emr-zapis-pravidla.md | f46e220151afb9d705c6921b9d1d74649edf51571b291f774652a8be5445358d |
 | skills/emr-konvence/references/hitl-brany.md | 83cef52cac1c7f9bf1cd40f7c580fd17d4ec3c2d5dcf058be102dc0025c650fe |
 | skills/emr-konvence/references/ir-format.md | 95293df0162ccbbf9b8a0d5aba51ae60c698c49eab79215a070a6d330b13193f |
 | skills/emr-konvence/references/qa-checklisty.md | 5dc6e7e972bb63927840476cfff05b5508ad0dc2685a4ee66bc004e12848d14f |

@@ -2,49 +2,60 @@
 
 ## Stav `confirm_required` — NENÍ chyba
 
-Zápisové dávky prochází deterministickým **Risk Gate**. Podle rizika:
+Zápisové dávky prochází deterministickým **Risk Gate** (prahy a třídy operací ti řekne `ping` v `riskPolicy`). Podle rizika:
 
-- **LOW** → provede se hned, dostaneš `EAFB OK …`.
-- **ELEVATED** → dávka **čeká na lidské potvrzení**. Dostaneš `EAFB CEKA NA POTVRZENI <id> (…): …`. Znamená to: zápis zatím NEproběhl, dávka čeká, uživatel ji potvrdí (nebo zamítne) ve svém dialogu/okně.
-  - **Co dělej:** počkej na finální ACK. **Nepřeposílej dávku, nic neopravuj, neduplikuj.** Když se ti chce něco udělat, zeptej se uživatele, ať dá vědět, až rozhodne.
-  - **Vždy ELEVATED:** mazání (`delete_*`), klonování (`clone_*`), rebuild varianty, přepisy linked dokumentů. Potvrzovací dialog je u nich normální chod, ne známka chyby.
-- **BLOCKED** → `EAFB BLOKOVANO <id>` / `E_RISK_BLOCKED`. Tvrdý stop, žádný override z tvé strany. Ohlas uživateli; cesta ven je jen změna politiky nebo ruční práce v EA (jeho věc).
+- **LOW** → provede se hned (`done`).
+- **ELEVATED** → dávka **čeká na lidské potvrzení**: `status: "confirm_required"` (v chat ACK `EAFB CEKA NA POTVRZENI <id> (…): …`). Zápis zatím NEproběhl.
+  - **Pumpa (VS Code):** potvrzuje se v **okně pumpy** (Ano / Ne / Storno), ne v EA. Okno zmizí po 5 minutách bez rozhodnutí — dávka dál čeká; když člověk řekne, že okno zmizelo, zapiš **tentýž soubor** (stejné jméno i obsah) znovu a pumpa okno nabídne znovu bez restartu. Stejné jméno s jiným obsahem = odpověď čekající dávky s varováním „DUPLICITA ID" — novou dávku pošli s novým id. Stejný obsah pod novým id = `E_DUPLICATE_ID` (`same-content-pending`) — čekej na rozhodnutí o první.
+  - **Schránka (M365):** potvrzuje uživatel v dialogu EA; vloží ti finální ACK.
+  - **Co dělej:** jednou větou řekni člověku, co čeká a kde (`res.since` říká od kdy), a **čekej bez časového limitu**. Nepřeposílej pod novým id, nic neopravuj, neduplikuj. Potřebuješ-li dávku opravit, řekni člověku, ať dá Ne, a pošli opravenou s novým id.
+  - **Vždy ELEVATED:** mazání (`delete_*`), přesuny (`move_elements`), klonování (`clone_*`), rebuild scénářů / zpráv / constraintů / requirements, přepisy linked dokumentů, nový balíček přímo pod kořenem modelu, mazání s kaskádou do chráněné části. Okno je u nich normální chod, ne známka chyby.
+  - **Naváděná cesta zálohy:** `confirm_required` s důvodem „bez pre-image…" = bridge zálohu pořídit nemůže; člověk pořídí v EA ruční baseline nad balíčkem cíle (nebo jeho předkem) a dávku potvrdí znovu — bez ní se neprovede.
+  - Čekající dávka starší než 8 hodin vyprší (`E_RISK_EXPIRED`, `rejected`) — je-li zápis stále potřeba, nová dávka s novým id.
+- **BLOCKED** → `E_RISK_BLOCKED` (chat ACK `EAFB BLOKOVANO <id>`). Tvrdý stop, žádný override z tvé strany. Ohlas uživateli; cesta ven je jen změna politiky nebo ruční práce v EA (jeho věc).
 
-**Potvrzení nikdy nepochází od tebe.** Nikdy nedávej do dávky `confirm`, `nonce`, `payloadHash` — EA takovou dávku odmítne (`E_RISK_CONFIRM`). V ACK vidíš jen `hash <prefix>…`; plný hash ani nonce neopisuj.
+**Potvrzení nikdy nepochází od tebe.** Nikdy nedávej do dávky `confirm`, `nonce`, `payloadHash` — bridge takovou dávku odmítne (`E_RISK_CONFIRM`). Plný hash ani nonce neopisuj.
 
 ## Chybové kódy
+
+Chyby **dávky** (nic se neprovedlo, všechny operace `skipped`) vs. chyby **operace** (stop-on-error: operace před ní proběhly — `items`, `partial`).
 
 | Kód | Význam a co s tím |
 |---|---|
 | `E_PARSE` | Nevalidní JSON / chybí `ops`. Oprav strukturu, pošli novou dávku s novým id. |
-| `E_REPO` | Dávka pro jiný repozitář — nic se neprovedlo. Chat ACK **pojmenuje připojený repozitář** (basename) — oprav pole `repo` na tuto hodnotu a pošli dávku znovu (s novým id). |
-| `E_OP_FORBIDDEN` | Operace není povolena whitelistem operací. Ohlas — neobcházej. |
-| `E_WHITELIST` | Package mimo povolenou větev. Ohlas — neobcházej. |
+| `E_REPO` | Deklarace `repo` nesedí na připojený repozitář (odpověď ho pojmenuje), repozitář nemá položku v konfiguraci cíle zápisu, nebo pumpa běží nad jiným projektem EA než při startu („restartuj pumpu"). Nic se neprovedlo. **Zastav se a ohlas** — `repo` neopravuj sám na to, co je zrovna připojeno; člověk potvrdí správný repozitář (nebo restartuje pumpu), pak nová dávka. |
+| `E_UNKNOWN_OP` | Neznámá operace — `problems[]` nese `suggestions[]` nejbližších názvů. Oprav název, nové id. Je to chyba dávky, ne bridge. |
+| `E_ARGS` | Chyba v dávce z předběžné kontroly: `problems[] {op, path, code, message}` vyjmenuje **všechny** problémy najednou (chybějící pole, prázdný seznam, zástupný text v identifikačním poli, `$N` dopředu, cíl zadaný GUIDem v modelu neexistuje, `$N` na výsledek bez `guid` — „použij `$0[0]`"). **Oprav všechno z `problems[]` sám**, nové id. Žádné okno, žádná záloha. |
+| `E_OP_FORBIDDEN` | Zápisová operace není v tomto prostředí povolena. Ohlas — neobcházej; co tím nejde, je ruční krok člověka v EA. |
+| `E_ADDIN_ACCESS` | Uživatel nemá write přístup k bridge (EA security skupiny). Čtecí operace fungují; ohlas, ať požádá správce EA o zařazení do write skupiny — neobcházej. |
+| `E_BLACKLIST` | Cíl zápisu leží v **chráněné části** (větev z blacklistu nebo její podstrom, balíček auditu, balíček add-inu, prvek vlastněný chráněným prvkem, kořen modelu jako cíl update), vazba s **oběma** konci v chráněné části, podstrom mazaného/klonovaného balíčku obsahující chráněnou větev, zdroj klonu, nebo kaskáda mazání při `cascadeDelete: "block"`. Odpověď nese `problems[]` s plnou cestou cíle a chráněnou větví (`branch`, `target`, u kaskád `cascade`). **Dávku neopakuj ani neděl — požádej člověka o jiný cíl.** |
+| `E_SCOPE_CONFIG` | Vadná konfigurace cíle zápisu (`problems[]` říká co). Všechny zápisy v repozitáři stojí, čtení běží. Řekni člověku, co opravit — opravu dělá správce; nic nezkoušej. |
+| `E_AMBIGUOUS` | Jméno, cesta nebo `match`/`dedupKey` odpovídá víc objektům — odpověď nese `guids[]` + `candidates[{guid, path}]`. Vyber kandidáta s člověkem a adresuj `guid` nebo cestu. |
+| `E_NOT_FOUND` | Cíl nenalezen. U cesty nese `found` (nejhlubší nalezená úroveň) + `children[]`; jméno prvku založeného touto dávkou → odkazuj `$N`. Oprav odkaz podle nápovědy, případně ověř zpětným čtením. |
+| `E_DUPLICATE_ID` | `duplicate.kind`: `same-id-final` = toto id už má konečný výsledek (starý `res` je v `responses\superseded\`); `same-content-pending` = tatáž dávka už čeká pod `duplicate.pendingId`. Řešení vždy: **nové id**, na výsledek navázat GUIDy, nikdy opakování téže dávky. |
+| `E_INTERRUPTED` | Minulý běh této dávky byl přerušen uprostřed (zavřená pumpa / pád EA) — nic se neprovedlo, model může nést část zápisů. Zkontroluj s člověkem Output tab / model, pošli **opravnou** dávku s novým id. |
 | `E_RISK_BLOCKED` | Risk Gate BLOCKED (tvrdý stop). Ohlas uživateli. |
 | `E_RISK_CONFIRM` | Potvrzovací pole v obsahu dávky (nikdy je tam nedávej) / neplatné potvrzení. |
-| `E_RISK_REJECTED` | Uživatel dávku zamítl. Respektuj, zeptej se, jak dál. |
+| `E_RISK_REJECTED` | Člověk dávku zamítl. **Neposílej ji znovu**; zeptej se, jak dál. |
+| `E_RISK_EXPIRED` | Čekající dávka vypršela (8 h). Je-li zápis stále potřeba, nová dávka s novým id. |
 | `E_RISK_INTEGRITY` | Obsah dávky se změnil mezi klasifikací a potvrzením. Pošli novou dávku. |
-| `E_AMBIGUOUS` | `match`/`dedupKey` našel víc kandidátů — ACK/response nese `guids`; adresuj konkrétní `guid`. |
-| `E_ADDIN_ACCESS` | Uživatel nemá write přístup k bridge (EA security skupiny). Čtecí operace fungují; ohlas, ať požádá správce EA o zařazení do write skupiny — neobcházej. |
-| `E_PERMISSION` | EA security nepustila zápis do cílového balíčku (balíčková práva uživatele, ne chyba bridge). Uživatel požádá správce o práva, nebo cílit jinam. |
-| `E_LOCKED` | Cílový prvek/balíček je zamčený (EA locking) — počkat na uvolnění zámku. |
-| `E_UNKNOWN_OP`, `E_ARGS` | Neznámá operace / chybí povinné argumenty. Oprav dávku. |
+| `E_NO_BASELINE` | Destruktivní dávka, ke které bridge nemůže pořídit zálohu (a politika ji vyžaduje). Konečný stav — nic se neprovedlo. Řeší člověk: ruční baseline v EA nad balíčkem cíle, menší balíček, nebo správce. **Neřeš rozdělením dávky**; po ruční záloze nová dávka s novým id. |
+| `E_PERMISSION` | EA security nepustila zápis do cílového balíčku (práva uživatele, ne chyba bridge). Položky před chybou proběhly (`items`, `partial: true`) — vyjmenuj je člověku; práva řeší člověk / správce, nebo cílit jinam. |
+| `E_LOCKED` | Cílový prvek/balíček je zamčený (EA locking). Totéž: řekni, co je zamčené a co proběhlo; zámek řeší člověk. (Vazby zámky nehlídají.) |
 | `E_SQL_READONLY` | Jiný dotaz než SELECT/WITH. |
-| `E_SQL` | Dotaz v EA selhal (neexistující sloupec/tabulka, syntaxe) — `message` = hláška EA (může chybět), `sql` = dotaz, `raw` = začátek odpovědi EA. Oprav dotaz (ověř sloupce), pošli znovu; EA k tomu otevřela modální dialog, který člověk odklikne. **Prázdný výsledek NENÍ `E_SQL`** — od v0.14 je to `ok`/`rowCount: 0` + warning. |
-| `E_NOT_FOUND` | Cíl nenalezen — ověř GUID/jméno zpětným čtením. |
-| `E_EXCEPTION`, `E_NO_EXECUTOR` | Neočekávaná chyba / bridge neběží. Ohlas uživateli. |
-
-`E_QUOTA` se už nevydává (kvótu klonů kryje ELEVATED potvrzení).
+| `E_SQL` | Dotaz v EA selhal (neexistující sloupec/tabulka, syntaxe) — `message` = hláška EA (může chybět), `sql` = dotaz, `raw` = začátek odpovědi EA. Oprav dotaz (ověř sloupce), pošli znovu; EA k tomu otevřela modální dialog, který člověk odklikne. **Prázdný výsledek NENÍ `E_SQL`** — je to `ok`/`rowCount: 0` + warning. |
+| `E_EXCEPTION` | Neočekávaná výjimka v EA/COM — **není to chyba tvé dávky**. Ohlas člověku, ať zkontroluje Output tab; další zápisová dávka půjde oknem (pojistka po pádu). |
+| `E_NO_EXECUTOR` | V modelu chybí kód bridge. Ohlas uživateli (správce). |
 
 ## Retry a idempotence (shrnutí)
 
-Dávka je **stop-on-error** bez rollbacku: položky vytvořené před chybou v modelu zůstaly. **Neposílej tutéž dávku slepě znovu** — vytvořil bys duplicity. Korektní oprava = dávka adresující GUIDy vytvořených položek přes `guid` → update, plus doplnění zbytku. **GUIDy máš přímo v chat ACK** — i chybová větev ACK nese GUIDy položek vzniklých před chybou; `res-*.json` je jen doložená výjimka (dump nad rozpočet, binární výstupy). Výjimka B3: u `create_or_update_constraints`/`requirements` položky GUIDy nemají — oprava = rebuild kompletní sady na element GUID. Výjimka (bezpečné přeposlat): položky s `matchByName:true` / `match:"composite"` / `dedupKey`, a zprávy s `rebuild:true` — druhý běh vrátí `created:false` + `matchedBy`.
+Dávka je **stop-on-error** bez rollbacku: položky vytvořené před chybou v modelu zůstaly — odpověď je vyjmenuje (`items`, `partial: true`; chybová větev chat ACK nese GUIDy položek vzniklých před chybou). **Neposílej tutéž dávku slepě znovu** — vytvořil bys duplicity. Korektní oprava = dávka adresující GUIDy vytvořených položek přes `guid` → update, plus doplnění zbytku. Výjimka B3: u `create_or_update_constraints`/`requirements` položky GUIDy nemají — oprava = rebuild kompletní sady na element GUID. Výjimka (bezpečné přeposlat): položky s `matchByName:true` / `match:"composite"` / `dedupKey`, a zprávy s `rebuild:true` — druhý běh vrátí `created:false` + `matchedBy`. Čtecí dávky se smějí opakovat beze změny.
 
-## Op-level `warnings` — nepřehlédnout
+## Warningy — nepřehlédnout
 
-Operace může skončit `status: ok` a přesto nést pole `warnings` (pole textů), např. `scenarios[1]: join 'BE95002' neni cislo kroku - Join nezapsan (End)`. Warning znamená: **část záměru se tiše nepropsala**, ačkoli dávka i počty vypadají v pořádku. Není to chyba (`status` zůstává `ok`) ani QC nález.
+Operace může skončit `status: ok` a přesto nést pole `warnings` (pole textů), např. `scenarios[1]: join 'BE95002' neni cislo kroku - Join nezapsan (End)`. Takový warning znamená: **část záměru se tiše nepropsala**, ačkoli dávka i počty vypadají v pořádku. Není to chyba (`status` zůstává `ok`) ani QC nález — řeš ho **opravnou dávkou** dle jeho textu, ne přeposláním (u B3 rebuild kompletní sady na element GUID). **Provozní varování** (záloha, úklid baselines, chybějící sekce politiky, „EA nerozlišuje 0 řádků od chybného dotazu", vypnutá security, kaskáda mazání) nic neopravují — jen je ohlas.
 
-**Chat ACK warningy nese** (od protokolu v0.11) — počet a první warning jsou v prvním řádku, pod ním výpis po operacích:
+**Chat ACK warningy nese** — počet a první warning jsou v prvním řádku, pod ním výpis po operacích:
 
 ```
 EAFB OK 20260821-83: 6/6 ops | 1 WARNING: scenarios[1]: join 'BE95002' neni cislo kroku - Join nezapsan (End) | QC ciste (3 kontrol)
@@ -52,8 +63,8 @@ Warnings (zapis PROBEHL, cast zameru se ale nepropsala - resit OPRAVNOU davkou, 
 - op[4] create_or_update_scenarios: scenarios[1]: join 'BE95002' neni cislo kroku - Join nezapsan (End)
 ```
 
-Je-li warningů víc, než se do ACK vejde, ACK to řekne ukazatelem (`dalsich N - plny vycet v res-<id>.json`) — **jen při tomto ukazateli** (doložená výjimka) si plný výčet vyžádej. Warning řeš **opravnou dávkou** dle jeho textu, ne přeposláním — GUIDy pro opravnou dávku jsou přímo v ACK (u B3 rebuild kompletní sady na element GUID).
+Je-li warningů víc, než se do ACK vejde, ACK to řekne ukazatelem (`dalsich N - plny vycet v res-<id>.json`) — **jen při tomto ukazateli** si plný výčet vyžádej.
 
-## QC v ACK
+## QC v odpovědi
 
-ACK zápisové dávky může nést stav QC odděleně od stavu zápisu: `QC ciste` / `QC NALEZ …` / `QC nedobehlo …`. **Nález ani nedoběhnutí QC NENÍ chyba zápisu** — zápis proběhl. Nález řeš s uživatelem, dávku kvůli němu nepřeposílej.
+Odpověď zápisové dávky může nést stav QC odděleně od stavu zápisu (chat ACK: `QC ciste` / `QC NALEZ …` / `QC nedobehlo …`). **Nález ani nedoběhnutí QC NENÍ chyba zápisu** — zápis proběhl. Nález řeš s uživatelem, dávku kvůli němu nepřeposílej.
