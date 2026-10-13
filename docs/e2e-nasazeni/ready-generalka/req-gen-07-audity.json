@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "gen-07-audity", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "query", "sql": "SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name IN ('FB gen-03-low-zapis','FB gen-05-delete','FB gen-05b-delete','FB gen-06-blacklist') ORDER BY o.Object_ID LIMIT 10" },
+ { "op": "query", "sql": "SELECT o.Name, p.Property, p.Value FROM t_objectproperties p JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.Object_Type = 'Artifact' AND o.Name IN ('FB gen-05-delete','FB gen-05b-delete','FB gen-06-blacklist') AND p.Property IN ('result','ai.risk.level','ai.risk.confirm','ai.risk.codes','ai.baseline') ORDER BY o.Name, p.Property LIMIT 40" },
+ { "op": "query", "sql": "SELECT COUNT(*) AS c FROM t_object WHERE Object_ID = 3853" } ] }

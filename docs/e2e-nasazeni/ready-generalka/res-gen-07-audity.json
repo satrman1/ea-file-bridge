@@ -1,0 +1,110 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"gen-07-audity",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":4,
+   "rows":[
+    {
+     "Object_ID":"3854",
+     "Name":"FB gen-03-low-zapis",
+     "Note":"Davka gen-03-low-zapis skoncila USPESNE: 2 z 2 operace provedeno.\nUroven rizika: bez potvrzeni.\nZaloha: neporizovala se (cisty create).\nKontrola kvality: bez kontrol - pro tento repozitar nejsou definovane QC kontroly.\n\n--- strojovy zaznam (beze zmeny) ---\ndone: 2 ops (2 ok, 0 chyb) | risk=LOW writeOps=2 createOps=2 updatedExisting=0 deleteTargets=0 affectedElements=0 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=4 hashMs=0 payloadHash=ef344e64322f4f8985fb342daa6267fb9e75e8919e9504a5b83b038c965170f8 | confirmationRequired=false | baseline=none (cisty create)\n\n--- request ---\n{ \"protocol\": \"eafb/0.2\", \"id\": \"gen-03-low-zapis\", \"repo\":\"EA17_Yoga_QEA2.qeax\", \"ops\": [\n { \"op\": \"create_or_update_package\", \"parent\": \"{931C997C-FD2F-4043-BACD-4B4D42C24DBE}\", \"name\": \"FBT-GENERALKA-1013\" },\n { \"op\": \"create_or_update_elements\", \"elements\": [ { \"package\": \"$0\", \"type\": \"Class\", \"name\": \"GEN Prvek 1013\", \"notes\": \"Vytvoreno davkou gen-03-low-zapis (Z261013-1, generalka nasazeni v0.21 v QEAX). Uklid davkou v temze vlakne.\" } ] } ] }\n"
+    },
+    {
+     "Object_ID":"3856",
+     "Name":"FB gen-05-delete",
+     "Note":"Davku gen-05-delete ZAMITL uzivatel v okne pumpy. Nic se nezapsalo.\nUroven rizika: vyzadovala potvrzeni. Zamitl uzivatel v okne pumpy 2026-10-13 14:54:55.\nProc potvrzeni: Mazani a odebirani nejde vzit zpet jednim krokem, proto ho vzdy potvrzuje clovek. Davka maze 1 cil; bez potvrzeni je dovoleno nejvys 0.\nZaloha: neporizovala se (nic se nezapsalo).\n\n--- strojovy zaznam (beze zmeny) ---\nrejected E_RISK_REJECTED: davka zamitnuta uzivatelem (kanal pumpa), nic neprovedeno | risk=ELEVATED writeOps=1 createOps=0 updatedExisting=0 deleteTargets=1 affectedElements=1 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=330 hashMs=1 payloadHash=0541af49e084cefff719410ba85ac79d3bf0e022277e6d54fa72e0e4dcf2be8f | confirmationRequired=true confirmedByUser=false confirmChannel=pumpa confirmedAt=2026-10-13 14:54:55 | duvody: Operace 'delete_from_model' je politikou klasifikovana ELEVATED; Prah ELEVATED prekrocen: deleteTargets 1 > 0 | kody: CLASS_ELEVATED,THRESHOLD_ELEVATED\n\n--- request ---\n{ \"protocol\": \"eafb/0.2\", \"id\": \"gen-05-delete\", \"repo\":\"EA17_Yoga_QEA2.qeax\", \"ops\": [\n { \"op\": \"delete_from_model\", \"targets\": [ { \"type\": \"Element\", \"guid\": \"{ACA5BB28-92AC-4834-9F14-7D176C23456F}\" } ] } ] }\n"
+    },
+    {
+     "Object_ID":"3857",
+     "Name":"FB gen-05b-delete",
+     "Note":"Davka gen-05b-delete skoncila USPESNE: 1 z 1 operace provedeno.\nUroven rizika: vyzadovala potvrzeni. Potvrdil uzivatel v okne pumpy 2026-10-13 14:56:18.\nProc potvrzeni: Mazani a odebirani nejde vzit zpet jednim krokem, proto ho vzdy potvrzuje clovek. Davka maze 1 cil; bez potvrzeni je dovoleno nejvys 0.\nZaloha: 'FB-AUTO admin s20261013-1 2026-10-13 14:56:18' nad balickem Groups.FBT-VOLNE.FBT-GENERALKA-1013.\nKontrola kvality: bez kontrol - pro tento repozitar nejsou definovane QC kontroly.\n\n--- strojovy zaznam (beze zmeny) ---\ndone: 1 ops (1 ok, 0 chyb) | risk=ELEVATED writeOps=1 createOps=0 updatedExisting=0 deleteTargets=1 affectedElements=1 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=339 hashMs=1 payloadHash=c9cd581a7ab9a356a5a4932373d43e7b4ff91a182ca52acedd02ebd26ae522e4 | confirmationRequired=true confirmedByUser=true confirmChannel=pumpa confirmedAt=2026-10-13 14:56:18 | duvody: Operace 'delete_from_model' je politikou klasifikovana ELEVATED; Prah ELEVATED prekrocen: deleteTargets 1 > 0 | kody: CLASS_ELEVATED,THRESHOLD_ELEVATED | baseline=created (pod prahem): Groups.FBT-VOLNE.FBT-GENERALKA-1013 -> FB-AUTO admin s20261013-1 2026-10-13 14:56:18 [created]\n\n--- request ---\n{ \"protocol\": \"eafb/0.2\", \"id\": \"gen-05b-delete\", \"repo\":\"EA17_Yoga_QEA2.qeax\", \"ops\": [\n { \"op\": \"delete_from_model\", \"targets\": [ { \"type\": \"Element\", \"guid\": \"{ACA5BB28-92AC-4834-9F14-7D176C23456F}\" } ] } ] }\n"
+    },
+    {
+     "Object_ID":"3858",
+     "Name":"FB gen-06-blacklist",
+     "Note":"Davka gen-06-blacklist byla ODMITNUTA pred zapisem: cil lezi v chranene casti modelu (1 operace). Nic se nezapsalo.\nDuvod: Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: ops[0].parent: rodic noveho balicku: E_BLACKLIST: cil Groups.FBT-CHRANENE (package 714) lezi v chranene vetvi 'Groups.FBT-CHRANENE' (blacklist: test bla...\nUroven rizika: nehodnoceno (kontrola rizika nebezela).\nZaloha: neporizovala se (nic se nezapsalo).\n\n--- strojovy zaznam (beze zmeny) ---\nerror E_BLACKLIST: 1 ops (0 ok, nic neprovedeno) - Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: ops[0].parent: rodic noveho balicku: E_BLACKLIST: cil Groups.FBT-CHRANENE (package 714) lezi v chranene vetvi 'Groups.FBT-CHRANENE' (blacklist: test blacklistu (Z261004b-10, Groups.FBT-CHRANENE)). Bridge sem nezapisuje - davku neopakuj ani nedel, pozadej cloveka o jiny cil.\n\n--- request ---\n{ \"protocol\": \"eafb/0.2\", \"id\": \"gen-06-blacklist\", \"repo\":\"EA17_Yoga_QEA2.qeax\", \"ops\": [\n { \"op\": \"create_or_update_package\", \"parent\": \"{54223CC8-A8DB-4a25-8488-171D3F546349}\", \"name\": \"GEN-NESMI-VZNIKNOUT\" } ] }\n"
+    }
+   ],
+   "maxRows":500
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":10,
+   "rows":[
+    {
+     "Name":"FB gen-05-delete",
+     "Property":"ai.risk.codes",
+     "Value":"CLASS_ELEVATED;THRESHOLD_ELEVATED"
+    },
+    {
+     "Name":"FB gen-05-delete",
+     "Property":"ai.risk.confirm",
+     "Value":"required=1;confirmedByUser=0;channel=pumpa;at=2026-10-13 14:54:55"
+    },
+    {
+     "Name":"FB gen-05-delete",
+     "Property":"ai.risk.level",
+     "Value":"ELEVATED"
+    },
+    {
+     "Name":"FB gen-05-delete",
+     "Property":"result",
+     "Value":"rejected E_RISK_REJECTED: davka zamitnuta uzivatelem (kanal pumpa), nic neprovedeno | risk=ELEVATED writeOps=1 createOps=0 updatedExisting=0 deleteTargets=1 affectedElements=1 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=33"
+    },
+    {
+     "Name":"FB gen-05b-delete",
+     "Property":"ai.baseline",
+     "Value":"pkgGuid={05D20C22-AD2D-4e50-BFF8-DD6575E3D172};name=FB-AUTO admin s20261013-1 2026-10-13 14:56:18;decision=created"
+    },
+    {
+     "Name":"FB gen-05b-delete",
+     "Property":"ai.risk.codes",
+     "Value":"CLASS_ELEVATED;THRESHOLD_ELEVATED"
+    },
+    {
+     "Name":"FB gen-05b-delete",
+     "Property":"ai.risk.confirm",
+     "Value":"required=1;confirmedByUser=1;channel=pumpa;at=2026-10-13 14:56:18"
+    },
+    {
+     "Name":"FB gen-05b-delete",
+     "Property":"ai.risk.level",
+     "Value":"ELEVATED"
+    },
+    {
+     "Name":"FB gen-05b-delete",
+     "Property":"result",
+     "Value":"done: 1 ops (1 ok, 0 chyb) | risk=ELEVATED writeOps=1 createOps=0 updatedExisting=0 deleteTargets=1 affectedElements=1 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=339 hashMs=1 payloadHash=c9cd581a7ab9a356a5a4932373d43e7b4f"
+    },
+    {
+     "Name":"FB gen-06-blacklist",
+     "Property":"result",
+     "Value":"error E_BLACKLIST: 1 ops (0 ok, nic neprovedeno) - Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: ops[0].parent: rodic noveho balicku: E_BLACKLIST: cil "
+    }
+   ],
+   "maxRows":500
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "c":"0"
+    }
+   ],
+   "maxRows":500
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "since":"2026-10-13 14:57:03",
+ "audit":{
+  "aiLogGuid":"{98F19C6A-94CC-4f2c-BA74-DCE259D4F596}"
+ }
+}

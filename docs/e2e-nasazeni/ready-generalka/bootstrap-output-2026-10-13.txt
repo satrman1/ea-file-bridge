@@ -1,0 +1,13 @@
+=== ITAN-Bootstrap File Bridge === (QEAX EA17_Yoga_QEA2, 2026-10-13 12:25, spusteno pres Debug: Run Script with Debugger -> vypis v panelu Debug; 139 radku OK vynechano)
+Slozka src: C:\GIT\ea-file-bridge\src\
+Element AICodeBridge uz existuje (elementID 3352) - jen doplnim operace/kod.
+PX  FB_Audit: (Repository, reqId, summary, requestText) -> (Repository, reqId, summary, requestText, human)
+PX  FB_ConfirmSummary: (resp) -> (resp, ageInfo)
+Otisk kodu v modelu: c37e5f8a4c1a (132 souboru bez konfigurace, sha256 c37e5f8a4c1aa751a8c8d83be41d4d63ea84f56baea3790b519244db1d5cca62) - tagged values fb.code.* na prvku AICodeBridge; totez vraci ping a About AI Bridge.
+Hotovo: 8 operaci zalozeno, 139 nahran kod (souboru v src: 139). Parametry: 2 operaci srovnano podle hlavicky (radky PX). Receptions: 0 zalozeno, 0 prepnuto na lokalni Signal, 0 parametry opraveny.
+POZOR: 2 operaci melo v modelu jiny seznam parametru nez hlavicka souboru (radky PX vyse) - bez tohoto srovnani by EA runtime i pumpa volaly nove telo se starymi parametry (FB-PU-01). Po restartu spust kontrolni dotaz parametru (NAVOD-NASAZENI-KLIKACI.md).
+DALSI KROKY: 1) zkontroluj configy v src (FB_WriteScope/FB_Config/FB_OpsAllowed/FB_RiskPolicy/FB_AccessGroups: repo + GUID) a pripadne spust znovu,
+2) PLNY restart EA (kod EA runtime) a spust/restartuj pumpu (pump.wsf) - kod se cte pri pripojeni.
+Script finished
+Zalozeno 8: FB_AuditText, FB_CodeFingerprint, FB_CodeInfo, FB_FieldCheck, FB_OutputFlush, FB_PumpAlive, FB_QcText, FB_ReasonText. V modelu navic (bez souboru v src): FB_Whitelist (bootstrap nemaze).
+Doba behu: cca 26 s (tiky 06102715 -> 06129062).

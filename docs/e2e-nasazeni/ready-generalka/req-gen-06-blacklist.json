@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "gen-06-blacklist", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_package", "parent": "{54223CC8-A8DB-4a25-8488-171D3F546349}", "name": "GEN-NESMI-VZNIKNOUT" } ] }

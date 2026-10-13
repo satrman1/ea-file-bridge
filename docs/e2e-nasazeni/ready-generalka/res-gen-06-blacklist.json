@@ -1,0 +1,40 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"gen-06-blacklist",
+ "status":"error",
+ "results":[
+  {
+   "op":"create_or_update_package",
+   "status":"skipped"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "since":"2026-10-13 14:56:45",
+ "code":"E_BLACKLIST",
+ "message":"Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: ops[0].parent: rodic noveho balicku: E_BLACKLIST: cil Groups.FBT-CHRANENE (package 714) lezi v chranene vetvi 'Groups.FBT-CHRANENE' (blacklist: test blacklistu (Z261004b-10, Groups.FBT-CHRANENE)). Bridge sem nezapisuje - davku neopakuj ani nedel, pozadej cloveka o jiny cil.",
+ "problems":[
+  {
+   "op":0,
+   "path":"ops[0].parent",
+   "code":"E_BLACKLIST",
+   "message":"rodic noveho balicku: E_BLACKLIST: cil Groups.FBT-CHRANENE (package 714) lezi v chranene vetvi 'Groups.FBT-CHRANENE' (blacklist: test blacklistu (Z261004b-10, Groups.FBT-CHRANENE)). Bridge sem nezapisuje - davku neopakuj ani nedel, pozadej cloveka o jiny cil.",
+   "branch":{
+    "kind":"blacklist",
+    "guid":"{54223CC8-A8DB-4a25-8488-171D3F546349}",
+    "name":"FBT-CHRANENE",
+    "path":"Groups.FBT-CHRANENE",
+    "note":"test blacklistu (Z261004b-10, Groups.FBT-CHRANENE)",
+    "allowIncomingRefs":true
+   },
+   "target":{
+    "kind":"package",
+    "id":714,
+    "path":"Groups.FBT-CHRANENE"
+   }
+  }
+ ],
+ "audit":{
+  "aiLogGuid":"{BE0542E3-5C8A-478f-86BE-C9C8EB0C9E4F}"
+ }
+}

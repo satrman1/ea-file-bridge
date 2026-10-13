@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "gen-05b-delete", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "delete_from_model", "targets": [ { "type": "Element", "guid": "{ACA5BB28-92AC-4834-9F14-7D176C23456F}" } ] } ] }

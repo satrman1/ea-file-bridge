@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "gen-09-uklid", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "delete_from_model", "targets": [ { "type": "Package", "guid": "{05D20C22-AD2D-4e50-BFF8-DD6575E3D172}" } ] } ] }

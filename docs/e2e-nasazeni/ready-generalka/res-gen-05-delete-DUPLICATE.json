@@ -1,0 +1,22 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"gen-05-delete",
+ "status":"error",
+ "results":[
+  {
+   "op":"delete_from_model",
+   "status":"skipped"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "code":"E_DUPLICATE_ID",
+ "message":"Id 'gen-05-delete' uz bylo pouzito (predchozi vysledek: rejected E_RISK_REJECTED, od ?); stary res presunut do responses\\superseded\\. Nic nebylo provedeno - posli davku s NOVYM id. Chces-li navazat na predchozi vysledek, pouzij GUIDy z nej (superseded\\), ne opakovani davky.",
+ "duplicate":{
+  "kind":"same-id-final",
+  "previousStatus":"rejected",
+  "previousCode":"E_RISK_REJECTED",
+  "previousResMovedTo":"responses\\superseded\\"
+ },
+ "since":"2026-10-13 14:55:17"
+}

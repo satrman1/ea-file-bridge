@@ -1,0 +1,165 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"gen-05b-delete",
+ "status":"done",
+ "results":[
+  {
+   "op":"delete_from_model",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "type":"Element",
+     "id":3853,
+     "name":"GEN Prvek 1013",
+     "path":"Groups.FBT-VOLNE.FBT-GENERALKA-1013.GEN Prvek 1013",
+     "deleted":true
+    }
+   ]
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "since":"2026-10-13 14:55:52",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Operace 'delete_from_model' je politikou klasifikovana ELEVATED",
+   "Prah ELEVATED prekrocen: deleteTargets 1 > 0"
+  ],
+  "reasonItems":[
+   {
+    "code":"CLASS_ELEVATED",
+    "text":"Operace 'delete_from_model' je politikou klasifikovana ELEVATED",
+    "args":{
+     "op":"delete_from_model"
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: deleteTargets 1 > 0",
+    "args":{
+     "key":"deleteTargets",
+     "value":1,
+     "limit":0
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "delete_from_model":1
+   },
+   "targets":[],
+   "packages":[],
+   "diagrams":[],
+   "paths":[
+    "Groups.FBT-VOLNE.FBT-GENERALKA-1013.GEN Prvek 1013"
+   ],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[
+    {
+     "kind":"element",
+     "name":"GEN Prvek 1013",
+     "type":"Class",
+     "path":"Groups.FBT-VOLNE.FBT-GENERALKA-1013.GEN Prvek 1013",
+     "scopeKnown":true,
+     "children":0
+    }
+   ],
+   "actions":[
+    {
+     "op":"delete_from_model",
+     "items":1,
+     "create":0,
+     "update":0,
+     "targets":[
+      "GEN Prvek 1013"
+     ],
+     "packages":[],
+     "diagrams":[],
+     "pairs":[]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":1,
+   "createOps":0,
+   "updatedExisting":0,
+   "deleteTargets":1,
+   "affectedElements":1,
+   "affectedPackages":1,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":339,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"a83fab9f8f171ae11674e13c39f55d5f4bf5be6b8393fca5aea5d1c58595ca63",
+  "payloadHash":"c9cd581a7ab9a356a5a4932373d43e7b4ff91a182ca52acedd02ebd26ae522e4",
+  "hashMs":1,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-13 14:56:18"
+  }
+ },
+ "baseline":{
+  "decision":"created",
+  "reason":"pod prahem",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{05D20C22-AD2D-4e50-BFF8-DD6575E3D172}",
+    "name":"FB-AUTO admin s20261013-1 2026-10-13 14:56:18",
+    "path":"Groups.FBT-VOLNE.FBT-GENERALKA-1013",
+    "packageName":"FBT-GENERALKA-1013",
+    "subtreeCount":1,
+    "probeMs":12,
+    "status":"ok",
+    "baselineGuid":"{D1819A03-9DA0-4199-AD9D-0E515363BC4F}",
+    "result":"created"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":12,
+  "elapsedMs":1664,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: Groups.FBT-VOLNE.FBT-GENERALKA-1013 (1 prvku)"
+  ],
+  "created":[
+   "FB-AUTO admin s20261013-1 2026-10-13 14:56:18"
+  ],
+  "reused":[],
+  "journal":{
+   "targets":0,
+   "covered":[],
+   "uncovered":[
+    "delete_from_model[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"",
+   "why":"zadny cil v rozsahu journalu"
+  }
+ },
+ "qc":{
+  "status":"bez_kontrol",
+  "reason":"pro tento repozitar nejsou definovane QC kontroly",
+  "checks":0,
+  "findings":[]
+ },
+ "audit":{
+  "aiLogGuid":"{5C53608D-8371-435c-9965-330B4023C3DF}"
+ }
+}

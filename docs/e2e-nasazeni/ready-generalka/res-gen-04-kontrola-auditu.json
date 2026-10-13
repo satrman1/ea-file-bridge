@@ -1,0 +1,94 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"gen-04-kontrola-auditu",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "Object_ID":"3854",
+     "Name":"FB gen-03-low-zapis",
+     "Note":"Davka gen-03-low-zapis skoncila USPESNE: 2 z 2 operace provedeno.\nUroven rizika: bez potvrzeni.\nZaloha: neporizovala se (cisty create).\nKontrola kvality: bez kontrol - pro tento repozitar nejsou definovane QC kontroly.\n\n--- strojovy zaznam (beze zmeny) ---\ndone: 2 ops (2 ok, 0 chyb) | risk=LOW writeOps=2 createOps=2 updatedExisting=0 deleteTargets=0 affectedElements=0 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=4 hashMs=0 payloadHash=ef344e64322f4f8985fb342daa6267fb9e75e8919e9504a5b83b038c965170f8 | confirmationRequired=false | baseline=none (cisty create)\n\n--- request ---\n{ \"protocol\": \"eafb/0.2\", \"id\": \"gen-03-low-zapis\", \"repo\":\"EA17_Yoga_QEA2.qeax\", \"ops\": [\n { \"op\": \"create_or_update_package\", \"parent\": \"{931C997C-FD2F-4043-BACD-4B4D42C24DBE}\", \"name\": \"FBT-GENERALKA-1013\" },\n { \"op\": \"create_or_update_elements\", \"elements\": [ { \"package\": \"$0\", \"type\": \"Class\", \"name\": \"GEN Prvek 1013\", \"notes\": \"Vytvoreno davkou gen-03-low-zapis (Z261013-1, generalka nasazeni v0.21 v QEAX). Uklid davkou v temze vlakne.\" } ] } ] }\n"
+    }
+   ],
+   "maxRows":500
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":8,
+   "rows":[
+    {
+     "Property":"ai.baseline",
+     "Value":"decision=none;reason=cisty create"
+    },
+    {
+     "Property":"ai.channel",
+     "Value":"eafb"
+    },
+    {
+     "Property":"ai.request",
+     "Value":"gen-03-low-zapis"
+    },
+    {
+     "Property":"ai.risk.confirm",
+     "Value":"required=0;confirmedByUser=0"
+    },
+    {
+     "Property":"ai.risk.hash",
+     "Value":"ef344e64322f4f8985fb342daa6267fb9e75e8919e9504a5b83b038c965170f8"
+    },
+    {
+     "Property":"ai.risk.level",
+     "Value":"LOW"
+    },
+    {
+     "Property":"ai.risk.metrics",
+     "Value":"writeOps=2;createOps=2;updatedExisting=0;deleteTargets=0;affectedElements=0;affectedPackages=1;affectedDiagrams=0;moveOps=0;complete=1"
+    },
+    {
+     "Property":"result",
+     "Value":"done: 2 ops (2 ok, 0 chyb) | risk=LOW writeOps=2 createOps=2 updatedExisting=0 deleteTargets=0 affectedElements=0 affectedPackages=1 affectedDiagrams=0 moveOps=0 policyValid=true gateMs=4 hashMs=0 payloadHash=ef344e64322f4f8985fb342daa6267fb9e75e8919"
+    }
+   ],
+   "maxRows":500
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "Object_ID":"3853",
+     "ea_guid":"{ACA5BB28-92AC-4834-9F14-7D176C23456F}",
+     "Name":"GEN Prvek 1013",
+     "Package_ID":"717"
+    }
+   ],
+   "maxRows":500
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "Package_ID":"717",
+     "ea_guid":"{05D20C22-AD2D-4e50-BFF8-DD6575E3D172}",
+     "Name":"FBT-GENERALKA-1013",
+     "Parent_ID":"715"
+    }
+   ],
+   "maxRows":500
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "since":"2026-10-13 14:53:57",
+ "audit":{
+  "aiLogGuid":"{BC20AE0C-298E-4734-8A26-07C093F9160F}"
+ }
+}

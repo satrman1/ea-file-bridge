@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "gen-04-kontrola-auditu", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "query", "sql": "SELECT o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name = 'FB gen-03-low-zapis' LIMIT 5" },
+ { "op": "query", "sql": "SELECT p.Property, p.Value FROM t_objectproperties p JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.Object_Type = 'Artifact' AND o.Name = 'FB gen-03-low-zapis' ORDER BY p.Property LIMIT 40" },
+ { "op": "query", "sql": "SELECT o.Object_ID, o.ea_guid, o.Name, o.Package_ID FROM t_object o WHERE o.Name = 'GEN Prvek 1013' LIMIT 5" },
+ { "op": "query", "sql": "SELECT Package_ID, ea_guid, Name, Parent_ID FROM t_package WHERE Name = 'FBT-GENERALKA-1013' LIMIT 5" } ] }

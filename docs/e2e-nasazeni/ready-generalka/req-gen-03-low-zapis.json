@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "gen-03-low-zapis", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_package", "parent": "{931C997C-FD2F-4043-BACD-4B4D42C24DBE}", "name": "FBT-GENERALKA-1013" },
+ { "op": "create_or_update_elements", "elements": [ { "package": "$0", "type": "Class", "name": "GEN Prvek 1013", "notes": "Vytvoreno davkou gen-03-low-zapis (Z261013-1, generalka nasazeni v0.21 v QEAX). Uklid davkou v temze vlakne." } ] } ] }
