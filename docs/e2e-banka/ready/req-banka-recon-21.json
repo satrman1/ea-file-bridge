@@ -1,0 +1,14 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-recon-21",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "query", "sql": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 't_sec%' ORDER BY TABLE_NAME" },
+  { "op": "query", "sql": "SELECT x.Type, g.GroupName, u.UserLogin FROM ((t_xrefsystem x LEFT JOIN t_secuser u ON x.Client = u.UserID) LEFT JOIN t_secgroup g ON x.Client = g.GroupID) LEFT JOIN t_object o ON x.Supplier = o.ea_guid WHERE x.Type IN ('UserSettings', 'GroupSettings') AND o.Name = 'AICodeBridge' ORDER BY x.Type" },
+  { "op": "query", "sql": "SELECT g.GroupName FROM t_secgroup g INNER JOIN t_secusergroup ug ON ug.GroupID = g.GroupID INNER JOIN t_secuser u ON u.UserID = ug.UserID WHERE u.UserLogin = '<LOGIN>' ORDER BY g.GroupName" },
+  { "op": "query", "sql": "SELECT Object_ID, Stereotype, Package_ID FROM t_object WHERE Name = 'AICodeBridge' ORDER BY Object_ID" },
+  { "op": "query", "sql": "SELECT Package_ID, Parent_ID FROM t_package WHERE Name = '#AI-LOG' ORDER BY Package_ID" },
+  { "op": "query", "sql": "SELECT x.Type, x.Client, x.Supplier, u.UserLogin, g.GroupName FROM t_xrefsystem x LEFT JOIN t_object o ON o.ea_guid = x.Supplier LEFT JOIN t_secuser u ON u.UserID = x.Client LEFT JOIN t_secgroup g ON g.GroupID = x.Client WHERE x.Type IN ('UserSettings', 'GroupSettings') AND o.Object_ID IS NULL ORDER BY x.Supplier, x.Type, x.Client" },
+  { "op": "query", "sql": "SELECT Package_ID FROM t_package WHERE Package_ID = -1" }
+ ]
+}

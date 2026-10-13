@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-blacklist-21",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "create_or_update_package", "parent": "<PROTECTED-PKG-1>", "name": "NAS-1016 NESMI VZNIKNOUT (blacklist)" }
+ ]
+}

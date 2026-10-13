@@ -1,0 +1,8 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-elevated-22",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "move_elements", "package": "<WORK-PKG>", "elements": [ "<GUID-LOW-EL>" ] }
+ ]
+}

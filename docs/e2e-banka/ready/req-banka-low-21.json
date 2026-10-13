@@ -1,0 +1,12 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-low-21",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "create_or_update_package", "parent": "<WORK-PKG>", "name": "NAS-1016 v0.21 LOW" },
+  { "op": "create_or_update_elements", "elements": [
+   { "package": "$0", "type": "Class", "name": "NAS-1016 prvek",
+     "notes": "Vytvoreno davkou banka-low-21 (nasazeni EA File Bridge v0.21 v bance, den D 2026-10-16, plan PLAN-NASAZENI-2026-10-16.md krok E6). Uklid rucne po dni D (E11)." }
+  ] }
+ ]
+}

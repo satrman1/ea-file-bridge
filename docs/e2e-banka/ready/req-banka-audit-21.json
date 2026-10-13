@@ -1,0 +1,11 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "banka-audit-21",
+ "repo": "<TEST-DB>",
+ "ops": [
+  { "op": "query", "sql": "SELECT TOP 10 o.Object_ID, o.Name, o.Note FROM t_object o WHERE o.Object_Type = 'Artifact' AND o.Name IN ('FB banka-low-21', 'FB banka-blacklist-21', 'FB banka-blacklist-22') ORDER BY o.Object_ID" },
+  { "op": "query", "sql": "SELECT TOP 40 o.Name, p.Property, p.Value FROM t_objectproperties p INNER JOIN t_object o ON o.Object_ID = p.Object_ID WHERE o.Object_Type = 'Artifact' AND o.Name IN ('FB banka-low-21', 'FB banka-blacklist-21', 'FB banka-blacklist-22') AND p.Property IN ('result', 'ai.risk.level', 'ai.risk.confirm', 'ai.risk.codes', 'ai.baseline') ORDER BY o.Name, p.Property" },
+  { "op": "query", "sql": "SELECT TOP 5 o.Object_ID, o.ea_guid, o.Name, o.Package_ID FROM t_object o WHERE o.Name = 'NAS-1016 prvek' ORDER BY o.Object_ID" },
+  { "op": "query", "sql": "SELECT TOP 5 Package_ID, ea_guid, Name, Parent_ID FROM t_package WHERE Name = 'NAS-1016 v0.21 LOW' ORDER BY Package_ID" }
+ ]
+}
