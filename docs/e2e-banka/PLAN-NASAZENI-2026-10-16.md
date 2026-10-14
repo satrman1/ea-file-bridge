@@ -1,6 +1,6 @@
 # Plán dne nasazení v0.21 v bance — 2026-10-16 (vlákno Z261013‑2 → provádí Z261013‑3)
 
-*Verze 1.0, 2026-10-13 (vlákno Z261013‑2, bez Miloše). Kód: tag **v0.21** = `45de928` (na GitHubu, ověřeno 13. 10. 16:19). Předchozí stav v bance: **v0.14** = `75534f1` + opravy `d53164c`/`47fdbb2` přenesené schránkou 10. 9. 2026, bankovní adaptace v korporátním repu (commit „adaptace banka v0.14"). Tento soubor nese žádné interní hodnoty banky — jen placeholdery z tabulky níže. Kódy vláken s U+2011 (sweep).*
+*Verze 1.1, 2026-10-14 (rozhodnutí Miloše 14. 10. 11:10–12:11: **den D = St 14. 10. 2026**, Čt 15. 10. rezerva, Pá příprava prezentace; M365 kity se nasazují týž den; bez druhého účtu; chráněná větev = katalog komponent; kit `.github` dnes nechat, build profilem banka = Čt; **příští týden refresh testu z produkce — vše dnes nasazené v `<TEST-DB>` zmizí, kap. I**). Verze 1.0 2026-10-13 (vlákno Z261013‑2, bez Miloše). Kód: tag **v0.21** = `45de928` (na GitHubu, ověřeno 13. 10. 16:19). Předchozí stav v bance: **v0.14** = `75534f1` + opravy `d53164c`/`47fdbb2` přenesené schránkou 10. 9. 2026, bankovní adaptace v korporátním repu (commit „adaptace banka v0.14"). Tento soubor nese žádné interní hodnoty banky — jen placeholdery z tabulky níže. Kódy vláken s U+2011 (sweep).*
 
 > **Co tenhle soubor je.** Pořadí kroků dne D shora dolů s odkazy na kapitoly `docs/NAVOD-NASAZENI-KLIKACI.md` v1.5a (dál jen **NAVOD**). Plán NAVOD neopisuje — říká **co se od 10. 9. změnilo**, **v jakém pořadí** to kliknout, **co čekat** a **kdy zastavit**. Každý krok: CO – KDE – JAK – OČEKÁVANÝ VÝSLEDEK – KDYŽ SELŽE.
 > **Co tenhle soubor NENÍ.** Není to návod (ten je NAVOD) ani protokol testu. Výsledky dne D patří do `docs/e2e-banka/VYSLEDKY-2026-10-16.md` (šablona v kap. H).
@@ -80,8 +80,8 @@ Z `git diff --name-status v0.14..v0.21 -- src\` (ověřeno 13. 10. 2026): **101 
 |---|---|---|---|---|---|
 | A1 | Tag `v0.21` je na GitHubu | GitHub `satrman1/ea-file-bridge` v prohlížeči | Code → větev/tag přepínač → Tags | `v0.21` v seznamu (13. 10. 16:19 ověřeno: `4b87c4c` → `45de928`) | VS Code doma: Source Control → … → Push → „Push (Follow Tags)" |
 | A2 | Token kurýra platí | — | karta `_FRONTA/PROBLEMS-obnova-tokenu-kuryrniho-kanalu.md` | platí do ≈ 27. 10. 2026 → pro 16. 10. stačí; obnova zůstává kartou | pull v bance spadne na přihlášení → obnovit token před dnem D |
-| A3 | ZIP kitů M365 | — | netřeba — kity M365 se dne D nepoužívají | — | — |
-| A4 | Odpovědi na kartu rozhodnutí (kap. 3) | `_FRONTA/` | Q1 kit/profil, Q2 druhý účet, Q3 den D, Q4 chráněná větev | odpovězeno před dnem D | bez odpovědi platí doporučení karty (vlákno Z261013‑3 je zopakuje na začátku) |
+| A3 | **ZIP kitů M365** (rozhodnutí 14. 10.: nasadit týž den) | `C:\Users\milos\CLAUDE\IT-ANALYSIS\M365\banka-kity-2026-10-12.zip` (12. 10. 17:47, 9 souborů) → schránkou/ZIPem do banky → SharePoint knihovna pro AI kontext | složky `EA-FILE-BRIDGE\` (4 soubory: `EA Bridge Expert.md` + 3 EAFB) a `LANGOSH\02-use-case-model\` (4 soubory) **přepsat** verzí 10‑12 (stará 09‑17 pryč); v `02-Use-Case-Model-Prompt.md` dosadit 7× `[DOPLŇ ODKAZ NA SHAREPOINT]` (odkazy zůstávají stejné jako 17. 9., když se názvy souborů nezměnily) | tři EAFB reference v ZIPu jsou bit‑shodné s `.github\skills\eafb-bridge\references\` v repu v0.21 (ověřeno 14. 10.) — kit M365 odpovídá kódu | `[DOPLŇ …]` zůstane v promptu → Copilot zdroj nenačte; grep před uložením |
+| A4 | Odpovědi na kartu rozhodnutí (kap. 3) | `_FRONTA/` | **odpovězeno 14. 10.:** den D = dnes 14. 10. (Čt rezerva); bez druhého účtu (G: `E_ADDIN_ACCESS` přeskočit); `<PROTECTED-PKG-1>` = **katalog komponent** (položka blacklistu, zámek EA navíc); kit `.github` dnes nechat, build profilem banka s placeholdery = Čt 15. 10. (nové vlákno Z261013‑4) | karta uzavřena | — |
 | A5 | Tento plán a dávky v klonu | — | commit tohoto vlákna je v `main` před tagem? **Ne** — plán vznikl **po** tagu `v0.21`; banka ho dostane pullem `main` (A1 = tag, plán = HEAD) | po pullu je v `<KLON>\docs\e2e-banka\PLAN-NASAZENI-2026-10-16.md` | pull jen tagu by plán nepřinesl — pull `main` (B1) |
 
 ### B. Kurýrní klon → korporátní repo (NAVOD 1.1–1.3)
@@ -343,6 +343,23 @@ GUID-LOW-EL a GUID-LOW-PKG (GUID se složenými závorkami nového prvku „NAS-
 
 ---
 
+## I. Refresh testu z produkce (příští týden) — co dnešní nasazení přežije a co ne
+
+Miloš 14. 10.: příští týden se do `<TEST-DB>` kopírují produkční data — **čerstvá kopie produkce, všechno dnes nasazené v testu zmizí.** Dnešek je tedy generálka na čisté kopii a příští týden se nasazuje podruhé, tentokrát do stavu „jako produkce" (= přesně to, co bude platit při případném nasazení na produkci). Co to mění:
+
+| Co | Přežije refresh? | Důsledek |
+|---|---|---|
+| kód v modelu (element `AICodeBridge`, 140 operací, receptions, tagy `fb.code.*`) | **ne** (pokud element není i v produkci — ověř E4: 2 elementy dnes; po refreshi čekej 0 nebo 1) | bootstrap podruhé: `139 operaci zalozeno, 139 nahran kod`, `Receptions: 4 zalozeno` (jako 10. 9.), **osiřelá `FB_Whitelist` i druhý element N‑B‑4 zmizí zadarmo** |
+| aktivace add-inu (Manage Add-Ins, `t_xrefsystem`) | ne | blok D3 znovu, celý (Groups/Optional/Load on Startup) |
+| `#AI-LOG` + audit Artifacty | ne (balíček vznikl v testu) | založit znovu → **nový GUID → `<GUID-AILOG>` v `banka-hodnoty.json` i `FB_Config.auditPkg` se mění** → bootstrap + restart; dnešní audity domů jako výtahy (H) |
+| `<WORK-PKG>` (`#FB-TEST`, obsah POC) | ne | nový pracovní balíček, nový GUID |
+| `<PROTECTED-PKG-1>` = katalog komponent | **ano** (produkční balíček, GUID stejný v klonu) | položka `FB_WriteScope` beze změny |
+| EA security: `<WRITE-GROUP>`, členství, zámky | **jen pokud jsou i v produkci** — ověř dnes v E4 (op 3 členství) a zapiš, zda write skupina existuje v produkci | když ne: správce zakládá znovu (NAVOD 3.3) + Manage Add-Ins + plný restart |
+| baselines `FB-AUTO`, `t_seclocks` | ne | nic |
+| korporátní repo, configy, `banka-hodnoty.json`, pumpa, workspace, kity na SharePointu | **ano** (mimo DB) | jen `GUID-AILOG` a `WORK-PKG` se přepíšou |
+
+**Druhé nasazení po refreshi (odhad 45 min, bez bloků B a C kromě C.2):** D0 → založit `#AI-LOG` a pracovní balíček (ručně v EA) → `banka-hodnoty.json` (`GUID-AILOG`, `WORK-PKG`) → C.2 `auditPkg` → D1 bootstrap (čekej 139/139/0 PX — model je čistý, srovnávat není co) → D3 Manage Add-Ins → D2 restart → D4 pumpa → D5 → E1 → E5b (`E_BLACKLIST` nad auditem) → E5 (katalog) → E6/E7 → hotovo; ELEVATED a deny netřeba opakovat (chování kódu se nemění), ledaže by se měnila politika. **Využití:** čistý stav je přesně ten, ve kterém se bude jednou nasazovat na produkci — druhé nasazení = doložený postup „z nuly" pro produkční žádost; dnešní běh = postup „upgrade nad existujícím prvkem".
+
 ## 3. Otázky pro Miloše (jedna karta `rozhodni` ve frontě: `_FRONTA/IT-ANALYSIS-rozhodnout-den-nasazeni-v021.md` — balík, položky a = Q3, b = Q2, c = Q4, d = Q1)
 
 | Q | Otázka | Doporučení | Důsledek |
@@ -368,6 +385,7 @@ Dál platí bez otázky (rozhodnuto dřív): `baseDir` = `<KORP>` (NAVOD 5.1, N�
 | N‑P‑8 | Zadání bloku F předpokládá „refresh profilem banka z korp. repa bridge" — `refresh-workspace.py` potřebuje `--kanon`, kanon v bance není (N‑B‑11) → kit v bance z buildu nevznikne | zadání × WORKSPACE-METODIKY kap. 5 | F4 = jen import + pumpa + config; kit = Q1 |
 | N‑P‑9 | N‑B‑4 (druhý element `AICodeBridge` bez stereotypu) od 10. 9. neuklizen → bootstrap vypíše `VAROVANI`, kontrola parametrů (dotaz filtruje stereotyp) ho nevidí | PROTOKOL‑POC §Nálezy | očekávané, ne STOP; úklid druhého elementu = ruční krok správce (kandidát karta po dni D) |
 | N‑P‑10 | Konvence závorek u GUID placeholderů nebyla nikde zapsaná (`{<PROTECTED-PKG-1>}` v šabloně config vs `'<GUID-AILOG>'` v SQL vs `"parent": "<GUID-SANDBOX>"` v dávkách) | NAVOD, dávky 10. 9. | pravidlo „v configu vždy se závorkami" v tabulce Placeholderů |
+| N‑P‑12 | Refresh testu z produkce (příští týden) smaže dnešní nasazení — plán dne D je tím zároveň postup pro opakované nasazení (kap. I); NAVOD nepočítá s tím, že `<TEST-DB>` je periodicky přepisovaný klon | prostředí banky | kap. I; kandidát NAVOD: „co přežije refresh" + `GUID-AILOG` jako nestabilní hodnota |
 | N‑P‑11 | NAVOD 1.1 „Checkout to… ukáže tag verze" — plán a dávky vznikly **po** tagu `v0.21`; banka musí pullovat `main` (HEAD), checkout tagu by plán nepřinesl | NAVOD 1.1 × tento commit | B1 |
 
 ## 5. Zdroje
@@ -376,4 +394,5 @@ Dál platí bez otázky (rozhodnuto dřív): `baseDir` = `<KORP>` (NAVOD 5.1, N�
 
 ## Changelog
 
+- **v1.1 — 2026-10-14** (rozhodnutí Miloše v chatu Z261013‑2): den D = 14. 10., A3 ZIP kitů M365, A4 odpovědi karty (b/c/d), nová kap. I refresh testu z produkce + N‑P‑12.
 - **v1.0 — 2026-10-13** (vlákno Z261013‑2): vznik. Dávky `ready\req-banka-ping-21/22, recon-21, blacklist-21/22, low-21, audit-21, elevated-21/22, uklid-21.json` + `ready\kontrola-parametru.cmd`.
