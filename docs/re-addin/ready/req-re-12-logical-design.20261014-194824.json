@@ -1,0 +1,1242 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-12-logical-design",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+   "name": "EAFB Request Manager",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+   "name": "EAFB Model Element Access",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$0",
+   "name": "ProcessRequest",
+   "notes": "Service package služby ProcessRequest (reverse z kódu)."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$0",
+   "name": "Ping",
+   "notes": "Service package služby Ping (reverse z kódu)."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "CreateOrUpdateElements",
+   "notes": "Service package služby CreateOrUpdateElements (reverse z kódu)."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "DeleteFromModel",
+   "notes": "Service package služby DeleteFromModel (reverse z kódu)."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+   "name": "EA Repository",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$6",
+   "name": "LDM of EA Repository",
+   "notes": "Logický datový model repozitáře EA tak, jak ho bridge používá (reverse z SQL a Automation volání v src)."
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$2",
+     "type": "CSOB-ITAN::Service Realization",
+     "name": "SR ProcessRequest",
+     "notes": "Servisní realizace operace EAFB Request Manager Interface.ProcessRequest - průběh odvozený z kódu (as-implemented).",
+     "taggedValues": [
+      {
+       "name": "505-1 Operation Link",
+       "ids": [
+        {
+         "type": "Operation",
+         "id": 1289
+        }
+       ]
+      },
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Main.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "CSOB-ITAN::Data Transfer Object",
+     "name": "DTO ProcessRequest",
+     "notes": "DTO služby ProcessRequest. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_Main.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Main.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Class",
+     "name": "ProcessRequest Request",
+     "notes": "Request služby ProcessRequest."
+    },
+    {
+     "package": "$2",
+     "type": "Class",
+     "name": "ProcessRequest Response",
+     "notes": "Response služby ProcessRequest."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$3",
+     "type": "CSOB-ITAN::Service Realization",
+     "name": "SR Ping",
+     "notes": "Servisní realizace operace EAFB Request Manager Interface.Ping - průběh odvozený z kódu (as-implemented).",
+     "taggedValues": [
+      {
+       "name": "505-1 Operation Link",
+       "ids": [
+        {
+         "type": "Operation",
+         "id": 1293
+        }
+       ]
+      },
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpPing.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$3",
+     "type": "CSOB-ITAN::Data Transfer Object",
+     "name": "DTO Ping",
+     "notes": "DTO služby Ping. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpPing.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpPing.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$3",
+     "type": "Class",
+     "name": "Ping Request",
+     "notes": "Request služby Ping."
+    },
+    {
+     "package": "$3",
+     "type": "Class",
+     "name": "Ping Response",
+     "notes": "Response služby Ping."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$4",
+     "type": "CSOB-ITAN::Service Realization",
+     "name": "SR CreateOrUpdateElements",
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.CreateOrUpdateElements - průběh odvozený z kódu (as-implemented).",
+     "taggedValues": [
+      {
+       "name": "505-1 Operation Link",
+       "ids": [
+        {
+         "type": "Operation",
+         "id": 1323
+        }
+       ]
+      },
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$4",
+     "type": "CSOB-ITAN::Data Transfer Object",
+     "name": "DTO CreateOrUpdateElements",
+     "notes": "DTO služby CreateOrUpdateElements. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpElements.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "CreateOrUpdateElements Request",
+     "notes": "Request služby CreateOrUpdateElements."
+    },
+    {
+     "package": "$4",
+     "type": "Class",
+     "name": "CreateOrUpdateElements Response",
+     "notes": "Response služby CreateOrUpdateElements."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Service Realization",
+     "name": "SR DeleteFromModel",
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.DeleteFromModel - průběh odvozený z kódu (as-implemented).",
+     "taggedValues": [
+      {
+       "name": "505-1 Operation Link",
+       "ids": [
+        {
+         "type": "Operation",
+         "id": 1332
+        }
+       ]
+      },
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDelete.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Data Transfer Object",
+     "name": "DTO DeleteFromModel",
+     "notes": "DTO služby DeleteFromModel. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpDelete.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDelete.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "Class",
+     "name": "DeleteFromModel Request",
+     "notes": "Request služby DeleteFromModel."
+    },
+    {
+     "package": "$5",
+     "type": "Class",
+     "name": "DeleteFromModel Response",
+     "notes": "Response služby DeleteFromModel."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$8[2]",
+   "attributes": [
+    {
+     "name": "Protocol",
+     "type": "string",
+     "notes": "verze protokolu, eafb/0.2"
+    },
+    {
+     "name": "Id",
+     "type": "string",
+     "notes": "identifikátor dávky, unikátní"
+    },
+    {
+     "name": "Repo",
+     "type": "string",
+     "notes": "podřetězec identity repozitáře"
+    },
+    {
+     "name": "Ops",
+     "type": "array",
+     "notes": "seznam operací protokolu (op + pole operace)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$8[3]",
+   "attributes": [
+    {
+     "name": "Protocol",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Id",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "done | error | confirm_required"
+    },
+    {
+     "name": "Results",
+     "type": "array",
+     "notes": "výsledek každé operace (status, items, code, message)"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_*"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Risk",
+     "type": "object",
+     "notes": "metriky a úroveň LOW | ELEVATED | BLOCKED, reasonItems"
+    },
+    {
+     "name": "Qc",
+     "type": "object",
+     "notes": "výsledek kontroly kvality"
+    },
+    {
+     "name": "Audit",
+     "type": "string",
+     "notes": "GUID auditního Artifactu v #AI-LOG"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": ""
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$9[2]",
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "ping"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$9[3]",
+   "attributes": [
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "EaVersion",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Repository",
+     "type": "string",
+     "notes": "identita repozitáře (DB_NAME nebo cesta)"
+    },
+    {
+     "name": "Time",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "WriteScope",
+     "type": "object",
+     "notes": "režim, blacklist, implicitní ochrana, souhrn, agentNotes"
+    },
+    {
+     "name": "CodeInfo",
+     "type": "object",
+     "notes": "verze a otisk nasazeného kódu"
+    },
+    {
+     "name": "RiskPolicy",
+     "type": "object",
+     "notes": ""
+    },
+    {
+     "name": "UserAccess",
+     "type": "object",
+     "notes": "write | read, skupiny"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$10[2]",
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "create_or_update_elements"
+    },
+    {
+     "name": "Elements",
+     "type": "array",
+     "notes": "položky ElementItem: guid | elementID (update), jinak create; package, name, type, stereotypes, notes, taggedValues, classifierID, dedupKey, matchByName"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$10[3]",
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "index, id, guid, name každého zapsaného prvku"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Stamped",
+     "type": "array",
+     "notes": "razítka ai.request mimo items po výjimce"
+    },
+    {
+     "name": "Recovery",
+     "type": "string",
+     "notes": "návod obnovy z baseline"
+    },
+    {
+     "name": "Partial",
+     "type": "boolean",
+     "notes": ""
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$11[2]",
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "delete_from_model"
+    },
+    {
+     "name": "Targets",
+     "type": "array",
+     "notes": "type (Element | Package | Connector | Diagram | Attribute | Operation | Parameter), id | guid, name"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$11[3]",
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": ""
+    },
+    {
+     "name": "Removed",
+     "type": "array",
+     "notes": "co se skutečně smazalo"
+    },
+    {
+     "name": "Cascades",
+     "type": "array",
+     "notes": "kaskády EA do chráněné části (cascadeDelete allow)"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": ""
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": ""
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$8[1]",
+     "target": "$8[2]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$8[1]",
+     "target": "$8[3]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$9[1]",
+     "target": "$9[2]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$9[1]",
+     "target": "$9[3]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$10[1]",
+     "target": "$10[2]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$10[1]",
+     "target": "$10[3]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$11[1]",
+     "target": "$11[2]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$11[1]",
+     "target": "$11[3]",
+     "type": "Aggregation",
+     "sourceEnd": {
+      "aggregation": 2
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$2",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_ProcessRequest"
+    },
+    {
+     "package": "$3",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_Ping"
+    },
+    {
+     "package": "$4",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_CreateOrUpdateElements"
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_DeleteFromModel"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Package",
+     "alias": "t_package",
+     "notes": "Balíček modelu (browser EA). Fyzická tabulka: t_package.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Element",
+     "alias": "t_object",
+     "notes": "Prvek modelu (třída, komponenta, objekt, artifact auditu ...). Fyzická tabulka: t_object.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "TaggedValue",
+     "alias": "t_objectproperties",
+     "notes": "Tagged value prvku (vč. ai.*, fb.code.*, 505-1). Fyzická tabulka: t_objectproperties.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Attribute",
+     "alias": "t_attribute",
+     "notes": "Atribut prvku. Fyzická tabulka: t_attribute.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Operation",
+     "alias": "t_operation",
+     "notes": "Operace prvku (vč. kódu add-inu v Method.Code prvku AICodeBridge). Fyzická tabulka: t_operation.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Connector",
+     "alias": "t_connector",
+     "notes": "Vazba mezi prvky, vč. zpráv sekvenčních diagramů. Fyzická tabulka: t_connector.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Diagram",
+     "alias": "t_diagram",
+     "notes": "Diagram v balíčku nebo pod prvkem. Fyzická tabulka: t_diagram.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "Baseline",
+     "alias": "t_document",
+     "notes": "Baseline balíčku (DocType = Baseline). Fyzická tabulka: t_document.",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[0]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[1]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[2]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[3]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[4]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[5]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[6]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$22[7]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$22[0]",
+     "target": "$22[1]",
+     "type": "Association",
+     "name": "vlastní",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[0]",
+     "target": "$22[6]",
+     "type": "Association",
+     "name": "vlastní",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[0]",
+     "target": "$22[7]",
+     "type": "Association",
+     "name": "zálohuje",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[1]",
+     "target": "$22[2]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[1]",
+     "target": "$22[3]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[1]",
+     "target": "$22[4]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[1]",
+     "target": "$22[5]",
+     "type": "Association",
+     "name": "zdroj",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$22[5]",
+     "target": "$22[1]",
+     "type": "Association",
+     "name": "cíl",
+     "sourceEnd": {
+      "multiplicity": "0..*"
+     },
+     "targetEnd": {
+      "multiplicity": "1"
+     }
+    },
+    {
+     "source": "$22[0]",
+     "target": "$22[0]",
+     "type": "Association",
+     "name": "rodič",
+     "sourceEnd": {
+      "multiplicity": "0..1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$7",
+     "type": "CSOB-ITAN::LD-Structural",
+     "name": "LDM of EA Repository"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$32[0]",
+   "elementPlacements": [
+    {
+     "element": "$22[0]",
+     "x": 300,
+     "y": 40,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[1]",
+     "x": 300,
+     "y": 260,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[2]",
+     "x": 40,
+     "y": 460,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[3]",
+     "x": 230,
+     "y": 460,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[4]",
+     "x": 420,
+     "y": 460,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[5]",
+     "x": 610,
+     "y": 300,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[6]",
+     "x": 560,
+     "y": 40,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$22[7]",
+     "x": 40,
+     "y": 40,
+     "width": 160,
+     "height": 110
+    }
+   ]
+  }
+ ]
+}

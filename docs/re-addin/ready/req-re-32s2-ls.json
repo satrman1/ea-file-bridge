@@ -1,0 +1,72 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32s2-ls",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1237,
+   "elementPlacements": [
+    {
+     "elementID": 12069,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 220
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1238,
+   "elementPlacements": [
+    {
+     "elementID": 12070,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 320
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1239,
+   "elementPlacements": [
+    {
+     "elementID": 12071,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1240,
+   "elementPlacements": [
+    {
+     "elementID": 12072,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1241,
+   "elementPlacements": [
+    {
+     "elementID": 12073,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 160
+    }
+   ]
+  }
+ ]
+}

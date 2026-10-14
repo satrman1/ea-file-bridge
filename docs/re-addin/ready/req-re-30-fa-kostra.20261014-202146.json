@@ -1,0 +1,1085 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-30-fa-kostra",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{DDA8A0F3-5920-4046-8F97-764CF89B9D8F}",
+   "name": "Business Applications",
+   "notes": "Zrcadlo větve Business Applications EMR - funkční analýza add-inu EA File Bridge (reverse z kódu, as-implemented)."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$0",
+   "name": "EA File Bridge",
+   "notes": "Business aplikace EA File Bridge = add-in EA + pumpa + schránkový kanál. FA odvozená z kódu src @ v0.21 (45de928) a pump.wsf v0.6 - popisuje, co nástroj dělá, ne co měl dělat. Logické obrazovky = menu, okna a Output tab add-inu."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "ACTORS",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "GLOBAL VIEWS",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "OTHER ELEMENTS",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "RULES (REUSABLE)",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95103 Zpracuj dávku ze schránky",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95105 Předej agentovi kontext výběru",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95106 Zobraz stav bridge",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95107 Prohlédni změny poslední dávky",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95108 Nasaď kód bridge do modelu",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "UC-95109 Ukliď automatické zálohy",
+   "notes": ""
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$2",
+     "type": "Actor",
+     "name": "AI agent",
+     "notes": "Agent (Copilot ve VS Code, M365 Copilot nebo jiný klient), který skládá dávky protokolu eafb/0.2 a čte odpovědi. Primární aktér zpracování dávek."
+    },
+    {
+     "package": "$2",
+     "type": "Actor",
+     "name": "Analytik",
+     "notes": "Uživatel EA, který spouští menu AI Bridge, potvrzuje nebo zamítá dávky v okně pumpy a předává agentovi kontext výběru."
+    },
+    {
+     "package": "$2",
+     "type": "Actor",
+     "name": "Správce bridge",
+     "notes": "Správce repozitáře / vývojář bridge: nasazuje kód do modelu, spravuje politiku rizik, cíl zápisu a úklid záloh."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$6",
+     "type": "UseCase",
+     "name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+     "notes": "AI agent uloží dávku protokolu eafb/0.2 jako soubor req-*.json do složky requests\\; pumpa ji převezme, předá bridge v EA a zapíše odpověď res-*.json. Analytik vstupuje jen u dávek vyžadujících potvrzení (UC-95102). Cíl: agent dostane deterministickou odpověď (čtení i zápis) nad otevřeným repozitářem bez ručního přenášení.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$7",
+     "type": "UseCase",
+     "name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "notes": "Analytik v okně pumpy (nebo v dialogu EA u schránky / GUI fallbacku) rozhodne o dávce ELEVATED: Ano provede, Ne zamítne, Storno nechá čekat. Jediná brána člověka nad zápisem agenta.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$8",
+     "type": "UseCase",
+     "name": "UC-95103 Zpracuj dávku ze schránky",
+     "notes": "Kanál pro M365 Copilot bez pumpy a bez souborů: agent připraví dávku jako JSON v chatu, analytik ji zkopíruje do schránky a spustí menu AI Bridge → Zpracovat dávku ze schránky; bridge dávku provede a vrátí do schránky chat ACK, který analytik vloží zpět agentovi. Výřez JSON od { po } (markdown obal se toleruje), zápis bez BOM.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$9",
+     "type": "UseCase",
+     "name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "notes": "GUI fallback (FB_ProcessFolder): když pumpa nemůže běžet (politika stanice, podpis WSF), analytik z menu nechá bridge projít složku requests\\ a zpracovat čekající soubory se stejným životním cyklem (responses, processed, rejected, pending). Dávky ELEVATED potvrzuje dialog EA.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$10",
+     "type": "UseCase",
+     "name": "UC-95105 Předej agentovi kontext výběru",
+     "notes": "Schránkový kanál nemá jak přečíst výběr ve stromu EA; analytik z menu zkopíruje do schránky identitu vybraného prvku/balíčku/diagramu (lidská věta + řádek JSON eafb-context s guid, cestou, větví a writeCheck) a vloží ji agentovi, který ji použije jako cíl zápisu. Totéž vrací operace get_selected_context pumpou (klientský vzor).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$11",
+     "type": "UseCase",
+     "name": "UC-95106 Zobraz stav bridge",
+     "notes": "Analytik si z menu zobrazí, nad kterým repozitářem bridge pracuje, kam nesmí zapisovat (blacklist s cestami), jaká je EA security a jeho přístup, kde je složka výměny a jaký kód (verze, otisk) běží. Stejnou větu o cíli zápisu hlásí start session pumpy a ping.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$12",
+     "type": "UseCase",
+     "name": "UC-95107 Prohlédni změny poslední dávky",
+     "notes": "Po dávce analytik vidí v Output tabu AI Bridge lidsky čitelný výpis změn (co a kde) a větu kontroly kvality; dvojklikem na řádek s markerem (el:|pkg:|dgm:ID) EA nativně vybere prvek v Project browseru. Add-in Search FB_Changes vrátí dotčené prvky poslední zápisové dávky jako výsledkovou sadu Find in Project.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$13",
+     "type": "UseCase",
+     "name": "UC-95108 Nasaď kód bridge do modelu",
+     "notes": "Kód operací add-inu žije v modelu (prvek AICodeBridge). Doma se nasazuje dávkou deploy_src pumpou (ELEVATED; pumpa po dávce sama přenačte kód), v bance bootstrap skriptem ITAN-Bootstrap File Bridge v EA Scripting (deploy_src je v deny) a plným restartem EA. Otisk nasazeného kódu se ukládá jako fb.code.* a hlásí v pingu, About a startu session.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$14",
+     "type": "UseCase",
+     "name": "UC-95109 Ukliď automatické zálohy",
+     "notes": "Úklid automatických baselines FB-AUTO-* (keepLastK, maxAgeDays, maxDeletesPerRun) z menu AI Bridge: nejdřív režim ukázat (report - nic nemaže), pak provést; ruční baselines se nemažou nikdy. Totéž běží jako hák po dokončené zápisové dávce v režimu podle politiky.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$6",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95101 Zpracuj dávku agenta přes pumpu"
+    },
+    {
+     "package": "$7",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95102 Rozhodni o dávce vyžadující potvrzení"
+    },
+    {
+     "package": "$8",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95103 Zpracuj dávku ze schránky"
+    },
+    {
+     "package": "$9",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95104 Zpracuj dávky ze složky bez pumpy"
+    },
+    {
+     "package": "$10",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95105 Předej agentovi kontext výběru"
+    },
+    {
+     "package": "$11",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95106 Zobraz stav bridge"
+    },
+    {
+     "package": "$12",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95107 Prohlédni změny poslední dávky"
+    },
+    {
+     "package": "$13",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95108 Nasaď kód bridge do modelu"
+    },
+    {
+     "package": "$14",
+     "type": "CSOB-ITAN::Version Root Diagram",
+     "name": "version_UC-95109 Ukliď automatické zálohy"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "owningElement": "$16[0]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[1]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[2]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95103 Zpracuj dávku ze schránky",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[3]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[4]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95105 Předej agentovi kontext výběru",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[5]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95106 Zobraz stav bridge",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[6]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95107 Prohlédni změny poslední dávky",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[7]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95108 Nasaď kód bridge do modelu",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    },
+    {
+     "owningElement": "$16[8]",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "UC-95109 Ukliď automatické zálohy",
+     "styleEx": "MDGDgm=CSOB-ITAN::FA-Behavioral;MDGView=CSOB-ITAN::Use Case Detail;"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$16[0]",
+     "isComposite": true,
+     "compositeDiagram": "$18[0]"
+    },
+    {
+     "elementID": "$16[1]",
+     "isComposite": true,
+     "compositeDiagram": "$18[1]"
+    },
+    {
+     "elementID": "$16[2]",
+     "isComposite": true,
+     "compositeDiagram": "$18[2]"
+    },
+    {
+     "elementID": "$16[3]",
+     "isComposite": true,
+     "compositeDiagram": "$18[3]"
+    },
+    {
+     "elementID": "$16[4]",
+     "isComposite": true,
+     "compositeDiagram": "$18[4]"
+    },
+    {
+     "elementID": "$16[5]",
+     "isComposite": true,
+     "compositeDiagram": "$18[5]"
+    },
+    {
+     "elementID": "$16[6]",
+     "isComposite": true,
+     "compositeDiagram": "$18[6]"
+    },
+    {
+     "elementID": "$16[7]",
+     "isComposite": true,
+     "compositeDiagram": "$18[7]"
+    },
+    {
+     "elementID": "$16[8]",
+     "isComposite": true,
+     "compositeDiagram": "$18[8]"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "$3",
+     "type": "CSOB-ITAN::FA-Behavioral",
+     "name": "Use Case Survey of EA File Bridge",
+     "notes": "Přehled use casů add-inu EA File Bridge (bez pravidel a požadavků - ta patří jen na detail)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9501 Klasifikace rizika dávky",
+     "notes": "Každá zápisová dávka se před provedením deterministicky klasifikuje bez AI hodnocení na LOW (provede se bez okna), ELEVATED (vyžaduje potvrzení člověka) nebo BLOCKED (odmítne se, E_RISK_BLOCKED).\n1. Třída operace: delete_from_model, delete_taggedvalue_from_model, remove_elements_from_diagram, move_elements, clone_package, clone_elements, import_element_linked_documents, create_or_update_scenarios / constraints / requirements, deploy_src = vždy ELEVATED; ostatní zápisové operace LOW.\n2. Prahy metrik (dev politika FB_RiskPolicy, banka má vlastní): ELEVATED když deleteTargets > 0, writeOps > 20, updatedExisting > 10, affectedPackages > 1, foreignDiagrams > 0 (diagram, který dávka sama nezaložila), moveOps > 0; BLOCKED když deleteTargets > 100, writeOps > 500, updatedExisting > 100, affectedPackages > 5.\n3. Eskalace podle obsahu: operace s parametry (přepis seznamu parametrů), zprávy s rebuild, změna typu existujícího prvku, nový balíček, kořenový balíček jako cíl, nejistý odkaz ($N na čtení, cíl jménem), objem klonu, rezervované jméno zálohy, předchozí dávka skončila výjimkou (první další zápis se potvrzuje), nevalidní politika.\n4. Prvky založené touto session pumpy nejsou cizí (ownSessionLow, dev true / banka false).\nKaždý důvod má stabilní kód (FB_ReasonText: CLASS_ELEVATED, THRESHOLD_ELEVATED, TYPE_CHANGE, OPS_PARAMS, MSG_REBUILD, ROOT_PACKAGE, REF_UNCERTAIN, CLONE_VOLUME, BASELINE_RESERVED, PREV_EXCEPTION, …) a větu pro člověka v okně i auditu (tag ai.risk.codes).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_RiskGate.js; FB_RiskPolicy"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9502 Cíl zápisu - blacklist",
+     "notes": "Bridge smí zapisovat kamkoli kromě chráněných větví: výčet FB_WriteScope.blacklist per repozitář + implicitně balíček auditu (FB_Config.auditPkg) a balíček add-inu (prvek AICodeBridge); kořeny modelu jen jako uzel.\nPravidlo vazby: vazba (i zpráva sekvence) je chráněná, jen když jsou OBA její konce v chráněné části; allowIncomingRefs false zpřísňuje jen založení vazby z volné části do chráněné.\nKaskády mazání do chráněné části (chráněný diagram, klasifikátor chráněné instance): cascadeDelete block = E_BLACKLIST už v předběžné kontrole; allow = provede se s výčtem kaskád v potvrzovacím okně a ve varování odpovědi (nikdy LOW).\nPorušení = E_BLACKLIST před oknem, zálohou i prvním zápisem; dávka do rejected\\, audit se zapíše. Dávka složená jen z deploy_src (a čtení) se kontrole cíle nepodrobuje (ochrana proti lockoutu vadnou konfigurací).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_WriteScope.js; FB_WriteScopeCfg; FB_ScopePrecheck; FB_CheckWrite; FB_CheckWriteEl"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9503 Záloha před zápisem (baseline politika)",
+     "notes": "Před první zápisovou operací dávky vznikne automatická baseline nad nejbližšími vlastnickými balíčky cílů (jméno v rezervovaném prostoru FB-AUTO-*, jednou za session executoru). Záloha se plánuje podle sondy velikosti podstromu (rozpočet času); pokud ji nelze pořídit (podstrom nad limitem, více balíčků než maxBaselinePackages, zamčený balíček), dávka se neprovede (E_NO_BASELINE) a okno nabídne naváděnou cestu: ruční záloha v EA a potvrzení znovu.\nZáloha u změny vazby s chráněným zdrojem se dělá nad balíčkem volného konce. Smazání balíčku maže i jeho baselines → pre-image pro delete package se dělá nad rodičem. Ruční baselines se nikdy automaticky nemažou; úklid automatických (keepLastK 3, maxAgeDays 14, maxDeletesPerRun 20) běží po dokončené zápisové dávce nebo z menu.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_BaselinePlan.js; FB_BaselinePolicy; FB_BaselineDecide; FB_AutoBaseline; FB_RecoveryPosture"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9504 Identita a stav dávky",
+     "notes": "Dávka nese protocol eafb/0.2, unikátní id a repo (podřetězec identity otevřeného repozitáře). Jiný otevřený projekt než při startu pumpy = E_REPO, nic se neprovede.\nSoubor odpovědi res-<id>.json je stavový záznam: vzniká při převzetí (processing), bez něj pumpa dávku nepřevzala. Stejné id podruhé = E_DUPLICATE_ID (starý res do responses\\superseded\\); tentýž soubor čekající dávky znovu = stávající stav (okno se nabídne znovu); po Ne je dávka rejected a opakovat jde jen dávku po Stornu - nový pokus = nové id.\nZápisová dávka, kterou pumpa převzala a nedokončila (restart uprostřed), se po startu neprovádí: E_INTERRUPTED (requests\\processing\\).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Main.js; FB_Precheck; pump.wsf"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9505 Předběžná kontrola bez okna",
+     "notes": "Chyba agenta okno neotvírá. Před kontrolou přístupu se kontroluje tvar: neznámá operace (E_UNKNOWN_OP s nápovědou), povinná pole, prázdné seznamy, zástupné texty <…> / GUID-… v identifikačních polích, odkaz $N jen na dřívější operaci; neznámé pole = varování s nejbližším známým jménem, aliasy (stereotype→stereotypes, id→elementID, description→notes, limit→maxRows …) se přepíší v dávce. Po kontrole přístupu: operace povolená, cíl zadaný GUIDem existuje, cíl zápisu není chráněný.\nVýsledek = jedna chyba se všemi problémy (problems[]), všechny operace skipped, žádné okno, žádná záloha; audit jen u E_BLACKLIST.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Precheck.js; FB_FieldCheck; FB_ScopePrecheck"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9506 Potvrzení dávky člověkem",
+     "notes": "Dávka ELEVATED se přesune do requests\\pending\\, odpověď má status confirm_required a jednorázový nonce (jen v res). Okno (pumpa) nebo dialog (schránka, GUI fallback) ukáže souhrn: co se stane a kde, co se maže se skutečným rozsahem, záloha, všechny důvody větami, od kdy čeká, legenda a patička (dávka | otisk | N zápisů | kódy).\nVýchozí tlačítko je Storno; Enter = Storno. Ano = provést: bridge dávku bezstavově znovu klasifikuje a porovná otisk souhrnu - při nesouladu (změna modelu mezitím, chybějící záloha) otevře nové kolo s pravdivým souhrnem místo provedení. Ne = zamítnout (rejected, audit ZAMITL). Storno nebo timeout okna (300 s) = dávka čeká dál; po confirmMaxAgeMin (480 min) expiruje jako E_RISK_EXPIRED. Čekající dávky po startu pumpy se nabízejí nejstarší první. Dávky ELEVATED posílat po jedné.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ConfirmPending.js; FB_ConfirmSummary; FB_Nonce; FB_PendingSweep; pump.wsf"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9507 Audit a kontrola kvality každé dávky",
+     "notes": "Za každou dávku - provedenou, odmítnutou i zablokovanou - vznikne Artifact v balíčku auditu (#AI-LOG): Notes = věty pro člověka (jak dávka skončila, úroveň rizika, kdo a kdy potvrdil, záloha, kontrola kvality), strojový záznam beze změny a request; riziková pole jako tagged values (ai.risk.*, ai.risk.codes). Bez balíčku auditu bridge nesmí spadnout (vrátí prázdný GUID a varování).\nKontrola kvality po zápisové dávce (SQL kontroly z konfigurace nad dotčenými balíčky) má stav oddělený od stavu zápisu: čistě / nález / neproběhla / bez kontrol - nález zápis neruší, jen se hlásí (Output, dialog, audit, chat ACK).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Audit.js; FB_AuditText; FB_RiskAuditTags; FB_QcRun; FB_QcText"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9508 Přístup uživatele a povolené operace",
+     "notes": "Zápisové funkce add-inu smí použít jen přihlášený uživatel, který je členem konfigurované EA security skupiny (FB_AccessGroups); nečlen dostane E_ADDIN_ACCESS, čtení zůstává. Při vypnuté security je jedinou hranicí blacklist.\nMnožina povolených operací je whitelist FB_OpsAllowed per repozitář: co v něm není, je E_OP_FORBIDDEN (v bance trvale deny deploy_src, delete_*, clone_*). Zámky EA (Lock Package / skupinový zámek) drží EA sama: create = E_PERMISSION, update = E_LOCKED; vazby z/do zamčeného prvku EA nehlídá a bridge je záměrně nehlídá také (rozhodnutí 12. 10. 2026).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_UserAccess.js; FB_AccessGroups; FB_OpsAllowed"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$5",
+     "type": "CSOB-ITAN::Behavioral Rule",
+     "name": "BRU-9509 Stop-on-error a částečný výsledek",
+     "notes": "Operace dávky se provádějí v pořadí; první chyba zastaví zbytek (skipped). Zápisy provedené před chybou zůstávají v modelu (partial: true), každý dotčený prvek nese razítko ai.request = id dávky (i mimo items po výjimce - stamped[]) a odpověď nese návod obnovy z baseline (recovery). Syrové chyby EA/COM se překládají na kódy E_PERMISSION, E_LOCKED, E_FILE, E_DB_RETRY, E_SQL; výjimka EA nastaví příznak, že první další zápis jde oknem (PREV_EXCEPTION).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Main.js; FB_OpElements; FB_InterpretError"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$6",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95101 Zpracuj dávku agenta přes pumpu",
+     "notes": "Realizace UC-95101: aktér → EAFB Pump → EAFB Request Manager + ref SR ProcessRequest (as-implemented z kódu)."
+    },
+    {
+     "package": "$7",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+     "notes": "Realizace UC-95102: aktér → EAFB Pump → EAFB Request Manager + ref SR ProcessRequest (as-implemented z kódu)."
+    },
+    {
+     "package": "$8",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95103 Zpracuj dávku ze schránky",
+     "notes": "Realizace UC-95103: aktér → EAFB Add-in UI → EAFB Request Manager + ref SR ProcessRequest (as-implemented z kódu)."
+    },
+    {
+     "package": "$9",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+     "notes": "Realizace UC-95104: aktér → EAFB Add-in UI → EAFB Request Manager + ref SR ProcessRequest (as-implemented z kódu)."
+    },
+    {
+     "package": "$10",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95105 Předej agentovi kontext výběru",
+     "notes": "Realizace UC-95105: aktér → EAFB Add-in UI → EAFB Request Manager (as-implemented z kódu)."
+    },
+    {
+     "package": "$11",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95106 Zobraz stav bridge",
+     "notes": "Realizace UC-95106: aktér → EAFB Add-in UI → EAFB Request Manager + ref SR Ping (as-implemented z kódu)."
+    },
+    {
+     "package": "$12",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95107 Prohlédni změny poslední dávky",
+     "notes": "Realizace UC-95107: aktér → EAFB Add-in UI → EAFB Request Manager (as-implemented z kódu)."
+    },
+    {
+     "package": "$13",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95108 Nasaď kód bridge do modelu",
+     "notes": "Realizace UC-95108: aktér → EAFB Pump → EAFB Request Manager (as-implemented z kódu)."
+    },
+    {
+     "package": "$14",
+     "type": "CSOB-ITAN::Use Case Realization",
+     "name": "UCR-95109 Ukliď automatické zálohy",
+     "notes": "Realizace UC-95109: aktér → EAFB Add-in UI → EAFB Request Manager (as-implemented z kódu)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$4",
+     "type": "CSOB-ITAN::Logical Screen",
+     "name": "LS95100-1 Menu AI Bridge",
+     "notes": "Hlavní menu add-inu v EA (EA_GetMenuItems/EA_MenuClick): položky bez akcelerátorů, lidské názvy, primární akce první. Položka „Zapnout AI import režim (vrátný)“ jen při FB_Config.gatekeeper = true; „Nav spike“ jen dev."
+    },
+    {
+     "package": "$7",
+     "type": "CSOB-ITAN::Logical Screen",
+     "name": "LS95102-1 Potvrzovací okno pumpy",
+     "notes": "Okno Ano/Ne/Storno pumpy (MsgBox typ 3 + ikona + 512 výchozí Storno + 4096 navrchu); text skládá FB_ConfirmSummary (vzor FB-UI-08). Stejný text používá dialog schránky a GUI fallbacku."
+    },
+    {
+     "package": "$8",
+     "type": "CSOB-ITAN::Logical Screen",
+     "name": "LS95103-1 Dialog schránkového importu",
+     "notes": "Session.Prompt dialog EA po načtení dávky ze schránky: u čtení/LOW rovnou výsledek a ACK do schránky; u ELEVATED souhrn jako v okně pumpy a Ano/Ne. Chat ACK (FB_ChatRender) se vrací do schránky pro Copilota - nikdy nonce ani plný otisk."
+    },
+    {
+     "package": "$11",
+     "type": "CSOB-ITAN::Logical Screen",
+     "name": "LS95106-1 Dialog Stav bridge",
+     "notes": "Dialog EA z menu Stav bridge (FB_Status): odpovídá na otázky nad kterým repozitářem jsem, kam nesmím zapisovat, jaká security, jaká složka výměny, jaký kód běží."
+    },
+    {
+     "package": "$12",
+     "type": "CSOB-ITAN::Logical Screen",
+     "name": "LS95107-1 Output tab AI Bridge",
+     "notes": "System Output tab „AI Bridge“ (Log, FB_LogChanges, FB_OutputFlush): po každé dávce blok změn a řádek kontroly kvality; zobrazí se jednou na konci dávky (vypínač FB_Config.outputShow)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$23[0]",
+   "attributes": [
+    {
+     "name": "ZpracovatDavkuZeSchranky",
+     "type": "akce",
+     "notes": "Zpracovat davku ze schranky (UC-95103)"
+    },
+    {
+     "name": "ZpracovatDavkyZeSlozky",
+     "type": "akce",
+     "notes": "Zpracovat davky ze slozky (requests) (UC-95104)"
+    },
+    {
+     "name": "ZapnoutAiImportRezim",
+     "type": "akce",
+     "notes": "Zapnout AI import rezim (vratny) - jen s gatekeeper: true"
+    },
+    {
+     "name": "StavBridge",
+     "type": "akce",
+     "notes": "Stav bridge (kam zapisuje / co cte) (UC-95106)"
+    },
+    {
+     "name": "KontextVyberuDoSchranky",
+     "type": "akce",
+     "notes": "Kontext vyberu do schranky (pro Copilota) (UC-95105)"
+    },
+    {
+     "name": "UklidAutomatickychBaselines",
+     "type": "akce",
+     "notes": "Uklid automatickych baselines (ukazat / provest) (UC-95109)"
+    },
+    {
+     "name": "AboutAiBridge",
+     "type": "akce",
+     "notes": "About AI Bridge - verze, otisk kodu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$23[1]",
+   "attributes": [
+    {
+     "name": "Titulek",
+     "type": "text",
+     "notes": "AI chce zapsat do modelu … / nove kolo: duvod (baseline-missing | metrics-changed | summary-mismatch)"
+    },
+    {
+     "name": "CoSeStane",
+     "type": "seznam",
+     "notes": "akce z risk.summary.actions: co a kam (tečková cesta)"
+    },
+    {
+     "name": "Mazane",
+     "type": "seznam",
+     "notes": "mazané cíle se skutečným rozsahem (balíček vč. N prvků/diagramů/podbalíčků, konektor A -> B, atribut Trida.x)"
+    },
+    {
+     "name": "Zaloha",
+     "type": "text",
+     "notes": "plán zálohy: balíčky, jméno FB-AUTO, nebo POZOR bez zálohy / ruční záloha nutná"
+    },
+    {
+     "name": "ProcSePtam",
+     "type": "seznam",
+     "notes": "všechny důvody větami (FB_ReasonText)"
+    },
+    {
+     "name": "Kaskady",
+     "type": "seznam",
+     "notes": "POZOR - smazani sahne kaskadou EA do CHRANENE casti (jen při cascadeDelete allow)"
+    },
+    {
+     "name": "CekaOd",
+     "type": "datum a čas",
+     "notes": "od kdy dávka čeká + stáří"
+    },
+    {
+     "name": "Legenda",
+     "type": "text",
+     "notes": "Ano = provést, Ne = zamítnout, Storno/timeout = nechat čekat"
+    },
+    {
+     "name": "Paticka",
+     "type": "text",
+     "notes": "dávka | otisk kódu | N zápisů | kódy důvodů"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$23[1]",
+   "operations": [
+    {
+     "name": "Ano",
+     "returnType": "void",
+     "notes": "provést dávku (FB_ConfirmPending approve)"
+    },
+    {
+     "name": "Ne",
+     "returnType": "void",
+     "notes": "zamítnout dávku (rejected)"
+    },
+    {
+     "name": "Storno",
+     "returnType": "void",
+     "notes": "nechat čekat; výchozí; timeout 300 s = totéž"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$23[2]",
+   "attributes": [
+    {
+     "name": "SouhrnDavky",
+     "type": "text",
+     "notes": "identita dávky, repozitář, počet operací"
+    },
+    {
+     "name": "SouhrnPotvrzeni",
+     "type": "text",
+     "notes": "text FB_ConfirmSummary (jen ELEVATED)"
+    },
+    {
+     "name": "VysledekKontrolyKvality",
+     "type": "text",
+     "notes": "věta FB_QcText"
+    },
+    {
+     "name": "AckText",
+     "type": "text",
+     "notes": "chat ACK pro agenta: status, položky s id/guid, writeCheck, kód bridge, qcLine"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$23[2]",
+   "operations": [
+    {
+     "name": "Ano",
+     "returnType": "void",
+     "notes": "provést čekající dávku"
+    },
+    {
+     "name": "Ne",
+     "returnType": "void",
+     "notes": "zamítnout"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$23[3]",
+   "attributes": [
+    {
+     "name": "Repozitar",
+     "type": "text",
+     "notes": "identita repozitáře (DB_NAME nebo cesta)"
+    },
+    {
+     "name": "RezimCileZapisu",
+     "type": "text",
+     "notes": "blacklist (N chráněných větví), věta FB_ScopeText"
+    },
+    {
+     "name": "ChraneneVetve",
+     "type": "seznam",
+     "notes": "cesty chráněných balíčků vč. implicitních (#AI-LOG, add-in)"
+    },
+    {
+     "name": "EaSecurity",
+     "type": "text",
+     "notes": "zapnuta/vypnuta, přístup uživatele write/read a skupiny"
+    },
+    {
+     "name": "SlozkaVymeny",
+     "type": "text",
+     "notes": "baseDir (requests\\, responses\\)"
+    },
+    {
+     "name": "VerzeOtiskKodu",
+     "type": "text",
+     "notes": "fb.code.* z prvku AICodeBridge, verze pumpy"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$23[4]",
+   "attributes": [
+    {
+     "name": "RadekZmeny",
+     "type": "text",
+     "notes": "vytvořeno/upraveno/smazáno: tečková cesta jako v browseru + marker (el:|pkg:|dgm:ID)"
+    },
+    {
+     "name": "RadekKontrolyKvality",
+     "type": "text",
+     "notes": "Kontrola kvality: ciste | NALEZ - … (el:ID)"
+    },
+    {
+     "name": "RadekStartuSession",
+     "type": "text",
+     "notes": "==== AI Bridge pripraven ==== + varování + cíl zápisu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$23[4]",
+   "operations": [
+    {
+     "name": "DvojklikNaviguj",
+     "returnType": "void",
+     "notes": "dvojklik na řádek s markerem vybere prvek/balíček/diagram v Project browseru (EA_OnOutputItemDoubleClicked)"
+    }
+   ]
+  }
+ ]
+}

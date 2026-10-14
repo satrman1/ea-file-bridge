@@ -1,0 +1,217 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-95106",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{DF5B480C-238E-46a3-900A-FCE0C77779D7}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{A70907E8-4AF9-41ae-8662-13B5B8EFB213}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "target": "{CEF1CE67-629A-43e7-9DDB-E46F87BED00E}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "target": "{E6E0DA3E-0C3B-4e61-B5D4-1AEAFB909C40}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1223,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 490
+    },
+    {
+     "elementID": 12047,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12065,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12072,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 380,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12052,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12058,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$3[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1233,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1233,
+   "messages": [
+    {
+     "source": "$3[0]",
+     "target": "$3[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Stav bridge"
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[2]",
+     "seqNo": 2,
+     "operation": 1294
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[0]",
+     "seqNo": 3,
+     "name": "dialog Stav bridge"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1233
+  }
+ ]
+}

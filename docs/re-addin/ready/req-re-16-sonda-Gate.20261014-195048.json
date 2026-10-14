@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "re-16-sonda-Gate", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}", "type": "Gate", "name": "" } ] }
+] }

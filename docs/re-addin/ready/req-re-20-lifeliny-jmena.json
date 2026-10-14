@@ -1,0 +1,124 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-20-lifeliny-jmena",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11993,
+     "name": ""
+    },
+    {
+     "elementID": 11994,
+     "name": ""
+    },
+    {
+     "elementID": 11995,
+     "name": ""
+    },
+    {
+     "elementID": 11996,
+     "name": ""
+    },
+    {
+     "elementID": 11997,
+     "name": ""
+    },
+    {
+     "elementID": 11998,
+     "name": ""
+    },
+    {
+     "elementID": 11999,
+     "name": ""
+    },
+    {
+     "elementID": 12000,
+     "name": ""
+    },
+    {
+     "elementID": 12001,
+     "name": ""
+    },
+    {
+     "elementID": 12004,
+     "name": ""
+    },
+    {
+     "elementID": 12005,
+     "name": ""
+    },
+    {
+     "elementID": 12006,
+     "name": ""
+    },
+    {
+     "elementID": 12007,
+     "name": ""
+    },
+    {
+     "elementID": 12008,
+     "name": ""
+    },
+    {
+     "elementID": 12009,
+     "name": ""
+    },
+    {
+     "elementID": 12010,
+     "name": ""
+    },
+    {
+     "elementID": 12011,
+     "name": ""
+    },
+    {
+     "elementID": 12012,
+     "name": ""
+    },
+    {
+     "elementID": 12013,
+     "name": ""
+    },
+    {
+     "elementID": 12014,
+     "name": ""
+    },
+    {
+     "elementID": 12015,
+     "name": ""
+    },
+    {
+     "elementID": 12016,
+     "name": ""
+    },
+    {
+     "elementID": 12017,
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1196,
+   "elementPlacements": [
+    {
+     "elementID": 12002,
+     "x": 1020,
+     "y": 760,
+     "width": 260,
+     "height": 50
+    },
+    {
+     "elementID": 12003,
+     "x": 1020,
+     "y": 830,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  }
+ ]
+}

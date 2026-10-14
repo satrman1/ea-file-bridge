@@ -1,0 +1,167 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-95107",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{52506C0D-C6E1-4ca8-93E2-F6580F469D9C}",
+     "target": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{6540B370-DAF0-4714-9098-ED790B1BBF20}",
+     "target": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1224,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12048,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12066,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12073,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$3[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[1]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1234,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1234,
+   "messages": [
+    {
+     "source": "$3[0]",
+     "target": "$3[1]",
+     "seqNo": 1,
+     "name": "dvojklik na řádek Output tabu AI Bridge"
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[1]",
+     "seqNo": 2,
+     "name": "vybere prvek podle markeru (el:|pkg:|dgm:ID) v Project browseru"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1234
+  }
+ ]
+}

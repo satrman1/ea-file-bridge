@@ -1,0 +1,204 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-95105",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C153CDE4-14EF-4b19-AE14-6C3ABDA6F6EB}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{4A01965B-779F-46e9-8246-40131112874F}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "target": "{CEF1CE67-629A-43e7-9DDB-E46F87BED00E}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1222,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12046,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12064,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12039,
+     "x": 40,
+     "y": 200,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12052,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$3[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1232,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1232,
+   "messages": [
+    {
+     "source": "$3[0]",
+     "target": "$3[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Kontext výběru do schránky"
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[2]",
+     "seqNo": 2,
+     "operation": 1316
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[0]",
+     "seqNo": 3,
+     "name": "věta + JSON eafb-context ve schránce"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1232
+  }
+ ]
+}

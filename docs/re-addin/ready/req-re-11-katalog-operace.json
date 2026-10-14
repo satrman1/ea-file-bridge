@@ -1,0 +1,3419 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-11-katalog-operace",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_operations",
+   "element": "{E6226645-67D3-4694-9C33-805FB3C1B749}",
+   "operations": [
+    {
+     "name": "ProcessRequest",
+     "returnType": "string",
+     "notes": "Zpracuje jednu dávku eafb/0.2 a vrátí JSON odpověď (status done | error | confirm_required, results[], risk, qc, audit).",
+     "parameters": [
+      {
+       "name": "RequestPath",
+       "type": "string",
+       "notes": "cesta k req-*.json (pumpa) nebo text dávky"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Main.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ConfirmPending",
+     "returnType": "string",
+     "notes": "Jediný vstupní bod potvrzení nebo zamítnutí čekající dávky ELEVATED; ověří nonce a otisk dávky, pak dávku provede nebo odmítne.",
+     "parameters": [
+      {
+       "name": "Path",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Nonce",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "PayloadHash",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Channel",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Approve",
+       "type": "boolean",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ConfirmPending.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "SweepPending",
+     "returnType": "string",
+     "notes": "Expirace čekajících dávek starších než confirmMaxAgeMin (E_RISK_EXPIRED), nejstarší první.",
+     "parameters": [
+      {
+       "name": "PendingDir",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "NowMs",
+       "type": "number",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PendingSweep.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "StartSession",
+     "returnType": "string",
+     "notes": "Start session pumpy: nová session baseline politiky, hlášení cíle zápisu, verze a otisk kódu, varování.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_SessionStart.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "Ping",
+     "returnType": "PingResult",
+     "notes": "Protokolová operace ping - úvodní kotva session: repozitář, verze EA, cíl zápisu (blacklist), přístup uživatele, risk politika, otisk kódu, poznámky pro agenta.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpPing.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetStatus",
+     "returnType": "string",
+     "notes": "Lidský přehled stavu bridge pro menu Stav bridge: repozitář, chráněné větve, EA security, složka výměny.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Status.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{38BB576C-CFF9-4ffe-8E7D-192073C910D4}",
+   "operations": [
+    {
+     "name": "PrecheckBatch",
+     "returnType": "PrecheckResult",
+     "notes": "Dvoufázová předběžná kontrola dávky; vrací jednu chybu s problems[] (E_UNKNOWN_OP, E_ARGS, ...) nebo ok.",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Phase",
+       "type": "string",
+       "notes": "shape | targets"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Precheck.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CheckFields",
+     "returnType": "FieldCheckResult",
+     "notes": "Kontrola polí operací: aliasy přepsané v dávce, neznámé pole = varování s nápovědou, chybné taggedValues = E_ARGS.",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_FieldCheck.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "InterpretError",
+     "returnType": "ErrorInfo",
+     "notes": "Syrová chyba EA/COM -> čitelný kód (E_PERMISSION, E_LOCKED, E_FILE, E_DB_RETRY) a hláška.",
+     "parameters": [
+      {
+       "name": "RawMessage",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_InterpretError.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{09C33928-F1DB-467f-AB06-15FF5EE0FE8C}",
+   "operations": [
+    {
+     "name": "PrecheckTargets",
+     "returnType": "ScopeResult",
+     "notes": "Kontrola cílů celé zápisové dávky před zápisem, oknem i zálohou (E_BLACKLIST v P2), výpočet kaskád mazání.",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ScopePrecheck.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CheckWrite",
+     "returnType": "ScopeResult",
+     "notes": "Kontrola zápisu do balíčku (null = povoleno, jinak kód a hláška).",
+     "parameters": [
+      {
+       "name": "PackageRef",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_CheckWrite.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CheckWriteElement",
+     "returnType": "ScopeResult",
+     "notes": "Kontrola zápisu do prvku nebo diagramu po řetězu vlastníků.",
+     "parameters": [
+      {
+       "name": "ObjectRef",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Kind",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_CheckWriteEl.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CheckUserAccess",
+     "returnType": "AccessResult",
+     "notes": "Přístup přihlášeného uživatele k zápisovým fíčurám (write | read) podle EA security skupin.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_UserAccess.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DescribeScope",
+     "returnType": "string",
+     "notes": "Jedna lidská věta o cíli zápisu pro start session, menu Stav bridge a ping.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ScopeText.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{0B679E1F-3541-414d-AB6E-98979E928879}",
+   "operations": [
+    {
+     "name": "ClassifyBatch",
+     "returnType": "RiskResult",
+     "notes": "Metriky (počty zápisů, mazání, cizí prvky, rozsah) a úroveň rizika s důvody reasonItems[].",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_RiskGate.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "BuildConfirmSummary",
+     "returnType": "string",
+     "notes": "Text potvrzovacího okna: co se stane a kde, záloha, důvody větami, legenda.",
+     "parameters": [
+      {
+       "name": "Response",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "AgeInfo",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ConfirmSummary.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DescribeReason",
+     "returnType": "string",
+     "notes": "Kód důvodu risk gate -> věta pro člověka.",
+     "parameters": [
+      {
+       "name": "ReasonItem",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ReasonText.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "IssueNonce",
+     "returnType": "string",
+     "notes": "Jednorázový autorizační token potvrzovacího okruhu.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Nonce.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{5F932850-04F1-4282-914C-30FEB4AF0555}",
+   "operations": [
+    {
+     "name": "PlanBaseline",
+     "returnType": "BaselinePlan",
+     "notes": "Plán zálohy dávky: scope balíčků, sonda, nejistota.",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Risk",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_BaselinePlan.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DecideBaseline",
+     "returnType": "BaselineDecision",
+     "notes": "Rozhodnutí: vytvořit / znovupoužít / nelze (E_NO_BASELINE) / bez zálohy.",
+     "parameters": [
+      {
+       "name": "Plan",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Risk",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_BaselineDecide.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "EvaluateRecoveryPosture",
+     "returnType": "string",
+     "notes": "Jediná funkce nejistoty: full | partial | none.",
+     "parameters": [
+      {
+       "name": "Metrics",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Scope",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_RecoveryPosture.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CleanupBaselines",
+     "returnType": "CleanupResult",
+     "notes": "Úklid automatických baselines starších než limit; ruční baselines se nemažou.",
+     "parameters": [
+      {
+       "name": "Mode",
+       "type": "string",
+       "notes": "report | delete"
+      },
+      {
+       "name": "Force",
+       "type": "boolean",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_BaselineCleanup.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{8A5F6038-D7F7-420a-BB4A-F691CD3F355E}",
+   "operations": [
+    {
+     "name": "RunQc",
+     "returnType": "QcResult",
+     "notes": "Spustí kontroly nad dotčenými balíčky: ciste | nalez | nedobehlo | bez_kontrol.",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Response",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_QcRun.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DescribeQc",
+     "returnType": "string",
+     "notes": "Výsledek kontroly kvality jednou větou pro Output, dialog a audit.",
+     "parameters": [
+      {
+       "name": "Qc",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_QcText.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{FBBDB372-B25B-4d6c-B36B-65851FAFFF5B}",
+   "operations": [
+    {
+     "name": "ApplyClassifierStereotypes",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace apply_classifier_stereotypes - port ITAN-Apply Classifier Stereotypes on SD.vbs.",
+     "parameters": [
+      {
+       "name": "Diagram",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpApplyClassifierStereotypes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "FindOrCreateReferencingSR",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace find_or_create_referencing_sr - port ITAN-Find or Create Referencing Service Realization.vbs.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Package",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpFindOrCreateSR.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{568EE192-E281-4b18-8C91-18AB8E6FF0F9}",
+   "operations": [
+    {
+     "name": "Query",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace query (čtení). SQL jen SELECT/WITH, maxRows, E_SQL_UNBOUNDED nad velkými tabulkami.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = query"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpQuery.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetSelectedContext",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_selected_context (čtení). Výběr v Project browseru a otevřený diagram jako kontext pro agenta.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_selected_context"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpSelectedContext.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "FindElementsByName",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace find_elements_by_name (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = find_elements_by_name"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpFindElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "FindPackagesByName",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace find_packages_by_name (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = find_packages_by_name"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpFindPackages.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetElementsInformation",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_elements_information (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_elements_information"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpGetElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetPackagesInformation",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_packages_information (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_packages_information"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpGetPackages.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetConnectorsInformation",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_connectors_information (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_connectors_information"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpGetConnectors.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateElement",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_element (zápis). Legacy eafb/0.1, převod na create_or_update_elements.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_element"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpCreateElement.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateElements",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_elements (zápis). Create/update prvků přes Automation API, dedup, tagged values.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_elements"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "MoveElements",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace move_elements (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = move_elements"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpMoveElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdatePackage",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_package (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_package"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpPackage.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateConnectors",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_connectors (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_connectors"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConnectors.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateAttributes",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_attributes (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_attributes"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpAttributes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateOperations",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_operations (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_operations"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpOperations.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateScenarios",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_scenarios (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_scenarios"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpScenarios.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateConstraints",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_constraints (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_constraints"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConstraints.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateRequirements",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_requirements (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_requirements"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpRequirements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DeleteFromModel",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace delete_from_model (zápis). Mazání přes Automation API (DeleteAt) s kontrolou cíle a kaskád.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = delete_from_model"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDelete.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DeleteTaggedvalueFromModel",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace delete_taggedvalue_from_model (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = delete_taggedvalue_from_model"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDeleteTag.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ClonePackage",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace clone_package (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = clone_package"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpClonePackage.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CloneElements",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace clone_elements (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = clone_elements"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpCloneElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ExportElementLinkedDocuments",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace export_element_linked_documents (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = export_element_linked_documents"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpLinkedDocExport.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ImportElementLinkedDocuments",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace import_element_linked_documents (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = import_element_linked_documents"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpLinkedDocImport.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{553274C3-29AC-4ded-8672-6FD6938FE7E4}",
+   "operations": [
+    {
+     "name": "GetDiagramsInformation",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_diagrams_information (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_diagrams_information"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpGetDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateDiagram",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_diagram (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_diagram"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDiagram.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "PlaceElementsOnDiagram",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace place_elements_on_diagram (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = place_elements_on_diagram"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpPlaceElements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "RemoveElementsFromDiagram",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace remove_elements_from_diagram (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = remove_elements_from_diagram"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpRemoveFromDiagram.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateOrUpdateMessages",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_or_update_messages (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_or_update_messages"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpMessages.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "LayoutConnectors",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace layout_connectors (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = layout_connectors"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpLayoutConnectors.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ChangeConnectorVisibility",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace change_connector_visibility (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = change_connector_visibility"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConnectorVisibility.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "OpenDiagrams",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace open_diagrams (čtení). UI operace.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = open_diagrams"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpOpenDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ReloadDiagrams",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace reload_diagrams (čtení). UI operace.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = reload_diagrams"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpReloadDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "UpdateDiagramProperties",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace update_diagram_properties (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = update_diagram_properties"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpUpdateDiagramProps.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "SetDiagramObjectStyle",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace set_diagram_object_style (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = set_diagram_object_style"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDiagramObjectStyle.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetDiagramImage",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_diagram_image (čtení). PNG do responses\\images.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_diagram_image"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDiagramImage.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{D2237F28-41D9-4de4-9364-B614FA1CED23}",
+   "operations": [
+    {
+     "name": "GetBaselines",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace get_baselines (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = get_baselines"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpBaselineList.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "BaselineDiff",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace baseline_diff (čtení).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = baseline_diff"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpBaselineDiff.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateBaseline",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace create_baseline (zápis).",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = create_baseline"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpBaselineCreate.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateAutoBaseline",
+     "returnType": "BaselineInfo",
+     "notes": "Líná automatická baseline jednoho balíčku těsně před první zápisovou operací (FB-AUTO-*).",
+     "parameters": [
+      {
+       "name": "PackageGuid",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Token",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Klass",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_AutoBaseline.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "WriteJournal",
+     "returnType": "string",
+     "notes": "Pre-image polí, která dávka přepíše.",
+     "parameters": [
+      {
+       "name": "Request",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Baseline",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Journal.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{AC03F3B2-5B99-4872-89A4-F5C1F33C5619}",
+   "operations": [
+    {
+     "name": "WriteAudit",
+     "returnType": "string",
+     "notes": "Založí auditní Artifact dávky v #AI-LOG; vrací GUID nebo prázdný řetězec.",
+     "parameters": [
+      {
+       "name": "RequestId",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Summary",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "RequestText",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Human",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Audit.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "WriteRiskAuditTags",
+     "returnType": "void",
+     "notes": "Riziková pole na audit jako tagged values (ai.risk.*).",
+     "parameters": [
+      {
+       "name": "AuditGuid",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Risk",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Baseline",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_RiskAuditTags.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "LogChanges",
+     "returnType": "void",
+     "notes": "Lidsky čitelný výpis změn s tečkovou cestou do Output tabu.",
+     "parameters": [
+      {
+       "name": "Response",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_LogChanges.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{5EE89B7F-5521-4814-95D6-6DE3F2E7141E}",
+   "operations": [
+    {
+     "name": "DeploySrc",
+     "returnType": "OpResult",
+     "notes": "Protokolová operace deploy_src (zápis). Jen dev; v bance trvale v deny.",
+     "parameters": [
+      {
+       "name": "Operation",
+       "type": "object",
+       "notes": "položka ops[] dávky: op = deploy_src"
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDeploySrc.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetCodeInfo",
+     "returnType": "CodeInfo",
+     "notes": "Přečte otisk a verzi nasazeného kódu z tagged values fb.code.*.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_CodeInfo.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{BAC3DC59-2EF6-4a87-B98F-4F224D59FDED}",
+   "operations": [
+    {
+     "name": "ReadRequestBytes",
+     "returnType": "array",
+     "notes": "Jedno binární čtení souboru (základ otisku dávky).",
+     "parameters": [
+      {
+       "name": "Path",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_FileBytes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ReadWriteState",
+     "returnType": "string",
+     "notes": "Perzistentní stav bridge v state-<name>.txt.",
+     "parameters": [
+      {
+       "name": "Name",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Value",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_StateFile.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "UpdatePendingIndex",
+     "returnType": "string",
+     "notes": "Index čekajících dávek .index.txt.",
+     "parameters": [
+      {
+       "name": "PendingDir",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Action",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Entry",
+       "type": "object",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PendingIndex.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "IsPumpAlive",
+     "returnType": "boolean",
+     "notes": "Běží pumpa nad složkou? (pump-status.json, aliveUntil)",
+     "parameters": [
+      {
+       "name": "BaseDir",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PumpAlive.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ResolveBaseDir",
+     "returnType": "string",
+     "notes": "Kořen výměnné složky pro připojený repozitář.",
+     "parameters": [],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ResolveBaseDir.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "{36C94531-6260-4c7f-B7E3-5A146A2444F7}",
+   "operations": [
+    {
+     "name": "ParseJson",
+     "returnType": "object",
+     "notes": "Bezpečný JSON parse s pozicí chyby (E_PARSE).",
+     "parameters": [
+      {
+       "name": "Text",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_JsonParse.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "StringifyJson",
+     "returnType": "string",
+     "notes": "",
+     "parameters": [
+      {
+       "name": "Value",
+       "type": "object",
+       "notes": ""
+      },
+      {
+       "name": "Indent",
+       "type": "number",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_JsonStringify.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "Sha256",
+     "returnType": "string",
+     "notes": "Čistá JS SHA-256 bez COM.",
+     "parameters": [
+      {
+       "name": "Input",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Sha256.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "EncodeBase64",
+     "returnType": "string",
+     "notes": "",
+     "parameters": [
+      {
+       "name": "Text",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.B64Encode.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DecodeBase64",
+     "returnType": "string",
+     "notes": "",
+     "parameters": [
+      {
+       "name": "Text",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.B64Decode.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "DecodeUtf8",
+     "returnType": "string",
+     "notes": "",
+     "parameters": [
+      {
+       "name": "Bytes",
+       "type": "array",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Utf8Decode.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "ParseXmlRows",
+     "returnType": "array",
+     "notes": "XML výsledek SQLQuery -> řádky.",
+     "parameters": [
+      {
+       "name": "Xml",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_XmlRows.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "CreateComObject",
+     "returnType": "object",
+     "notes": "COM objekt nezávisle na běhovém prostředí.",
+     "parameters": [
+      {
+       "name": "ProgId",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ComObj.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "name": "GetElementPath",
+     "returnType": "string",
+     "notes": "Tečková cesta jako v browseru EA.",
+     "parameters": [
+      {
+       "name": "Kind",
+       "type": "string",
+       "notes": ""
+      },
+      {
+       "name": "Ref",
+       "type": "string",
+       "notes": ""
+      }
+     ],
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ElementPath.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{47A8C3E6-ED95-4fef-9225-27CA9EEE04C8}",
+     "target": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "type": "Usage",
+     "notes": "pumpa vola FB_Main / FB_ConfirmPending / FB_PendingSweep / FB_SessionStart",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{47A8C3E6-ED95-4fef-9225-27CA9EEE04C8}",
+     "target": "{64C56272-0144-45da-B57C-E521C171FF35}",
+     "type": "Usage",
+     "notes": "as-implemented: pumpa cte a presouva soubory sama",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAF4793D-E899-4511-A456-8495EB5686FE}",
+     "target": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "type": "Usage",
+     "notes": "schranka, GUI fallback, menu Stav bridge",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{E393B192-8104-4a24-BD3C-8CB2ADDE2FF3}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{9A0CF631-399A-443b-BA5F-A6E169F7D53C}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{9581C877-CF7E-46d9-9982-DF7E5503F4E6}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{162CD0B2-4FFE-43c6-87D3-D3D41B3A17CA}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{ABD6B3F3-39F4-4a15-B295-7B6C6628FCD4}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{8716B029-15B0-4a63-B94D-7A458797FFA2}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{1B6C484F-5B89-44a9-94AB-79B045567EF6}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{25DCDC0A-E7A6-4b5c-908F-E8725FA416A7}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{904B8B24-A387-47cc-B2B0-BDA74DAB8886}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{88F97095-9B91-4502-92BA-6D68336B8088}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "target": "{64C56272-0144-45da-B57C-E521C171FF35}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "target": "{9A0CF631-399A-443b-BA5F-A6E169F7D53C}",
+     "type": "Usage",
+     "notes": "as-implemented: Resource Access vola Engine (CheckWrite / CheckWriteElement)",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{1B6C484F-5B89-44a9-94AB-79B045567EF6}",
+     "target": "{9A0CF631-399A-443b-BA5F-A6E169F7D53C}",
+     "type": "Usage",
+     "notes": "as-implemented: Resource Access vola Engine",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{9A0CF631-399A-443b-BA5F-A6E169F7D53C}",
+     "target": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "type": "Usage",
+     "notes": "SQL cteni cilu",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{9581C877-CF7E-46d9-9982-DF7E5503F4E6}",
+     "target": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "type": "Usage",
+     "notes": "SQL metriky",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{162CD0B2-4FFE-43c6-87D3-D3D41B3A17CA}",
+     "target": "{25DCDC0A-E7A6-4b5c-908F-E8725FA416A7}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{ABD6B3F3-39F4-4a15-B295-7B6C6628FCD4}",
+     "target": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "type": "Usage",
+     "notes": "SQL kontroly",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8716B029-15B0-4a63-B94D-7A458797FFA2}",
+     "target": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{8716B029-15B0-4a63-B94D-7A458797FFA2}",
+     "target": "{1B6C484F-5B89-44a9-94AB-79B045567EF6}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "target": "{E895365B-9699-4c49-8FE6-F7C6D0EE18F4}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{1B6C484F-5B89-44a9-94AB-79B045567EF6}",
+     "target": "{E895365B-9699-4c49-8FE6-F7C6D0EE18F4}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{25DCDC0A-E7A6-4b5c-908F-E8725FA416A7}",
+     "target": "{E895365B-9699-4c49-8FE6-F7C6D0EE18F4}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{904B8B24-A387-47cc-B2B0-BDA74DAB8886}",
+     "target": "{E895365B-9699-4c49-8FE6-F7C6D0EE18F4}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{88F97095-9B91-4502-92BA-6D68336B8088}",
+     "target": "{E895365B-9699-4c49-8FE6-F7C6D0EE18F4}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{64C56272-0144-45da-B57C-E521C171FF35}",
+     "target": "{1BC0654B-1480-4bc1-8186-6D83B65E8606}",
+     "type": "Usage",
+     "notes": "",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "package": "{4E731E8B-2A31-4a96-AD92-C0D7444DF155}",
+     "type": "Component",
+     "name": "EA File Bridge - Component Overview",
+     "notes": "Přehled komponent add-inu EA File Bridge dle IDesign (reverse z kódu src @ v0.21 (45de928)). Vazby Usage = skutečná volání v kódu; poznámka as-implemented označuje odchylky od směru volání IDesign."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": "$15[0]",
+   "elementPlacements": [
+    {
+     "element": "{47A8C3E6-ED95-4fef-9225-27CA9EEE04C8}",
+     "x": 430,
+     "y": 40,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{AAF4793D-E899-4511-A456-8495EB5686FE}",
+     "x": 625,
+     "y": 40,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{8ED7AE86-1171-46ee-B80B-16C9999E8365}",
+     "x": 527,
+     "y": 190,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{E393B192-8104-4a24-BD3C-8CB2ADDE2FF3}",
+     "x": 40,
+     "y": 340,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{9A0CF631-399A-443b-BA5F-A6E169F7D53C}",
+     "x": 235,
+     "y": 340,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{9581C877-CF7E-46d9-9982-DF7E5503F4E6}",
+     "x": 430,
+     "y": 340,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{162CD0B2-4FFE-43c6-87D3-D3D41B3A17CA}",
+     "x": 625,
+     "y": 340,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{ABD6B3F3-39F4-4a15-B295-7B6C6628FCD4}",
+     "x": 820,
+     "y": 340,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{8716B029-15B0-4a63-B94D-7A458797FFA2}",
+     "x": 1015,
+     "y": 340,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{FEB5E0EC-F835-4a7a-AA14-C15DF24D2A18}",
+     "x": 40,
+     "y": 520,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{1B6C484F-5B89-44a9-94AB-79B045567EF6}",
+     "x": 235,
+     "y": 520,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{25DCDC0A-E7A6-4b5c-908F-E8725FA416A7}",
+     "x": 430,
+     "y": 520,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{904B8B24-A387-47cc-B2B0-BDA74DAB8886}",
+     "x": 625,
+     "y": 520,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{88F97095-9B91-4502-92BA-6D68336B8088}",
+     "x": 820,
+     "y": 520,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{64C56272-0144-45da-B57C-E521C171FF35}",
+     "x": 1015,
+     "y": 520,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{E895365B-9699-4c49-8FE6-F7C6D0EE18F4}",
+     "x": 430,
+     "y": 700,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{1BC0654B-1480-4bc1-8186-6D83B65E8606}",
+     "x": 625,
+     "y": 700,
+     "width": 170,
+     "height": 80
+    },
+    {
+     "element": "{7335D3C7-96D6-479f-817D-308BEC14C1BF}",
+     "x": 1250,
+     "y": 40,
+     "width": 170,
+     "height": 80
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,162 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32s-fa-survey",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1227,
+   "elementPlacements": [
+    {
+     "elementID": 12039,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 260,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12041,
+     "x": 40,
+     "y": 460,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12042,
+     "x": 300,
+     "y": 40,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12043,
+     "x": 640,
+     "y": 40,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12044,
+     "x": 980,
+     "y": 40,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12045,
+     "x": 300,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12046,
+     "x": 640,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12047,
+     "x": 980,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12048,
+     "x": 300,
+     "y": 320,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12049,
+     "x": 640,
+     "y": 320,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12050,
+     "x": 980,
+     "y": 320,
+     "width": 300,
+     "height": 100
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1237,
+   "elementPlacements": [
+    {
+     "elementID": 12069,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 220
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1238,
+   "elementPlacements": [
+    {
+     "elementID": 12070,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 320
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1239,
+   "elementPlacements": [
+    {
+     "elementID": 12071,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1240,
+   "elementPlacements": [
+    {
+     "elementID": 12072,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1241,
+   "elementPlacements": [
+    {
+     "elementID": 12073,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 160
+    }
+   ]
+  }
+ ]
+}

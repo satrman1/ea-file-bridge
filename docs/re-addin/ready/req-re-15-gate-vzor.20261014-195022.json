@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "re-15-gate-vzor", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT Object_ID, Name, Object_Type, Stereotype, Classifier, Package_ID FROM t_object WHERE Package_ID IN (1061,1132,1133,1134,1135) LIMIT 60" },
+ { "op": "query", "sql": "SELECT DISTINCT Object_Type FROM t_object WHERE Object_Type LIKE '%Gate%' OR Object_Type LIKE '%Occurrence%' OR Object_Type LIKE 'Interaction%' LIMIT 20" }
+] }

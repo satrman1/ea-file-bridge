@@ -1,0 +1,241 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-95108",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{5A1F1986-F918-4908-B832-240D9BA18AEE}",
+     "target": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{97111295-A9A5-41c5-B112-8F69DD9FF7F0}",
+     "target": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C27CF193-628D-4c9a-AC12-A09D83DE19FC}",
+     "target": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "target": "{D3D7A445-A416-4be1-87CA-BDCF2DEA2416}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "target": "{E0831486-5617-4059-9FD2-A5E9E965074D}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "target": "{E6E0DA3E-0C3B-4e61-B5D4-1AEAFB909C40}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1225,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12049,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12067,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12070,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12041,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12051,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12056,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12058,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12041
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11919,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11932,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$3[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[2]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[3]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1235,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[3]",
+     "x": 730,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1235,
+   "messages": [
+    {
+     "source": "$3[0]",
+     "target": "$3[1]",
+     "seqNo": 1,
+     "name": "dávka deploy_src do requests\\ (nebo bootstrap skript v EA)"
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[2]",
+     "seqNo": 2,
+     "operation": 1289
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[3]",
+     "seqNo": 3,
+     "operation": 1358
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[0]",
+     "seqNo": 4,
+     "name": "res + reloadCode → pumpa přenačte kód"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1235
+  }
+ ]
+}

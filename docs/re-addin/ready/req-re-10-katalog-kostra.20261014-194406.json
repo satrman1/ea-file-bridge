@@ -1,0 +1,788 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-10-katalog-kostra",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_package",
+   "parent": "{DDA8A0F3-5920-4046-8F97-764CF89B9D8F}",
+   "name": "Catalogues",
+   "notes": "Zrcadlo větve Catalogues EMR - reverse add-inu EA File Bridge (RE-FULL, 2026-10-14)."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$0",
+   "name": "Solution Artefacts"
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$1",
+   "name": "EA File Bridge",
+   "notes": "Platforma EA File Bridge - katalog komponent odvozený z kódu (src @ v0.21 (45de928))."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "{DDA8A0F3-5920-4046-8F97-764CF89B9D8F}",
+   "name": "Logical Design",
+   "notes": "Zrcadlo větve Logical Design EMR - reverse add-inu EA File Bridge."
+  },
+  {
+   "op": "create_or_update_package",
+   "parent": "$3",
+   "name": "EA File Bridge"
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Client",
+     "name": "EAFB Pump",
+     "notes": "Pumpa (Windows Script Host, pump.wsf v0.6): hlídá složku requests\\, připojí se přes COM k běžícímu EA, načte kód operací z prvku AICodeBridge v modelu a předá dávku Manageru. Zobrazuje potvrzovací okno Ano/Ne/Storno u dávek ELEVATED, píše pump-status.json a denní log. Žádná business logika - těla operací žijí v modelu.\nAs-implemented: pumpa čte a přesouvá soubory výměnné složky sama (nejde přes Exchange Folder Access).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "pump.wsf"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Client",
+     "name": "EAFB Add-in UI",
+     "notes": "Uživatelské vstupy add-inu uvnitř EA: menu AI Bridge (EA_GetMenuItems/EA_MenuClick), schránkový kanál pro M365 Copilot (import dávky ze schránky, kontext výběru do schránky), GUI fallback bez pumpy (zpracování složky requests\\), stav bridge, dvojklik na řádek Output (navigace na prvek) a add-in search FB_Changes.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.EA_*.js; FB_ClipboardImport; FB_ClipboardContext; FB_ProcessFolder; FB_Status; FB_Changes"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Manager",
+     "name": "EAFB Request Manager",
+     "notes": "Orchestrace zpracování dávky protokolu eafb/0.2 (FB_Main): parse, kontrola přístupu a povolených operací, předběžná kontrola, risk gate, potvrzovací okruh, baseline politika, exekuce operací z registru (stop-on-error), kontrola kvality, audit a odpověď. Drží registr 42 operací protokolu.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Main.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Engine",
+     "name": "EAFB Batch Validation Engine",
+     "notes": "Předběžná kontrola dávky bez okna a bez zápisu: tvar, známé operace a pole (aliasy, nápovědy překlepů), zástupné texty, odkazy $N, existence cílů; převod syrových chyb EA/COM na kódy E_*.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Precheck.js; FB_FieldCheck; FB_InterpretError"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Engine",
+     "name": "EAFB Write Scope Engine",
+     "notes": "Cíl zápisu v režimu blacklist: chráněné větve, implicitní ochrana auditu a add-inu, pravidlo vazby (chráněná jen když jsou oba konce v chráněné části), kaskády mazání (cascadeDelete allow | block), přístup uživatele přes EA security skupiny a whitelist povolených operací.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ScopePrecheck.js; FB_ScopeCheck; FB_CheckWrite; FB_CheckWriteEl; FB_WriteScope(Cfg); FB_UserAccess; FB_AccessGroups; FB_OpsAllowed; FB_ScopeText"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Engine",
+     "name": "EAFB Risk Gate Engine",
+     "notes": "Deterministické metriky a klasifikace zápisové dávky před exekucí (LOW | ELEVATED | BLOCKED), bez AI hodnocení. Důvody se stabilními kódy, lidský souhrn pro potvrzovací okno, jednorázový nonce potvrzovacího okruhu.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_RiskGate.js; FB_RiskPolicy; FB_ConfirmSummary; FB_ReasonText; FB_Nonce; FB_RiskNote"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Engine",
+     "name": "EAFB Baseline Policy Engine",
+     "notes": "Baseline politika: které balíčky jsou nejbližší vlastníci cílů zápisu, sonda velikosti podstromu, nejistota obnovy, rozhodnutí o automatické záloze před zápisem a úklid automatických baselines.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_BaselinePlan.js; FB_BaselinePolicy; FB_BaselineDecide; FB_BaselineConfig; FB_BaselineName; FB_RecoveryPosture; FB_SubtreeCount; FB_BaselineCleanup"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Engine",
+     "name": "EAFB Quality Check Engine",
+     "notes": "Kontrola kvality po zápisové dávce: SQL kontroly z konfigurace per repozitář scopované na dotčené balíčky; stav kontroly je oddělený od stavu zápisu.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_QcRun.js; FB_QcConfig; FB_QcText"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Engine",
+     "name": "EAFB ITAN Methodology Engine",
+     "notes": "Porty produkčních skriptů metodiky ITAN do protokolu: dorovnání typu a stereotypu lifelin podle classifieru a scaffold referencující servisní realizace z operace katalogu.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpApplyClassifierStereotypes.js; FB_OpFindOrCreateSR; FB_ScaffoldConfig"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Resource Access",
+     "name": "EAFB Model Element Access",
+     "notes": "Čtení a zápis prvků, balíčků, vazeb, atributů, operací, scénářů a tagged values repozitáře EA přes Automation API a SQL (Repository.SQLQuery). Sdílené resolvery cílů ({GUID} | id | jméno | cesta | $N).\nAs-implemented: zápisové operace samy volají Write Scope Engine (CheckWrite/CheckWriteElement) - v IDesign je to opačný směr volání (Resource Access -> Engine).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Op*.js (prvky, balíčky, vazby); FB_ResolveEl; FB_ResolvePkg; FB_ResolvePath; FB_TargetCache; FB_TagRead; FB_TagWrite; FB_DedupFind"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Resource Access",
+     "name": "EAFB Diagram Access",
+     "notes": "Čtení a zápis diagramů repozitáře EA: diagramy, umístění objektů, zprávy sekvenčních diagramů, vedení a viditelnost vazeb, styly, PNG export a UI operace otevření/obnovení.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDiagram*.js; FB_OpPlaceElements; FB_OpMessages; FB_OpLayoutConnectors; ..."
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Resource Access",
+     "name": "EAFB Baseline Access",
+     "notes": "Baselines balíčků v repozitáři EA (t_document, Project.CreateBaseline/GetBaselines/DeleteBaseline): výpis, diff, ruční a automatická záloha před zápisem, minimální journal pre-image.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpBaseline*.js; FB_AutoBaseline; FB_Journal; FB_BaselineNameReserved"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Resource Access",
+     "name": "EAFB Audit Access",
+     "notes": "Auditní stopa: Artifact za každou dávku v balíčku #AI-LOG (věty pro člověka + strojový záznam + request), riziková pole jako tagged values, výpis změn do Output tabu AI Bridge.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Audit.js; FB_AuditText; FB_RiskAuditTags; FB_LogChanges; Log; FB_OutputFlush"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Resource Access",
+     "name": "EAFB Code Access",
+     "notes": "Kód add-inu uložený v modelu (operace prvku AICodeBridge): nasazení ze složky src\\ (jen dev, v bance deny) a otisk nasazeného kódu fb.code.*.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDeploySrc.js; FB_CodeInfo; FB_CodeFingerprint; DeployRequest; ExportRequest"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Resource Access",
+     "name": "EAFB Exchange Folder Access",
+     "notes": "Souborová výměnná složka (requests\\, responses\\, pending\\, state-*.txt): bajtové čtení dávky, malý perzistentní stav, index čekajících dávek, test běžící pumpy.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_FileBytes.js; FB_StateFile; FB_PendingIndex; FB_PumpAlive; FB_ResolveBaseDir"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-DB Resource",
+     "name": "EA Repository",
+     "notes": "Repozitář Sparx EA (doma .qea/.qeax SQLite, v bance MS SQL). Bridge k němu přistupuje přes Automation API a Repository.SQLQuery.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-File Resource",
+     "name": "EAFB Exchange Folder",
+     "notes": "Souborová výměnná složka mezi agentem (VS Code / Copilot) a pumpou.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "requests\\, responses\\, state-*.txt"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "IDS-IDesign::IDS-Utility",
+     "name": "EAFB Utilities",
+     "notes": "Průřezové pomůcky pro dva běhové prostředí (JScript pumpy i JavaScript EA): JSON, SHA-256, Base64, UTF-8, převod XML výsledku SQL, COM objekty, tečková cesta prvku.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_JsonParse.js; FB_JsonStringify; FB_Sha256; B64Encode; B64Decode; FB_Utf8Decode; FB_XmlRows; FB_ComObj; FB_ElementPath"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.21 (45de928)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-14"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Request Manager Interface",
+     "notes": "Rozhraní komponenty EAFB Request Manager (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Batch Validation Engine Interface",
+     "notes": "Rozhraní komponenty EAFB Batch Validation Engine (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Write Scope Engine Interface",
+     "notes": "Rozhraní komponenty EAFB Write Scope Engine (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Risk Gate Engine Interface",
+     "notes": "Rozhraní komponenty EAFB Risk Gate Engine (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Baseline Policy Engine Interface",
+     "notes": "Rozhraní komponenty EAFB Baseline Policy Engine (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Quality Check Engine Interface",
+     "notes": "Rozhraní komponenty EAFB Quality Check Engine (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB ITAN Methodology Engine Interface",
+     "notes": "Rozhraní komponenty EAFB ITAN Methodology Engine (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Model Element Access Interface",
+     "notes": "Rozhraní komponenty EAFB Model Element Access (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Diagram Access Interface",
+     "notes": "Rozhraní komponenty EAFB Diagram Access (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Baseline Access Interface",
+     "notes": "Rozhraní komponenty EAFB Baseline Access (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Audit Access Interface",
+     "notes": "Rozhraní komponenty EAFB Audit Access (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Code Access Interface",
+     "notes": "Rozhraní komponenty EAFB Code Access (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Exchange Folder Access Interface",
+     "notes": "Rozhraní komponenty EAFB Exchange Folder Access (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "$2",
+     "type": "Interface",
+     "name": "EAFB Utilities Interface",
+     "notes": "Rozhraní komponenty EAFB Utilities (reverse z kódu).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "$5[2]",
+     "target": "$6[0]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[3]",
+     "target": "$6[1]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[4]",
+     "target": "$6[2]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[5]",
+     "target": "$6[3]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[6]",
+     "target": "$6[4]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[7]",
+     "target": "$6[5]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[8]",
+     "target": "$6[6]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[9]",
+     "target": "$6[7]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[10]",
+     "target": "$6[8]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[11]",
+     "target": "$6[9]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[12]",
+     "target": "$6[10]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[13]",
+     "target": "$6[11]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[14]",
+     "target": "$6[12]",
+     "type": "Realisation"
+    },
+    {
+     "source": "$5[17]",
+     "target": "$6[13]",
+     "type": "Realisation"
+    }
+   ]
+  }
+ ]
+}

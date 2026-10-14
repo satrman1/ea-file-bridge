@@ -1,0 +1,214 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-34b-ls-rozestupy",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1222,
+   "elementPlacements": [
+    {
+     "elementID": 12046,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12064,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1223,
+   "elementPlacements": [
+    {
+     "elementID": 12047,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12065,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12072,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    },
+    {
+     "elementID": 12069,
+     "x": 300,
+     "y": 540,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1224,
+   "elementPlacements": [
+    {
+     "elementID": 12048,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12066,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12073,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1225,
+   "elementPlacements": [
+    {
+     "elementID": 12049,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12067,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12070,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1226,
+   "elementPlacements": [
+    {
+     "elementID": 12050,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12068,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1222,
+   "elementPlacements": [
+    {
+     "elementID": 12103,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 560
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1223,
+   "elementPlacements": [
+    {
+     "elementID": 12108,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 790
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1224,
+   "elementPlacements": [
+    {
+     "elementID": 12113,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 560
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1225,
+   "elementPlacements": [
+    {
+     "elementID": 12117,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 560
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1226,
+   "elementPlacements": [
+    {
+     "elementID": 12123,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 560
+    }
+   ]
+  }
+ ]
+}

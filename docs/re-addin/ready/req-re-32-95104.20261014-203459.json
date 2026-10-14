@@ -1,0 +1,243 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-95104",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{3A90C8AF-207C-49af-9968-D1500E09D8CD}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{EBA59A11-99A1-4d79-95FE-A5290237388D}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "target": "{E225F9B8-B9A0-44f7-8113-0AD35BE48158}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "target": "{E0831486-5617-4059-9FD2-A5E9E965074D}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1221,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 490
+    },
+    {
+     "elementID": 12045,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12063,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12071,
+     "x": 330,
+     "y": 380,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12054,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12056,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "InteractionOccurrence",
+     "name": "ref SR ProcessRequest",
+     "classifierID": 11961
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$3[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1231,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[3]",
+     "x": 480,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1231,
+   "messages": [
+    {
+     "source": "$3[0]",
+     "target": "$3[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Zpracovat dávky ze složky"
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[2]",
+     "seqNo": 2,
+     "operation": 1289
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[0]",
+     "seqNo": 3,
+     "name": "souhrn počtů v dialogu"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1231
+  }
+ ]
+}

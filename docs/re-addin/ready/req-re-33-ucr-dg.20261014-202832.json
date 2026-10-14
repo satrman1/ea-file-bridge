@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "re-33-ucr-dg", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT d.Diagram_ID, d.ParentID, d.Name, d.Diagram_Type FROM t_diagram d WHERE d.ParentID BETWEEN 12060 AND 12068 OR (d.ParentID BETWEEN 12069 AND 12073) ORDER BY d.ParentID LIMIT 40" }
+] }

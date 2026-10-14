@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "re-17-sonda-own-Gate", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "owningElement": "11961", "type": "Gate", "name": "" } ] }
+] }

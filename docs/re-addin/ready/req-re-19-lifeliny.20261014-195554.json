@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "re-19-lifeliny", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT o.Object_ID, o.Name, o.Object_Type, o.Stereotype, o.Classifier, o.Package_ID FROM t_object o WHERE o.Package_ID IN (1132,1133,1134,1135) AND o.Object_ID >= 11977 ORDER BY o.Object_ID LIMIT 60" }
+] }

@@ -1,0 +1,191 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-95109",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{5A1F1986-F918-4908-B832-240D9BA18AEE}",
+     "target": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{357F5777-D003-4d7d-8DFD-D9DB32F568D7}",
+     "target": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "target": "{7FCFAFB4-A163-46a2-8095-5973028A28BB}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1226,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12050,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12068,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12041,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12053,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12041
+    },
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11925,
+     "stereotypes": "IDS-Engine"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$3[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$3[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1236,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$3[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1236,
+   "messages": [
+    {
+     "source": "$3[0]",
+     "target": "$3[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Úklid automatických baselines"
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[2]",
+     "seqNo": 2,
+     "operation": 1310
+    },
+    {
+     "source": "$3[1]",
+     "target": "$3[0]",
+     "seqNo": 3,
+     "name": "výčet smazaných záloh v Output tabu"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1236
+  }
+ ]
+}

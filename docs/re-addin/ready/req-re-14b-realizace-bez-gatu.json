@@ -1,0 +1,693 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-14b-realizace-bez-gatu",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11922,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11924,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11925,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11930,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11926,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11931,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 11969
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 11973
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1196,
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 40,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[1]",
+     "x": 210,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[2]",
+     "x": 380,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[3]",
+     "x": 550,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[4]",
+     "x": 720,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[5]",
+     "x": 890,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[6]",
+     "x": 1060,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[7]",
+     "x": 1230,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[8]",
+     "x": 1400,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$0[9]",
+     "x": 1020,
+     "y": 540,
+     "width": 260,
+     "height": 50
+    },
+    {
+     "element": "$0[10]",
+     "x": 1020,
+     "y": 610,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1196,
+   "messages": [
+    {
+     "source": "$0[0]",
+     "target": "$0[0]",
+     "seqNo": 1,
+     "operation": 1289,
+     "arguments": "RequestPath"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[1]",
+     "seqNo": 2,
+     "operation": 1295,
+     "arguments": "Request, \"shape\""
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[2]",
+     "seqNo": 3,
+     "operation": 1301
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[1]",
+     "seqNo": 4,
+     "operation": 1295,
+     "arguments": "Request, \"targets\""
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[2]",
+     "seqNo": 5,
+     "operation": 1298,
+     "arguments": "Request"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[3]",
+     "seqNo": 6,
+     "operation": 1303,
+     "arguments": "Request"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[4]",
+     "seqNo": 7,
+     "operation": 1307,
+     "arguments": "Request, Risk"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[4]",
+     "seqNo": 8,
+     "operation": 1308,
+     "arguments": "Plan, Risk"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[5]",
+     "seqNo": 9,
+     "operation": 1353,
+     "arguments": "PackageGuid, Token, Klass"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[6]",
+     "seqNo": 10,
+     "name": "exekuce operací dávky z registru (stop-on-error)",
+     "arguments": "ops[i]"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[7]",
+     "seqNo": 11,
+     "operation": 1311,
+     "arguments": "Request, Response"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[8]",
+     "seqNo": 12,
+     "operation": 1355,
+     "arguments": "RequestId, Summary, RequestText, Human"
+    },
+    {
+     "source": "$0[0]",
+     "target": "$0[8]",
+     "seqNo": 13,
+     "operation": 1357,
+     "arguments": "Response"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1196
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11932,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1198,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 40,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[1]",
+     "x": 210,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[2]",
+     "x": 380,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1198,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[0]",
+     "seqNo": 1,
+     "operation": 1293
+    },
+    {
+     "source": "$4[0]",
+     "target": "$4[1]",
+     "seqNo": 2,
+     "operation": 1301
+    },
+    {
+     "source": "$4[0]",
+     "target": "$4[1]",
+     "seqNo": 3,
+     "operation": 1302
+    },
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 4,
+     "operation": 1359
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1198
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1200,
+   "elementPlacements": [
+    {
+     "element": "$8[0]",
+     "x": 40,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$8[1]",
+     "x": 210,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$8[2]",
+     "x": 380,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$8[3]",
+     "x": 550,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$8[4]",
+     "x": 720,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1200,
+   "messages": [
+    {
+     "source": "$8[0]",
+     "target": "$8[0]",
+     "seqNo": 1,
+     "operation": 1323,
+     "arguments": "Operation"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[2]",
+     "seqNo": 2,
+     "operation": 1375,
+     "notes": "resolve cílového balíčku"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[1]",
+     "seqNo": 3,
+     "operation": 1299,
+     "arguments": "PackageRef"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[4]",
+     "seqNo": 4,
+     "operation": 1383,
+     "notes": "dedup ai.dedup"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[3]",
+     "seqNo": 5,
+     "operation": 1379,
+     "notes": "resolve guid | elementID (update)"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[1]",
+     "seqNo": 6,
+     "operation": 1300,
+     "arguments": "ObjectRef, \"element\""
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[3]",
+     "seqNo": 7,
+     "operation": 1378,
+     "notes": "Package.Elements.AddNew"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[3]",
+     "seqNo": 8,
+     "operation": 1380,
+     "notes": "Element.Update"
+    },
+    {
+     "source": "$8[0]",
+     "target": "$8[4]",
+     "seqNo": 9,
+     "operation": 1382,
+     "notes": "taggedValues, razítko ai.request"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1200
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11982,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1202,
+   "elementPlacements": [
+    {
+     "element": "$12[0]",
+     "x": 40,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[1]",
+     "x": 210,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[2]",
+     "x": 380,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[3]",
+     "x": 550,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[4]",
+     "x": 720,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[5]",
+     "x": 890,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1202,
+   "messages": [
+    {
+     "source": "$12[0]",
+     "target": "$12[0]",
+     "seqNo": 1,
+     "operation": 1332,
+     "arguments": "Operation"
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[2]",
+     "seqNo": 2,
+     "operation": 1379,
+     "notes": "resolve cílů"
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[1]",
+     "seqNo": 3,
+     "operation": 1300,
+     "arguments": "ObjectRef, Kind"
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[3]",
+     "seqNo": 4,
+     "operation": 1395,
+     "notes": "kaskády SQL (vazby, instance)"
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[3]",
+     "seqNo": 5,
+     "operation": 1397,
+     "notes": ""
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[4]",
+     "seqNo": 6,
+     "operation": 1401,
+     "notes": ""
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[2]",
+     "seqNo": 7,
+     "operation": 1381,
+     "notes": "Package.Elements.DeleteAt"
+    },
+    {
+     "source": "$12[0]",
+     "target": "$12[5]",
+     "seqNo": 8,
+     "operation": 1377,
+     "notes": "Packages.DeleteAt"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1202
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11961,
+     "notes": "Servisní realizace operace ProcessRequest - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nVětve: chyba předběžné kontroly / E_BLACKLIST = odpověď error bez okna; ELEVATED = dávka do pending\\, odpověď confirm_required a pokračování přes ConfirmPending (okno pumpy); BLOCKED = error. Zápisová část (baseline, exekuce, QC, audit) běží jen u LOW nebo potvrzené dávky.\nBez Diagram Gate (vstup a výstup): bridge v0.21 gate neumí založit (E_EXCEPTION Invalid type) - oprava v zápřahu; vstupní volání je zatím zpráva lifeline sama na sebe, návratová zpráva chybí."
+    },
+    {
+     "elementID": 11965,
+     "notes": "Servisní realizace operace Ping - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nPing je čtecí operace bez risk gate a bez auditu zápisu; identitu repozitáře bere z FB_RepoId (Utility).\nBez Diagram Gate (vstup a výstup): bridge v0.21 gate neumí založit (E_EXCEPTION Invalid type) - oprava v zápřahu; vstupní volání je zatím zpráva lifeline sama na sebe, návratová zpráva chybí."
+    },
+    {
+     "elementID": 11969,
+     "notes": "Servisní realizace operace CreateOrUpdateElements - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nAs-implemented: Resource Access sám volá Write Scope Engine (CheckWrite / CheckWriteElement) - opačný směr volání vůči IDesign; nález pro člověka, ne oprava.\nBez Diagram Gate (vstup a výstup): bridge v0.21 gate neumí založit (E_EXCEPTION Invalid type) - oprava v zápřahu; vstupní volání je zatím zpráva lifeline sama na sebe, návratová zpráva chybí."
+    },
+    {
+     "elementID": 11973,
+     "notes": "Servisní realizace operace DeleteFromModel - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nKaskády do chráněné části: cascadeDelete block = E_BLACKLIST už v předběžné kontrole; allow = cascades[] v odpovědi a varování v okně.\nBez Diagram Gate (vstup a výstup): bridge v0.21 gate neumí založit (E_EXCEPTION Invalid type) - oprava v zápřahu; vstupní volání je zatím zpráva lifeline sama na sebe, návratová zpráva chybí."
+    }
+   ]
+  }
+ ]
+}

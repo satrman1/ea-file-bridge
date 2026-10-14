@@ -1,0 +1,141 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-34a-ls-rozestupy",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1219,
+   "elementPlacements": [
+    {
+     "elementID": 12043,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12061,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12070,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1220,
+   "elementPlacements": [
+    {
+     "elementID": 12044,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12062,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12071,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    },
+    {
+     "elementID": 12069,
+     "x": 300,
+     "y": 540,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1221,
+   "elementPlacements": [
+    {
+     "elementID": 12045,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12063,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 300,
+     "y": 310,
+     "width": 400,
+     "height": 200
+    },
+    {
+     "elementID": 12071,
+     "x": 300,
+     "y": 540,
+     "width": 400,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1219,
+   "elementPlacements": [
+    {
+     "elementID": 12085,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 560
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1220,
+   "elementPlacements": [
+    {
+     "elementID": 12091,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 790
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1221,
+   "elementPlacements": [
+    {
+     "elementID": 12097,
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 790
+    }
+   ]
+  }
+ ]
+}

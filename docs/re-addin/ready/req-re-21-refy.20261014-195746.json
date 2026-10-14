@@ -1,0 +1,7 @@
+{ "protocol": "eafb/0.2", "id": "re-21-refy", "repo":"EAEXAMPLE", "ops": [
+ { "op": "reload_diagrams", "diagrams": [1196] },
+ { "op": "place_elements_on_diagram", "diagram": 1196, "elementPlacements": [
+   {"elementID":12002,"x":1020,"y":760,"width":260,"height":50},
+   {"elementID":12003,"x":1020,"y":830,"width":260,"height":50}] },
+ { "op": "reload_diagrams", "diagrams": [1196,1198,1200,1202] }
+] }

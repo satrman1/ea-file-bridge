@@ -1,0 +1,2115 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-32-fa-diagramy",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": "{C153CDE4-14EF-4b19-AE14-6C3ABDA6F6EB}",
+     "target": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{2870B75F-2E2C-4a34-981B-B5B40344B026}",
+     "target": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{D3D7A445-A416-4be1-87CA-BDCF2DEA2416}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{CEF1CE67-629A-43e7-9DDB-E46F87BED00E}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{7FCFAFB4-A163-46a2-8095-5973028A28BB}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{E225F9B8-B9A0-44f7-8113-0AD35BE48158}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{5C65925D-23AE-4fda-B85C-1F4B5A259AB4}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{E6E0DA3E-0C3B-4e61-B5D4-1AEAFB909C40}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+     "target": "{18562CDC-311C-4bef-93E6-FC85945A111F}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AB80721C-7A57-4271-A72A-DC50002CD3E9}",
+     "target": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C27CF193-628D-4c9a-AC12-A09D83DE19FC}",
+     "target": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "target": "{E0831486-5617-4059-9FD2-A5E9E965074D}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "target": "{D3D7A445-A416-4be1-87CA-BDCF2DEA2416}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "target": "{7FCFAFB4-A163-46a2-8095-5973028A28BB}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C153CDE4-14EF-4b19-AE14-6C3ABDA6F6EB}",
+     "target": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{EF8576AF-B25D-4744-A175-112047A476A8}",
+     "target": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{EBA59A11-99A1-4d79-95FE-A5290237388D}",
+     "target": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "target": "{D3D7A445-A416-4be1-87CA-BDCF2DEA2416}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "target": "{CEF1CE67-629A-43e7-9DDB-E46F87BED00E}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "target": "{5C65925D-23AE-4fda-B85C-1F4B5A259AB4}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "target": "{E0831486-5617-4059-9FD2-A5E9E965074D}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+     "target": "{E6E0DA3E-0C3B-4e61-B5D4-1AEAFB909C40}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{3A90C8AF-207C-49af-9968-D1500E09D8CD}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{EBA59A11-99A1-4d79-95FE-A5290237388D}",
+     "target": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "target": "{E225F9B8-B9A0-44f7-8113-0AD35BE48158}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "target": "{E0831486-5617-4059-9FD2-A5E9E965074D}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C153CDE4-14EF-4b19-AE14-6C3ABDA6F6EB}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{4A01965B-779F-46e9-8246-40131112874F}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "target": "{CEF1CE67-629A-43e7-9DDB-E46F87BED00E}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{DF5B480C-238E-46a3-900A-FCE0C77779D7}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{A70907E8-4AF9-41ae-8662-13B5B8EFB213}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "target": "{CEF1CE67-629A-43e7-9DDB-E46F87BED00E}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "target": "{E6E0DA3E-0C3B-4e61-B5D4-1AEAFB909C40}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{AAB02910-DEF8-410c-9D97-A3416365A53B}",
+     "target": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{52506C0D-C6E1-4ca8-93E2-F6580F469D9C}",
+     "target": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{6540B370-DAF0-4714-9098-ED790B1BBF20}",
+     "target": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "target": "{BCFA84D5-7757-4322-BF7A-5E9511C64166}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{5A1F1986-F918-4908-B832-240D9BA18AEE}",
+     "target": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{97111295-A9A5-41c5-B112-8F69DD9FF7F0}",
+     "target": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C27CF193-628D-4c9a-AC12-A09D83DE19FC}",
+     "target": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "target": "{D3D7A445-A416-4be1-87CA-BDCF2DEA2416}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "target": "{E0831486-5617-4059-9FD2-A5E9E965074D}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "target": "{E6E0DA3E-0C3B-4e61-B5D4-1AEAFB909C40}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{5A1F1986-F918-4908-B832-240D9BA18AEE}",
+     "target": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "type": "Association",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{357F5777-D003-4d7d-8DFD-D9DB32F568D7}",
+     "target": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "type": "Realisation",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "target": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "type": "Dependency",
+     "direction": "FromSourceToTarget"
+    },
+    {
+     "source": "{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "target": "{7FCFAFB4-A163-46a2-8095-5973028A28BB}",
+     "type": "Usage",
+     "direction": "FromSourceToTarget"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    },
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1218,
+   "elementPlacements": [
+    {
+     "element": "$1[0]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 330
+    },
+    {
+     "elementID": 12042,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12060,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12039,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 200,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12051,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12052,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12053,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12054,
+     "x": 820,
+     "y": 245,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12055,
+     "x": 820,
+     "y": 320,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 395,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12058,
+     "x": 820,
+     "y": 470,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12059,
+     "x": 820,
+     "y": 545,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1219,
+   "elementPlacements": [
+    {
+     "element": "$1[1]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12043,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12061,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12070,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12056,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12051,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12053,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 245,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1220,
+   "elementPlacements": [
+    {
+     "element": "$1[2]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 490
+    },
+    {
+     "elementID": 12044,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12062,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12071,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 380,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12039,
+     "x": 40,
+     "y": 200,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12051,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12052,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12055,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12056,
+     "x": 820,
+     "y": 245,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 320,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12058,
+     "x": 820,
+     "y": 395,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1221,
+   "elementPlacements": [
+    {
+     "element": "$1[3]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 490
+    },
+    {
+     "elementID": 12045,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12063,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12071,
+     "x": 330,
+     "y": 380,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12054,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12056,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1222,
+   "elementPlacements": [
+    {
+     "element": "$1[4]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12046,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12064,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12039,
+     "x": 40,
+     "y": 200,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12052,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1223,
+   "elementPlacements": [
+    {
+     "element": "$1[5]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 490
+    },
+    {
+     "elementID": 12047,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12065,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12072,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 380,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12052,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12058,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1224,
+   "elementPlacements": [
+    {
+     "element": "$1[6]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12048,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12066,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12073,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12057,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1225,
+   "elementPlacements": [
+    {
+     "element": "$1[7]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12049,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12067,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12070,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12041,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12051,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12056,
+     "x": 820,
+     "y": 95,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12058,
+     "x": 820,
+     "y": 170,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1226,
+   "elementPlacements": [
+    {
+     "element": "$1[8]",
+     "x": 220,
+     "y": 20,
+     "width": 540,
+     "height": 410
+    },
+    {
+     "elementID": 12050,
+     "x": 330,
+     "y": 60,
+     "width": 320,
+     "height": 100
+    },
+    {
+     "elementID": 12068,
+     "x": 330,
+     "y": 200,
+     "width": 320,
+     "height": 70
+    },
+    {
+     "elementID": 12069,
+     "x": 330,
+     "y": 300,
+     "width": 320,
+     "height": 60
+    },
+    {
+     "elementID": 12041,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12053,
+     "x": 820,
+     "y": 20,
+     "width": 300,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1227,
+   "elementPlacements": [
+    {
+     "elementID": 12039,
+     "x": 40,
+     "y": 60,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12040,
+     "x": 40,
+     "y": 260,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12041,
+     "x": 40,
+     "y": 460,
+     "width": 90,
+     "height": 100
+    },
+    {
+     "elementID": 12042,
+     "x": 300,
+     "y": 40,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12043,
+     "x": 640,
+     "y": 40,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12044,
+     "x": 980,
+     "y": 40,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12045,
+     "x": 300,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12046,
+     "x": 640,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12047,
+     "x": 980,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12048,
+     "x": 300,
+     "y": 320,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12049,
+     "x": 640,
+     "y": 320,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12050,
+     "x": 980,
+     "y": 320,
+     "width": 300,
+     "height": 100
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1237,
+   "elementPlacements": [
+    {
+     "elementID": 12069,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 220
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1238,
+   "elementPlacements": [
+    {
+     "elementID": 12070,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 320
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1239,
+   "elementPlacements": [
+    {
+     "elementID": 12071,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1240,
+   "elementPlacements": [
+    {
+     "elementID": 12072,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1241,
+   "elementPlacements": [
+    {
+     "elementID": 12073,
+     "x": 40,
+     "y": 40,
+     "width": 420,
+     "height": 160
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12039
+    },
+    {
+     "package": "{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11919,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+     "type": "InteractionOccurrence",
+     "name": "ref SR ProcessRequest",
+     "classifierID": 11961
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$17[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$17[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$17[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1228,
+   "elementPlacements": [
+    {
+     "element": "$17[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$17[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$17[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$17[3]",
+     "x": 480,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1228,
+   "messages": [
+    {
+     "source": "$17[0]",
+     "target": "$17[1]",
+     "seqNo": 1,
+     "name": "uloží req-<id>.json do requests\\"
+    },
+    {
+     "source": "$17[1]",
+     "target": "$17[2]",
+     "seqNo": 2,
+     "operation": 1289
+    },
+    {
+     "source": "$17[1]",
+     "target": "$17[0]",
+     "seqNo": 3,
+     "name": "res-<id>.json (done | error | confirm_required)"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1228
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11919,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+     "type": "InteractionOccurrence",
+     "name": "ref SR ProcessRequest",
+     "classifierID": 11961
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$22[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$22[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$22[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1229,
+   "elementPlacements": [
+    {
+     "element": "$22[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$22[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$22[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$22[3]",
+     "x": 480,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1229,
+   "messages": [
+    {
+     "source": "$22[0]",
+     "target": "$22[1]",
+     "seqNo": 1,
+     "name": "Ano / Ne / Storno v okně pumpy"
+    },
+    {
+     "source": "$22[1]",
+     "target": "$22[2]",
+     "seqNo": 2,
+     "operation": 1290
+    },
+    {
+     "source": "$22[1]",
+     "target": "$22[0]",
+     "seqNo": 3,
+     "name": "výsledek na konzoli a v Output tabu"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1229
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+     "type": "InteractionOccurrence",
+     "name": "ref SR ProcessRequest",
+     "classifierID": 11961
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$27[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$27[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$27[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1230,
+   "elementPlacements": [
+    {
+     "element": "$27[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$27[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$27[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$27[3]",
+     "x": 480,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1230,
+   "messages": [
+    {
+     "source": "$27[0]",
+     "target": "$27[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Zpracovat dávku ze schránky"
+    },
+    {
+     "source": "$27[1]",
+     "target": "$27[2]",
+     "seqNo": 2,
+     "operation": 1289
+    },
+    {
+     "source": "$27[1]",
+     "target": "$27[0]",
+     "seqNo": 3,
+     "name": "dialog + chat ACK ve schránce"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1230
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+     "type": "InteractionOccurrence",
+     "name": "ref SR ProcessRequest",
+     "classifierID": 11961
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$32[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$32[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$32[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1231,
+   "elementPlacements": [
+    {
+     "element": "$32[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$32[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$32[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$32[3]",
+     "x": 480,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1231,
+   "messages": [
+    {
+     "source": "$32[0]",
+     "target": "$32[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Zpracovat dávky ze složky"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[2]",
+     "seqNo": 2,
+     "operation": 1289
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[0]",
+     "seqNo": 3,
+     "name": "souhrn počtů v dialogu"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1231
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$37[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$37[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$37[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1232,
+   "elementPlacements": [
+    {
+     "element": "$37[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$37[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$37[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1232,
+   "messages": [
+    {
+     "source": "$37[0]",
+     "target": "$37[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Kontext výběru do schránky"
+    },
+    {
+     "source": "$37[1]",
+     "target": "$37[2]",
+     "seqNo": 2,
+     "operation": 1316
+    },
+    {
+     "source": "$37[1]",
+     "target": "$37[0]",
+     "seqNo": 3,
+     "name": "věta + JSON eafb-context ve schránce"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1232
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$42[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$42[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$42[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1233,
+   "elementPlacements": [
+    {
+     "element": "$42[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$42[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$42[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1233,
+   "messages": [
+    {
+     "source": "$42[0]",
+     "target": "$42[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Stav bridge"
+    },
+    {
+     "source": "$42[1]",
+     "target": "$42[2]",
+     "seqNo": 2,
+     "operation": 1294
+    },
+    {
+     "source": "$42[1]",
+     "target": "$42[0]",
+     "seqNo": 3,
+     "name": "dialog Stav bridge"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1233
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12040
+    },
+    {
+     "package": "{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$47[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$47[1]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1234,
+   "elementPlacements": [
+    {
+     "element": "$47[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$47[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1234,
+   "messages": [
+    {
+     "source": "$47[0]",
+     "target": "$47[1]",
+     "seqNo": 1,
+     "name": "dvojklik na řádek Output tabu AI Bridge"
+    },
+    {
+     "source": "$47[1]",
+     "target": "$47[1]",
+     "seqNo": 2,
+     "name": "vybere prvek podle markeru (el:|pkg:|dgm:ID) v Project browseru"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1234
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12041
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11919,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11932,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$52[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$52[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$52[2]",
+     "name": ""
+    },
+    {
+     "elementID": "$52[3]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1235,
+   "elementPlacements": [
+    {
+     "element": "$52[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$52[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$52[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$52[3]",
+     "x": 730,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1235,
+   "messages": [
+    {
+     "source": "$52[0]",
+     "target": "$52[1]",
+     "seqNo": 1,
+     "name": "dávka deploy_src do requests\\ (nebo bootstrap skript v EA)"
+    },
+    {
+     "source": "$52[1]",
+     "target": "$52[2]",
+     "seqNo": 2,
+     "operation": 1289
+    },
+    {
+     "source": "$52[1]",
+     "target": "$52[3]",
+     "seqNo": 3,
+     "operation": 1358
+    },
+    {
+     "source": "$52[1]",
+     "target": "$52[0]",
+     "seqNo": 4,
+     "name": "res + reloadCode → pumpa přenačte kód"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1235
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 12041
+    },
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11920,
+     "stereotypes": "IDS-Client"
+    },
+    {
+     "package": "{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11925,
+     "stereotypes": "IDS-Engine"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": "$57[0]",
+     "name": ""
+    },
+    {
+     "elementID": "$57[1]",
+     "name": ""
+    },
+    {
+     "elementID": "$57[2]",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1236,
+   "elementPlacements": [
+    {
+     "element": "$57[0]",
+     "x": 40,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$57[1]",
+     "x": 270,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    },
+    {
+     "element": "$57[2]",
+     "x": 500,
+     "y": 40,
+     "width": 150,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1236,
+   "messages": [
+    {
+     "source": "$57[0]",
+     "target": "$57[1]",
+     "seqNo": 1,
+     "name": "menu AI Bridge → Úklid automatických baselines"
+    },
+    {
+     "source": "$57[1]",
+     "target": "$57[2]",
+     "seqNo": 2,
+     "operation": 1310
+    },
+    {
+     "source": "$57[1]",
+     "target": "$57[0]",
+     "seqNo": 3,
+     "name": "výčet smazaných záloh v Output tabu"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1236
+  }
+ ]
+}

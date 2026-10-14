@@ -1,0 +1,614 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-31a-fa-scenare",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_constraints",
+   "element": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+   "constraints": [
+    {
+     "name": "PRE95101-1 Pumpa běží nad otevřeným repozitářem",
+     "type": "Pre-condition",
+     "notes": "Pumpa je spuštěná nad stejným projektem EA, jaký byl otevřen při jejím startu, a kód bridge je v modelu nasazený (prvek AICodeBridge)."
+    },
+    {
+     "name": "PRE95101-2 Agent zná identitu repozitáře",
+     "type": "Pre-condition",
+     "notes": "Agent předtím provedl ping (UC kotva session) a zná repository, cíl zápisu a poznámky pro agenta."
+    },
+    {
+     "name": "PST95101-1 Odpověď a audit",
+     "type": "Post-condition",
+     "notes": "Existuje responses\\res-<id>.json se stavem done | error | confirm_required a Artifact auditu v #AI-LOG; dávka je v processed\\, rejected\\ nebo pending\\."
+    },
+    {
+     "name": "PST95101-2 Změny jsou vidět",
+     "type": "Post-condition",
+     "notes": "Změny jsou v Output tabu AI Bridge a dotčené prvky nesou razítko ai.request."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+   "requirements": [
+    {
+     "name": "BRU95101-1 Jen soubory req-*.json",
+     "notes": "Pumpa bere jen soubory přímo v requests\\ se jménem req-*.json; podsložky (pending, processing, processed, rejected) strukturálně přeskakuje, ostatní soubory hlásí jako ignorované.",
+     "type": "Functional",
+     "status": "Approved"
+    },
+    {
+     "name": "BRU95101-2 Odpověď je zdroj pravdy",
+     "notes": "Agent čte výsledek výhradně z res-*.json (pumpa chat ACK netvoří); čeká déle, než trvá dotaz nebo potvrzení člověkem, a stav pumpy sleduje přes pump-status.json (aliveUntil).",
+     "type": "Functional",
+     "status": "Approved"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{71A761BA-9698-4bae-BB01-1A246DB6437F}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "Agent uloží dávku req-<id>.json do složky requests.",
+       "kind": "actor"
+      },
+      {
+       "text": "Pumpa soubor převezme, zapíše stavový res-<id>.json (processing) a předá cestu bridge v EA.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém ověří protokol a repozitář, přístup uživatele a povolené operace.",
+       "kind": "system",
+       "uses": "BRU-9504, BRU-9508"
+      },
+      {
+       "text": "Systém provede předběžnou kontrolu dávky bez okna.",
+       "kind": "system",
+       "uses": "BRU-9505"
+      },
+      {
+       "text": "Systém klasifikuje riziko dávky.",
+       "kind": "system",
+       "uses": "BRU-9501"
+      },
+      {
+       "text": "Systém naplánuje a pořídí zálohu nejbližších vlastnických balíčků.",
+       "kind": "system",
+       "uses": "BRU-9503"
+      },
+      {
+       "text": "Systém provede operace dávky v pořadí a zapíše změny do modelu.",
+       "kind": "system",
+       "uses": "BRU-9509"
+      },
+      {
+       "text": "Systém spustí kontrolu kvality nad dotčenými balíčky a zapíše audit.",
+       "kind": "system",
+       "uses": "BRU-9507"
+      },
+      {
+       "text": "Systém zapíše odpověď res-<id>.json (done), přesune dávku do processed a vypíše změny do Output tabu.",
+       "kind": "system"
+      },
+      {
+       "text": "Agent přečte odpověď a pokračuje další dávkou.",
+       "kind": "actor"
+      }
+     ]
+    },
+    {
+     "name": "Dávka vyžaduje potvrzení",
+     "type": "Alternate",
+     "steps": [
+      {
+       "text": "Systém vyhodnotí dávku jako ELEVATED, přesune ji do pending a zapíše odpověď confirm_required s jednorázovým nonce.",
+       "kind": "system",
+       "uses": "BRU-9506"
+      },
+      {
+       "text": "Pumpa zobrazí potvrzovací okno analytikovi (UC-95102).",
+       "kind": "system"
+      },
+      {
+       "text": "Po rozhodnutí analytika systém dávku provede (pokračuje krokem 6) nebo zamítne (konec).",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 5
+     },
+     "join": 6
+    },
+    {
+     "name": "Dávka je jen čtecí",
+     "type": "Alternate",
+     "steps": [
+      {
+       "text": "Systém vynechá klasifikaci rizika, zálohu i kontrolu kvality a odpoví výsledkem čtení (bez okna); audit se zapíše.",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 4
+     },
+     "join": 9
+    },
+    {
+     "name": "Dávka odmítnuta před provedením",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém odpoví jednou chybou s výčtem problémů (E_UNKNOWN_OP, E_ARGS, E_BLACKLIST, E_REPO, E_ADDIN_ACCESS, E_OP_FORBIDDEN, E_DUPLICATE_ID, E_RISK_BLOCKED, E_NO_BASELINE), nic nezapíše a dávku přesune do rejected.",
+       "kind": "system"
+      },
+      {
+       "text": "Agent opraví dávku a pošle ji pod novým id.",
+       "kind": "actor"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 3
+     },
+     "join": "End"
+    },
+    {
+     "name": "Chyba uprostřed dávky",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém zastaví zbytek operací (skipped), ponechá provedené zápisy, označí dotčené prvky razítkem ai.request a vrátí partial s návodem obnovy ze zálohy.",
+       "kind": "system",
+       "uses": "BRU-9509"
+      },
+      {
+       "text": "Agent podle návodu buď pokračuje opravnou dávkou, nebo požádá analytika o obnovu z baseline.",
+       "kind": "actor"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 7
+     },
+     "join": "End"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+   "constraints": [
+    {
+     "name": "PRE95102-1 Čekající dávka",
+     "type": "Pre-condition",
+     "notes": "V requests\\pending\\ je dávka se stavem confirm_required a platným nonce (mladší než confirmMaxAgeMin)."
+    },
+    {
+     "name": "PST95102-1 Rozhodnutí zaznamenáno",
+     "type": "Post-condition",
+     "notes": "Audit nese „Potvrdil/Zamítl uživatel v okně pumpy <datum čas>“; dávka je v processed (provedena) nebo rejected (zamítnuta), nebo zůstává v pending (Storno/timeout)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+   "requirements": [
+    {
+     "name": "BRU95102-1 Souhrn musí být pravdivý",
+     "notes": "Před provedením se dávka znovu klasifikuje a otisk souhrnu z res se porovná s čerstvým; nesoulad = nové kolo okna s pravdivým souhrnem, nikdy tiché provedení.",
+     "type": "Functional",
+     "status": "Approved"
+    },
+    {
+     "name": "BRU95102-2 Výchozí volba je neškodná",
+     "notes": "Výchozí tlačítko okna je Storno (Enter = Storno); okno zůstává navrchu; timeout 300 s dávku neprovede ani nezamítne.",
+     "type": "Functional",
+     "status": "Approved"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{745DAC53-3D39-4a7e-923B-14CF33FDEC47}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "Pumpa zobrazí okno se souhrnem dávky: co se stane, kde, záloha, důvody, od kdy čeká.",
+       "kind": "system"
+      },
+      {
+       "text": "Analytik souhrn přečte a klikne Ano.",
+       "kind": "actor"
+      },
+      {
+       "text": "Systém ověří nonce a otisk, znovu klasifikuje dávku a porovná souhrn.",
+       "kind": "system",
+       "uses": "BRU-9506"
+      },
+      {
+       "text": "Systém pořídí zálohu, provede dávku, spustí kontrolu kvality a zapíše audit s potvrzením.",
+       "kind": "system",
+       "uses": "BRU-9503, BRU-9507"
+      },
+      {
+       "text": "Pumpa vypíše výsledek na konzoli a do Output tabu.",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "Zamítnutí",
+     "type": "Alternate",
+     "steps": [
+      {
+       "text": "Analytik klikne Ne.",
+       "kind": "actor"
+      },
+      {
+       "text": "Systém dávku přesune do rejected, zapíše odpověď E_RISK_REJECTED a audit ZAMITL; opakovat ji jde jen pod novým id.",
+       "kind": "system",
+       "uses": "BRU-9504"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 2
+     },
+     "join": "End"
+    },
+    {
+     "name": "Odložení",
+     "type": "Alternate",
+     "steps": [
+      {
+       "text": "Analytik klikne Storno, stiskne Enter nebo okno vyprší (300 s).",
+       "kind": "actor"
+      },
+      {
+       "text": "Systém nechá dávku čekat v pending; pumpa ji nabídne znovu po dalším průchodu nebo po startu (nejstarší první).",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 2
+     },
+     "join": "End"
+    },
+    {
+     "name": "Souhrn už neplatí",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém zjistí nesoulad otisku souhrnu nebo chybějící zálohu a místo provedení otevře nové kolo okna s důvodem (summary-mismatch, metrics-changed, baseline-missing).",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 3
+     },
+     "join": 1
+    },
+    {
+     "name": "Dávka expirovala",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém zjistí, že dávka čeká déle než confirmMaxAgeMin (480 min), odpoví E_RISK_EXPIRED a přesune ji do rejected.",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 1
+     },
+     "join": "End"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+   "constraints": [
+    {
+     "name": "PRE95103-1 Dávka ve schránce",
+     "type": "Pre-condition",
+     "notes": "Schránka obsahuje JSON dávky eafb/0.2 (může být v markdown bloku)."
+    },
+    {
+     "name": "PRE95103-2 Pumpa neběží nad touž složkou",
+     "type": "Pre-condition",
+     "notes": "Nad složkou výměny repozitáře neběží pumpa (pump-status.json aliveUntil minul) - jinak bridge import odmítne (FB_PumpAlive)."
+    },
+    {
+     "name": "PST95103-1 ACK ve schránce",
+     "type": "Post-condition",
+     "notes": "Schránka obsahuje chat ACK (status, položky s id/guid, writeCheck, kód bridge, věta kontroly kvality); dávka a odpověď jsou uloženy v požadavky/odpovědi složce výměny a audit v #AI-LOG."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+   "requirements": [
+    {
+     "name": "BRU95103-1 Dedup přes odpověď",
+     "notes": "Tatáž dávka podruhé se pozná podle konečného res-<id>.json; stejné id = E_DUPLICATE_ID.",
+     "type": "Functional",
+     "status": "Approved"
+    },
+    {
+     "name": "BRU95103-2 Nic citlivého do chatu",
+     "notes": "Chat ACK nikdy nenese nonce, plný otisk ani plný payload (W10/I3); jen identitu výsledků a kódy.",
+     "type": "Functional",
+     "status": "Approved"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{31B4A90C-1CD7-4dc3-B2C1-3C66F96AF8B7}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "Analytik zkopíruje dávku z chatu agenta do schránky.",
+       "kind": "actor"
+      },
+      {
+       "text": "Analytik spustí menu AI Bridge → Zpracovat dávku ze schránky.",
+       "kind": "actor",
+       "uses": "LS95100-1"
+      },
+      {
+       "text": "Systém přečte schránku, vyřízne JSON, ověří, že nad složkou neběží pumpa, a uloží dávku jako soubor.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém dávku zpracuje stejně jako z pumpy (UC-95101 kroky 3–8).",
+       "kind": "system"
+      },
+      {
+       "text": "Systém zobrazí dialog s výsledkem a větou kontroly kvality a zapíše chat ACK do schránky.",
+       "kind": "system",
+       "uses": "LS95103-1"
+      },
+      {
+       "text": "Analytik vloží ACK do chatu agentovi.",
+       "kind": "actor"
+      }
+     ]
+    },
+    {
+     "name": "Dávka vyžaduje potvrzení",
+     "type": "Alternate",
+     "steps": [
+      {
+       "text": "Systém zobrazí dialog EA se souhrnem jako v okně pumpy a tlačítky Ano/Ne.",
+       "kind": "system",
+       "uses": "BRU-9506"
+      },
+      {
+       "text": "Analytik rozhodne (UC-95102); po Ano systém dávku provede a pokračuje krokem 5.",
+       "kind": "actor"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 4
+     },
+     "join": 5
+    },
+    {
+     "name": "Schránka bez dávky",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém nenajde ve schránce JSON dávky a zobrazí dialog s vysvětlením; nic se nezapíše.",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 3
+     },
+     "join": "End"
+    },
+    {
+     "name": "Pumpa běží",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém zjistí běžící pumpu nad touž složkou a import odmítne s pokynem použít pumpu (soubor do requests).",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 3
+     },
+     "join": "End"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+   "constraints": [
+    {
+     "name": "PRE95104-1 Pumpa neběží",
+     "type": "Pre-condition",
+     "notes": "Nad složkou výměny neběží pumpa (FB_PumpAlive); jinak se zpracování odmítne."
+    },
+    {
+     "name": "PST95104-1 Složka zpracována",
+     "type": "Post-condition",
+     "notes": "Každý soubor req-*.json má odpověď a je přesunut do processed / rejected / pending; souhrn počtů v dialogu a Output tabu."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+   "requirements": [
+    {
+     "name": "BRU95104-1 Jeden průchod, nejstarší první",
+     "notes": "Zpracování je jednorázový průchod složkou v pořadí podle času souboru; čekající dávky z pending se nabídnou k rozhodnutí před novými.",
+     "type": "Functional",
+     "status": "Approved"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{AA1B8809-DD4A-4ddc-835C-715CCD1E6411}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "Analytik spustí menu AI Bridge → Zpracovat dávky ze složky (requests).",
+       "kind": "actor",
+       "uses": "LS95100-1"
+      },
+      {
+       "text": "Systém ověří, že neběží pumpa, a nabídne čekající dávky z pending k rozhodnutí.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém zpracuje soubory req-*.json v pořadí podle času jako v UC-95101.",
+       "kind": "system"
+      },
+      {
+       "text": "Systém zobrazí souhrn (počty done/error/čekající) a vypíše změny do Output tabu.",
+       "kind": "system"
+      }
+     ]
+    },
+    {
+     "name": "Dávka vyžaduje potvrzení",
+     "type": "Alternate",
+     "steps": [
+      {
+       "text": "Systém zobrazí dialog EA se souhrnem a Ano/Ne; analytik rozhodne (UC-95102).",
+       "kind": "system",
+       "uses": "BRU-9506"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 3
+     },
+     "join": 3
+    },
+    {
+     "name": "Pumpa běží",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém zpracování odmítne a sdělí, že nad složkou běží pumpa.",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 2
+     },
+     "join": "End"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_constraints",
+   "element": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+   "constraints": [
+    {
+     "name": "PRE95105-1 Výběr v EA",
+     "type": "Pre-condition",
+     "notes": "V Project browseru je vybraný prvek nebo balíček, nebo je otevřený diagram."
+    },
+    {
+     "name": "PST95105-1 Kontext ve schránce",
+     "type": "Post-condition",
+     "notes": "Schránka obsahuje větu + JSON {kind: eafb-context, repository, type, guid, id, name, path, branchGuid, writeCheck, selectedElements?, currentDiagram?} bez BOM."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_requirements",
+   "element": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+   "requirements": [
+    {
+     "name": "BRU95105-1 Jen identita",
+     "notes": "Kontext nese identitu a cestu, ne obsah prvků (notes, atributy) - obsah si agent vyžádá čtecí dávkou.",
+     "type": "Functional",
+     "status": "Approved"
+    },
+    {
+     "name": "BRU95105-2 writeCheck předem",
+     "notes": "Součástí kontextu je výsledek kontroly cíle zápisu (ok | kód), aby agent nenavrhoval zápis do chráněné větve.",
+     "type": "Functional",
+     "status": "Approved"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_scenarios",
+   "element": "{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+   "scenarios": [
+    {
+     "name": "Basic Path",
+     "type": "Basic Path",
+     "steps": [
+      {
+       "text": "Analytik vybere prvek, balíček nebo diagram a spustí menu AI Bridge → Kontext výběru do schránky.",
+       "kind": "actor",
+       "uses": "LS95100-1"
+      },
+      {
+       "text": "Systém zjistí výběr, cestu, větev a kontrolu cíle zápisu a zapíše větu + JSON do schránky.",
+       "kind": "system",
+       "uses": "BRU-9502"
+      },
+      {
+       "text": "Analytik vloží kontext do chatu agentovi.",
+       "kind": "actor"
+      }
+     ]
+    },
+    {
+     "name": "Nic není vybráno",
+     "type": "Exception",
+     "steps": [
+      {
+       "text": "Systém oznámí dialogem, že není co kopírovat.",
+       "kind": "system"
+      }
+     ],
+     "attachTo": {
+      "scenario": "Basic Path",
+      "step": 2
+     },
+     "join": "End"
+    }
+   ]
+  }
+ ]
+}

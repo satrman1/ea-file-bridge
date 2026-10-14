@@ -1,0 +1,1183 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re-14-realizace",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1197,
+   "elementPlacements": [
+    {
+     "elementID": 11962,
+     "x": 260,
+     "y": 30,
+     "width": 200,
+     "height": 70
+    },
+    {
+     "elementID": 11963,
+     "x": 40,
+     "y": 180,
+     "width": 260,
+     "height": 128
+    },
+    {
+     "elementID": 11964,
+     "x": 380,
+     "y": 180,
+     "width": 300,
+     "height": 260
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1199,
+   "elementPlacements": [
+    {
+     "elementID": 11966,
+     "x": 260,
+     "y": 30,
+     "width": 200,
+     "height": 70
+    },
+    {
+     "elementID": 11967,
+     "x": 40,
+     "y": 180,
+     "width": 260,
+     "height": 62
+    },
+    {
+     "elementID": 11968,
+     "x": 380,
+     "y": 180,
+     "width": 300,
+     "height": 216
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1201,
+   "elementPlacements": [
+    {
+     "elementID": 11970,
+     "x": 260,
+     "y": 30,
+     "width": 200,
+     "height": 70
+    },
+    {
+     "elementID": 11971,
+     "x": 40,
+     "y": 180,
+     "width": 260,
+     "height": 84
+    },
+    {
+     "elementID": 11972,
+     "x": 380,
+     "y": 180,
+     "width": 300,
+     "height": 216
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1203,
+   "elementPlacements": [
+    {
+     "elementID": 11974,
+     "x": 260,
+     "y": 30,
+     "width": 200,
+     "height": 70
+    },
+    {
+     "elementID": 11975,
+     "x": 40,
+     "y": 180,
+     "width": 260,
+     "height": 84
+    },
+    {
+     "elementID": 11976,
+     "x": 380,
+     "y": 180,
+     "width": 300,
+     "height": 216
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1178,
+   "elementPlacements": [
+    {
+     "elementID": 11919,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1179,
+   "elementPlacements": [
+    {
+     "elementID": 11920,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1180,
+   "elementPlacements": [
+    {
+     "elementID": 11921,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11937,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 136
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1181,
+   "elementPlacements": [
+    {
+     "elementID": 11922,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11938,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 88
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1182,
+   "elementPlacements": [
+    {
+     "elementID": 11923,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11939,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 120
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1183,
+   "elementPlacements": [
+    {
+     "elementID": 11924,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11940,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 104
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1184,
+   "elementPlacements": [
+    {
+     "elementID": 11925,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11941,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 104
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1185,
+   "elementPlacements": [
+    {
+     "elementID": 11926,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11942,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 72
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1186,
+   "elementPlacements": [
+    {
+     "elementID": 11927,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11943,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 72
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1187,
+   "elementPlacements": [
+    {
+     "elementID": 11928,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11944,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 408
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1188,
+   "elementPlacements": [
+    {
+     "elementID": 11929,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11945,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 232
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1189,
+   "elementPlacements": [
+    {
+     "elementID": 11930,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11946,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 120
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1190,
+   "elementPlacements": [
+    {
+     "elementID": 11931,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11947,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 88
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1191,
+   "elementPlacements": [
+    {
+     "elementID": 11932,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11948,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 72
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1192,
+   "elementPlacements": [
+    {
+     "elementID": 11933,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11949,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 120
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1194,
+   "elementPlacements": [
+    {
+     "elementID": 11936,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    },
+    {
+     "elementID": 11950,
+     "x": 360,
+     "y": 40,
+     "width": 360,
+     "height": 184
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11922,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11924,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11925,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11930,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11926,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11931,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 11969
+    },
+    {
+     "package": "{7259144D-99F3-4827-BAED-AF732380DDF5}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 11973
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1196,
+   "elementPlacements": [
+    {
+     "element": "$20[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[1]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[2]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[3]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[4]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[5]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[6]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[7]",
+     "x": 1110,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[8]",
+     "x": 1280,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[9]",
+     "x": 1450,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[10]",
+     "x": 1070,
+     "y": 540,
+     "width": 260,
+     "height": 50
+    },
+    {
+     "element": "$20[11]",
+     "x": 1070,
+     "y": 610,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1196,
+   "messages": [
+    {
+     "source": "$20[0]",
+     "target": "$20[1]",
+     "seqNo": 1,
+     "operation": 1289,
+     "arguments": "RequestPath"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[2]",
+     "seqNo": 2,
+     "operation": 1295,
+     "arguments": "Request, \"shape\""
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[3]",
+     "seqNo": 3,
+     "operation": 1301
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[2]",
+     "seqNo": 4,
+     "operation": 1295,
+     "arguments": "Request, \"targets\""
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[3]",
+     "seqNo": 5,
+     "operation": 1298,
+     "arguments": "Request"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[4]",
+     "seqNo": 6,
+     "operation": 1303,
+     "arguments": "Request"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[5]",
+     "seqNo": 7,
+     "operation": 1307,
+     "arguments": "Request, Risk"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[5]",
+     "seqNo": 8,
+     "operation": 1308,
+     "arguments": "Plan, Risk"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[6]",
+     "seqNo": 9,
+     "operation": 1353,
+     "arguments": "PackageGuid, Token, Klass"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[7]",
+     "seqNo": 10,
+     "name": "exekuce operací dávky z registru (stop-on-error)",
+     "arguments": "ops[i]"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[8]",
+     "seqNo": 11,
+     "operation": 1311,
+     "arguments": "Request, Response"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[9]",
+     "seqNo": 12,
+     "operation": 1355,
+     "arguments": "RequestId, Summary, RequestText, Human"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[9]",
+     "seqNo": 13,
+     "operation": 1357,
+     "arguments": "Response"
+    },
+    {
+     "source": "$20[1]",
+     "target": "$20[0]",
+     "seqNo": 14,
+     "isReturn": true,
+     "name": "response (done | error | confirm_required)"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1196
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11921,
+     "stereotypes": "IDS-Manager"
+    },
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11932,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1198,
+   "elementPlacements": [
+    {
+     "element": "$24[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$24[1]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$24[2]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$24[3]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1198,
+   "messages": [
+    {
+     "source": "$24[0]",
+     "target": "$24[1]",
+     "seqNo": 1,
+     "operation": 1293
+    },
+    {
+     "source": "$24[1]",
+     "target": "$24[2]",
+     "seqNo": 2,
+     "operation": 1301
+    },
+    {
+     "source": "$24[1]",
+     "target": "$24[2]",
+     "seqNo": 3,
+     "operation": 1302
+    },
+    {
+     "source": "$24[1]",
+     "target": "$24[3]",
+     "seqNo": 4,
+     "operation": 1359
+    },
+    {
+     "source": "$24[1]",
+     "target": "$24[0]",
+     "seqNo": 5,
+     "isReturn": true,
+     "name": "PingResult"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1198
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1200,
+   "elementPlacements": [
+    {
+     "element": "$28[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[1]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[2]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[3]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[4]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[5]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1200,
+   "messages": [
+    {
+     "source": "$28[0]",
+     "target": "$28[1]",
+     "seqNo": 1,
+     "operation": 1323,
+     "arguments": "Operation"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[3]",
+     "seqNo": 2,
+     "operation": 1375,
+     "notes": "resolve cílového balíčku"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[2]",
+     "seqNo": 3,
+     "operation": 1299,
+     "arguments": "PackageRef"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[5]",
+     "seqNo": 4,
+     "operation": 1383,
+     "notes": "dedup ai.dedup"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[4]",
+     "seqNo": 5,
+     "operation": 1379,
+     "notes": "resolve guid | elementID (update)"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[2]",
+     "seqNo": 6,
+     "operation": 1300,
+     "arguments": "ObjectRef, \"element\""
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[4]",
+     "seqNo": 7,
+     "operation": 1378,
+     "notes": "Package.Elements.AddNew"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[4]",
+     "seqNo": 8,
+     "operation": 1380,
+     "notes": "Element.Update"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[5]",
+     "seqNo": 9,
+     "operation": 1382,
+     "notes": "taggedValues, razítko ai.request"
+    },
+    {
+     "source": "$28[1]",
+     "target": "$28[0]",
+     "seqNo": 10,
+     "isReturn": true,
+     "name": "OpResult (items[])"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1200
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11982,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "package": "{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1202,
+   "elementPlacements": [
+    {
+     "element": "$32[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$32[1]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$32[2]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$32[3]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$32[4]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$32[5]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$32[6]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1202,
+   "messages": [
+    {
+     "source": "$32[0]",
+     "target": "$32[1]",
+     "seqNo": 1,
+     "operation": 1332,
+     "arguments": "Operation"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[3]",
+     "seqNo": 2,
+     "operation": 1379,
+     "notes": "resolve cílů"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[2]",
+     "seqNo": 3,
+     "operation": 1300,
+     "arguments": "ObjectRef, Kind"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[4]",
+     "seqNo": 4,
+     "operation": 1395,
+     "notes": "kaskády SQL (vazby, instance)"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[4]",
+     "seqNo": 5,
+     "operation": 1397,
+     "notes": ""
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[5]",
+     "seqNo": 6,
+     "operation": 1401,
+     "notes": ""
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[3]",
+     "seqNo": 7,
+     "operation": 1381,
+     "notes": "Package.Elements.DeleteAt"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[6]",
+     "seqNo": 8,
+     "operation": 1377,
+     "notes": "Packages.DeleteAt"
+    },
+    {
+     "source": "$32[1]",
+     "target": "$32[0]",
+     "seqNo": 9,
+     "isReturn": true,
+     "name": "OpResult (items[], removed[], cascades[])"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1202
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11961,
+     "notes": "Servisní realizace operace ProcessRequest - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nVětve: chyba předběžné kontroly / E_BLACKLIST = odpověď error bez okna; ELEVATED = dávka do pending\\, odpověď confirm_required a pokračování přes ConfirmPending (okno pumpy); BLOCKED = error. Zápisová část (baseline, exekuce, QC, audit) běží jen u LOW nebo potvrzené dávky."
+    },
+    {
+     "elementID": 11965,
+     "notes": "Servisní realizace operace Ping - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nPing je čtecí operace bez risk gate a bez auditu zápisu; identitu repozitáře bere z FB_RepoId (Utility)."
+    },
+    {
+     "elementID": 11969,
+     "notes": "Servisní realizace operace CreateOrUpdateElements - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nAs-implemented: Resource Access sám volá Write Scope Engine (CheckWrite / CheckWriteElement) - opačný směr volání vůči IDesign; nález pro člověka, ne oprava."
+    },
+    {
+     "elementID": 11973,
+     "notes": "Servisní realizace operace DeleteFromModel - průběh odvozený z kódu (as-implemented, src @ v0.21 (45de928)).\nKaskády do chráněné části: cascadeDelete block = E_BLACKLIST už v předběžné kontrole; allow = cascades[] v odpovědi a varování v okně."
+    }
+   ]
+  }
+ ]
+}
