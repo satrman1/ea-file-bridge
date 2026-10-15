@@ -13,11 +13,12 @@
 return [
     { repo: "EAEXAMPLE.QEA", checks: [
         // N-RE-9 (v0.22): prazdne jmeno je metodicky SPRAVNE u nepojmenovanych instanci
-        // (lifeline Object/Sequence s classifierem = ':Classifier'), refu (InteractionOccurrence),
-        // hranice (Boundary) a gatu (MessageEndpoint) - ty se nehlasi
+        // s classifierem (':Classifier' - lifeline Object/Sequence, po apply_classifier_stereotypes
+        // i Component/Actor; zive 15. 10. naslo 9 lifelin typu Component), refu
+        // (InteractionOccurrence), hranice (Boundary) a gatu (MessageEndpoint) - ty se nehlasi
         { id: "QC-DEMO-001", desc: "Element bez jmena v dotcenych packages",
           sql: "SELECT o.Object_ID FROM t_object o INNER JOIN t_package p ON o.Package_ID = p.Package_ID WHERE p.Name IN ($PKGNAMES) AND (o.Name IS NULL OR o.Name = '')"
-             + " AND NOT (o.Object_Type IN ('Object','Sequence') AND o.Classifier > 0)"
+             + " AND (o.Classifier IS NULL OR o.Classifier = 0)"
              + " AND o.Object_Type NOT IN ('InteractionOccurrence','Boundary','MessageEndpoint')" }
     ] }
 ];
