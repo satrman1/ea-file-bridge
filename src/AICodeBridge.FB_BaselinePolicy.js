@@ -439,10 +439,18 @@ for (i = 0; i < req.ops.length; i++) {
         for (j = 0; j < lst.length; j++) {
             var mv = lst[j];
             var mvRef = (mv !== null && typeof mv == "object") ? (mv.element || mv.guid || mv.elementID) : mv;
-            var mvPkg = (mv !== null && typeof mv == "object" && !blank(mv["package"])) ? mv["package"] : o["package"];
+            var mvIt = (mv !== null && typeof mv == "object" && (!blank(mv["package"]) || !blank(mv.owningElement)));
+            var mvPkg = mvIt ? mv["package"] : o["package"];
+            var mvOwn = mvIt ? mv.owningElement : o.owningElement; // v0.22 (N-RE-17): cil pod prvkem -> balicek vlastnika
             addEl(mvRef, ctx + ".elements[" + j + "]", i, name + " (zdroj)");
-            var tp = pkgRow(mvPkg, ctx + ".elements[" + j + "].package", i);
-            if (tp && !tp.own) { addPkgId(tp.id, name + " (cil)"); }
+            if (!blank(mvOwn)) {
+                var opk = elPkgRaw(mvOwn);
+                if (opk > 0) { addPkgId(opk, name + " (cil = balicek vlastnika)"); }
+                else { addEl(mvOwn, ctx + ".elements[" + j + "].owningElement", i, name + " (cil = vlastnik)"); }
+            } else {
+                var tp = pkgRow(mvPkg, ctx + ".elements[" + j + "].package", i);
+                if (tp && !tp.own) { addPkgId(tp.id, name + " (cil)"); }
+            }
         }
     } else if (sc.scope == "clonePkg") {
         volumeUnknown = true;

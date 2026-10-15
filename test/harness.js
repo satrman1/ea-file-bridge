@@ -6595,6 +6595,15 @@ t("RE-11/RE-17 P2: refRe ve vsech kontrolach prijima .compositeDiagram; FB_Field
     eq(fa.warnings.length, 0, JSON.stringify(fa.warnings));
 });
 
+t("RE-gate (zive 15. 10.): presmerovani konce zpravy (source/target) zachova SeqNo, kdyz davka seqNo neuvadi (EA ho jinak vynuluje); explicitni seqNo ma prednost", function () {
+    var repo = scopeRepo();
+    var cn = repo.GetConnectorByID(302); cn.Type = "Sequence"; cn.SequenceNo = 7; cn.TransitionEvent = ""; cn.TransitionGuard = ""; cn.TransitionAction = "";
+    var r = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ connectorID: 302, source: 22 }] }, "re-g1"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 300)); eq(cn.ClientID, 22); eq(cn.SequenceNo, 7, "poradi zachovano");
+    var r2 = withScope(scopeBL(), function () { return B.FB_OpMessages.call(B, repo, { op: "create_or_update_messages", messages: [{ connectorID: 302, target: 14, seqNo: 3 }] }, "re-g2"); });
+    eq(r2.status, "ok"); eq(cn.SequenceNo, 3, "explicitni seqNo");
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");

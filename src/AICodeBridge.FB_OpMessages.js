@@ -229,8 +229,14 @@ for (var i = 0; i < op.messages.length; i++) {
         created = true;
     } else {
         if (name !== null) { conn.Name = name; }
+        // LEKCE 15. 10. 2026 (zive, gaty na SR): zmena konce zpravy (ClientID/SupplierID)
+        // vynuluje v EA SeqNo -> zprava vyskoci na zacatek sekvence. Poradi se proto
+        // zachova, kdyz davka seqNo neuvadi.
+        var keepSeq = -1;
+        if (ns != null || nt != null) { try { keepSeq = parseInt(conn.SequenceNo, 10); } catch (eKs) { keepSeq = -1; } }
         if (ns != null) { conn.ClientID = ns.ElementID; }
         if (nt != null) { conn.SupplierID = nt.ElementID; }
+        if (keepSeq > 0 && typeof msg.seqNo == "undefined") { msg.seqNo = keepSeq; }
     }
     // --- kind/synch dle MCP reference: PDATA1=Sync/Async, PDATA3=Call ---
     if (typeof msg.isAsynchronous != "undefined") {
