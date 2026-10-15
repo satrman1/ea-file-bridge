@@ -27,7 +27,7 @@
 var self = this;
 var problems = [], resolved = [], cascades = [];
 var isArr = function (v) { return Object.prototype.toString.call(v) == "[object Array]"; };
-var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
+var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid|compositeDiagram))?$/; // v0.22: .compositeDiagram (N-RE-11)
 function blank(v) { return v === null || typeof v == "undefined" || ("" + v) == ""; }
 function isDollar(v) { return typeof v == "string" && refRe.test(v); }
 function isPath(v) { return v !== null && typeof v == "object" && isArr(v.path); }

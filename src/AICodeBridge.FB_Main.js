@@ -550,18 +550,23 @@ if (pre1 && pre1.warnings && pre1.warnings.length > 0) {
 if (pre1 && pre1.ok === false) { return emitPrecheck(pre1); }
 if (pre1 && pre1.warning) { if (!resp.warnings) { resp.warnings = []; } resp.warnings.push(pre1.warning + " - predbezna kontrola preskocena, plati fail-closed Risk Gate"); }
 // --- reseni "$N" referenci: "$2" -> results[2].guid, "$2.id" -> results[2].id,
-//     "$2[1]" -> results[2].items[1].guid, "$2[1].id" -> .id ---
+//     "$2[1]" -> results[2].items[1].guid, "$2[1].id" -> .id,
+//     "$2[1].compositeDiagram" -> results[2].items[1].compositeDiagramID (N-RE-11, v0.22:
+//     kompozitni diagram prvku zalozeneho touto davkou vc. auto-kompozitu MDG) ---
 var results = resp.results;
 function refValue(m) {
     var idx = parseInt(m[1], 10);
     if (idx >= results.length) { return null; }
     var r = results[idx];
+    var src = r;
     if (typeof m[2] != "undefined" && m[2] !== "" && m[2] !== null) {
-        var it = (r.items && r.items[parseInt(m[2], 10)]) || null;
-        if (it == null) { return null; }
-        return (m[3] == "id") ? it.id : it.guid;
+        src = (r.items && r.items[parseInt(m[2], 10)]) || null;
+        if (src == null) { return null; }
+    } else if (m[3] == "compositeDiagram" && r.items && r.items.length > 0 && typeof r.compositeDiagramID == "undefined") {
+        src = r.items[0];
     }
-    return (m[3] == "id") ? r.id : r.guid;
+    if (m[3] == "compositeDiagram") { return (typeof src.compositeDiagramID != "undefined") ? src.compositeDiagramID : null; }
+    return (m[3] == "id") ? src.id : src.guid;
 }
 // napoveda k chybe odkazu (FB-PU-28): rekne agentovi, CO s tim
 function refHint(m, v) {
@@ -570,17 +575,24 @@ function refHint(m, v) {
     var r = results[idx];
     var rop = "" + (r.op || "?");
     if (r.status != "ok") { return "odkaz " + v + ": operace ops[" + idx + "] (" + rop + ") skoncila " + (r.status || "?") + (r.code ? " " + r.code : "") + " - nema vysledek, na ktery by slo odkazat"; }
+    var noComposite = "nenese compositeDiagramID - prvek nema kompozitni diagram (kompozit vznika u MDG typu s kompozitem, nebo s isComposite/compositeDiagram v davce)";
     if (typeof m[2] != "undefined" && m[2] !== "" && m[2] !== null) {
         var n = (r.items && r.items.length) ? r.items.length : 0;
+        var itx = (r.items && r.items[parseInt(m[2], 10)]) || null;
+        if (itx != null) {
+            if (m[3] == "compositeDiagram") { return "odkaz " + v + ": polozka items[" + m[2] + "] vysledku ops[" + idx + "] (" + rop + ") " + noComposite; }
+            return "odkaz " + v + ": polozka items[" + m[2] + "] vysledku ops[" + idx + "] (" + rop + ") nenese " + (m[3] == "id" ? "id" : "guid");
+        }
         return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") ma " + n + " polozek items - index [" + m[2] + "] je mimo rozsah" + (n > 0 ? " (povolene 0.." + (n - 1) + ")" : "");
     }
-    if (r.items && r.items.length > 0) { return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") nema guid na urovni operace, ma items[] (" + r.items.length + ") - pouzij " + v.replace(/\.(id|guid)$/, "") + "[0]" + (m[3] ? "." + m[3] : ""); }
+    if (m[3] == "compositeDiagram") { return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") " + noComposite; }
+    if (r.items && r.items.length > 0) { return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") nema guid na urovni operace, ma items[] (" + r.items.length + ") - pouzij " + v.replace(/\.(id|guid|compositeDiagram)$/, "") + "[0]" + (m[3] ? "." + m[3] : ""); }
     return "odkaz " + v + ": vysledek ops[" + idx + "] (" + rop + ") nenese " + (m[3] == "id" ? "id" : "guid") + " (cteci operace vraci seznam, zapisova guid) - zkontroluj, na co odkazujes";
 }
 function resolveRefs(v) {
     if (v === null || typeof v == "undefined") { return v; }
     if (typeof v == "string") {
-        var m = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/.exec(v);
+        var m = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid|compositeDiagram))?$/.exec(v);
         if (m) {
             var rv = refValue(m);
             if (rv === null || typeof rv == "undefined") { throw new Error("Odkaz " + v + " nelze rozresolvovat: " + refHint(m, v) + "."); }
@@ -1182,7 +1194,12 @@ try {
             if (ogr.items && Object.prototype.toString.call(ogr.items) == "[object Array]") {
                 for (var oi = 0; oi < ogr.items.length; oi++) {
                     var oit = ogr.items[oi];
-                    if (oit && oit.created === true && oit.guid) { this._fbOwnGuids[("" + oit.guid).toUpperCase()] = 1; ownAdd++; }
+                    if (oit && oit.created === true && oit.guid) {
+                        this._fbOwnGuids[("" + oit.guid).toUpperCase()] = 1; ownAdd++;
+                        // N-RE-6 (v0.22): auto-kompozit MDG (UCR, LS, UC detail...) vznika s prvkem
+                        // teze session -> je vlastni; bez toho sel kazdy place na nej oknem (foreignDiagrams)
+                        if (oit.compositeDiagramGUID) { this._fbOwnGuids[("" + oit.compositeDiagramGUID).toUpperCase()] = 1; ownAdd++; }
+                    }
                 }
             }
         }

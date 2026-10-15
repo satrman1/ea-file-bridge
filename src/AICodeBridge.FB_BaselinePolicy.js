@@ -132,7 +132,7 @@ function blank(v) { return v === null || typeof v == "undefined" || ("" + v) == 
 // odchylka smi vest jen k `unknown`. B3 (Z261004b-10): u ne-vlastniho $N se
 // pro ZALOHU vezme balicek cile predchozi operace, je-li znam z jeji definice
 // (dollarPkg) - rozsah je pak znamy, ne "unknown".
-var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
+var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid|compositeDiagram))?$/; // v0.22: .compositeDiagram (N-RE-11)
 function dollarOwn(ref, opIdx) {
     var m = refRe.exec("" + ref);
     if (!m) { return null; }              // neni $N

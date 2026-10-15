@@ -39,7 +39,7 @@ function prob(opIdx, pth, code, msg, extra) {
 function isArr(v) { return Object.prototype.toString.call(v) == "[object Array]"; }
 function has(o, k) { return o && typeof o[k] != "undefined" && o[k] !== null && ("" + o[k]) != ""; }
 function nonEmptyArr(o, k) { return o && isArr(o[k]) && o[k].length > 0; }
-var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
+var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid|compositeDiagram))?$/; // v0.22: .compositeDiagram (N-RE-11)
 var guidRe = /^\{[^{}<>]{3,}\}$/; // tvar {…} = odkaz GUIDem (stejne kriterium jako resolvery: prvni znak '{'); zastupne {GUID-…} chyta placeholder() driv
 var bareGuidRe = /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/; // FB-PU-30: GUID bez zavorek
 var badBraceRe = /^\{(?![A-Za-z0-9-]+\}$)/; // zacina { ale uvnitr jsou cizi znaky / chybi }

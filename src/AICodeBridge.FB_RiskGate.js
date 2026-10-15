@@ -295,7 +295,7 @@ function pushPath(kind, id, nm) {
 }
 
 // --- klasifikace $N reference (B3): OWN | EXISTING | UNCERTAIN ---
-var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid))?$/;
+var refRe = /^\$(\d+)(?:\[(\d+)\])?(?:\.(id|guid|compositeDiagram))?$/; // v0.22: .compositeDiagram (N-RE-11)
 var opIndex = 0;
 function classifyDollar(m) {
     var idx = parseInt(m[1], 10);
