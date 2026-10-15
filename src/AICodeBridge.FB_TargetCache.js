@@ -34,6 +34,8 @@ var bucket = (k == "package") ? C.pkg : ((k == "diagram") ? C.dgm : C.el);
 function esc(s) { return ("" + s).replace(/'/g, "''"); }
 function rows(sql) { C.queries++; return self.FB_XmlRows(Repository.SQLQuery(sql)); }
 function num(v) { var n = parseInt(v, 10); return isNaN(n) ? 0 : n; }
+// v0.22: prazdne jmeno (nepojmenovana instance) - radek XML sloupec nenese -> "" misto "undefined" (zive 15. 10., okno pumpy)
+function nm(v) { return (typeof v == "undefined" || v === null) ? "" : ("" + v); }
 // --- cesta (jen balicky) ---
 if (ref !== null && typeof ref == "object" && Object.prototype.toString.call(ref.path) == "[object Array]") {
     var pkey = "path:" + ref.path.join("\u0001") + "|" + ("" + (ref.from === null || typeof ref.from == "undefined" ? "" : ref.from));
@@ -61,7 +63,7 @@ try {
         else { rr = rows("SELECT Package_ID, Parent_ID, ea_guid, Name FROM t_package WHERE Name = '" + esc(t) + "'"); }
         for (var i = 0; rr != null && i < rr.length; i++) {
             if (byName && typeof rr[i].Name != "undefined" && ("" + rr[i].Name) !== t) { continue; } // W7: presna shoda v JS (radek bez Name = predfiltr bez moznosti overeni)
-            cands.push({ guid: "" + rr[i].ea_guid, id: num(rr[i].Package_ID), parentId: num(rr[i].Parent_ID), name: "" + rr[i].Name });
+            cands.push({ guid: "" + rr[i].ea_guid, id: num(rr[i].Package_ID), parentId: num(rr[i].Parent_ID), name: nm(rr[i].Name) });
         }
     } else if (k == "diagram") {
         if (t.charAt(0) == "{") { rr = rows("SELECT Diagram_ID, ea_guid, Package_ID, ParentID, Name FROM t_diagram WHERE ea_guid = '" + esc(t) + "'"); }
@@ -69,7 +71,7 @@ try {
         else { rr = rows("SELECT Diagram_ID, ea_guid, Package_ID, ParentID, Name FROM t_diagram WHERE Name = '" + esc(t) + "'"); }
         for (var d = 0; rr != null && d < rr.length; d++) {
             if (byName && typeof rr[d].Name != "undefined" && ("" + rr[d].Name) !== t) { continue; }
-            cands.push({ guid: "" + rr[d].ea_guid, id: num(rr[d].Diagram_ID), pkgId: num(rr[d].Package_ID), parentId: num(rr[d].ParentID), name: "" + rr[d].Name });
+            cands.push({ guid: "" + rr[d].ea_guid, id: num(rr[d].Diagram_ID), pkgId: num(rr[d].Package_ID), parentId: num(rr[d].ParentID), name: nm(rr[d].Name) });
         }
     } else {
         if (t.charAt(0) == "{") { rr = rows("SELECT Object_ID, ea_guid, Package_ID, ParentID, Object_Type, Name FROM t_object WHERE ea_guid = '" + esc(t) + "'"); }
@@ -77,7 +79,7 @@ try {
         else { rr = rows("SELECT Object_ID, ea_guid, Package_ID, ParentID, Object_Type, Name FROM t_object WHERE Name = '" + esc(t) + "'"); }
         for (var e = 0; rr != null && e < rr.length; e++) {
             if (byName && typeof rr[e].Name != "undefined" && ("" + rr[e].Name) !== t) { continue; }
-            cands.push({ guid: "" + rr[e].ea_guid, id: num(rr[e].Object_ID), pkgId: num(rr[e].Package_ID), parentId: num(rr[e].ParentID), type: "" + rr[e].Object_Type, name: "" + rr[e].Name });
+            cands.push({ guid: "" + rr[e].ea_guid, id: num(rr[e].Object_ID), pkgId: num(rr[e].Package_ID), parentId: num(rr[e].ParentID), type: "" + rr[e].Object_Type, name: nm(rr[e].Name) });
         }
     }
 } catch (eQ) { cands = []; }

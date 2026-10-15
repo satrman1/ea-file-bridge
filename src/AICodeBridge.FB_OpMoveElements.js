@@ -256,11 +256,29 @@ for (var i = 0; i < plan.length; i++) {
         : (e.PackageID == tp.PackageID);
     if (!already) {
         try {
-            if (p.owner != null) { e.ParentID = p.owner.ElementID; }
-            e.PackageID = tp.PackageID;
-            if (!e.Update()) {
-                return { op: "move_elements", status: "error", code: "E_EXCEPTION",
-                    message: "elements[" + p.idx + "]: Update selhal: " + e.GetLastError(), items: items };
+            // LEKCE 15. 10. 2026 (zive, N-RE-17): zapis PackageID (i na stejnou hodnotu)
+            // bere EA jako presun do balicku a ParentID pri Update vynuluje - proto
+            // PackageID jen kdyz se lisi, a ParentID vzdy az ve VLASTNIM Update.
+            if (e.PackageID != tp.PackageID) {
+                e.PackageID = tp.PackageID;
+                if (!e.Update()) {
+                    return { op: "move_elements", status: "error", code: "E_EXCEPTION",
+                        message: "elements[" + p.idx + "]: Update (PackageID) selhal: " + e.GetLastError(), items: items };
+                }
+            }
+            if (p.owner != null && e.ParentID != p.owner.ElementID) {
+                e.ParentID = p.owner.ElementID;
+                if (!e.Update()) {
+                    return { op: "move_elements", status: "error", code: "E_EXCEPTION",
+                        message: "elements[" + p.idx + "]: Update (ParentID) selhal: " + e.GetLastError(), items: items };
+                }
+                // readback z modelu - EA umi Update vratit true a ParentID nezapsat
+                var chkE = null;
+                try { chkE = Repository.GetElementByID(e.ElementID); } catch (eRb) { chkE = null; }
+                if (chkE != null && chkE.ParentID != p.owner.ElementID) {
+                    return { op: "move_elements", status: "error", code: "E_EXCEPTION",
+                        message: "elements[" + p.idx + "]: EA nezapsal vlastnika (ParentID zustal " + chkE.ParentID + ") - prvek zustava, kde byl.", items: items };
+                }
             }
         } catch (eMv) {
             return { op: "move_elements", status: "error", code: "E_EXCEPTION",

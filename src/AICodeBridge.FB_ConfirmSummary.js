@@ -62,8 +62,13 @@ if (del > 0) {
     head = "AI chce SMAZAT " + pl(del, "cil", "cile", "cilu") + " z modelu a potrebuje tvuj souhlas.";
 } else if (mov > 0) {
     // iterace 6: presun je zasah do STRUKTURY - dialog to musi rict rovnou
-    head = "AI chce PRESUNOUT " + pl(mov, "prvek", "prvky", "prvku") + " mezi balicky"
-        + (pkgs.length > 0 ? " (" + pkgs.join(" / ") + ")" : "") + " a potrebuje tvuj souhlas.";
+    // v0.22 (N-RE-17): cil presunu muze byt i vlastnici prvek (owningElement)
+    var ownersAll = [];
+    for (var oa = 0; oa < (sm.actions || []).length; oa++) { var acO = sm.actions[oa]; if (acO && acO.op == "move_elements" && acO.owners) { for (var ob = 0; ob < acO.owners.length; ob++) { ownersAll.push(acO.owners[ob]); } } }
+    head = "AI chce PRESUNOUT " + pl(mov, "prvek", "prvky", "prvku")
+        + (ownersAll.length > 0 ? " pod jiny prvek ve stromu (" + ownersAll.join(" / ") + (pkgs.length > 0 ? "; balicky " + pkgs.join(" / ") : "") + ")"
+                                : " mezi balicky" + (pkgs.length > 0 ? " (" + pkgs.join(" / ") + ")" : ""))
+        + " a potrebuje tvuj souhlas.";
 } else {
     head = "AI chce zapsat do modelu a potrebuje tvuj souhlas.";
 }
@@ -168,7 +173,10 @@ function actionSentence(ac) {
             return sd.length ? sd.join(" a ") : "zapise diagram";
         }
         case "place_elements_on_diagram": return "umisti " + pl(n, "prvek", "prvky", "prvku") + (dg ? " na diagram " + dg : " na diagram");
-        case "move_elements": return "PRESUNE " + pl(n, "prvek", "prvky", "prvku") + (tg ? " " + tg : "") + (pk ? " mezi balicky " + pk : "");
+        case "move_elements": {
+            var ow = (ac.owners && ac.owners.length) ? names(ac.owners, 0) : "";
+            return "PRESUNE " + pl(n, "prvek", "prvky", "prvku") + (tg ? " " + tg : "") + (ow ? " pod prvek " + ow : "") + (pk ? (ow ? " (balicky " + pk + ")" : " mezi balicky " + pk) : "");
+        }
         case "apply_classifier_stereotypes": return "upravi stereotypy prvku podle klasifikatoru" + (dg ? " na diagramu " + dg : "");
         case "find_or_create_referencing_sr": return "zalozi kostru realizace sluzby (balicek, diagramy, prvky, vazby)" + (pk ? " v " + pk : "") + " - pokud uz neexistuje";
         case "deploy_src": return "nasadi kod bridge do modelu (" + (typeof ac.files == "number" && ac.files > 0 ? ac.files + " operaci" : "rozsah nespocitan") + ")";

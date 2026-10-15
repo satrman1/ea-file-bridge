@@ -6505,6 +6505,14 @@ t("RE-17 N-RE-17: move_elements s cilem owningElement - ParentID = vlastnik, Pac
     var e3 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-LL}", elements: ["{EL-SR}"] }, "re17g"); });
     eq(e3.code, "E_ARGS", JSON.stringify(e3).substring(0, 300)); contains(e3.message, "cyklus");
     eq(sr.ParentID, 0, "nic se nepresunulo");
+    // EA vrati z Update true, ale ParentID nezapise (zive 15. 10.) -> E_EXCEPTION, ne tiche "moved"
+    var oG = repo.GetElementByID; var ll2 = repo.GetElementByID(12001);
+    var rbCalls = 0; repo.GetElementByID = function (id) { var x = oG(id); if (x === ll2 && ll2.ParentID == 11961) { rbCalls++; return { ElementID: 12001, ParentID: 0, PackageID: 2 }; } return x; };
+    try {
+        ll2.ParentID = 0;
+        var rb = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "11961", elements: ["{EL-LL}"] }, "re17rb"); });
+        eq(rb.code, "E_EXCEPTION", JSON.stringify(rb).substring(0, 300)); contains(rb.message, "EA nezapsal vlastnika");
+    } finally { repo.GetElementByID = oG; }
     // polozka s package prebiji op.owningElement (a naopak)
     var r5 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-COMP}", elements: [{ element: "{EL-REF}", "package": "{PKG-FREE}" }] }, "re17h"); });
     eq(r5.status, "ok", JSON.stringify(r5).substring(0, 300)); eq(ref.PackageID, 2); eq(ref.ParentID, 11919, "cil balicek vlastnika nemeni (jen Package_ID)");
@@ -6519,6 +6527,10 @@ t("RE-17 P2 + Risk Gate: move_elements s owningElement projde predbeznou kontrol
             var codes = r.risk.reasonItems.map(function (x) { return x.code; }).join(",");
             ok(codes.indexOf("CLASS_ELEVATED") >= 0 && codes.indexOf("TARGET_MISSING") < 0 && codes.indexOf("EMPTY_LIST") < 0, codes);
             eq(r.risk.metrics.moveOps, 1); ok(r.risk.metrics.affectedPackages >= 2, "zdroj + balicek vlastnika: " + r.risk.metrics.affectedPackages);
+            var mvAct = null; r.risk.summary.actions.forEach(function (a) { if (a.op == "move_elements") { mvAct = a; } });
+            eq((mvAct.owners || []).join("|"), "ElB", "vlastnik v souhrnu akce"); ok(mvAct.packages.join("|").indexOf("pod ") < 0, "zadne 'pod X' mezi balicky: " + JSON.stringify(mvAct.packages));
+            var txt = "" + B.FB_ConfirmSummary.call(B, r);
+            contains(txt, "AI chce PRESUNOUT 1 prvek pod jiny prvek ve stromu (ElB"); contains(txt, "PRESUNE 1 prvek"); contains(txt, "pod prvek");
             var e1 = pumpRun(repo, [{ op: "move_elements", owningElement: "{EL-102}", "package": "{PK-12}", elements: ["{EL-101}"] }], "re17q");
             eq(e1.code, "E_ARGS", JSON.stringify(e1).substring(0, 300)); contains(e1.problems[0].message, "soucasne");
             var e2 = pumpRun(repo, [{ op: "move_elements", elements: ["{EL-101}"] }], "re17r");
@@ -6569,9 +6581,9 @@ t("RE-12 N-RE-12: prah affectedPackages nese vycet balicku (teckove cesty, max 1
         });
     } finally { B.FB_OpElements = oE; }
 });
-t("RE-9 N-RE-9: QC-DEMO-001 'Element bez jmena' vynechava nepojmenovane instance (Object/Sequence s classifierem), refy, hranice a gaty", function () {
+t("RE-9 N-RE-9: QC-DEMO-001 'Element bez jmena' vynechava nepojmenovane instance s classifierem (Object/Sequence i Component/Actor po apply_classifier_stereotypes), refy, hranice a gaty", function () {
     var cfg = B.FB_QcConfig.call(B); var sql = cfg[0].checks[0].sql;
-    contains(sql, "NOT (o.Object_Type IN ('Object','Sequence') AND o.Classifier > 0)");
+    contains(sql, "AND (o.Classifier IS NULL OR o.Classifier = 0)");
     contains(sql, "o.Object_Type NOT IN ('InteractionOccurrence','Boundary','MessageEndpoint')");
     ok(!/LEN\(/.test(sql), "zadne dialektove funkce");
 });

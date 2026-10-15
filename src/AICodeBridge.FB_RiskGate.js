@@ -760,7 +760,9 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
             if (mvOwn !== null) {
                 // cil = vlastnici prvek: jeho balicek se zapocita (addPackages), prvek sam se nemeni
                 var tow = touchElement(mvOwn, "move.elements[" + j + "].owningElement", false, true);
-                if (tow && tow.res) { actAdd("packages", "pod " + tow.res.name); }
+                if (!curAct.owners) { curAct.owners = []; }
+                var ownNm = (tow && tow.res) ? ("" + tow.res.name) : ("" + mvOwn);
+                if (ownNm != "" && curAct.owners.length < 12) { var dupO = false; for (var oq = 0; oq < curAct.owners.length; oq++) { if (curAct.owners[oq] == ownNm) { dupO = true; break; } } if (!dupO) { curAct.owners.push(ownNm); } }
             } else {
                 touchPackage(mvPkg, "move.elements[" + j + "].package", false);
             }
