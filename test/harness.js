@@ -6348,6 +6348,241 @@ t("UI-06/11: texty bez diakritiky v novych zdrojich (spike S1 nerozhodnut)", fun
     });
 });
 
+
+// ================================================================ v0.22: opravy z reverse engineeringu add-inu (Z261014b-1, nalezy N-RE-1..18)
+function reRepo() {
+    // SR (Collaboration) 11961 v package 2 s kompozitem 1196; lifeline 12001 (Object:Component 11919) v package 2;
+    // ref 12002 (InteractionOccurrence) v package 2; komponenta 11919 v package 3 s rozhranim 11937 v package 3
+    var repo = scopeRepo();
+    function el(id, pkg, parent, name, type, guid) { var e = repo._addElement({ id: id, packageID: pkg, parentID: parent, name: name, type: type, guid: guid }); e.Elements = mkColl(function (n, ty) { return mkElement({ name: n, type: ty, parentID: id, packageID: pkg }); }); e.Diagrams = mkColl(); e.SetCompositeDiagram = function (g) { e._composite = g; }; e.Name = name; return e; }
+    var sr = el(11961, 2, 0, "SR ProcessRequest", "Collaboration", "{EL-SR}");
+    sr.CompositeDiagram = { DiagramID: 1196, DiagramGUID: "{DG-SR}" };
+    el(11919, 3, 0, "EAFB Request Manager", "Component", "{EL-COMP}").Stereotype = "manager";
+    el(11937, 3, 0, "Request Manager Interface", "Interface", "{EL-IFACE}");
+    var ll = el(12001, 2, 0, "", "Object", "{EL-LL}"); ll.ClassifierID = 11919;
+    el(12002, 2, 0, "", "InteractionOccurrence", "{EL-REF}");
+    var ac = el(12039, 2, 0, "Analytik", "Actor", "{EL-ACTOR}"); ac.Stereotype = "user";
+    var la = el(12040, 2, 0, "", "Object", "{EL-LL-ACTOR}"); la.ClassifierID = 12039;
+    var dg = { DiagramID: 1196, DiagramGUID: "{DG-SR}", PackageID: 2, ParentID: 11961, Name: "SR ProcessRequest", Type: "Sequence", Notes: "", Update: function () { return true; }, GetLastError: function () { return ""; },
+        DiagramObjects: mkColl(function (pos) { var o = { ElementID: 0, left: 0, right: 0, top: 0, bottom: 0, Sequence: 0, Style: "", Update: function () { return true; }, GetLastError: function () { return ""; } };
+            var m = /l=(\d+);r=(\d+);t=(\d+);b=(\d+)/.exec("" + pos); if (m) { o.left = +m[1]; o.right = +m[2]; o.top = -m[3]; o.bottom = -m[4]; } return o; }), DiagramLinks: mkColl() };
+    var oD = repo.GetDiagramByID, oG = repo.GetDiagramByGuid;
+    repo.GetDiagramByID = function (id) { return id == 1196 ? dg : oD(id); };
+    repo.GetDiagramByGuid = function (g) { return g == "{DG-SR}" ? dg : oG(g); };
+    repo._dg = dg;
+    return repo;
+}
+t("RE-1 N-RE-1: type 'DiagramGate' | 'Gate' = Automation 'MessageEndpoint' + Subtype 2 pod vlastnikem (SR); update type DiagramGate preklada stejne; gate primo v package = warning", function () {
+    var repo = reRepo(); var sr = repo.GetElementByID(11961);
+    var seen = [];
+    sr.Elements.AddNew = function (n, ty) { seen.push(ty); var e = mkElement({ name: n === "" ? "MessageEndpoint" : n, type: ty, parentID: 11961, packageID: 2 }); sr.Elements._items.push(e); return e; };
+    var r = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ owningElement: "{EL-SR}", type: "DiagramGate", name: "" }, { owningElement: "11961", type: "Gate" }] }, "re1"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 300));
+    eq(seen.join(","), "MessageEndpoint,MessageEndpoint", "AddNew dostal Automation typ");
+    eq(sr.Elements._items[0].Subtype, 2, "gate = NType 2"); eq(sr.Elements._items[0].Name, "", "jmeno gatu zadane '' se drzi");
+    eq(sr.Elements._items[1].Subtype, 2); eq(r.items.length, 2); eq(r.items[0].created, true);
+    ok(!r.warnings, "pod vlastnikem bez varovani: " + JSON.stringify(r.warnings));
+    // update: zmena typu existujiciho prvku na gate
+    var ref = repo.GetElementByID(12002);
+    var u = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ guid: "{EL-REF}", type: "DiagramGate" }] }, "re1u"); });
+    eq(u.status, "ok"); eq(ref.Type, "MessageEndpoint"); eq(ref.Subtype, 2);
+    // gate primo v package: projde, ale varuje (nesedi na ramu diagramu)
+    var p = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ "package": "{PKG-FREE}", type: "DiagramGate", name: "" }] }, "re1p"); });
+    eq(p.status, "ok"); ok(p.warnings && /owningElement = SR/.test(p.warnings[0]), JSON.stringify(p.warnings));
+});
+t("RE-2 N-RE-2: create s name '' nenecha EA dosadit 'Object' - jmeno se zapise hned po AddNew (i pres package, i pres owningElement); bez pole name zustava vychozi EA", function () {
+    var repo = reRepo(); var pkg = repo.GetPackageByID(2);
+    pkg.Elements.AddNew = function (n, ty) { var e = mkElement({ name: (n === "" ? ty : n), type: ty, packageID: 2 }); e._nameAtFirstUpdate = null; e.Update = function () { if (e._nameAtFirstUpdate === null) { e._nameAtFirstUpdate = "" + e.Name; } return true; }; pkg.Elements._items.push(e); return e; };
+    var r = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ "package": "{PKG-FREE}", type: "Object", name: "", classifierID: 11919 }, { "package": "{PKG-FREE}", type: "Object" }] }, "re2"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 300));
+    var a = pkg.Elements._items[pkg.Elements._items.length - 2], b = pkg.Elements._items[pkg.Elements._items.length - 1];
+    eq(a.Name, "", "name '' = prazdne jmeno (lifeline ':Classifier')"); eq(a._nameAtFirstUpdate, "", "jmeno nastavene PRED prvnim Update");
+    eq(r.items[0].name, "", "readback v items");
+    eq(b.Name, "Object", "bez pole name: vychozi EA se nemeni"); eq(r.items[1].name, "Object");
+    var sr = repo.GetElementByID(11961);
+    var o = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ owningElement: "{EL-SR}", type: "Object", name: "", classifierID: 11919 }] }, "re2o"); });
+    eq(o.status, "ok"); eq(sr.Elements._items[sr.Elements._items.length - 1].Name, "");
+});
+t("RE-3 N-RE-3: place prvku, ktery uz na diagramu je = PRESUN existujiciho DiagramObject (zadny druhy AddNew), geometrie top/bottom zaporne; bez x/y noop; novy prvek = AddNew jako dosud", function () {
+    var repo = reRepo(); var dg = repo._dg;
+    var r1 = withScope(scopeBL(), function () { return B.FB_OpPlaceElements.call(B, repo, { op: "place_elements_on_diagram", diagram: 1196, elementPlacements: [{ elementID: 12002, x: 100, y: 200, width: 260, height: 50 }] }, "re3a"); });
+    eq(r1.status, "ok", JSON.stringify(r1).substring(0, 300)); eq(dg.DiagramObjects.Count, 1); eq(r1.items[0].moved, false); eq(r1.moved, 0);
+    var obj = dg.DiagramObjects.GetAt(0); eq(obj.ElementID, 12002); eq(obj.top, -200); eq(obj.bottom, -250);
+    // druhe umisteni tehoz prvku = presun
+    var r2 = withScope(scopeBL(), function () { return B.FB_OpPlaceElements.call(B, repo, { op: "place_elements_on_diagram", diagram: 1196, elementPlacements: [{ elementID: 12002, x: 1020, y: 760 }] }, "re3b"); });
+    eq(r2.status, "ok", JSON.stringify(r2).substring(0, 300)); eq(dg.DiagramObjects.Count, 1, "zadny druhy DiagramObject");
+    eq(r2.items[0].moved, true); eq(r2.moved, 1); eq(r2.items[0].from.x, 100); eq(r2.items[0].from.y, 200);
+    eq(obj.left, 1020); eq(obj.right, 1280, "sirka zustava z puvodniho objektu"); eq(obj.top, -760); eq(obj.bottom, -810);
+    // bez x/y: nic se nemeni
+    var r3 = withScope(scopeBL(), function () { return B.FB_OpPlaceElements.call(B, repo, { op: "place_elements_on_diagram", diagram: 1196, elementPlacements: [{ elementID: 12002 }] }, "re3c"); });
+    eq(r3.status, "ok"); eq(r3.items[0].moved, false); eq(obj.left, 1020); contains(r3.items[0].note, "uz na diagramu");
+    // mix: existujici + novy
+    var r4 = withScope(scopeBL(), function () { return B.FB_OpPlaceElements.call(B, repo, { op: "place_elements_on_diagram", diagram: 1196, elementPlacements: [{ elementID: 12002, x: 10, y: 10 }, { elementID: 12001, x: 300, y: 10 }] }, "re3d"); });
+    eq(r4.status, "ok"); eq(dg.DiagramObjects.Count, 2); eq(r4.moved, 1); eq(r4.items[1].moved, false); eq(r4.count, 2);
+});
+t("RE-4 N-RE-4: InteractionOccurrence s classifierem a bez jmena dostane jmeno classifieru a kompozitni odkaz na kompozit classifieru (refDiagramID); explicitni compositeDiagram ma prednost; classifier bez kompozitu = warning", function () {
+    var repo = reRepo(); var pkg = repo.GetPackageByID(2);
+    pkg.Elements.AddNew = function (n, ty) { var e = mkElement({ name: n, type: ty, packageID: 2 }); e.SetCompositeDiagram = function (g) { e._composite = g; }; pkg.Elements._items.push(e); return e; };
+    var r = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ "package": "{PKG-FREE}", type: "InteractionOccurrence", name: "", classifierID: 11961 }] }, "re4"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 300));
+    var e = pkg.Elements._items[pkg.Elements._items.length - 1];
+    eq(e.Name, "SR ProcessRequest", "jmeno z classifieru "); eq(e._composite, "{DG-SR}", "kompozitni odkaz na kompozit SR"); eq(r.items[0].refDiagramID, 1196); eq(r.items[0].name, "SR ProcessRequest");
+    // existujici ref bez jmena: update s classifier -> jmeno + odkaz
+    var ref = repo.GetElementByID(12002);
+    var u = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ guid: "{EL-REF}", classifier: "{EL-SR}" }] }, "re4u"); });
+    eq(u.status, "ok"); eq(ref.Name, "SR ProcessRequest"); eq(ref._composite, "{DG-SR}");
+    // zadane jmeno se neprepisuje; classifier bez kompozitu -> warning
+    var w = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ "package": "{PKG-FREE}", type: "InteractionOccurrence", name: "ref X", classifierID: 11919 }] }, "re4w"); });
+    eq(w.status, "ok"); eq(pkg.Elements._items[pkg.Elements._items.length - 1].Name, "ref X"); ok(w.warnings && /nema kompozitni diagram/.test(w.warnings[0]), JSON.stringify(w.warnings));
+});
+t("RE-11 N-RE-11: items nesou compositeDiagramID/GUID (Automation CompositeDiagram, jinak t_diagram.ParentID); odkaz $N[i].compositeDiagram se rozresolvuje v FB_Main, P2 ho pusti, Risk Gate ho bere jako vlastni diagram; chybejici kompozit = E_ARGS s napovedou", function () {
+    var repo = reRepo(); var pkg = repo.GetPackageByID(2);
+    pkg.Elements.AddNew = function (n, ty) { var e = mkElement({ name: n, type: ty, packageID: 2 }); if (n == "UCR-1") { e.CompositeDiagram = { DiagramID: 1228, DiagramGUID: "{DG-UCR}" }; } pkg.Elements._items.push(e); return e; };
+    repo._sqlRules.unshift({ re: /FROM t_diagram WHERE ParentID = (\d+)/i, rows: function (sql) { var m = /ParentID = (\d+)/.exec(sql); var e = null; pkg.Elements._items.forEach(function (x) { if (x.ElementID == parseInt(m[1], 10)) { e = x; } }); return (e && e.Name == "LS-1") ? [{ Diagram_ID: 1237, ea_guid: "{DG-LS}" }] : []; } });
+    var r = withScope(scopeBL(), function () { return B.FB_OpElements.call(B, repo, { op: "create_or_update_elements", elements: [{ "package": "{PKG-FREE}", type: "UseCase", name: "UCR-1" }, { "package": "{PKG-FREE}", type: "Class", name: "LS-1" }, { "package": "{PKG-FREE}", type: "Class", name: "Plain" }] }, "re11"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 300));
+    eq(r.items[0].compositeDiagramID, 1228); eq(r.items[0].compositeDiagramGUID, "{DG-UCR}");
+    eq(r.items[1].compositeDiagramID, 1237, "fallback SQL t_diagram.ParentID (auto-kompozit MDG)");
+    ok(typeof r.items[2].compositeDiagramID == "undefined", "prvek bez kompozitu nic nenese");
+    // $N[i].compositeDiagram v davce pod pumpou
+    b1Reset(); var repo2 = blRepo(); var got = null;
+    var oE = B.FB_OpElements, oP = B.FB_OpPlaceElements;
+    B.FB_OpElements = function () { var g = mkGuid(); return { op: "create_or_update_elements", status: "ok", guid: g, items: [{ guid: g, id: 5001, name: "UCR", created: true, compositeDiagramID: 201, compositeDiagramGUID: "{DG-201}" }, { guid: mkGuid(), id: 5002, name: "Plain", created: true }] }; };
+    B.FB_OpPlaceElements = function (R, op) { got = op; return { op: "place_elements_on_diagram", status: "ok", items: [] }; };
+    try {
+        withPump(function () {
+            var rr = pumpRun(repo2, [{ op: "create_or_update_elements", elements: [{ name: "UCR", type: "UseCase", "package": "{PK-11}" }, { name: "Plain", type: "Class", "package": "{PK-11}" }] },
+                                     { op: "place_elements_on_diagram", diagram: "$0[0].compositeDiagram", elementPlacements: [{ element: "$0[1]" }] }], "re11p");
+            eq(rr.status, "done", JSON.stringify(rr).substring(0, 400)); eq(rr.risk.riskLevel, "LOW", "kompozit vlastniho prvku = vlastni diagram: " + JSON.stringify(rr.risk.riskReasons));
+            eq(got.diagram, 201, "odkaz rozresolvovan na DiagramID");
+            var r2 = pumpRun(repo2, [{ op: "create_or_update_elements", elements: [{ name: "UCR", type: "UseCase", "package": "{PK-11}" }, { name: "Plain", type: "Class", "package": "{PK-11}" }] },
+                                     { op: "place_elements_on_diagram", diagram: "$0[1].compositeDiagram", elementPlacements: [{ element: "$0[0]" }] }], "re11e");
+            eq(r2.status, "error"); eq(r2.results[1].code, "E_ARGS", JSON.stringify(r2.results[1]).substring(0, 300)); contains(r2.results[1].message, "nenese compositeDiagramID");
+        });
+    } finally { B.FB_OpElements = oE; B.FB_OpPlaceElements = oP; }
+});
+t("RE-6 N-RE-6: auto-kompozit MDG zalozeny s prvkem v davce A je VLASTNI diagram session - davka B (place na nej) jde bez okna (foreignDiagrams 0)", function () {
+    b1Reset(); var repo = blRepo();
+    var oE = B.FB_OpElements, oP = B.FB_OpPlaceElements;
+    B.FB_OpElements = function () { var g = mkGuid(); return { op: "create_or_update_elements", status: "ok", guid: g, items: [{ guid: g, id: 5001, name: "UCR", created: true, compositeDiagramID: 201, compositeDiagramGUID: "{dg-201}" }] }; };
+    B.FB_OpPlaceElements = function () { return { op: "place_elements_on_diagram", status: "ok", items: [] }; };
+    try {
+        withPump(function () {
+            var a = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ name: "UCR", type: "UseCase", "package": "{PK-11}" }] }], "re6a");
+            eq(a.status, "done", JSON.stringify(a).substring(0, 300)); eq(a.ownSession.added, 2, "prvek + jeho kompozit");
+            eq(B._fbOwnGuids["{DG-201}"], 1, "GUID kompozitu v pameti session (velka pismena)");
+            var b = pumpRun(repo, [{ op: "place_elements_on_diagram", diagram: "{DG-201}", elementPlacements: [{ element: 102 }] }], "re6b");
+            eq(b.status, "done", JSON.stringify(b).substring(0, 300)); eq(b.risk.riskLevel, "LOW"); eq(b.risk.metrics.affectedDiagrams, 0);
+        });
+    } finally { B.FB_OpElements = oE; B.FB_OpPlaceElements = oP; }
+});
+t("RE-17 N-RE-17: move_elements s cilem owningElement - ParentID = vlastnik, PackageID = balicek vlastnika, potomci a diagramy nasleduji; idempotence; package+owningElement = E_ARGS; vlastnik = sam prvek nebo jeho potomek = E_ARGS; readback ParentID", function () {
+    var repo = reRepo();
+    var iface = repo.GetElementByID(11937), comp = repo.GetElementByID(11919);
+    var ll = repo.GetElementByID(12001), sr = repo.GetElementByID(11961);
+    var sub = mkElement({ id: 12077, name: "Vlastneny potomek", type: "Class", packageID: 3, parentID: 11937 }); sub.Elements = mkColl(); sub.Diagrams = mkColl();
+    iface.Elements._items.push(sub); repo._addElement({ id: 12077, name: "x" }); // readback nad mockem (id existuje)
+    var dgI = { Name: "Iface detail", PackageID: 3, Update: function () { return true; }, GetLastError: function () { return ""; } }; iface.Diagrams._items.push(dgI);
+    // rozhrani (package 3) -> pod komponentu (package 3): meni se jen vlastnik
+    var r = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-COMP}", elements: [11937] }, "re17a"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 400)); eq(r.moved, 1);
+    eq(iface.ParentID, 11919, "ParentID = komponenta"); eq(iface.PackageID, 3);
+    eq(r.items[0].toOwnerID, 11919); eq(r.items[0].toOwner, "EAFB Request Manager"); eq(r.items[0].fromOwnerID, 0); eq(r.items[0].children, 1); eq(r.items[0].diagrams, 1);
+    // lifeline (package 2, ParentID 0) -> pod SR v package 2: idempotentni druhy beh
+    var r2 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", elements: [{ element: "{EL-LL}", owningElement: "11961" }] }, "re17b"); });
+    eq(r2.status, "ok", JSON.stringify(r2).substring(0, 300)); eq(ll.ParentID, 11961); eq(ll.PackageID, 2); eq(r2.moved, 1);
+    var r3 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", elements: [{ element: "{EL-LL}", owningElement: "11961" }] }, "re17c"); });
+    eq(r3.status, "ok"); eq(r3.moved, 0); eq(r3.items[0].moved, false);
+    // vlastnik v jinem balicku: prvek 12002 (package 2) pod komponentu (package 3) -> PackageID = 3
+    var ref = repo.GetElementByID(12002);
+    var r4 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-COMP}", elements: ["{EL-REF}"] }, "re17d"); });
+    eq(r4.status, "ok", JSON.stringify(r4).substring(0, 300)); eq(ref.ParentID, 11919); eq(ref.PackageID, 3); eq(r4.items[0].fromPackageID, 2); eq(r4.items[0].toPackageID, 3);
+    // chyby argumentu
+    var e1 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", "package": "{PKG-FREE}", owningElement: "{EL-COMP}", elements: ["{EL-REF}"] }, "re17e"); });
+    eq(e1.code, "E_ARGS"); contains(e1.message, "soucasne");
+    var e2 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-COMP}", elements: ["{EL-COMP}"] }, "re17f"); });
+    eq(e2.code, "E_ARGS"); contains(e2.message, "sam presouvany prvek");
+    var e3 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-LL}", elements: ["{EL-SR}"] }, "re17g"); });
+    eq(e3.code, "E_ARGS", JSON.stringify(e3).substring(0, 300)); contains(e3.message, "cyklus");
+    eq(sr.ParentID, 0, "nic se nepresunulo");
+    // polozka s package prebiji op.owningElement (a naopak)
+    var r5 = withScope(scopeBL(), function () { return B.FB_OpMoveElements.call(B, repo, { op: "move_elements", owningElement: "{EL-COMP}", elements: [{ element: "{EL-REF}", "package": "{PKG-FREE}" }] }, "re17h"); });
+    eq(r5.status, "ok", JSON.stringify(r5).substring(0, 300)); eq(ref.PackageID, 2); eq(ref.ParentID, 11919, "cil balicek vlastnika nemeni (jen Package_ID)");
+});
+t("RE-17 P2 + Risk Gate: move_elements s owningElement projde predbeznou kontrolou (bez 'chybi package'), je ELEVATED (trida move) a pocita balicek vlastnika; package+owningElement = E_ARGS v P2; bez cile = E_ARGS", function () {
+    b1Reset(); var repo = blRepo();
+    var oM = B.FB_OpMoveElements; B.FB_OpMoveElements = function () { return { op: "move_elements", status: "ok", moved: 1, items: [] }; };
+    try {
+        withPump(function () {
+            var r = pumpRun(repo, [{ op: "move_elements", owningElement: "{EL-102}", elements: ["{EL-101}"] }], "re17p");
+            eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 400));
+            var codes = r.risk.reasonItems.map(function (x) { return x.code; }).join(",");
+            ok(codes.indexOf("CLASS_ELEVATED") >= 0 && codes.indexOf("TARGET_MISSING") < 0 && codes.indexOf("EMPTY_LIST") < 0, codes);
+            eq(r.risk.metrics.moveOps, 1); ok(r.risk.metrics.affectedPackages >= 2, "zdroj + balicek vlastnika: " + r.risk.metrics.affectedPackages);
+            var e1 = pumpRun(repo, [{ op: "move_elements", owningElement: "{EL-102}", "package": "{PK-12}", elements: ["{EL-101}"] }], "re17q");
+            eq(e1.code, "E_ARGS", JSON.stringify(e1).substring(0, 300)); contains(e1.problems[0].message, "soucasne");
+            var e2 = pumpRun(repo, [{ op: "move_elements", elements: ["{EL-101}"] }], "re17r");
+            eq(e2.code, "E_ARGS"); contains(e2.problems[0].message, "package nebo owningElement");
+            var w = pumpRun(repo, [{ op: "move_elements", owner: "{EL-102}", elements: ["{EL-101}"] }], "re17s");
+            eq(w.status, "confirm_required", "alias owner -> owningElement: " + JSON.stringify(w).substring(0, 300));
+        });
+    } finally { B.FB_OpMoveElements = oM; }
+});
+t("RE-18 N-RE-18: apply_classifier_stereotypes - lifeline s classifierem Actor -> Type 'Actor' + stereotyp classifiera (rozsireni nad VBS); idempotentni druhy beh", function () {
+    var repo = reRepo(); var dg = repo._dg;
+    var o1 = dg.DiagramObjects.AddNew("l=10;r=100;t=10;b=50;", ""); o1.ElementID = 12040;
+    var o2 = dg.DiagramObjects.AddNew("l=10;r=100;t=10;b=50;", ""); o2.ElementID = 12001;
+    var la = repo.GetElementByID(12040), ll = repo.GetElementByID(12001);
+    var r = withScope(scopeBL(), function () { return B.FB_OpApplyClassifierStereotypes.call(B, repo, { op: "apply_classifier_stereotypes", diagram: 1196 }, "re18"); });
+    eq(r.status, "ok", JSON.stringify(r).substring(0, 300)); eq(r.changedCount, 2);
+    eq(la.Type, "Actor"); eq(la.Stereotype, "user"); eq(ll.Type, "Component"); eq(ll.Stereotype, "manager");
+    var r2 = withScope(scopeBL(), function () { return B.FB_OpApplyClassifierStereotypes.call(B, repo, { op: "apply_classifier_stereotypes", diagram: 1196 }, "re18b"); });
+    eq(r2.changedCount, 0, "idempotence");
+});
+t("RE-12 N-RE-12: prah affectedPackages nese vycet balicku (teckove cesty, max 10 + 'a N dalsich') v textu duvodu, args.packages, FB_ReasonText i v message E_RISK_BLOCKED; summary.packages doplneno o balicky dotcene jen pres prvky", function () {
+    b1Reset(); var repo = blRepo();
+    var oE = B.FB_OpElements; B.FB_OpElements = function () { return { op: "create_or_update_elements", status: "ok", items: [] }; };
+    try {
+        withPump(function () {
+            // 3 balicky pres prvky (ELEVATED 1) - jmena jen z ID
+            var r = pumpRun(repo, [{ op: "create_or_update_elements", elements: [{ guid: "{EL-101}", notes: "a" }, { guid: "{EL-102}", notes: "b" }, { guid: "{EL-104}", notes: "c" }] }], "re12a");
+            eq(r.status, "confirm_required", JSON.stringify(r).substring(0, 400));
+            var it = null; r.risk.reasonItems.forEach(function (x) { if (x.code == "THRESHOLD_ELEVATED" && x.args.key == "affectedPackages") { it = x; } });
+            ok(it, "duvod affectedPackages: " + JSON.stringify(r.risk.reasonItems));
+            eq(it.args.packages.join("|"), "Model.#FB-TEST.A|Model.#FB-TEST.B|Model.#FB-TEST.C"); eq(it.args.packagesMore, 0);
+            contains(it.text, "(Model.#FB-TEST.A, Model.#FB-TEST.B, Model.#FB-TEST.C)");
+            contains("" + B.FB_ReasonText.call(B, it), "zasahuje do 3 balicku: Model.#FB-TEST.A, Model.#FB-TEST.B, Model.#FB-TEST.C; bez potvrzeni");
+            eq(r.risk.summary.packages.join("|"), "Model.#FB-TEST.A|Model.#FB-TEST.B|Model.#FB-TEST.C", "summary.packages uz neni prazdne");
+            // 8 balicku (BLOCKED 5): message E_RISK_BLOCKED rika kam
+            var els = [101, 102, 103, 104, 105, 106, 107, 108].map(function (id) { return { guid: "{EL-" + id + "}", notes: "x" }; });
+            var b = pumpRun(repo, [{ op: "create_or_update_elements", elements: els }], "re12b");
+            eq(b.code, "E_RISK_BLOCKED", JSON.stringify(b).substring(0, 300));
+            contains(b.message, "affectedPackages 8 > 5 (Model.#FB-TEST.A, Model.#FB-TEST.B, Model.#FB-TEST.A.A1, Model.#FB-TEST.C");
+            var bt = null; b.risk.reasonItems.forEach(function (x) { if (x.code == "THRESHOLD_BLOCKED") { bt = x; } });
+            eq(bt.args.packages.length, 8); contains("" + B.FB_ReasonText.call(B, bt), "zasahuje do 8 balicku: Model.#FB-TEST.A");
+            // strop 10 + 'a N dalsich' (FB_ReasonText)
+            var many = { code: "THRESHOLD_BLOCKED", text: "t", args: { key: "affectedPackages", value: 12, limit: 5, packages: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10"], packagesMore: 2 } };
+            contains("" + B.FB_ReasonText.call(B, many), "P10 a 2 dalsich");
+            // mazany balicek: zustava v deletes, ne v summary.packages (FB-PU-20 b)
+            var d = runFile(repo, [{ op: "delete_from_model", targets: [{ type: "Package", id: 11 }] }], "re12d");
+            eq((d.risk.summary.packages || []).length, 0, JSON.stringify(d.risk.summary.packages));
+        });
+    } finally { B.FB_OpElements = oE; }
+});
+t("RE-9 N-RE-9: QC-DEMO-001 'Element bez jmena' vynechava nepojmenovane instance (Object/Sequence s classifierem), refy, hranice a gaty", function () {
+    var cfg = B.FB_QcConfig.call(B); var sql = cfg[0].checks[0].sql;
+    contains(sql, "NOT (o.Object_Type IN ('Object','Sequence') AND o.Classifier > 0)");
+    contains(sql, "o.Object_Type NOT IN ('InteractionOccurrence','Boundary','MessageEndpoint')");
+    ok(!/LEN\(/.test(sql), "zadne dialektove funkce");
+});
+t("RE-11/RE-17 P2: refRe ve vsech kontrolach prijima .compositeDiagram; FB_FieldCheck zna owningElement u move_elements (cizi pole = varovani, ne E_ARGS)", function () {
+    ["FB_Precheck", "FB_RiskGate", "FB_BaselinePolicy", "FB_ScopePrecheck", "FB_Main"].forEach(function (n) { contains(srcOf(n), "(?:\\.(id|guid|compositeDiagram))?$/", n); });
+    var fc = B.FB_FieldCheck.call(B, { ops: [{ op: "move_elements", owningElement: "{A}", elements: ["{B}"] }] }, REG_B2);
+    eq(fc.problems.length, 0); eq(fc.warnings.length, 0, JSON.stringify(fc.warnings));
+    var fa = B.FB_FieldCheck.call(B, { ops: [{ op: "move_elements", owner: "{A}", elements: ["{B}"] }] }, REG_B2);
+    eq(fa.warnings.length, 0, JSON.stringify(fa.warnings));
+});
+
 // ------------------------------------------------------------------ vysledek
 console.log("");
 console.log("EA File Bridge offline harness: " + passed + "/" + (passed + failed) + " PASS");
