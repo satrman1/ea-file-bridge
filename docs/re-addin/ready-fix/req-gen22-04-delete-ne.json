@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "gen22-04-delete-ne", "repo":"EA17_Yoga_QEA2.qeax", "ops": [ { "op": "delete_from_model", "targets": [ { "type": "Element", "id": 3866 } ] } ] }

@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "gen22-03b-low", "repo":"EA17_Yoga_QEA2.qeax", "ops": [
+ { "op": "create_or_update_package", "parent": "{931C997C-FD2F-4043-BACD-4B4D42C24DBE}", "name": "FBT-GENERALKA-1015" },
+ { "op": "create_or_update_elements", "elements": [ { "package": "$0", "type": "Class", "name": "GEN Prvek 1015", "notes": "Vytvoreno davkou gen22-03b-low (Z261014b-1, generalka v0.22 v QEAX). Uklid davkou v temze vlakne." } ] },
+ { "op": "create_or_update_elements", "elements": [ { "package": "$0", "type": "Object", "name": "", "classifier": "$1" } ] } ] }

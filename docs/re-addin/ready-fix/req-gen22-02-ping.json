@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "gen22-02-ping", "repo":"EA17_Yoga_QEA2.qeax", "ops": [ { "op": "ping" },
+ { "op": "query", "sql": "SELECT COUNT(*) AS ops FROM t_operation m INNER JOIN t_object o ON o.Object_ID = m.Object_ID WHERE o.Name = 'AICodeBridge' AND o.Stereotype = 'JavascriptAddin'", "maxRows": 2 } ] }

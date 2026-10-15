@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "gen22-05-uklid", "repo":"EA17_Yoga_QEA2.qeax", "ops": [ { "op": "delete_from_model", "targets": [ { "type": "Package", "id": 718 } ] }, { "op": "query", "sql": "SELECT COUNT(*) AS zbytek FROM t_object WHERE Package_ID = 718", "maxRows": 2 } ] }

@@ -1,0 +1,28 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"gen22-03-low",
+ "status":"error",
+ "results":[
+  {
+   "op":"create_or_update_package",
+   "status":"skipped"
+  },
+  {
+   "op":"create_or_update_elements",
+   "status":"skipped"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EA17_Yoga_QEA2.qeax",
+ "since":"2026-10-15 18:46:42",
+ "code":"E_ARGS",
+ "message":"Predbezna kontrola davky: 1 problem - nic nebylo provedeno, zadne okno, zadna zaloha. Oprav davku podle problems[] a posli ji s NOVYM id. Prvni: ops[1].elements[1].classifier: odkaz $1 miri na vlastni operaci - $N smi odkazovat jen na DRIVEJSI operaci teze davky",
+ "problems":[
+  {
+   "op":1,
+   "path":"ops[1].elements[1].classifier",
+   "code":"E_ARGS",
+   "message":"odkaz $1 miri na vlastni operaci - $N smi odkazovat jen na DRIVEJSI operaci teze davky"
+  }
+ ]
+}
