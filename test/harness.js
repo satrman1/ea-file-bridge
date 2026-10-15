@@ -6552,7 +6552,7 @@ t("RE-12 N-RE-12: prah affectedPackages nese vycet balicku (teckove cesty, max 1
             eq(it.args.packages.join("|"), "Model.#FB-TEST.A|Model.#FB-TEST.B|Model.#FB-TEST.C"); eq(it.args.packagesMore, 0);
             contains(it.text, "(Model.#FB-TEST.A, Model.#FB-TEST.B, Model.#FB-TEST.C)");
             contains("" + B.FB_ReasonText.call(B, it), "zasahuje do 3 balicku: Model.#FB-TEST.A, Model.#FB-TEST.B, Model.#FB-TEST.C; bez potvrzeni");
-            eq(r.risk.summary.packages.join("|"), "Model.#FB-TEST.A|Model.#FB-TEST.B|Model.#FB-TEST.C", "summary.packages uz neni prazdne");
+            eq(r.risk.summary.packages.join("|"), "A|B|C", "summary.packages = prosta jmena (QC $PKGNAMES), uz ne prazdne"); eq(r.risk.summary.packagePaths.join("|"), "Model.#FB-TEST.A|Model.#FB-TEST.B|Model.#FB-TEST.C");
             // 8 balicku (BLOCKED 5): message E_RISK_BLOCKED rika kam
             var els = [101, 102, 103, 104, 105, 106, 107, 108].map(function (id) { return { guid: "{EL-" + id + "}", notes: "x" }; });
             var b = pumpRun(repo, [{ op: "create_or_update_elements", elements: els }], "re12b");
@@ -6565,7 +6565,7 @@ t("RE-12 N-RE-12: prah affectedPackages nese vycet balicku (teckove cesty, max 1
             contains("" + B.FB_ReasonText.call(B, many), "P10 a 2 dalsich");
             // mazany balicek: zustava v deletes, ne v summary.packages (FB-PU-20 b)
             var d = runFile(repo, [{ op: "delete_from_model", targets: [{ type: "Package", id: 11 }] }], "re12d");
-            eq((d.risk.summary.packages || []).length, 0, JSON.stringify(d.risk.summary.packages));
+            eq((d.risk.summary.packages || []).length, 0, JSON.stringify(d.risk.summary.packages)); eq((d.risk.summary.packagePaths || []).length, 0, "mazany balicek ani v packagePaths");
         });
     } finally { B.FB_OpElements = oE; }
 });

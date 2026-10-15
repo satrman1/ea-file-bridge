@@ -857,16 +857,20 @@ if (polValid) {
 }
 
 // N-RE-12: summary.packages doplnit o balicky zapoctene jen pres prvky/diagramy
-// (touchElement/touchDiagram daly jen ID) - okno i E_RISK_BLOCKED pak rikaji KAM
-if (pkgIds.length > 0 && pkgNames.length < pkgCount) {
+// (touchElement/touchDiagram daly jen ID) - okno i E_RISK_BLOCKED pak rikaji KAM.
+// POZOR: summary.packages jsou PROSTA jmena (FB_QcRun $PKGNAMES = t_package.Name IN (...),
+// FB_ConfirmSummary) - teckove cesty jdou zvlast do summary.packagePaths.
+var pkgPaths = [];
+if (pkgIds.length > 0) {
     inDelete = false;
     var plS = pkgList(true);
-    for (var ps = 0; ps < plS.names.length; ps++) {
-        var last = plS.names[ps], dot = last.lastIndexOf(".");
-        if (dot >= 0) { last = last.substring(dot + 1); }
-        var seenP = false;
-        for (var pq = 0; pq < pkgNames.length; pq++) { if (pkgNames[pq] == last || pkgNames[pq] == plS.names[ps]) { seenP = true; break; } }
-        if (!seenP) { pushName(pkgNames, "p", plS.names[ps]); }
+    pkgPaths = plS.names;
+    if (pkgNames.length < pkgCount) {
+        for (var ps = 0; ps < plS.names.length; ps++) {
+            var last = plS.names[ps], dot = last.lastIndexOf(".");
+            if (dot >= 0) { last = last.substring(dot + 1); }
+            pushName(pkgNames, "p", last); // dedup pres nameSeen
+        }
     }
 }
 return {
@@ -875,7 +879,7 @@ return {
     reasonItems: reasonItems, // v0.19: stabilni kody duvodu (FB_ReasonText, tag ai.risk.codes)
     policyValid: polValid,
     baselinePolicyValid: blValid,
-    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, diagrams: dgmNames, paths: tgtPaths,
+    summary: { ops: opCounts, targets: tgtNames, packages: pkgNames, packagePaths: pkgPaths, diagrams: dgmNames, paths: tgtPaths,
                targetsMore: nameMore.e, packagesMore: nameMore.p, diagramsMore: nameMore.d,
                deletes: deletes, actions: actions },
     metrics: {
