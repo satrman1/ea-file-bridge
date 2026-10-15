@@ -4,6 +4,9 @@
 // Pro objekty na diagramu (typicky lifeliny na SD), ktere maji ClassifierID:
 //   - classifier Component          -> Type = "Component" + stereotyp classifiera
 //   - classifier Interface | Class  -> Type = "Object"    + stereotyp classifiera
+//   - classifier Actor              -> Type = "Actor"     + stereotyp classifiera
+//     (N-RE-18, v0.22 - ROZSIRENI nad ramec VBS: domaci kanon Scripts/ aktera
+//     neresi; lifeline aktera na UCR sekvenci zustavala 'Object')
 // Pouziti: po "convert to instance" / po AI zapisu lifelin jako Object
 // (par. 7g N-K4-5) ztraci instance stereotyp - operace dorovna cilovy stav
 // dle classifiera. Idempotentni: kdyz Type i stereotyp uz sedi, nic nezapisuje
@@ -48,6 +51,7 @@ for (var i = 0; i < dg.DiagramObjects.Count; i++) {
     var targetType = null;
     if (clsType == "Component") { targetType = "Component"; }
     else if (clsType == "Interface" || clsType == "Class") { targetType = "Object"; }
+    else if (clsType == "Actor") { targetType = "Actor"; } // N-RE-18
     if (targetType == null) { continue; } // jine typy classifiera VBS nresi - parita
     var oldType = "" + el.Type;
     var oldStereo = "" + el.Stereotype;
