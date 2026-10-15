@@ -92,7 +92,7 @@ var SPEC = {
         item: ["type", "id", "guid", "name"], alias: { elementID: "id", packageID: "id", connectorID: "id", diagramID: "id", attributeID: "id", operationID: "id", kind: "type" } } } },
     "delete_taggedvalue_from_model": { top: ["targets"], lists: { targets: {
         item: ["type", "id", "name"], alias: { elementID: "id", connectorID: "id", attributeID: "id", operationID: "id", packageID: "id", tag: "name" } } } },
-    "move_elements": { top: ["package", "elements", "withChildren"], alias: { target: "package", targetPackage: "package", to: "package" } },
+    "move_elements": { top: ["package", "owningElement", "elements", "withChildren"], alias: { target: "package", targetPackage: "package", to: "package", owner: "owningElement", parent: "owningElement" } }, // v0.22: owningElement (N-RE-17)
     "remove_elements_from_diagram": { top: ["diagram", "elementIDs"], alias: { elements: "elementIDs", ids: "elementIDs" } },
     "query": { top: ["sql", "sql_b64", "maxRows"], alias: { limit: "maxRows", top: "maxRows", rows: "maxRows", max_rows: "maxRows", maxrows: "maxRows", query: "sql" } },
     "find_elements_by_name": { top: ["name", "exactMatch", "scope"], alias: { exact: "exactMatch", "package": "scope", branch: "scope" } },

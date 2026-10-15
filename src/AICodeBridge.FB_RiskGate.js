@@ -714,8 +714,10 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
         for (j = 0; j < lst.length; j++) {
             var mv = lst[j];
             var mvRef = (mv !== null && typeof mv == "object") ? (mv.element || mv.guid || mv.elementID) : mv;
-            var mvPkg = (mv !== null && typeof mv == "object" && typeof mv["package"] != "undefined"
-                && mv["package"] !== null && ("" + mv["package"]) != "") ? mv["package"] : o["package"];
+            var mvHas = function (x, k) { return x !== null && typeof x == "object" && typeof x[k] != "undefined" && x[k] !== null && ("" + x[k]) != ""; };
+            var mvItem = (mvHas(mv, "package") || mvHas(mv, "owningElement"));
+            var mvPkg = mvItem ? (mvHas(mv, "package") ? mv["package"] : null) : (mvHas(o, "package") ? o["package"] : null);
+            var mvOwn = mvItem ? (mvHas(mv, "owningElement") ? mv.owningElement : null) : (mvHas(o, "owningElement") ? o.owningElement : null); // v0.22 (N-RE-17)
             // countUpdate: presun je zmena existujiciho prvku; addPackages:
             // zapocte ZDROJOVY package prvku
             var tmv = touchElement(mvRef, "move.elements[" + j + "]", true, true);
@@ -725,7 +727,13 @@ for (opIndex = 0; opIndex < req.ops.length; opIndex++) {
             if (tmv && tmv.res && tmv.res.pkgId > 0) {
                 touchPackage("" + tmv.res.pkgId, "move.elements[" + j + "].fromPackage", false);
             }
-            touchPackage(mvPkg, "move.elements[" + j + "].package", false);
+            if (mvOwn !== null) {
+                // cil = vlastnici prvek: jeho balicek se zapocita (addPackages), prvek sam se nemeni
+                var tow = touchElement(mvOwn, "move.elements[" + j + "].owningElement", false, true);
+                if (tow && tow.res) { actAdd("packages", "pod " + tow.res.name); }
+            } else {
+                touchPackage(mvPkg, "move.elements[" + j + "].package", false);
+            }
         }
     } else if (name == "create_or_update_scenarios" || name == "create_or_update_constraints"
                || name == "create_or_update_requirements") {

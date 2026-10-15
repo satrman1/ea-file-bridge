@@ -15,8 +15,17 @@
 // + Update()).
 //
 // op.package     = spolecny cil ("{GUID}" | packageID | jmeno | $ref)
-// op.elements    = [ "{GUID}"|id|jmeno|$ref  NEBO  { element, package } ]
-//                  per-polozka `package` prebiji op.package
+// op.owningElement = ALTERNATIVNI cil (N-RE-17, v0.22): presun POD PRVEK
+//                  ("{GUID}" | elementID | $ref) - Element.ParentID = vlastnik,
+//                  PackageID = balicek vlastnika; potomci a vlastnene diagramy
+//                  nasleduji (stejna kaskada jako u balicku). Metodicky duvod
+//                  (Milos 15. 10. 2026): rozhrani patri pod komponentu, prvky
+//                  sekvence (lifeliny, refy, gaty) pod prvek SR / UCR na uroven
+//                  jeho kompozitniho diagramu. `package` a `owningElement`
+//                  soucasne = E_ARGS; vlastnik = sam prvek nebo jeho potomek =
+//                  E_ARGS. Presun pod prvek je v Risk Gate stejne ELEVATED.
+// op.elements    = [ "{GUID}"|id|jmeno|$ref  NEBO  { element, package | owningElement } ]
+//                  per-polozka `package` / `owningElement` prebiji op.*
 // op.withChildren = true (DEFAULT) - DOROVNA i vlastneny podstrom:
 //                  child elementy (ParentID retez) a diagramy vlastnene
 //                  elementem. false = pojistka se vypne (viz nize).
@@ -46,8 +55,9 @@
 // MAX_NODES uzlu = E_BLACKLIST "presun po castech" (nikdy tichy presun).
 // Validace CELE davky probehne PRED prvnim zapisem - zadny castecny presun.
 // Vysledek: items = [{guid, id, name, moved, fromPackageID, fromPackage,
-// toPackageID, toPackage, children, childrenFixed, diagrams, diagramsFixed}],
-// readback (SQL Package_ID - kontrola, kde prvky po davce skutecne jsou).
+// toPackageID, toPackage, fromOwnerID, toOwnerID?, toOwner?, children,
+// childrenFixed, diagrams, diagramsFixed}],
+// readback (SQL Package_ID + ParentID - kontrola, kde prvky po davce skutecne jsou).
 if (!op) {
     return { op: "move_elements", status: "error", code: "E_ARGS", message: "Povinne: elements." };
 }
@@ -90,33 +100,74 @@ function subtreeCheck(rootEl, idx) {
 }
 
 // --- validace CELE davky pred prvnim zapisem ---
+function given(v2) { return typeof v2 != "undefined" && v2 !== null && ("" + v2) != ""; }
 var plan = [];
 for (var v = 0; v < op.elements.length; v++) {
     var raw = op.elements[v];
-    var elRef = null, pkgRef = null;
+    var elRef = null, pkgRef = null, ownRef = null;
     if (raw !== null && typeof raw == "object") {
         elRef = raw.element || raw.guid || raw.elementID;
-        pkgRef = (typeof raw["package"] != "undefined" && raw["package"] !== null && ("" + raw["package"]) != "")
-            ? raw["package"] : op["package"];
+        if (given(raw["package"]) || given(raw.owningElement)) {
+            // polozka urcuje cil sama (jeden z dvojice)
+            pkgRef = given(raw["package"]) ? raw["package"] : null;
+            ownRef = given(raw.owningElement) ? raw.owningElement : null;
+        } else {
+            pkgRef = given(op["package"]) ? op["package"] : null;
+            ownRef = given(op.owningElement) ? op.owningElement : null;
+        }
     } else {
         elRef = raw;
-        pkgRef = op["package"];
+        pkgRef = given(op["package"]) ? op["package"] : null;
+        ownRef = given(op.owningElement) ? op.owningElement : null;
     }
     if (elRef === null || typeof elRef == "undefined" || ("" + elRef) == "") {
         return { op: "move_elements", status: "error", code: "E_ARGS", message: "elements[" + v + "]: chybi element." };
     }
-    if (pkgRef === null || typeof pkgRef == "undefined" || ("" + pkgRef) == "") {
+    if (pkgRef !== null && ownRef !== null) {
         return { op: "move_elements", status: "error", code: "E_ARGS",
-            message: "elements[" + v + "]: chybi cilovy package (ani op.package, ani polozka)." };
+            message: "elements[" + v + "]: package a owningElement soucasne - cil presunu je bud balicek, nebo vlastnici prvek (ne oboji)." };
+    }
+    if (pkgRef === null && ownRef === null) {
+        return { op: "move_elements", status: "error", code: "E_ARGS",
+            message: "elements[" + v + "]: chybi cil presunu - package nebo owningElement (na urovni operace nebo v polozce)." };
     }
     var el = this.FB_ResolveEl(Repository, elRef);
     if (el == null) {
         return this.FB_ResolveFail("move_elements", "elements[" + v + "]: element nenalezen (" + elRef + ")", null);
     }
-    var tgt = this.FB_ResolvePkg(Repository, pkgRef);
-    if (tgt == null) {
-        var pl = (pkgRef !== null && typeof pkgRef == "object" && pkgRef.path) ? ("path " + pkgRef.path.join(".")) : ("" + pkgRef);
-        return this.FB_ResolveFail("move_elements", "elements[" + v + "]: cilovy package nenalezen (" + pl + ")", null);
+    var tgt = null, owner = null;
+    if (ownRef !== null) {
+        // N-RE-17: cil = vlastnici prvek; balicek = balicek vlastnika
+        owner = this.FB_ResolveEl(Repository, ownRef);
+        if (owner == null) {
+            return this.FB_ResolveFail("move_elements", "elements[" + v + "]: owningElement nenalezen (" + ownRef + ")", null);
+        }
+        if (owner.ElementID == el.ElementID) {
+            return { op: "move_elements", status: "error", code: "E_ARGS", message: "elements[" + v + "]: owningElement je sam presouvany prvek." };
+        }
+        // vlastnik nesmi byt potomek prvku (cyklus ve stromu): retez ParentID od vlastnika nahoru
+        var anc = owner, hops = 0, cyc = false;
+        while (anc && anc.ParentID && anc.ParentID > 0 && hops++ < MAX_DEPTH) {
+            if (anc.ParentID == el.ElementID) { cyc = true; break; }
+            try { anc = Repository.GetElementByID(anc.ParentID); } catch (eAn) { anc = null; }
+        }
+        if (cyc) {
+            return { op: "move_elements", status: "error", code: "E_ARGS", message: "elements[" + v + "]: owningElement '" + owner.Name + "' je potomek presouvaneho prvku - vznikl by cyklus ve stromu." };
+        }
+        var chkOw = this.FB_CheckWriteEl(Repository, owner);
+        if (chkOw != null) {
+            return { op: "move_elements", status: "error", code: chkOw.code, message: "elements[" + v + "] (cilovy vlastnik): " + chkOw.message };
+        }
+        try { tgt = Repository.GetPackageByID(owner.PackageID); } catch (eTp) { tgt = null; }
+        if (tgt == null) {
+            return { op: "move_elements", status: "error", code: "E_NOT_FOUND", message: "elements[" + v + "]: balicek vlastnika (" + owner.PackageID + ") nenalezen." };
+        }
+    } else {
+        tgt = this.FB_ResolvePkg(Repository, pkgRef);
+        if (tgt == null) {
+            var pl = (pkgRef !== null && typeof pkgRef == "object" && pkgRef.path) ? ("path " + pkgRef.path.join(".")) : ("" + pkgRef);
+            return this.FB_ResolveFail("move_elements", "elements[" + v + "]: cilovy package nenalezen (" + pl + ")", null);
+        }
     }
     // cil zapisu: zdroj (prvek vc. vlastniku), cil, vlastneny podstrom
     var src = null;
@@ -133,7 +184,7 @@ for (var v = 0; v < op.elements.length; v++) {
     if (chkSub != null) {
         return { op: "move_elements", status: "error", code: chkSub.code, message: chkSub.message };
     }
-    plan.push({ idx: v, el: el, tgt: tgt, srcId: el.PackageID, srcName: (src ? "" + src.Name : "") });
+    plan.push({ idx: v, el: el, tgt: tgt, owner: owner, srcId: el.PackageID, srcName: (src ? "" + src.Name : ""), srcOwner: el.ParentID });
 }
 
 // --- presun vlastneneho podstromu (child elementy + jejich diagramy) ---
@@ -198,9 +249,14 @@ for (var i = 0; i < plan.length; i++) {
     var p = plan[i];
     var e = p.el, tp = p.tgt;
     var stat = { children: 0, childrenFixed: 0, diagrams: 0, diagramsFixed: 0, warns: [] };
-    var already = (e.PackageID == tp.PackageID);
+    // cil balicek: prvek zustava vlastneny tim, kym byl (ParentID se nemeni);
+    // cil vlastnik (N-RE-17): ParentID = vlastnik + balicek vlastnika
+    var already = (p.owner != null)
+        ? (e.ParentID == p.owner.ElementID && e.PackageID == tp.PackageID)
+        : (e.PackageID == tp.PackageID);
     if (!already) {
         try {
+            if (p.owner != null) { e.ParentID = p.owner.ElementID; }
             e.PackageID = tp.PackageID;
             if (!e.Update()) {
                 return { op: "move_elements", status: "error", code: "E_EXCEPTION",
@@ -221,11 +277,13 @@ for (var i = 0; i < plan.length; i++) {
     if (!already || stat.childrenFixed > 0 || stat.diagramsFixed > 0) {
         this.SetTag(e, "ai.request", "" + reqId);
     }
-    items.push({ guid: "" + e.ElementGUID, id: e.ElementID, name: "" + e.Name,
+    var itM = { guid: "" + e.ElementGUID, id: e.ElementID, name: "" + e.Name,
         moved: !already, fromPackageID: p.srcId, fromPackage: p.srcName,
-        toPackageID: tp.PackageID, toPackage: "" + tp.Name,
+        toPackageID: tp.PackageID, toPackage: "" + tp.Name, fromOwnerID: p.srcOwner,
         children: stat.children, childrenFixed: stat.childrenFixed,
-        diagrams: stat.diagrams, diagramsFixed: stat.diagramsFixed });
+        diagrams: stat.diagrams, diagramsFixed: stat.diagramsFixed };
+    if (p.owner != null) { itM.toOwnerID = p.owner.ElementID; itM.toOwner = "" + p.owner.Name; }
+    items.push(itM);
     movedIds.push(e.ElementID);
     touched["p" + p.srcId] = 1; touched["p" + tp.PackageID] = 1;
 }
@@ -243,6 +301,10 @@ try {
 for (var tk in touched) {
     if (touched[tk] != 1) { continue; }
     try { Repository.RefreshModelView(parseInt(("" + tk).substring(1), 10)); } catch (eRf) { }
+}
+// N-RE-17: vlastnici prvky (strom pod prvkem EA prekresli az po Refresh vlastnika)
+for (var oi = 0; oi < plan.length; oi++) {
+    if (plan[oi].owner != null) { try { plan[oi].owner.Elements.Refresh(); } catch (eRo) { } }
 }
 
 var movedCount = 0;

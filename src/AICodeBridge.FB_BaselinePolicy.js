@@ -189,7 +189,10 @@ function dollarPkg(ref, opIdx) {
     }
     if (rn == "move_elements") {
         x = (rop.elements || [])[it];
-        var mp = (x !== null && typeof x == "object" && !blank(x["package"])) ? x["package"] : rop["package"];
+        var mIt = (x !== null && typeof x == "object" && (!blank(x["package"]) || !blank(x.owningElement)));
+        var mo = mIt ? x.owningElement : rop.owningElement; // v0.22 (N-RE-17): cil pod prvkem -> balicek vlastnika
+        if (!blank(mo)) { return elPkgRaw(mo); }
+        var mp = mIt ? x["package"] : rop["package"];
         pr = pkgRowRaw(mp); return pr ? pr.id : 0;
     }
     return 0;

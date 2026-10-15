@@ -236,9 +236,13 @@ function checkNeed(i, name, o) {
         for (j = 0; j < o.elements.length; j++) {
             it = o.elements[j];
             var mref = (it !== null && typeof it == "object") ? (it.element || it.guid || it.elementID) : it;
-            var mpkg = (it !== null && typeof it == "object" && has(it, "package")) ? it["package"] : o["package"];
+            // v0.22 (N-RE-17): cil = package NEBO owningElement; polozka s jednim z nich prebiji operaci
+            var mItem = (it !== null && typeof it == "object" && (has(it, "package") || has(it, "owningElement")));
+            var mpkg = mItem ? (has(it, "package") ? it["package"] : null) : (has(o, "package") ? o["package"] : null);
+            var mown = mItem ? (has(it, "owningElement") ? it.owningElement : null) : (has(o, "owningElement") ? o.owningElement : null);
             if (!mref) { prob(i, "ops[" + i + "].elements[" + j + "]", "E_ARGS", "chybi element"); }
-            if (!mpkg) { prob(i, "ops[" + i + "].elements[" + j + "].package", "E_ARGS", "chybi cilovy package (v polozce nebo na urovni operace)"); }
+            if (!mpkg && !mown) { prob(i, "ops[" + i + "].elements[" + j + "].package", "E_ARGS", "chybi cil presunu - package nebo owningElement (v polozce nebo na urovni operace)"); }
+            if (mpkg && mown) { prob(i, "ops[" + i + "].elements[" + j + "].owningElement", "E_ARGS", "package a owningElement soucasne - cil presunu je bud balicek, nebo vlastnici prvek"); }
         }
     }
 }

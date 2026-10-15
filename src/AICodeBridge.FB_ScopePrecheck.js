@@ -292,9 +292,12 @@ for (var i = 0; i < req.ops.length; i++) {
         for (j = 0; j < lst.length; j++) {
             it = lst[j];
             var mref = (it !== null && typeof it == "object") ? (it.element || it.guid || it.elementID) : it;
-            var mpkg = (it !== null && typeof it == "object" && !blank(it["package"])) ? it["package"] : o["package"];
+            var mItem = (it !== null && typeof it == "object" && (!blank(it["package"]) || !blank(it.owningElement)));
+            var mpkg = mItem ? it["package"] : o["package"];
+            var mown = mItem ? it.owningElement : o.owningElement; // v0.22 (N-RE-17): cil pod prvkem
             target(i, P + ".elements[" + j + "]", "element", mref, "zdroj presunu");
-            target(i, P + ".elements[" + j + "].package", "package", mpkg, "cil presunu");
+            if (!blank(mown)) { target(i, P + ".elements[" + j + "].owningElement", "element", mown, "cil presunu (vlastnik)"); }
+            else { target(i, P + ".elements[" + j + "].package", "package", mpkg, "cil presunu"); }
         }
     } else if (name == "create_or_update_package") {
         lst = isArr(o.packages) ? o.packages : [o];
