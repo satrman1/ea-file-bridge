@@ -30,6 +30,11 @@ var known = /^(POLICY_INVALID|BASELINE_POLICY_INVALID|OWN_SESSION|PREV_EXCEPTION
 return known ? cap(sentence()) : sentence(); // neznamy kod = puvodni text beze zmeny
 function sentence() {
 function pl(n, one, few, many) { return n + " " + (n == 1 ? one : ((n >= 2 && n <= 4) ? few : many)); }
+// N-RE-12 (v0.22): vycet balicku u prahu affectedPackages (args.packages = teckove cesty, max 10)
+function pkgs(a) {
+    if (!a || !a.packages || Object.prototype.toString.call(a.packages) != "[object Array]" || a.packages.length == 0) { return ""; }
+    return ": " + a.packages.join(", ") + (a.packagesMore > 0 ? " a " + a.packagesMore + " dalsich" : "");
+}
 function keyText(key, v) {
     switch ("" + key) {
         case "deleteTargets": return "maze " + pl(v, "cil", "cile", "cilu");
@@ -102,9 +107,9 @@ switch (code) {
     case "BUDGET":
         return "Bridge nedokazal spocitat rozsah davky v casovem limitu (" + (a.ms || "?") + " ms) - zkontroluj souhrn rucne.";
     case "THRESHOLD_ELEVATED":
-        return "Davka " + keyText(a.key, a.value) + "; bez potvrzeni je dovoleno nejvys " + a.limit + ".";
+        return "Davka " + keyText(a.key, a.value) + pkgs(a) + "; bez potvrzeni je dovoleno nejvys " + a.limit + ".";
     case "THRESHOLD_BLOCKED":
-        return "Prekrocen tvrdy strop (" + (a.key || "?") + " " + a.value + " > " + a.limit + ") - davka je odmitnuta, potvrzeni nepomuze.";
+        return "Prekrocen tvrdy strop (" + keyText(a.key, a.value) + pkgs(a) + ", povoleno nejvys " + a.limit + ") - davka je odmitnuta, potvrzeni nepomuze.";
     case "CONFIG_TARGET":
         return "Cil " + q(a.ref || "?") + " je konfiguracni prvek bridge - zapis do nej je zakazany.";
     case "HASH_MISSING":

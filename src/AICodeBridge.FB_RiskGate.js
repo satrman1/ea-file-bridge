@@ -191,7 +191,37 @@ var writeOps = 0, createOps = 0, updatedExisting = 0, deleteTargets = 0, moveOps
 var updatedExistingApprox = 0;
 var elSet = {}, elCount = 0, pkgSet = {}, pkgCount = 0, dgmSet = {}, dgmCount = 0;
 function addEl(k) { if (elSet[k] != 1) { elSet[k] = 1; elCount++; } }
-function addPkg(k) { if (pkgSet[k] != 1) { pkgSet[k] = 1; pkgCount++; } }
+var pkgIds = [], pkgIdsDel = {}; // N-RE-12 (v0.22): ID dotcenych balicku pro vycet jmen v duvodu/odpovedi (mazane zvlast - FB-PU-20 b)
+function addPkg(k) {
+    if (pkgSet[k] != 1) {
+        pkgSet[k] = 1; pkgCount++;
+        if (("" + k).charAt(0) == "p") { var pid = parseInt(("" + k).substring(1), 10); pkgIds.push(pid); if (inDelete) { pkgIdsDel["p" + pid] = 1; } }
+    }
+}
+// N-RE-12: teckove cesty dotcenych balicku (max 10 + "a N dalsich"); jen cteni, strop 10 lookupu
+var pkgPathCache = {};
+function pkgPath(pid) {
+    if (typeof pkgPathCache["p" + pid] != "undefined") { return pkgPathCache["p" + pid]; }
+    var pth = "";
+    try { pth = "" + self.FB_ElementPath(Repository, "package", pid); } catch (ePp) { pth = ""; }
+    if (pth == "" || pth == "?") { try { var pko = Repository.GetPackageByID(pid); pth = pko ? "" + pko.Name : ("#" + pid); } catch (ePn) { pth = "#" + pid; } }
+    pkgPathCache["p" + pid] = pth;
+    return pth;
+}
+function pkgList(skipDeleted) {
+    var names = [], more = 0;
+    for (var pi = 0; pi < pkgIds.length; pi++) {
+        if (skipDeleted && pkgIdsDel["p" + pkgIds[pi]] == 1) { continue; }
+        if (names.length >= 10) { more++; continue; }
+        names.push(pkgPath(pkgIds[pi]));
+    }
+    return { names: names, more: more };
+}
+function pkgListText() {
+    var pl = pkgList(false);
+    if (pl.names.length == 0) { return ""; }
+    return pl.names.join(", ") + (pl.more > 0 ? " a " + pl.more + " dalsich" : "");
+}
 function addForeignDgm(k) { if (dgmSet[k] != 1) { dgmSet[k] = 1; dgmCount++; } }
 // --- souhrn pro potvrzovaci UI (V2, I6: dialog zobrazuje konkretni davku) ---
 var opCounts = {}, tgtNames = [], pkgNames = [], dgmNames = [], nameSeen = {}, nameMore = { e: 0, p: 0, d: 0 };
@@ -798,11 +828,18 @@ if (budgetHit || metricsIncomplete) {
 // --- prahy politiky ---
 if (polValid) {
     // function expression, ne declaration - deklarace v bloku neni ES3
+    // N-RE-12: u affectedPackages nese duvod i vycet balicku (text + args.packages)
+    var thrArgs = function (key, v, lim) {
+        var a = { key: key, value: v, limit: lim };
+        if (key == "affectedPackages") { var pl = pkgList(false); a.packages = pl.names; a.packagesMore = pl.more; }
+        return a;
+    };
+    var thrSuffix = function (key) { var t = (key == "affectedPackages") ? pkgListText() : ""; return t ? " (" + t + ")" : ""; };
     var overB = function (v, key) {
-        if (v > pol.block[key]) { block("Prah BLOCKED prekrocen: " + key + " " + v + " > " + pol.block[key], "THRESHOLD_BLOCKED", { key: key, value: v, limit: pol.block[key] }); }
+        if (v > pol.block[key]) { block("Prah BLOCKED prekrocen: " + key + " " + v + " > " + pol.block[key] + thrSuffix(key), "THRESHOLD_BLOCKED", thrArgs(key, v, pol.block[key])); }
     };
     var overE = function (v, key) {
-        if (v > pol.elevate[key]) { elevate("Prah ELEVATED prekrocen: " + key + " " + v + " > " + pol.elevate[key], "THRESHOLD_ELEVATED", { key: key, value: v, limit: pol.elevate[key] }); }
+        if (v > pol.elevate[key]) { elevate("Prah ELEVATED prekrocen: " + key + " " + v + " > " + pol.elevate[key] + thrSuffix(key), "THRESHOLD_ELEVATED", thrArgs(key, v, pol.elevate[key])); }
     };
     overB(deleteTargets, "deleteTargets");
     overB(writeOps, "writeOps");
@@ -819,6 +856,19 @@ if (polValid) {
     if (typeof pol.elevate.moveOps == "number") { overE(moveOps, "moveOps"); }
 }
 
+// N-RE-12: summary.packages doplnit o balicky zapoctene jen pres prvky/diagramy
+// (touchElement/touchDiagram daly jen ID) - okno i E_RISK_BLOCKED pak rikaji KAM
+if (pkgIds.length > 0 && pkgNames.length < pkgCount) {
+    inDelete = false;
+    var plS = pkgList(true);
+    for (var ps = 0; ps < plS.names.length; ps++) {
+        var last = plS.names[ps], dot = last.lastIndexOf(".");
+        if (dot >= 0) { last = last.substring(dot + 1); }
+        var seenP = false;
+        for (var pq = 0; pq < pkgNames.length; pq++) { if (pkgNames[pq] == last || pkgNames[pq] == plS.names[ps]) { seenP = true; break; } }
+        if (!seenP) { pushName(pkgNames, "p", plS.names[ps]); }
+    }
+}
 return {
     riskLevel: (level == 3 ? "BLOCKED" : (level == 2 ? "ELEVATED" : "LOW")),
     riskReasons: reasons,
