@@ -7,9 +7,20 @@
 //                                nalez N-2) - vraci warning a odkazuje na
 //                                operaci move_elements.
 //   owningElement             -> alternativa: create POD elementem (napr. BRU pod UC)
-//   name                      -> jmeno (chybejici = "" - nepojmenovane instance/lifeliny)
+//   name                      -> jmeno (chybejici = "" - nepojmenovane instance/lifeliny).
+//                                N-RE-2 (v0.22): zadane jmeno (i "") se zapise i pri CREATE
+//                                hned po AddNew - EA jinak dosadi vychozi ("Object").
 //   type                      -> povinne na create; na UPDATE = ZMENA TYPU (bonus K7,
-//                                napr. Object -> Component; nahrazuje FIX skript)
+//                                napr. Object -> Component; nahrazuje FIX skript).
+//                                N-RE-1 (v0.22): "DiagramGate" | "Gate" = Diagram Gate
+//                                sekvencniho diagramu - Automation typ neexistuje
+//                                (AddNew hodi "Invalid type"); EA ho uklada jako
+//                                Object_Type 'MessageEndpoint' + NType 2 (Element.Subtype),
+//                                vlastnik = prvek interakce (owningElement = SR). Bridge
+//                                preklada sam (overeno 15. 10. 2026 nad EAExample).
+//                                InteractionOccurrence (ref, N-RE-4): bez jmena dostane
+//                                jmeno classifieru a kompozitni odkaz na jeho kompozitni
+//                                diagram (dvojklik otevre SR) - pokud neni dan compositeDiagram.
 //   stereotypes               -> string nebo pole; PLAIN jmena (par. 7h), sklada se do StereotypeEx
 //   notes | description       -> poznamky plain; notes_b64 = base64 UTF-8 zaloha
 //   alias, multiplicity, status
@@ -29,11 +40,38 @@
 //                                Default off - chovani stavajicich davek se NEMENI
 //                                (duplicitni jmena zustavaji legitimni).
 // } ]
-// Vysledek: items = [{guid, id, name, created}] + warnings. Razitka ai.channel/ai.request.
+// Vysledek: items = [{guid, id, name, created, compositeDiagramID?, compositeDiagramGUID?}]
+// + warnings. N-RE-11 (v0.22): kompozitni diagram prvku (vc. auto-kompozitu MDG) je
+// v items -> odkaz `$N[i].compositeDiagram` v dalsi operaci teze davky; FB_Main ho
+// bere i jako VLASTNI diagram session (pravidlo 3, N-RE-6). Razitka ai.channel/ai.request.
 if (!op || !op.elements || Object.prototype.toString.call(op.elements) != "[object Array]" || op.elements.length == 0) {
     return { op: "create_or_update_elements", status: "error", code: "E_ARGS", message: "Povinne: elements (neprazdne pole)." };
 }
 var items = [], warns = [];
+var self = this;
+// N-RE-1: preklad typu davky na typ Automation (+ Subtype)
+function eaType(t) {
+    var s = "" + t;
+    if (/^(diagram)?gate$/i.test(s)) { return { type: "MessageEndpoint", subtype: 2, gate: true }; }
+    return { type: s, subtype: -1, gate: false };
+}
+function applyType(el, t) {
+    var et = eaType(t);
+    el.Type = et.type;
+    if (et.subtype >= 0) { el.Subtype = et.subtype; }
+    return et;
+}
+// kompozitni diagram prvku: Automation CompositeDiagram, jinak t_diagram.ParentID (auto-kompozit MDG)
+function compositeOf(el) {
+    var d = null;
+    try { d = el.CompositeDiagram; } catch (eCd) { d = null; }
+    if (d && d.DiagramID) { return { id: d.DiagramID, guid: "" + d.DiagramGUID }; }
+    try {
+        var rws = self.FB_XmlRows(Repository.SQLQuery("SELECT Diagram_ID, ea_guid FROM t_diagram WHERE ParentID = " + parseInt(el.ElementID, 10)));
+        if (rws.length > 0) { return { id: parseInt(rws[0].Diagram_ID, 10), guid: "" + rws[0].ea_guid }; }
+    } catch (eCq) { }
+    return null;
+}
 this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou (E_PERMISSION / E_LOCKED)
 for (var i = 0; i < op.elements.length; i++) {
     var e = op.elements[i];
@@ -50,7 +88,7 @@ for (var i = 0; i < op.elements.length; i++) {
         }
         var chkU = this.FB_CheckWriteEl(Repository, el); // osa balicku + osa vlastniku (I14)
         if (chkU != null) { return { op: "create_or_update_elements", status: "error", code: chkU.code, message: "elements[" + i + "]: " + chkU.message, items: items }; }
-        if (e.type) { el.Type = "" + e.type; } // K7: zmena typu elementu
+        if (e.type) { applyType(el, e.type); } // K7: zmena typu elementu (N-RE-1: gate preklad)
     } else {
         // --- CREATE (s OPT-IN idempotenci - audit B2: dedupKey K4, matchByName K1) ---
         if (!e.type) {
@@ -70,7 +108,7 @@ for (var i = 0; i < op.elements.length; i++) {
                 el = dfE.obj;
                 var chkD = this.FB_CheckWriteEl(Repository, el); // cil dohledany pres dedupKey (kap. 5.6)
                 if (chkD != null) { return { op: "create_or_update_elements", status: "error", code: chkD.code, message: "elements[" + i + "]: " + chkD.message, items: items }; }
-                if (e.type) { el.Type = "" + e.type; } // parita s UPDATE cestou (K7)
+                if (e.type) { applyType(el, e.type); } // parita s UPDATE cestou (K7)
                 matchedBy = "dedupKey";
             }
         }
@@ -102,11 +140,14 @@ for (var i = 0; i < op.elements.length; i++) {
                 }
                 if (rowsO.length == 1) {
                     try { el = Repository.GetElementByGuid("" + rowsO[0].ea_guid); } catch (eGO) { el = null; }
-                    if (el != null) { if (e.type) { el.Type = "" + e.type; } matchedBy = "name"; }
+                    if (el != null) { if (e.type) { applyType(el, e.type); } matchedBy = "name"; }
                 }
             }
             if (el == null) {
-                el = owner.Elements.AddNew(nm, "" + e.type);
+                var etO = eaType(e.type);
+                el = owner.Elements.AddNew(nm, etO.type);
+                if (etO.subtype >= 0) { el.Subtype = etO.subtype; }
+                if (typeof e.name != "undefined" && e.name !== null) { el.Name = nm; } // N-RE-2: i prazdne jmeno
                 if (!el.Update()) { return { op: "create_or_update_elements", status: "error", code: "E_EXCEPTION", message: "elements[" + i + "]: Update selhal: " + el.GetLastError(), items: items }; }
                 owner.Elements.Refresh();
                 created = true;
@@ -136,11 +177,15 @@ for (var i = 0; i < op.elements.length; i++) {
                 }
                 if (rowsP.length == 1) {
                     try { el = Repository.GetElementByGuid("" + rowsP[0].ea_guid); } catch (eGP) { el = null; }
-                    if (el != null) { if (e.type) { el.Type = "" + e.type; } matchedBy = "name"; }
+                    if (el != null) { if (e.type) { applyType(el, e.type); } matchedBy = "name"; }
                 }
             }
             if (el == null) {
-                el = pkg.Elements.AddNew(nm, "" + e.type);
+                var etP = eaType(e.type);
+                if (etP.gate) { warns.push("elements[" + i + "]: Diagram Gate zalozen primo v package - gate patri pod prvek interakce (owningElement = SR), jinak nesedi na ramu jeho diagramu."); }
+                el = pkg.Elements.AddNew(nm, etP.type);
+                if (etP.subtype >= 0) { el.Subtype = etP.subtype; }
+                if (typeof e.name != "undefined" && e.name !== null) { el.Name = nm; } // N-RE-2: i prazdne jmeno
                 if (!el.Update()) { return { op: "create_or_update_elements", status: "error", code: "E_EXCEPTION", message: "elements[" + i + "]: Update selhal: " + el.GetLastError(), items: items }; }
                 pkg.Elements.Refresh();
                 created = true;
@@ -166,7 +211,7 @@ for (var i = 0; i < op.elements.length; i++) {
                 + el.PackageID + ". Na presun mezi packages pouzij operaci move_elements.");
         }
     }
-    if (!created && typeof e.name != "undefined" && e.name !== null) { el.Name = "" + e.name; }
+    if (typeof e.name != "undefined" && e.name !== null) { el.Name = "" + e.name; } // N-RE-2: plati i pro create
     if (typeof e.alias != "undefined") { el.Alias = "" + e.alias; }
     if (e.stereotypes) {
         var st = e.stereotypes;
@@ -180,16 +225,30 @@ for (var i = 0; i < op.elements.length; i++) {
     if (typeof e.status != "undefined") { el.Status = "" + e.status; }
     if (typeof e.author != "undefined") { el.Author = "" + e.author; }     // K6
     if (typeof e.version != "undefined") { el.Version = "" + e.version; }  // K6
-    if (typeof e.classifierID != "undefined") { el.ClassifierID = parseInt(e.classifierID, 10); }
-    else if (e.classifier) {
+    var clObj = null; // classifier jako objekt (N-RE-4: jmeno + kompozit refu)
+    if (typeof e.classifierID != "undefined") {
+        el.ClassifierID = parseInt(e.classifierID, 10);
+        try { clObj = Repository.GetElementByID(parseInt(e.classifierID, 10)); } catch (eCl) { clObj = null; }
+    } else if (e.classifier) {
         var cl = this.FB_ResolveEl(Repository, e.classifier);
         if (cl == null) { warns.push("elements[" + i + "]: classifier nenalezen - preskocen"); }
-        else { el.ClassifierID = cl.ElementID; }
+        else { el.ClassifierID = cl.ElementID; clObj = cl; }
     }
+    // N-RE-4: InteractionOccurrence (ref) bez jmena -> jmeno classifieru (vzor MCP)
+    var isRef = (("" + el.Type) == "InteractionOccurrence");
+    if (isRef && clObj != null && ("" + el.Name) == "") { el.Name = "" + clObj.Name; }
     if (typeof e.isComposite != "undefined") { el.IsComposite = e.isComposite ? true : false; } // K8
     if (!el.Update()) {
         return { op: "create_or_update_elements", status: "error", code: "E_EXCEPTION",
             message: "elements[" + i + "]: Update selhal: " + el.GetLastError(), items: items };
+    }
+    // N-RE-4: ref bez explicitniho compositeDiagram -> kompozitni odkaz na kompozit classifieru (dvojklik otevre SR)
+    if (isRef && clObj != null && !e.compositeDiagram) {
+        var clCd = compositeOf(clObj);
+        if (clCd != null) {
+            try { el.SetCompositeDiagram(clCd.guid); itE.refDiagramID = clCd.id; }
+            catch (eRc) { warns.push("elements[" + i + "]: SetCompositeDiagram (ref -> kompozit classifieru) selhal: " + eRc.message); }
+        } else { warns.push("elements[" + i + "]: classifier '" + clObj.Name + "' nema kompozitni diagram - ref zustava bez odkazu"); }
     }
     // K8: klikatelny kompozitni diagram
     if (e.compositeDiagram) {
@@ -209,6 +268,11 @@ for (var i = 0; i < op.elements.length; i++) {
     if (created && e.dedupKey) { this.SetTag(el, "ai.dedup", "" + e.dedupKey); } // K4: klic prezije prejmenovani
     this.SetTag(el, "ai.request", "" + reqId);
     itE.name = "" + el.Name; // jmeno po zapisu vlastnosti (create s name, update s prejmenovanim)
+    // N-RE-11: kompozitni diagram prvku do items (create, isComposite, compositeDiagram) - auto-kompozit MDG vznika az Update
+    if (created || typeof e.isComposite != "undefined" || e.compositeDiagram) {
+        var cdE = compositeOf(el);
+        if (cdE != null) { itE.compositeDiagramID = cdE.id; itE.compositeDiagramGUID = cdE.guid; }
+    }
 }
 var res = { op: "create_or_update_elements", status: "ok", count: items.length, items: items };
 if (items.length > 0) { res.guid = items[0].guid; res.id = items[0].id; }
