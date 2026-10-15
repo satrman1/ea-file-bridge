@@ -10,7 +10,12 @@
 // op.diagram = diagramID | "{GUID}" | $ref
 // op.elementPlacements = [ { elementID | element ("{GUID}"|$ref), x, y,
 //                            width, height, style } ]   (alias: op.elements)
-// Vysledek: items = [{elementID, guid, x, y, width, height}] +
+// N-RE-3 (v0.22): prvek, ktery UZ na diagramu je, se NEPRIDAVA znovu (druhy
+// DiagramObject tehoz prvku EA odmitne: Update() false s prazdnym GetLastError
+// - sekvencni i UC diagram), ale PRESUNE: existujici DiagramObject dostane
+// novou geometrii (left/right/top/bottom; top/bottom zaporne jako v
+// t_diagramobjects). Bez x/y zustava, kde je (moved:false). Item nese moved.
+// Vysledek: items = [{elementID, guid, x, y, width, height, moved}] +
 //           connectorsOnDiagram = [{connectorID, hidden}].
 var pls = (op && (op.elementPlacements || op.elements)) || null;
 if (!op || !op.diagram || !pls || Object.prototype.toString.call(pls) != "[object Array]" || pls.length == 0) {
@@ -28,6 +33,17 @@ if (chk != null) { return { op: "place_elements_on_diagram", status: "error", co
 var items = [];
 this._fbOpProgress = { items: items }; // W3: polozky pred pripadnou vyjimkou
 var auto = 0; // poradove cislo auto-pozicovanych elementu (mrizka)
+// N-RE-3: existujici DiagramObject prvku na diagramu (null = prvek na diagramu neni)
+function existingObj(elId) {
+    try {
+        for (var k = 0; k < dg.DiagramObjects.Count; k++) {
+            var o = dg.DiagramObjects.GetAt(k);
+            if (o && o.ElementID == elId) { return o; }
+        }
+    } catch (eX) { }
+    return null;
+}
+var movedCount = 0;
 for (var i = 0; i < pls.length; i++) {
     var p = pls[i];
     var el = null;
@@ -37,10 +53,28 @@ for (var i = 0; i < pls.length; i++) {
         el = this.FB_ResolveEl(Repository, p.element);
     }
     if (el == null) { return { op: "place_elements_on_diagram", status: "error", code: "E_NOT_FOUND", message: "elementPlacements[" + i + "]: element nenalezen (" + (p.elementID || p.element) + ")", items: items }; }
+    var hasXY = (typeof p.x != "undefined" && typeof p.y != "undefined");
+    var ex = existingObj(el.ElementID);
+    if (ex != null) {
+        // uz na diagramu: presun (s geometrii) nebo noop (bez x/y)
+        var ox = ex.left, oy = -ex.top, ow = ex.right - ex.left, oh = ex.top - ex.bottom;
+        if (hasXY) {
+            var nx = parseInt(p.x, 10), ny = parseInt(p.y, 10);
+            var nw = (typeof p.width != "undefined") ? parseInt(p.width, 10) : ow;
+            var nh = (typeof p.height != "undefined") ? parseInt(p.height, 10) : oh;
+            ex.left = nx; ex.right = nx + nw; ex.top = -ny; ex.bottom = -(ny + nh);
+            if (!ex.Update()) { return { op: "place_elements_on_diagram", status: "error", code: "E_EXCEPTION", message: "elementPlacements[" + i + "]: presun existujiciho DiagramObject - Update() selhal: " + ex.GetLastError(), items: items }; }
+            items.push({ elementID: el.ElementID, guid: "" + el.ElementGUID, x: nx, y: ny, width: nw, height: nh, moved: true, from: { x: ox, y: oy, width: ow, height: oh } });
+            movedCount++;
+        } else {
+            items.push({ elementID: el.ElementID, guid: "" + el.ElementGUID, x: ox, y: oy, width: ow, height: oh, moved: false, note: "prvek uz na diagramu je - bez x/y se nemeni" });
+        }
+        continue;
+    }
     var w = (typeof p.width != "undefined") ? parseInt(p.width, 10) : 160;
     var h = (typeof p.height != "undefined") ? parseInt(p.height, 10) : 80;
     var x, y;
-    if (typeof p.x != "undefined" && typeof p.y != "undefined") {
+    if (hasXY) {
         x = parseInt(p.x, 10); y = parseInt(p.y, 10);
     } else {
         x = 40 + (auto % 4) * 220;
@@ -51,7 +85,7 @@ for (var i = 0; i < pls.length; i++) {
     var obj = dg.DiagramObjects.AddNew(pos, (p.style ? "" + p.style : ""));
     obj.ElementID = el.ElementID;
     if (!obj.Update()) { return { op: "place_elements_on_diagram", status: "error", code: "E_EXCEPTION", message: "elementPlacements[" + i + "]: DiagramObject.Update() selhal: " + obj.GetLastError(), items: items }; }
-    items.push({ elementID: el.ElementID, guid: "" + el.ElementGUID, x: x, y: y, width: w, height: h });
+    items.push({ elementID: el.ElementID, guid: "" + el.ElementGUID, x: x, y: y, width: w, height: h, moved: false });
 }
 dg.DiagramObjects.Refresh();
 try { Repository.ReloadDiagram(dg.DiagramID); } catch (eR) { }
@@ -76,4 +110,4 @@ try {
     }
 } catch (eL) { }
 return { op: "place_elements_on_diagram", status: "ok", diagramID: dg.DiagramID, guid: "" + dg.DiagramGUID,
-    count: items.length, items: items, connectorsOnDiagram: links };
+    count: items.length, moved: movedCount, items: items, connectorsOnDiagram: links };
