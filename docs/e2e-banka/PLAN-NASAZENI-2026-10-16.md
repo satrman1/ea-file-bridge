@@ -1,6 +1,6 @@
-# Plán dne nasazení v0.21 v bance — 2026-10-16 (vlákno Z261013‑2 → provádí Z261013‑3)
+# Plán dne nasazení v0.22 v bance — nový den D (vlákno Z261013‑2 → provádí Z261013‑3; dorovnáno na v0.22 vláknem Z261014b‑1)
 
-*Verze 1.1, 2026-10-14 (rozhodnutí Miloše 14. 10. 11:10–12:11: **den D = St 14. 10. 2026**, Čt 15. 10. rezerva, Pá příprava prezentace; M365 kity se nasazují týž den; bez druhého účtu; chráněná větev = katalog komponent; kit `.github` dnes nechat, build profilem banka = Čt; **příští týden refresh testu z produkce — vše dnes nasazené v `<TEST-DB>` zmizí, kap. I**). Verze 1.0 2026-10-13 (vlákno Z261013‑2, bez Miloše). Kód: tag **v0.21** = `45de928` (na GitHubu, ověřeno 13. 10. 16:19). Předchozí stav v bance: **v0.14** = `75534f1` + opravy `d53164c`/`47fdbb2` přenesené schránkou 10. 9. 2026, bankovní adaptace v korporátním repu (commit „adaptace banka v0.14"). Tento soubor nese žádné interní hodnoty banky — jen placeholdery z tabulky níže. Kódy vláken s U+2011 (sweep).*
+*Verze 1.2, 2026-10-15 (vlákno Z261014b‑1): **kód = tag `v0.22`** (opravy z reverse engineeringu add‑inu — Diagram Gate, jméno `""` při create, přemístění prvku po diagramu, ref s odkazem, `$N[i].compositeDiagram`, `move_elements` pod prvek, výčet balíčků u prahu, Actor na SD, QC bez jména; `docs/re-addin/VYSLEDKY-2026-10-15-opravy.md`, PROTOKOL hlavička v0.22). **Den D se posunul za doběhnutí Z261014b‑1 (rozhodnutí Miloše 14. 10. 21:59)** — datum určí Miloš; postup dne beze změny, mění se jen tag, otisk a tabulka adaptací (kap. 1.1 řádky N‑RE). Bankovní dávky `ready\req-banka-*.json` **beze změny** (diff signatur v0.21→v0.22 = 0, žádná z dávek nepoužívá změněná pole; tvar odpovědí je jen rozšířen o nová pole). Kap. I beze změny. Verze 1.1, 2026-10-14 (rozhodnutí Miloše 14. 10. 11:10–12:11: **den D = St 14. 10. 2026**, Čt 15. 10. rezerva, Pá příprava prezentace; M365 kity se nasazují týž den; bez druhého účtu; chráněná větev = katalog komponent; kit `.github` dnes nechat, build profilem banka = Čt; **příští týden refresh testu z produkce — vše dnes nasazené v `<TEST-DB>` zmizí, kap. I**). Verze 1.0 2026-10-13 (vlákno Z261013‑2, bez Miloše). Kód (v1.1): tag v0.21 = `45de928`; **od v1.2: tag `v0.22`** (lokálně založen 15. 10., push tagu = Miloš z VS Code — A1). Předchozí stav v bance: **v0.14** = `75534f1` + opravy `d53164c`/`47fdbb2` přenesené schránkou 10. 9. 2026, bankovní adaptace v korporátním repu (commit „adaptace banka v0.14"). Tento soubor nese žádné interní hodnoty banky — jen placeholdery z tabulky níže. Kódy vláken s U+2011 (sweep).*
 
 > **Co tenhle soubor je.** Pořadí kroků dne D shora dolů s odkazy na kapitoly `docs/NAVOD-NASAZENI-KLIKACI.md` v1.5a (dál jen **NAVOD**). Plán NAVOD neopisuje — říká **co se od 10. 9. změnilo**, **v jakém pořadí** to kliknout, **co čekat** a **kdy zastavit**. Každý krok: CO – KDE – JAK – OČEKÁVANÝ VÝSLEDEK – KDYŽ SELŽE.
 > **Co tenhle soubor NENÍ.** Není to návod (ten je NAVOD) ani protokol testu. Výsledky dne D patří do `docs/e2e-banka/VYSLEDKY-2026-10-16.md` (šablona v kap. H).
@@ -12,7 +12,7 @@
 |---|---|---|---|---|
 | A | Před dnem D (doma) | VS Code doma | 15 min | — |
 | B | Kurýrní klon → korporátní repo (pull, diff, adaptace zpět, commit) | VS Code v bance | 30 min | 1.1–1.3 |
-| C | Šest configů = bankovní položky do souborů v0.21 (Copilot) | VS Code v bance, Copilot | 30 min | 5.1–5.6 |
+| C | Šest configů = bankovní položky do souborů v0.22 (Copilot) | VS Code v bance, Copilot | 30 min | 5.1–5.6 |
 | D | Bootstrap → plný restart EA → Manage Add-Ins → pumpa v0.6 → kontrola parametrů | EA, pumpa | 20 min | 2.2, 4, 3, 4a |
 | E | Ping (pumpa, schránka) → checklist → recon → blacklist naostro → LOW + audit → ELEVATED Ne/Ano → deny naostro → úklid | pumpa, EA | 40 min | 6.1–6.4, 7.3a, 7.5 |
 | F | Blok 2 (jen když zbývá čas): workspace analytika | VS Code v bance | 30 min | `docs/WORKSPACE-METODIKY.md` kap. 5 |
@@ -45,20 +45,29 @@ Tabulka NAVOD „Placeholdery" platí celá. Navíc pro tento den (**doplň do `
 
 ---
 
-## 1. Prescan: bankovní adaptace v0.14 → v0.21 (základ plánu)
+## 1. Prescan: bankovní adaptace v0.14 → v0.22 (základ plánu; v1.0/1.1 psáno pro v0.21)
 
-Z `git diff --name-status v0.14..v0.21 -- src\` (ověřeno 13. 10. 2026): **101 souborů** v `src\` změněno — **35 nových**, **1 smazaný** (`FB_Whitelist`), 65 upravených; `src\` má **140 souborů = 139 operací + `gatekeeper.ps1`**. Změněné signatury existujících operací: **6** (`FB_Audit` +`human`, `FB_ConfirmSummary` +`ageInfo`, `FB_ResolveEl` +`mode`, `FB_ResolvePkg` +`mode`, `FB_RiskAuditTags` +`baseline`, `FB_RiskNote` +`baseline`; všechny čtou nový parametr přes `typeof`). Mimo `src\`: nový `pump.wsf` **v0.6** (pumpa 10. 9. byla v0.5), nové/změněné docs, `tools\`, `config\`.
+Z `git diff --name-status v0.14..v0.22 -- src\` (ověřeno 15. 10. 2026; proti v0.21 se změnilo 15 souborů, všechny už v těchto počtech): **101 souborů** v `src\` změněno — **35 nových**, **1 smazaný** (`FB_Whitelist`), 65 upravených; `src\` má **140 souborů = 139 operací + `gatekeeper.ps1`**. Změněné signatury existujících operací: **6** (`diff-signatures v0.14 HEAD`; v0.21→v0.22 **0**) (`FB_Audit` +`human`, `FB_ConfirmSummary` +`ageInfo`, `FB_ResolveEl` +`mode`, `FB_ResolvePkg` +`mode`, `FB_RiskAuditTags` +`baseline`, `FB_RiskNote` +`baseline`; všechny čtou nový parametr přes `typeof`). Mimo `src\`: nový `pump.wsf` **v0.6** (pumpa 10. 9. byla v0.5), nové/změněné docs, `tools\`, `config\`.
 
 ### 1.1 Tabulka adaptací (co v bankovních položkách přibývá / mizí)
 
-| Soubor | Stav v bance po 10. 9. | Co přidat ve v0.21 | Co odebrat | Vzor položky (placeholdery) |
+| Soubor | Stav v bance po 10. 9. | Co přidat ve v0.22 | Co odebrat | Vzor položky (placeholdery) |
 |---|---|---|---|---|
 | `src\AICodeBridge.FB_WriteScope.js` | **neexistuje** (byl `FB_Whitelist.js` s položkou `{ repo: "<TEST-DB>", pkg: "{<GUID-SANDBOX>}" }`) | **nová položka** (NAVOD 5.2): `cascadeDelete: "block"`, `blacklist[]` s aspoň jednou větví; `name` povinné | `src\AICodeBridge.FB_Whitelist.js` **smazat ze `<KORP>\src\`** (překopírování ho nesmaže — nález N‑P‑2); osiřelou operaci `FB_Whitelist` v modelu nechat (NAVOD 1.2) | `{ repo: "<TEST-DB>", cascadeDelete: "block", blacklist: [ { pkg: "{<PROTECTED-PKG-1>}", name: "<PROTECTED-PKG-1-NAME>", note: "proc je chranena" } ] }` |
 | `src\AICodeBridge.FB_Config.js` | položka `{ repo, baseDir: "<KORP>", srcDir: "<KORP>\\src\\", navProbe: false, auditPkg: "{<GUID-AILOG>}" }` | nic nového povinného; **`baseDir` = `<KORP>` ponechat** (N‑GEN‑3: jen tak schránkový kanál odmítne `BEZI PUMPA`); `auditPkg` od v0.17 **povinný** (chybí = `E_SCOPE_CONFIG`) | **žádný klíč `gatekeeper`** (vrátný se v bance nenasazuje, FB‑PU‑43) | `{ repo: "<TEST-DB>", baseDir: "<KORP>", srcDir: "<KORP>\\src\\", navProbe: false, auditPkg: "{<GUID-AILOG>}" }` |
 | `src\AICodeBridge.FB_RiskPolicy.js` | `BANK_CLASSES` = kopie `DEV_CLASSES` + `deploy_src: "BLOCKED"`; položka bez `baseline` | **sekce `baseline`** (šablona v komentáři souboru, par. 5 Baseline politiky): kopie `DEV_BASELINE` s `requireRecoveryForUpdates: true`, `sessionBaseline: "off"`; **`ownSessionLow: false`**; **`confirmMaxAgeMin: 480`**. Bez sekce `baseline` by každý start session hlásil varování „polozka nema sekci baseline" a platily defaulty (funkčně totéž, ale varování na startu = šum) | — | viz prompt C.5 |
 | `src\AICodeBridge.FB_OpsAllowed.js` | položka `allow: ["*"]`, deny 6 operací | beze změny (jen komentáře) | — | `{ repo: "<TEST-DB>", allow: ["*"], deny: ["delete_from_model", "delete_taggedvalue_from_model", "remove_elements_from_diagram", "clone_package", "clone_elements", "deploy_src"] }` |
 | `src\AICodeBridge.FB_AccessGroups.js` | položka `{ repo, writeGroups: ["<WRITE-GROUP>"] }` | beze změny | — | `{ repo: "<TEST-DB>", writeGroups: ["<WRITE-GROUP>"] }` |
-| `src\AICodeBridge.FB_QcConfig.js` | bankovní podmnožina kontrol z 10. 9. | beze změny (jen komentář); QC se od v0.21 hlásí větou `Kontrola kvality: …` v Outputu a auditu | — | položka z 10. 9. beze změny |
+| `src\AICodeBridge.FB_QcConfig.js` | bankovní podmnožina kontrol z 10. 9. | beze změny (jen komentář); QC se od v0.22 hlásí větou `Kontrola kvality: …` v Outputu a auditu | — | položka z 10. 9. beze změny |
+| **N‑RE‑1 Diagram Gate** (v0.22) | `type: "DiagramGate"` padalo `Invalid type` | nic v configu — chování: gate = `MessageEndpoint` + `Subtype 2` pod `owningElement` (SR/UCR), zprávy z gatu i na gate (`isReturn`) | — | kit: EAFB‑Operace‑Registr `create_or_update_elements` (po dni D) |
+| **N‑RE‑2 jméno `""`** (v0.22) | create dosadil „Object" | nic — `name` (i prázdné) platí při create | — | — |
+| **N‑RE‑3 přemístění** (v0.22) | `place_elements_on_diagram` na prvek už na diagramu = `E_EXCEPTION` | nic — existující prvek se přesune (`moved: true`) | — | — |
+| **N‑RE‑4 ref** (v0.22) | ref bez jména/odkazu | nic — jméno + kompozitní odkaz z classifieru | — | — |
+| **N‑RE‑6/‑11 kompozit** (v0.22) | auto‑kompozit MDG = cizí diagram; druhá dávka na `t_diagram` | nic — `items[].compositeDiagramID`, `$N[i].compositeDiagram`; vlastní diagram session jen při `ownSessionLow: true` (**banka má `false`** — tam se okno nemění) | — | — |
+| **N‑RE‑12 výčet balíčků** (v0.22) | `affectedPackages N > M` bez jmen | nic — texty oken a `E_RISK_BLOCKED` nesou tečkové cesty (max 10); **v bance je to první věc, kterou uvidí správce v okně** — nese jména balíčků testovací DB, do vaultu jen `<skryto>` | — | kit: EAFB‑Pravidla‑Agenta (dělení dávky podle výčtu) |
+| **N‑RE‑17 `move_elements` pod prvek** (v0.22) | jen cíl `package` | nic v configu — `owningElement` jako cíl; **E8/E9 dávky používají `package` — beze změny**; třída ELEVATED trvá | — | `FB_RiskPolicy` bez změny (`move_elements: "ELEVATED"`) |
+| **N‑RE‑18 Actor** (v0.22) | `apply_classifier_stereotypes` aktéra nechával `Object` | nic — Actor → Actor | — | — |
+| **N‑RE‑9 QC** (v0.22) | QC‑DEMO‑001 (jen doma) hlásila lifeliny | **bankovní položka `FB_QcConfig` beze změny** — má‑li banka vlastní kontrolu „prázdné jméno", přidej `AND (o.Classifier IS NULL OR o.Classifier = 0) AND o.Object_Type NOT IN ('InteractionOccurrence','Boundary','MessageEndpoint')` | — | prompt C.6 (QcConfig) doplnit větu |
 | `.github\copilot-instructions.md` | ručně adaptovaný kit thin v0.13 (N‑B‑11) | pro den D **není potřeba** (dávky jsou hotové, agent se nepouští); kit = blok F / jiné vlákno | — | — |
 | `pump.wsf` | v0.5 | **v0.6** přijde kopií z klonu do `<KORP>` — starou pumpu před startem zavřít | — | — |
 | `src-bak\` (mimo git) | záloha z 10. 9. měla být smazána (N‑B‑9) | nová dočasná záloha šesti configů **mimo `<KORP>`** (blok B.0) | po dni D smazat | — |
@@ -66,8 +75,8 @@ Z `git diff --name-status v0.14..v0.21 -- src\` (ověřeno 13. 10. 2026): **101 
 ### 1.2 Co bootstrap v bance vypíše (odvozeno z diffu; čísla ověř)
 
 - `Element AICodeBridge uz existuje (<ID>)` + **`VAROVANI: v modelu je 2 elementu jmenem AICodeBridge`** s výpisem (N‑B‑4 z 10. 9. trvá: druhý bez stereotypu) — kód dostane ten se stereotypem (`<- CIL`). **Není STOP.** `STOP: 2 elementy … se stereotypem JavascriptAddin` by znamenal, že se v modelu něco změnilo — nepokračovat.
-- **6 řádků `PX`** (signatury výše) a souhrn **`Hotovo: 35 operaci zalozeno, 139 nahran kod (souboru v src: 139). Parametry: 6 operaci srovnano podle hlavicky (radky PX). Receptions: 0 zalozeno, 0 prepnuto na lokalni Signal, 0 parametry opraveny.`** (receptions založil a opravil bootstrap 10. 9.; žádný nový `EA_*` handler od v0.14 nepřibyl).
-- `Otisk kodu v modelu: c37e5f8a4c1a (132 souboru bez konfigurace, …)` — musí sedět na otisk klonu (`python tools\code-fingerprint.py` doma 13. 10. = `c37e5f8a4c1a`; v bance totéž nad `<KLON>`, Python 3.12 je).
+- **6 řádků `PX`** (signatury výše; v0.22 žádnou nepřidává) a souhrn **`Hotovo: 35 operaci zalozeno, 139 nahran kod (souboru v src: 139). Parametry: 6 operaci srovnano podle hlavicky (radky PX). Receptions: 0 zalozeno, 0 prepnuto na lokalni Signal, 0 parametry opraveny.`** (receptions založil a opravil bootstrap 10. 9.; žádný nový `EA_*` handler od v0.14 nepřibyl).
+- `Otisk kodu v modelu: ea47ee1a03a8 (132 souboru bez konfigurace, …)` — **v0.22 = `ea47ee1a03a8`** (`python tools\code-fingerprint.py` doma 15. 10.; v0.21 byl `c37e5f8a4c1a`); v bance totéž nad `<KLON>`, Python 3.12 je. Generálka doma 15. 10. (QEAX z v0.21 → v0.22): viz `docs/re-addin/VYSLEDKY-2026-10-15-opravy.md` kap. 7 — z v0.21 bootstrap hlásí `0 zalozeno / 139 nahran / Parametry 0`; **banka jde z v0.14, proto 35 / 139 / 6**.
 - Po restartu: **Code loader 140 operací** (139 + osiřelá `FB_Whitelist`); kontrola parametrů (4a): `operaci v modelu: 140, souboru v src: 139, rozdilu: 0` + jeden řádek `V MODELU NAVIC (bez souboru v src): FB_Whitelist`.
 
 ---
@@ -78,22 +87,22 @@ Z `git diff --name-status v0.14..v0.21 -- src\` (ověřeno 13. 10. 2026): **101 
 
 | # | CO | KDE | JAK | OČEKÁVANÝ VÝSLEDEK | KDYŽ SELŽE |
 |---|---|---|---|---|---|
-| A1 | Tag `v0.21` je na GitHubu | GitHub `satrman1/ea-file-bridge` v prohlížeči | Code → větev/tag přepínač → Tags | `v0.21` v seznamu (13. 10. 16:19 ověřeno: `4b87c4c` → `45de928`) | VS Code doma: Source Control → … → Push → „Push (Follow Tags)" |
+| A1 | Tag `v0.22` je na GitHubu (v1.2; lokálně založen 15. 10., push = Miloš z VS Code „Push (Follow Tags)") | GitHub `satrman1/ea-file-bridge` v prohlížeči | Code → větev/tag přepínač → Tags | `v0.21` v seznamu (13. 10. 16:19 ověřeno: `4b87c4c` → `45de928`) | VS Code doma: Source Control → … → Push → „Push (Follow Tags)" |
 | A2 | Token kurýra platí | — | karta `_FRONTA/PROBLEMS-obnova-tokenu-kuryrniho-kanalu.md` | platí do ≈ 27. 10. 2026 → pro 16. 10. stačí; obnova zůstává kartou | pull v bance spadne na přihlášení → obnovit token před dnem D |
-| A3 | **ZIP kitů M365** (rozhodnutí 14. 10.: nasadit týž den) | `C:\Users\milos\CLAUDE\IT-ANALYSIS\M365\banka-kity-2026-10-12.zip` (12. 10. 17:47, 9 souborů) → schránkou/ZIPem do banky → SharePoint knihovna pro AI kontext | složky `EA-FILE-BRIDGE\` (4 soubory: `EA Bridge Expert.md` + 3 EAFB) a `LANGOSH\02-use-case-model\` (4 soubory) **přepsat** verzí 10‑12 (stará 09‑17 pryč); v `02-Use-Case-Model-Prompt.md` dosadit 7× `[DOPLŇ ODKAZ NA SHAREPOINT]` (odkazy zůstávají stejné jako 17. 9., když se názvy souborů nezměnily) | tři EAFB reference v ZIPu jsou bit‑shodné s `.github\skills\eafb-bridge\references\` v repu v0.21 (ověřeno 14. 10.) — kit M365 odpovídá kódu | `[DOPLŇ …]` zůstane v promptu → Copilot zdroj nenačte; grep před uložením |
+| A3 | **ZIP kitů M365** (rozhodnutí 14. 10.: nasadit týž den) | `C:\Users\milos\CLAUDE\IT-ANALYSIS\M365\banka-kity-2026-10-12.zip` (12. 10. 17:47, 9 souborů) → schránkou/ZIPem do banky → SharePoint knihovna pro AI kontext | složky `EA-FILE-BRIDGE\` (4 soubory: `EA Bridge Expert.md` + 3 EAFB) a `LANGOSH\02-use-case-model\` (4 soubory) **přepsat** verzí 10‑12 (stará 09‑17 pryč); v `02-Use-Case-Model-Prompt.md` dosadit 7× `[DOPLŇ ODKAZ NA SHAREPOINT]` (odkazy zůstávají stejné jako 17. 9., když se názvy souborů nezměnily) | tři EAFB reference v ZIPu jsou bit‑shodné s `.github\skills\eafb-bridge\references\` v repu v0.22 (ověřeno 14. 10.) — kit M365 odpovídá kódu | `[DOPLŇ …]` zůstane v promptu → Copilot zdroj nenačte; grep před uložením |
 | A4 | Odpovědi na kartu rozhodnutí (kap. 3) | `_FRONTA/` | **odpovězeno 14. 10.:** den D = dnes 14. 10. (Čt rezerva); bez druhého účtu (G: `E_ADDIN_ACCESS` přeskočit); `<PROTECTED-PKG-1>` = **katalog komponent** (položka blacklistu, zámek EA navíc); kit `.github` dnes nechat, build profilem banka s placeholdery = Čt 15. 10. (nové vlákno Z261013‑4) | karta uzavřena | — |
-| A5 | Tento plán a dávky v klonu | — | commit tohoto vlákna je v `main` před tagem? **Ne** — plán vznikl **po** tagu `v0.21`; banka ho dostane pullem `main` (A1 = tag, plán = HEAD) | po pullu je v `<KLON>\docs\e2e-banka\PLAN-NASAZENI-2026-10-16.md` | pull jen tagu by plán nepřinesl — pull `main` (B1) |
+| A5 | Tento plán a dávky v klonu | — | commit tohoto vlákna je v `main` před tagem? v1.2: plán v1.2 je **před** tagem `v0.22` (tag založen na posledním commitu vlákna Z261014b‑1), pull `main` i checkout tagu ho přinesou; (v1.0 vznikl po tagu `v0.21`; banka ho dostane pullem `main` (A1 = tag, plán = HEAD) | po pullu je v `<KLON>\docs\e2e-banka\PLAN-NASAZENI-2026-10-16.md` | pull jen tagu by plán nepřinesl — pull `main` (B1) |
 
 ### B. Kurýrní klon → korporátní repo (NAVOD 1.1–1.3)
 
 | # | CO | KDE | JAK | OČEKÁVANÝ VÝSLEDEK | KDYŽ SELŽE |
 |---|---|---|---|---|---|
 | B0 | **Záloha bankovních configů** (6 souborů) před přepisem | Průzkumník | `<KORP>\src\AICodeBridge.FB_Whitelist.js`, `FB_Config.js`, `FB_RiskPolicy.js`, `FB_OpsAllowed.js`, `FB_AccessGroups.js`, `FB_QcConfig.js` → zkopíruj do nové složky **mimo repo**, např. `<KORP>\..\adaptace-banka-v014\` | 6 souborů v záloze — zdroj pro Copilota v bloku C | — |
-| B1 | Pull kurýrního klonu | VS Code nad `<KLON>` | NAVOD 1.1: Source Control → … → Pull (větev `main`) | poslední commit = **`docs(e2e-banka): plan nasazeni v0.21 …`** (toto vlákno) nad `45de928` (`docs(e2e-nasazeni): generalka v0.21 …`); … → Checkout to… ukáže i tag `v0.21`. Checkout tagu **nedělej** (plán a dávky jsou až za tagem) | „Repository not found" → identita `satrman1@` (kanál fáze D); přihlášení → token (A2) |
+| B1 | Pull kurýrního klonu | VS Code nad `<KLON>` | NAVOD 1.1: Source Control → … → Pull (větev `main`) | poslední commit = **`docs(e2e-banka): plan nasazeni v0.22 …`** (toto vlákno) nad `45de928` (`docs(e2e-nasazeni): generalka v0.22 …`); … → Checkout to… ukáže i tag `v0.22`. Checkout tagu **nedělej** (plán a dávky jsou až za tagem) | „Repository not found" → identita `satrman1@` (kanál fáze D); přihlášení → token (A2) |
 | B2 | Diff klon × korp. repo | VS Code nad `<KORP>` | NAVOD 1.2: kopie obsahu `<KLON>` **bez `.git`** přes `<KORP>` → Source Control ukáže změny | řádově **stovky** změněných souborů (47 commitů od v0.14: `src\` 101, `docs\`, `tools\`, `config\`, `pump.wsf`, `.github\`); **6 configů** ukážou domácí verzi místo bankovní (zálohováno v B0) | nečekaná položka (soubor, který ani doma neexistuje) = stop, vyšetřit |
 | B3 | **Smazat `FB_Whitelist.js`** | Průzkumník `<KORP>\src\` | smaž `AICodeBridge.FB_Whitelist.js` (v klonu už není; kopie ho nesmaže — N‑P‑2) | Source Control: soubor jako „Deleted"; `src\` má **140 souborů** (Průzkumník: označ vše → stavový řádek) | zůstane-li, bootstrap ho nahraje jako 140. operaci se souborem — neškodí, ale otisk souborů v src bude 140 a kontrola parametrů nebude sedět na „139" |
 | B4 | Checklist adaptací (kap. 1.1) — **zatím jen poznamenat**, přepis dělá blok C | — | projdi tabulku 1.1: 6 configů = po kopii domácí verze (správně — blok C do nich vloží bankovní položku); `pump.wsf` nový; `.github\` domácí (nechat, blok F) | víš, které soubory blok C upraví | — |
-| B5 | Commit importu — **až po bloku C** (jeden commit s položkami, ne dva) | VS Code nad `<KORP>` | NAVOD 1.3, zpráva: `import v0.21 + adaptace banka` | jeden commit; Source Control prázdný; **kurýrní klon needitován** | — |
+| B5 | Commit importu — **až po bloku C** (jeden commit s položkami, ne dva) | VS Code nad `<KORP>` | NAVOD 1.3, zpráva: `import v0.22 + adaptace banka` | jeden commit; Source Control prázdný; **kurýrní klon needitován** | — |
 
 ### C. Configy v korporátním repu (NAVOD 5.1–5.6) — prompty pro bankovního Copilota
 
@@ -102,7 +111,7 @@ Postup z 10. 9.: Copilot v bance píše položky **podle promptu**, hodnoty bere
 **C.1 `FB_WriteScope` (nový soubor, nová položka)**
 
 ```text
-Soubor src\AICodeBridge.FB_WriteScope.js (verze z kurýra v0.21) vrací pole položek per repozitář.
+Soubor src\AICodeBridge.FB_WriteScope.js (verze z kurýra v0.22) vrací pole položek per repozitář.
 Přidej na konec pole (za položku EA17_Yoga_QEA2.qeax) bankovní položku podle komentáře
 „Bankovní šablona" v hlavičce souboru:
   { repo: "<TEST-DB>", cascadeDelete: "block",
@@ -120,7 +129,7 @@ Nic jiného v souboru neměň. Nevypisuj mi hodnoty z configu do chatu — jen �
 **C.2 `FB_Config` (položka existovala — ověř a přenes)**
 
 ```text
-Soubor src\AICodeBridge.FB_Config.js (verze z kurýra v0.21). V záloze <ZALOHA>\AICodeBridge.FB_Config.js
+Soubor src\AICodeBridge.FB_Config.js (verze z kurýra v0.22). V záloze <ZALOHA>\AICodeBridge.FB_Config.js
 je bankovní verze z 10. 9. 2026 s položkou pro repozitář <TEST-DB> (repo, baseDir, srcDir, navProbe, auditPkg).
 Přenes tuto položku do nového souboru na konec pole (za položku EA17_Yoga_QEA2.qeax), beze změny hodnot.
 Ověř: baseDir = kořen pracovní kopie korporátního repa (složka, kde leží pump.wsf a requests\),
@@ -133,7 +142,7 @@ Domácí položky nech beze změny. Vypiš jen: „položka přenesena, klíče:
 **C.3 `FB_OpsAllowed`**
 
 ```text
-Soubor src\AICodeBridge.FB_OpsAllowed.js (v0.21). Přidej na konec pole bankovní položku
+Soubor src\AICodeBridge.FB_OpsAllowed.js (v0.22). Přidej na konec pole bankovní položku
   { repo: "<TEST-DB>", allow: ["*"],
     deny: ["delete_from_model", "delete_taggedvalue_from_model", "remove_elements_from_diagram",
            "clone_package", "clone_elements", "deploy_src"] }
@@ -145,7 +154,7 @@ Vypiš jen „ok, deny 6" nebo rozdíl.
 **C.4 `FB_AccessGroups`**
 
 ```text
-Soubor src\AICodeBridge.FB_AccessGroups.js (v0.21). Přenes bankovní položku
+Soubor src\AICodeBridge.FB_AccessGroups.js (v0.22). Přenes bankovní položku
   { repo: "<TEST-DB>", writeGroups: ["<WRITE-GROUP>"] }
 ze zálohy <ZALOHA>\AICodeBridge.FB_AccessGroups.js na konec pole nového souboru (repo = TEST-DB,
 writeGroups = WRITE-GROUP z config\banka-hodnoty.json — jméno skupiny opiš přesně). Domácí položky beze změny.
@@ -155,7 +164,7 @@ Vypiš jen „ok" nebo rozdíl, název skupiny do chatu nepiš.
 **C.5 `FB_RiskPolicy` (položka existovala, přibývá sekce `baseline` + 2 klíče)**
 
 ```text
-Soubor src\AICodeBridge.FB_RiskPolicy.js (v0.21). Nový soubor má proměnné DEV_CLASSES, DEV_ELEVATE,
+Soubor src\AICodeBridge.FB_RiskPolicy.js (v0.22). Nový soubor má proměnné DEV_CLASSES, DEV_ELEVATE,
 DEV_BLOCK a nově DEV_BASELINE a v komentáři na konci bankovní šablonu. Udělej:
 1. Před `return [` vlož (pokud tam po kopii není):
    var BANK_CLASSES = {}; for (var bk in DEV_CLASSES) { BANK_CLASSES[bk] = DEV_CLASSES[bk]; }
@@ -178,7 +187,7 @@ Domácí položky beze změny. Vypiš jen „ok" nebo co se liší.
 **C.6 `FB_QcConfig`**
 
 ```text
-Soubor src\AICodeBridge.FB_QcConfig.js (v0.21). Přenes bankovní položku (repo + checks[]) ze zálohy
+Soubor src\AICodeBridge.FB_QcConfig.js (v0.22). Přenes bankovní položku (repo + checks[]) ze zálohy
 <ZALOHA>\AICodeBridge.FB_QcConfig.js na konec pole nového souboru beze změny. Repo = TEST-DB z configu.
 Ověř, že každé SQL v checks používá jen standardní sloupce EA a žádnou dialektovou funkci. Vypiš jen „ok, N kontrol".
 ```
@@ -201,7 +210,7 @@ Do chatu nepiš žádné hodnoty z configu — jen „ok" / „chybí X" / „ba
 
 **C.8 `FB_Whitelist` v modelu:** nechat. Operace v modelu zůstane osiřelá (140. operace), nikdo ji nevolá, bootstrap ji nemaže, kontrola parametrů ji hlásí jako „v modelu navíc" — ne jako rozdíl (NAVOD 1.2, N‑GEN‑6). **Zapsáno; žádný krok.**
 
-**C.9 Commit** (B5): `import v0.21 + adaptace banka` — pak teprve blok D (bootstrap čte `<KORP>\src\` z disku, commit na to vliv nemá, ale evidence je čistá).
+**C.9 Commit** (B5): `import v0.22 + adaptace banka` — pak teprve blok D (bootstrap čte `<KORP>\src\` z disku, commit na to vliv nemá, ale evidence je čistá).
 
 ### D. Model: bootstrap, restart, add-in, pumpa, kontrola parametrů
 
@@ -241,7 +250,7 @@ Pořadí dávek dne D a jejich soubory v `docs\e2e-banka\ready\` (všechny `prot
 | E5 | `req-banka-blacklist-21.json` | pumpa | **blacklist naostro** (6.3 poslední odstavec): `create_or_update_package` s `parent` = `<PROTECTED-PKG-1>` | konzole `CHYBA E_BLACKLIST req-…`; `res`: `error E_BLACKLIST` v **předběžné kontrole** (`problems[0].path ops[0].parent`, text „Bridge sem nezapisuje…"), žádné okno, žádná záloha, soubor v `requests\rejected\`, **audit Artifact `FB banka-blacklist-21`** v `<AI-LOG>` („ODMITNUTA pred zapisem") | balíček vznikl = blacklist neplatí → **STOP** (C.1 GUID/name, ping `found`) |
 | E5b | `req-banka-blacklist-22.json` | pumpa | implicitní ochrana: `parent` = `<GUID-AILOG>` (balíček auditu) | `E_BLACKLIST` stejně jako E5 (funguje i s prázdným blacklistem) | — |
 | E6 | `req-banka-low-21.json` | pumpa | **LOW zápis** do `<WORK-PKG>`: balíček `NAS-1016 v0.21 LOW` + prvek Class `$0` | `OK 2/2`; `res done`, `riskLevel LOW`, **bez okna**, `baseline none (cisty create)`; Output: blok změn `[vytvoreno]` ×2 s markery `(pkg:ID)`/`(el:ID)` + řádek **`Kontrola kvality: …`** (podle `FB_QcConfig`: `ciste (N kontrol…)` nebo `bez kontrol - …`); dvojklik na řádek označí prvek | `E_ADDIN_ACCESS` → 7.2; `E_PERMISSION` → `<WORK-PKG>` zamčený (7.4) — jiný pracovní balíček; `E_NO_BASELINE` → viz 7.9 „chybi cerstva rucni baseline" (Baseline politika odmítla zálohu — zapiš text, nález) |
-| E7 | `req-banka-audit-21.json` | pumpa | **audit Notes v0.21**: Artifacty `FB banka-low-21`, `FB banka-blacklist-21`, `FB banka-blacklist-22` + GUIDy nových objektů pro další dávky | `done`; Notes `FB banka-low-21` začínají **„Davka banka-low-21 skoncila USPESNE: 2 z 2 operaci provedeno."**, „Uroven rizika: bez potvrzeni.", „Zaloha: …", „Kontrola kvality: …", pak `--- strojovy zaznam (beze zmeny) ---` a `--- request ---`; tagy `ai.risk.level=LOW`, `ai.risk.codes`, `result` = strojový řádek; **z řádků s `GUID-LOW-EL` / `GUID-LOW-PKG` dosadí Copilot do `banka-hodnoty.json`** (H.2) | Notes ve starém tvaru (jen strojový řádek) = kód v modelu starší → D1 neproběhl |
+| E7 | `req-banka-audit-21.json` | pumpa | **audit Notes v0.22**: Artifacty `FB banka-low-21`, `FB banka-blacklist-21`, `FB banka-blacklist-22` + GUIDy nových objektů pro další dávky | `done`; Notes `FB banka-low-21` začínají **„Davka banka-low-21 skoncila USPESNE: 2 z 2 operaci provedeno."**, „Uroven rizika: bez potvrzeni.", „Zaloha: …", „Kontrola kvality: …", pak `--- strojovy zaznam (beze zmeny) ---` a `--- request ---`; tagy `ai.risk.level=LOW`, `ai.risk.codes`, `result` = strojový řádek; **z řádků s `GUID-LOW-EL` / `GUID-LOW-PKG` dosadí Copilot do `banka-hodnoty.json`** (H.2) | Notes ve starém tvaru (jen strojový řádek) = kód v modelu starší → D1 neproběhl |
 | E8 | `req-banka-elevated-21.json` | pumpa | **ELEVATED → Ne**: `move_elements` prvku `<GUID-LOW-EL>` z balíčku `NAS-1016 v0.21 LOW` o úroveň výš do `<WORK-PKG>` (přesun = ELEVATED vždy, NAVOD 5.5; `delete_*` je v bance v deny — nález N‑P‑1; cíl = existující balíček, aby záloha měla nad čím vzniknout) | konzole `CEKA NA TEBE (okno potvrzeni)`; okno podle NAVOD 7.5 („AI chce PRESUNOUT …", Co se stane, Kde, Zaloha, Proc se ptam, Ceka od, Ano/Ne/Storno, výchozí **Storno**, Enter nic) → klikni **Ne** → konzole `ZAMITNUTA`, `res rejected E_RISK_REJECTED`, soubor v `rejected\`, audit „ZAMITL uzivatel v okne pumpy …"; prvek zůstal, kde byl | okno nepřišlo a dávka prošla LOW → politika nemá `move_elements` ELEVATED → **STOP** (C.5) |
 | E9 | `req-banka-elevated-22.json` | pumpa | **ELEVATED → Ano** (nový id — tentýž soubor po Ne = `E_DUPLICATE_ID`, N‑GEN‑4) | okno → **Ano** → `OK 1/1`; `res done`, `confirmedByUser true`; prvek `NAS-1016 prvek` je přímo v `<WORK-PKG>` (Project Browser); **záloha** `FB-AUTO <login> s… 2026-10-16 …` nad `<WORK-PKG>` — v EA Baselines; audit „Potvrdil uzivatel v okne pumpy …", `ai.baseline=…decision=created` | `E_NO_BASELINE` (`requireRecoveryForUpdates: true` + záloha nešla, např. `<WORK-PKG>` nad `subtreeMax`) → udělej ruční baseline nad `<WORK-PKG>` (Ctrl+Alt+B, jméno bez `FB-AUTO`) a pošli **tentýž soubor** znovu (čekající po `NEPROVEDENO`, ne po Ne) |
 | E10 | `req-banka-uklid-21.json` | pumpa | **deny naostro** (NAVOD 5.3): `delete_from_model` balíčku `<GUID-LOW-PKG>` | `CHYBA E_OP_FORBIDDEN`, nic se neprovede, bez okna; audit zapsán | balíček smazán = `deploy`/`delete` není v deny → **STOP**, C.3 |
@@ -264,32 +273,32 @@ Podle `docs/WORKSPACE-METODIKY.md` kap. 5: korporátní **workspace** repo = imp
 
 | Kritérium | Zdroj | GO když | NO‑GO → |
 |---|---|---|---|
-| Bootstrap souhrn | D1 | `35 zalozeno / 139 nahran / Parametry 6`, žádný `STOP:` | D1 znovu po B3 |
+| Bootstrap souhrn | D1 | `35 zalozeno / 139 nahran / Parametry 6` (z v0.14; v0.22 nic nepřidává), otisk `ea47ee1a03a8`, žádný `STOP:` | D1 znovu po B3 |
 | Kontrola parametrů | D5 | **0 rozdílů**, 140 v modelu / 139 v src | STOP, D1 → D2 → D5 |
 | Ping pumpou | E1 | `problems []`, `repository <TEST-DB>`, `access write`, otisk `c37e5f8a4c1a`, pumpa 0.6 | C → D |
 | Ping schránkou | E3 | ACK se segmentem `zapis: blacklist`; `BEZI PUMPA` při běžící pumpě | nález (ne STOP, pokud ACK přišel) |
 | `E_BLACKLIST` | E5 (+E5b) | v předběžné kontrole, balíček nevznikl, audit | STOP (konfigurace) |
-| LOW + audit v0.21 | E6, E7 | `done` bez okna, Notes větami, `Kontrola kvality` řádek | STOP (kód v modelu) |
+| LOW + audit v0.22 | E6, E7 | `done` bez okna, Notes větami, `Kontrola kvality` řádek | STOP (kód v modelu) |
 | ELEVATED Ne / Ano | E8, E9 | okno FB‑UI‑08, Ne = `E_RISK_REJECTED`, Ano = `done` + `FB-AUTO` záloha + audit | STOP (politika) |
 | `E_OP_FORBIDDEN` | E10 | delete odmítnut | STOP (`FB_OpsAllowed`) |
 | `E_ADDIN_ACCESS` u nečlena | jen s druhým účtem (Q2); dávka `ready\req-banka-A2-write.json` (10. 9., `parent` `<GUID-SANDBOX>` → stejnou hodnotu jako `<WORK-PKG>`) | nečlen → `E_ADDIN_ACCESS`, nic se neprovede | bez druhého účtu **přeskočit** (doloženo 13. 9.) |
 
-**Při NO‑GO:** v modelu **zůstává kód v0.21** (rollback kódu se nedělá — chyba je vždy v konfiguraci nebo prostředí, kód prošel generálkou). Oprava = soubor v `<KORP>\src\` → bootstrap (D1) → plný restart EA (D2) → pumpa (D4) → ping (E1). **Návrat k v0.14** (jen kdyby v0.21 blokoval práci analytiků a oprava nebyla do konce dne): v `<KORP>` Source Control → … → Checkout to… → commit „adaptace banka v0.14" (před importem) → bootstrap z toho `src\` (nahraje starý kód do všech 105 operací; 35 nových zůstane v modelu osiřelých — neškodí, nikdo je nevolá) → plný restart EA → **starou pumpu v0.5** (z téhož checkoutu) — pumpa v0.6 nad kódem bez `FB_PumpAlive` odmítne (`STOP: kod v modelu je STARSI`). Pak zpět na `main`.
+**Při NO‑GO:** v modelu **zůstává kód v0.22** (rollback kódu se nedělá — chyba je vždy v konfiguraci nebo prostředí, kód prošel generálkou). Oprava = soubor v `<KORP>\src\` → bootstrap (D1) → plný restart EA (D2) → pumpa (D4) → ping (E1). **Návrat k v0.14** (jen kdyby v0.22 blokoval práci analytiků a oprava nebyla do konce dne): v `<KORP>` Source Control → … → Checkout to… → commit „adaptace banka v0.14" (před importem) → bootstrap z toho `src\` (nahraje starý kód do všech 105 operací; 35 nových zůstane v modelu osiřelých — neškodí, nikdo je nevolá) → plný restart EA → **starou pumpu v0.5** (z téhož checkoutu) — pumpa v0.6 nad kódem bez `FB_PumpAlive` odmítne (`STOP: kod v modelu je STARSI`). Pak zpět na `main`.
 
 ### H. Co přinést domů (bez interních hodnot)
 
 **H.1 Šablona `docs/e2e-banka/VYSLEDKY-2026-10-16.md`** (vyplní vlákno Z261013‑3 z výtahů):
 
 ```markdown
-# Nasazení v0.21 v bance — výsledky živého běhu 2026-10-16 (vlákno Z261013‑3)
-*Repozitář `<TEST-DB>` (MS SQL 2022, EA 17.1.x, security zapnutá). Kód v0.21 = 45de928, otisk c37e5f8a4c1a, pumpa v0.6 (943a3941ff62). Plán: PLAN-NASAZENI-2026-10-16.md. Žádné interní hodnoty.*
+# Nasazení v0.22 v bance — výsledky živého běhu 2026-10-16 (vlákno Z261013‑3)
+*Repozitář `<TEST-DB>` (MS SQL 2022, EA 17.1.x, security zapnutá). Kód v0.22 = <commit tagu v0.22>, otisk ea47ee1a03a8, pumpa v0.6 (943a3941ff62). Plán: PLAN-NASAZENI-2026-10-16.md. Žádné interní hodnoty.*
 
 ## 1. Shrnutí (3 věty: prošlo/neprošlo, odchylky, go/no-go)
 
 ## 2. Tabulka bloků
 | Blok/krok | CO | VÝSLEDEK ✅/⚠/❌ | Čas | Doklad (`res-…`, výtah) | Poznámka |
 |---|---|---|---|---|---|
-| B1–B5 | import v0.21 | | | commit „import v0.21 + adaptace banka" | počet změněných souborů v diffu |
+| B1–B5 | import v0.22 | | | commit „import v0.22 + adaptace banka" | počet změněných souborů v diffu |
 | C.1–C.7 | configy | | | kontrola C.7 | |
 | D1 | bootstrap | | | výpis: zalozeno / nahran / PX / VAROVANI | |
 | D2–D4 | restart, add-in, pumpa | | | konzole: Code loader, otisk | |
@@ -377,7 +386,7 @@ Dál platí bez otázky (rozhodnuto dřív): `baseDir` = `<KORP>` (NAVOD 5.1, N�
 |---|---|---|---|
 | N‑P‑1 | Zadání Z261013‑2 chtělo ELEVATED test jako `delete $N z low` — v bance je `delete_from_model` trvale v deny (`FB_OpsAllowed`, NAVOD 5.3) → přišel by `E_OP_FORBIDDEN`, ne okno | zadání × NAVOD 5.3 | ELEVATED = `move_elements` (třída ELEVATED vždy, NAVOD 5.5); `delete` = test deny (E10); úklid ručně (E11) |
 | N‑P‑2 | NAVOD 1.2 „zkopíruj obsah klonu přes korp. repo" **nesmaže** soubory, které v klonu zanikly — `src\AICodeBridge.FB_Whitelist.js` by v `<KORP>` zůstal a bootstrap by ho nahrál jako operaci se souborem (140 v src) | NAVOD 1.2 × git diff `D` | krok B3; kandidát do NAVOD 1.2: „soubory smazané mezi tagy smaž ručně (seznam v release poznámce)" |
-| N‑P‑3 | NAVOD 4a uvádí očekávaný počet „10. 10. 2026: 119", 6.3 „12. 10.: 139", 2.1 „140 operací" — pro v0.21 v bance platí **140 v modelu / 139 v src** (osiřelá `FB_Whitelist`) | NAVOD 4a/6.3/2.1 | čísla v D5; kandidát: sjednotit na „139 + osiřelé" |
+| N‑P‑3 | NAVOD 4a uvádí očekávaný počet „10. 10. 2026: 119", 6.3 „12. 10.: 139", 2.1 „140 operací" — pro v0.22 v bance platí **140 v modelu / 139 v src** (osiřelá `FB_Whitelist`) | NAVOD 4a/6.3/2.1 | čísla v D5; kandidát: sjednotit na „139 + osiřelé" |
 | N‑P‑4 | NAVOD (Placeholdery, 4a, 6.1) posílá na `<KORP>\tools\banka-dosad.cmd` v repu **bridge**; `WORKSPACE-METODIKY` kap. 5 říká, že `banka-dosad` žije ve **workspace** `ai-transfer`; repo bridge `tools\` žádný `banka-dosad` nemá — v bance existuje jen verze, kterou 10. 9. napsal Copilot do `<KORP>` | NAVOD × WORKSPACE-METODIKY × `tools\` | dne D bankovní verze z `<KORP>`; nové klíče ověřit (C.7); po bloku F = verze z workspace |
 | N‑P‑5 | NAVOD 5.5 „nejmenší funkční zápis" RiskPolicy nemá sekci `baseline`, `ownSessionLow`, `confirmMaxAgeMin`; šablona v komentáři `FB_RiskPolicy.js` je má | NAVOD 5.5 × src | prompt C.5 podle src; kandidát NAVOD 5.5 |
 | N‑P‑6 | Tabulka Placeholderů v NAVOD nezná `<LOGIN>` (užívá ho 6.4 a `banka-dosad`), ani `<WORK-PKG>`, `<GUID-LOW-EL>`, `<GUID-LOW-PKG>`, `<PROTECTED-PKG-1-NAME>` | NAVOD Placeholdery | tabulka v tomto plánu; kandidát NAVOD |
@@ -394,5 +403,6 @@ Dál platí bez otázky (rozhodnuto dřív): `baseDir` = `<KORP>` (NAVOD 5.1, N�
 
 ## Changelog
 
+- **v1.2 — 2026-10-15** (vlákno Z261014b‑1): tag **v0.22** místo v0.21 (otisk `ea47ee1a03a8`), den D posunut za opravy z RE (datum = Miloš), tabulka adaptací + 9 řádků N‑RE‑1…18 (žádná změna configu kromě volitelné QC věty), kap. 1.2 počty bootstrapu (banka z v0.14 = 35/139/6 beze změny; doma z v0.21 = 0/139/0), kontrola dávek `ready\req-banka-*.json` diffem signatur = beze změny; kap. I beze změny.
 - **v1.1 — 2026-10-14** (rozhodnutí Miloše v chatu Z261013‑2): den D = 14. 10., A3 ZIP kitů M365, A4 odpovědi karty (b/c/d), nová kap. I refresh testu z produkce + N‑P‑12.
 - **v1.0 — 2026-10-13** (vlákno Z261013‑2): vznik. Dávky `ready\req-banka-ping-21/22, recon-21, blacklist-21/22, low-21, audit-21, elevated-21/22, uklid-21.json` + `ready\kontrola-parametru.cmd`.

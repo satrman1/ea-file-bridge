@@ -60,7 +60,7 @@ Mimo rozsah (beze změny, zůstávají v kap. 5 VYSLEDKY ‑14): N‑RE‑5 (hl�
 | `SELECT COUNT(*) FROM t_object WHERE Package_ID BETWEEN 1132 AND 1152 AND Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint','Actor') AND Classifier > 0 AND ParentID = 0` | 0 | **0** |
 | survey 1227 má Boundary | 1 | **1** |
 | git log `main` = commity per nález | `feat(fix-re-N)` | 12 commitů: fix‑re‑1,2,4 · 3 · 6,11 · 17 · 12 · 18 · 9 · test · fix‑re‑12 (summary.packages) · fix‑re‑9 (Component/Actor) · fix‑re‑17 (ParentID) · fix‑re‑1,17 (SeqNo, baseline) + docs |
-| sanitizační sweep blobů `v0.21..HEAD` | 0 mimo `@F0` | viz kap. 7 |
+| sanitizační sweep blobů `v0.21..HEAD` | 0 mimo známé výjimky (vzor názvů skupin zavináč‑F‑nula, název MDG profilu) | viz kap. 7 |
 | generálka cestou banky (bootstrap nad QEAX, ping) | „N zalozeno / M nahran / Parametry K" + `problems []` | viz kap. 7 |
 | tag `v0.22` lokálně | na commitu po generálce | viz kap. 7 |
 
