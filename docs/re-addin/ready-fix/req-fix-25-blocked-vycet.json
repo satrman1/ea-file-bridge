@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "fix-25-blocked-vycet", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_elements", "elements": [
+   { "elementID": 12042, "alias": "x" }, { "elementID": 12043, "alias": "x" }, { "elementID": 12044, "alias": "x" },
+   { "elementID": 12045, "alias": "x" }, { "elementID": 12046, "alias": "x" }, { "elementID": 12047, "alias": "x" } ] }
+] }

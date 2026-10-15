@@ -1,0 +1,8 @@
+{ "protocol": "eafb/0.2", "id": "fix-21b-presun-pod-ucr", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_elements", "elements": [ { "package": "1153", "type": "Actor", "name": "Akter FixTest", "stereotypes": ["user"] } ] },
+ { "op": "create_or_update_elements", "elements": [ { "package": "1153", "type": "Object", "name": "", "classifier": "$0" } ] },
+ { "op": "place_elements_on_diagram", "diagram": 1244, "elementPlacements": [ { "element": "$1", "x": 20, "y": 40, "width": 90, "height": 300 } ] },
+ { "op": "move_elements", "owningElement": "12146", "elements": [12147, 12148, "$1"] },
+ { "op": "apply_classifier_stereotypes", "diagram": 1244 },
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID, Classifier, Stereotype FROM t_object WHERE Package_ID = 1153 AND Object_ID > 12143", "maxRows": 50 }
+] }

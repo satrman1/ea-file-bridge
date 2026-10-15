@@ -1,0 +1,189 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-30-gaty-sr",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "11961",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "11965",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "11969",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "11973",
+     "type": "DiagramGate",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1196,
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 6,
+     "y": 128,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1196,
+   "messages": [
+    {
+     "connectorID": 4987,
+     "source": "$0[0]"
+    },
+    {
+     "source": "11993",
+     "target": "$0[0]",
+     "name": "",
+     "returnValue": "string",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1198,
+   "elementPlacements": [
+    {
+     "element": "$0[1]",
+     "x": 6,
+     "y": 128,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1198,
+   "messages": [
+    {
+     "connectorID": 5000,
+     "source": "$0[1]"
+    },
+    {
+     "source": "12004",
+     "target": "$0[1]",
+     "name": "",
+     "returnValue": "PingResult",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1200,
+   "elementPlacements": [
+    {
+     "element": "$0[2]",
+     "x": 6,
+     "y": 128,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1200,
+   "messages": [
+    {
+     "connectorID": 5004,
+     "source": "$0[2]"
+    },
+    {
+     "source": "12007",
+     "target": "$0[2]",
+     "name": "",
+     "returnValue": "OpResult",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1202,
+   "elementPlacements": [
+    {
+     "element": "$0[3]",
+     "x": 6,
+     "y": 128,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1202,
+   "messages": [
+    {
+     "connectorID": 5013,
+     "source": "$0[3]"
+    },
+    {
+     "source": "12012",
+     "target": "$0[3]",
+     "name": "",
+     "returnValue": "OpResult",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12002,
+     "classifierID": 11969
+    },
+    {
+     "elementID": 12003,
+     "classifierID": 11973
+    }
+   ]
+  },
+  {
+   "op": "reload_diagrams",
+   "diagrams": [
+    1196,
+    1198,
+    1200,
+    1202
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Object_Type, ParentID, Package_ID, NType FROM t_object WHERE Object_Type = 'MessageEndpoint' AND Package_ID IN (1132,1133,1134,1135)",
+   "maxRows": 20
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, DiagramID, SeqNo, Name, Start_Object_ID, End_Object_ID, PDATA2, PDATA4 FROM t_connector WHERE Connector_Type = 'Sequence' AND DiagramID IN (1196,1198,1200,1202) AND (SeqNo = 1 OR PDATA4 = '1') ORDER BY DiagramID, SeqNo",
+   "maxRows": 20
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, Classifier, PDATA1 FROM t_object WHERE Object_ID IN (12002, 12003)",
+   "maxRows": 5
+  }
+ ]
+}

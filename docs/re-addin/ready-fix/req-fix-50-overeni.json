@@ -1,0 +1,9 @@
+{ "protocol": "eafb/0.2", "id": "fix-50-overeni", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT COUNT(*) AS gaty FROM t_object WHERE Object_Type = 'MessageEndpoint' AND NType = 2 AND Package_ID IN (1132,1133,1134,1135)", "maxRows": 2 },
+ { "op": "query", "sql": "SELECT COUNT(*) AS objekty FROM t_object WHERE Name='Object' AND Package_ID BETWEEN 1124 AND 1152", "maxRows": 2 },
+ { "op": "query", "sql": "SELECT COUNT(*) AS rozhrani_volna FROM t_object WHERE Object_Type='Interface' AND Package_ID=1127 AND ParentID=0", "maxRows": 2 },
+ { "op": "query", "sql": "SELECT COUNT(*) AS instance_volne FROM t_object WHERE Package_ID BETWEEN 1132 AND 1152 AND Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint','Actor') AND Classifier > 0 AND ParentID = 0", "maxRows": 2 },
+ { "op": "query", "sql": "SELECT COUNT(*) AS boundary_survey FROM t_diagramobjects x INNER JOIN t_object o ON o.Object_ID = x.Object_ID WHERE x.Diagram_ID = 1227 AND o.Object_Type = 'Boundary'", "maxRows": 2 },
+ { "op": "query", "sql": "SELECT COUNT(*) AS gaty_total FROM t_object WHERE Object_Type LIKE '%Gate%'", "maxRows": 2 },
+ { "op": "query", "sql": "SELECT Package_ID, Name FROM t_package WHERE Parent_ID = 1153 OR Package_ID = 1153", "maxRows": 5 }
+] }

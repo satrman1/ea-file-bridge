@@ -1,0 +1,73 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-36-rozhrani-pod-komponenty",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "move_elements",
+   "elements": [
+    {
+     "element": 11937,
+     "owningElement": "11921"
+    },
+    {
+     "element": 11938,
+     "owningElement": "11922"
+    },
+    {
+     "element": 11939,
+     "owningElement": "11923"
+    },
+    {
+     "element": 11940,
+     "owningElement": "11924"
+    },
+    {
+     "element": 11941,
+     "owningElement": "11925"
+    },
+    {
+     "element": 11942,
+     "owningElement": "11926"
+    },
+    {
+     "element": 11943,
+     "owningElement": "11927"
+    },
+    {
+     "element": 11944,
+     "owningElement": "11928"
+    },
+    {
+     "element": 11945,
+     "owningElement": "11929"
+    },
+    {
+     "element": 11946,
+     "owningElement": "11930"
+    },
+    {
+     "element": 11947,
+     "owningElement": "11931"
+    },
+    {
+     "element": 11948,
+     "owningElement": "11932"
+    },
+    {
+     "element": 11949,
+     "owningElement": "11933"
+    },
+    {
+     "element": 11950,
+     "owningElement": "11936"
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS cnt FROM t_object WHERE Object_Type='Interface' AND Package_ID=1127 AND ParentID=0",
+   "maxRows": 2
+  }
+ ]
+}

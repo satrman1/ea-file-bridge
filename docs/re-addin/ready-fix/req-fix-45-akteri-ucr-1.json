@@ -1,0 +1,53 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-45-akteri-ucr-1",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1228
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1229
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1230
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1231
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1232
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12083,
+     "classifierID": 11961
+    },
+    {
+     "elementID": 12089,
+     "classifierID": 11961
+    },
+    {
+     "elementID": 12095,
+     "classifierID": 11961
+    },
+    {
+     "elementID": 12101,
+     "classifierID": 11961
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, Classifier, PDATA1, ParentID FROM t_object WHERE Object_ID IN (12083,12089,12095,12101)",
+   "maxRows": 5
+  }
+ ]
+}

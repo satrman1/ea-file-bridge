@@ -1,0 +1,25 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-12b-qc-model",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "Name":"FB_QcConfig",
+     "Code":"// AICodeBridge.FB_QcConfig()\n// QC kontroly per repozitar pro ACK zapisovych davek (FB_QcRun, zadani\n// iterace 4 par. 3.4). Parovani pres FB_RepoId (case-insensitive\n// podretezec - stejna mechanika jako FB_Config/FB_WriteScope).\n// !! SQL VYHRADNE nad overenymi standardnimi sloupci (lekce par. 6a/3:\n// neznamy sloupec na .qea = modalni dialog EA = viselec) a bez\n// dialektovych funkci (bezi na SQLite i MS SQL).\n// $PKGNAMES = scope na dotcene packages (jmena z risk.summary.packages).\n// Repo bez polozky => QC status \"nedobehlo: zadne kontroly\" (tri stavy W6).\n// BANKA: sem prijde relevantni podmnozina QC101-405 (pamet\n// produkcni-qc-kontroly) - tvrde kriterium \"AI zapis nesmi vygenerovat\n// nalez\"; doba behu se meri v T4-6 (rozpocet zamrznuti).\nreturn [\n    { repo: \"EAEXAMPLE.QEA\", checks: [\n        // N-RE-9 (v0.22): prazdne jmeno je metodicky SPRAVNE u nepojmenovanych instanci\n        // (lifeline Object/Sequence s classifierem = ':Classifier'), refu (InteractionOccurrence),\n        // hranice (Boundary) a gatu (MessageEndpoint) - ty se nehlasi\n        { id: \"QC-DEMO-001\", desc: \"Element bez jmena v dotcenych packages\",\n          sql: \"SELECT o.Object_ID FROM t_object o INNER JOIN t_package p ON o.Package_ID = p.Package_ID WHERE p.Name IN ($PKGNAMES) AND (o.Name IS NULL OR o.Name = '')\"\n             + \" AND NOT (o.Object_Type IN ('Object','Sequence') AND o.Classifier > 0)\"\n             + \" AND o.Object_Type NOT IN ('InteractionOccurrence','Boundary','MessageEndpoint')\" }\n    ] }\n];\n"
+    }
+   ],
+   "maxRows":5
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 17:43:14",
+ "audit":{
+  "aiLogGuid":"{2CF59369-C4D2-41b0-B45B-BAD3392394D5}"
+ }
+}

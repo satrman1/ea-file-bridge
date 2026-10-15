@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "fix-12b-qc-model", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT m.Name, m.Code FROM t_operation m INNER JOIN t_object o ON o.Object_ID = m.Object_ID WHERE o.Name = 'AICodeBridge' AND m.Name = 'FB_QcConfig'", "maxRows": 5 }
+] }

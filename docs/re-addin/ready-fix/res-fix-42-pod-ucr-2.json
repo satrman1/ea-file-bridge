@@ -1,0 +1,521 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-42-pod-ucr-2",
+ "status":"done",
+ "results":[
+  {
+   "op":"move_elements",
+   "status":"ok",
+   "count":12,
+   "moved":12,
+   "withChildren":true,
+   "items":[
+    {
+     "guid":"{7148DFD0-0E78-45ce-977E-E764B7B4B7CD}",
+     "id":12109,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1149,
+     "fromPackage":"UC-95106 Zobraz stav bridge",
+     "toPackageID":1149,
+     "toPackage":"UC-95106 Zobraz stav bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12065,
+     "toOwner":"UCR-95106 Zobraz stav bridge"
+    },
+    {
+     "guid":"{3E2DCDE3-F093-4a27-9281-D8D3638D271D}",
+     "id":12110,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1149,
+     "fromPackage":"UC-95106 Zobraz stav bridge",
+     "toPackageID":1149,
+     "toPackage":"UC-95106 Zobraz stav bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12065,
+     "toOwner":"UCR-95106 Zobraz stav bridge"
+    },
+    {
+     "guid":"{6EC8A7DC-FC52-464b-812C-9176FF3F7BD5}",
+     "id":12111,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1149,
+     "fromPackage":"UC-95106 Zobraz stav bridge",
+     "toPackageID":1149,
+     "toPackage":"UC-95106 Zobraz stav bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12065,
+     "toOwner":"UCR-95106 Zobraz stav bridge"
+    },
+    {
+     "guid":"{3A152C62-3FB8-4987-ADC8-2D24AB1D3D0A}",
+     "id":12114,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1150,
+     "fromPackage":"UC-95107 Prohlédni změny poslední dávky",
+     "toPackageID":1150,
+     "toPackage":"UC-95107 Prohlédni změny poslední dávky",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12066,
+     "toOwner":"UCR-95107 Prohlédni změny poslední dávky"
+    },
+    {
+     "guid":"{72F34FFE-7E0D-4579-9E96-2BB5AE7529E1}",
+     "id":12115,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1150,
+     "fromPackage":"UC-95107 Prohlédni změny poslední dávky",
+     "toPackageID":1150,
+     "toPackage":"UC-95107 Prohlédni změny poslední dávky",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12066,
+     "toOwner":"UCR-95107 Prohlédni změny poslední dávky"
+    },
+    {
+     "guid":"{7BC0E5F4-B7EF-4a39-9DC5-CEC0658AAF4A}",
+     "id":12118,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1151,
+     "fromPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "toPackageID":1151,
+     "toPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12067,
+     "toOwner":"UCR-95108 Nasaď kód bridge do modelu"
+    },
+    {
+     "guid":"{0483C067-152B-4162-8C22-70B7BAD85E86}",
+     "id":12119,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1151,
+     "fromPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "toPackageID":1151,
+     "toPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12067,
+     "toOwner":"UCR-95108 Nasaď kód bridge do modelu"
+    },
+    {
+     "guid":"{8FDB5529-E0DE-47bc-B88A-89B3F2CAD7BE}",
+     "id":12120,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1151,
+     "fromPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "toPackageID":1151,
+     "toPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12067,
+     "toOwner":"UCR-95108 Nasaď kód bridge do modelu"
+    },
+    {
+     "guid":"{D4441A3D-2A7A-4a7f-B306-07C83579BFAB}",
+     "id":12121,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1151,
+     "fromPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "toPackageID":1151,
+     "toPackage":"UC-95108 Nasaď kód bridge do modelu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12067,
+     "toOwner":"UCR-95108 Nasaď kód bridge do modelu"
+    },
+    {
+     "guid":"{AA0522CA-D651-4ccd-94B3-552CB272E279}",
+     "id":12124,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1152,
+     "fromPackage":"UC-95109 Ukliď automatické zálohy",
+     "toPackageID":1152,
+     "toPackage":"UC-95109 Ukliď automatické zálohy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12068,
+     "toOwner":"UCR-95109 Ukliď automatické zálohy"
+    },
+    {
+     "guid":"{2E150178-26EB-4f73-BC48-D9FDDA0C1DA6}",
+     "id":12125,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1152,
+     "fromPackage":"UC-95109 Ukliď automatické zálohy",
+     "toPackageID":1152,
+     "toPackage":"UC-95109 Ukliď automatické zálohy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12068,
+     "toOwner":"UCR-95109 Ukliď automatické zálohy"
+    },
+    {
+     "guid":"{9F34533D-7C3E-47f3-9718-9CBD303B6DAE}",
+     "id":12126,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1152,
+     "fromPackage":"UC-95109 Ukliď automatické zálohy",
+     "toPackageID":1152,
+     "toPackage":"UC-95109 Ukliď automatické zálohy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12068,
+     "toOwner":"UCR-95109 Ukliď automatické zálohy"
+    }
+   ],
+   "readback":{
+    "elements":[
+     {
+      "Object_ID":"12109",
+      "Package_ID":"1149",
+      "ParentID":"12065"
+     },
+     {
+      "Object_ID":"12110",
+      "Package_ID":"1149",
+      "ParentID":"12065"
+     },
+     {
+      "Object_ID":"12111",
+      "Package_ID":"1149",
+      "ParentID":"12065"
+     },
+     {
+      "Object_ID":"12114",
+      "Package_ID":"1150",
+      "ParentID":"12066"
+     },
+     {
+      "Object_ID":"12115",
+      "Package_ID":"1150",
+      "ParentID":"12066"
+     },
+     {
+      "Object_ID":"12118",
+      "Package_ID":"1151",
+      "ParentID":"12067"
+     },
+     {
+      "Object_ID":"12119",
+      "Package_ID":"1151",
+      "ParentID":"12067"
+     },
+     {
+      "Object_ID":"12120",
+      "Package_ID":"1151",
+      "ParentID":"12067"
+     },
+     {
+      "Object_ID":"12121",
+      "Package_ID":"1151",
+      "ParentID":"12067"
+     },
+     {
+      "Object_ID":"12124",
+      "Package_ID":"1152",
+      "ParentID":"12068"
+     },
+     {
+      "Object_ID":"12125",
+      "Package_ID":"1152",
+      "ParentID":"12068"
+     },
+     {
+      "Object_ID":"12126",
+      "Package_ID":"1152",
+      "ParentID":"12068"
+     }
+    ]
+   },
+   "guid":"{7148DFD0-0E78-45ce-977E-E764B7B4B7CD}",
+   "id":12109
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:20:29",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Operace 'move_elements' je politikou klasifikovana ELEVATED",
+   "Prah ELEVATED prekrocen: updatedExisting 12 > 10",
+   "Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy)",
+   "Prah ELEVATED prekrocen: moveOps 12 > 0",
+   "bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge; RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu)) - po potvrzeni se zapise"
+  ],
+  "reasonItems":[
+   {
+    "code":"CLASS_ELEVATED",
+    "text":"Operace 'move_elements' je politikou klasifikovana ELEVATED",
+    "args":{
+     "op":"move_elements"
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: updatedExisting 12 > 10",
+    "args":{
+     "key":"updatedExisting",
+     "value":12,
+     "limit":10
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy)",
+    "args":{
+     "key":"affectedPackages",
+     "value":4,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: moveOps 12 > 0",
+    "args":{
+     "key":"moveOps",
+     "value":12,
+     "limit":0
+    }
+   },
+   {
+    "code":"BASELINE_GUIDED",
+    "text":"bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge; RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu)) - po potvrzeni se zapise",
+    "args":{
+     "manualOk":true
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "move_elements":1
+   },
+   "targets":[
+    "",
+    "UCR-95106 Zobraz stav bridge",
+    "UCR-95107 Prohlédni změny poslední dávky",
+    "UCR-95108 Nasaď kód bridge do modelu",
+    "UCR-95109 Ukliď automatické zálohy"
+   ],
+   "packages":[
+    "UC-95106 Zobraz stav bridge",
+    "UC-95107 Prohlédni změny poslední dávky",
+    "UC-95108 Nasaď kód bridge do modelu",
+    "UC-95109 Ukliď automatické zálohy"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy"
+   ],
+   "diagrams":[],
+   "paths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy."
+   ],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"move_elements",
+     "items":12,
+     "create":0,
+     "update":0,
+     "targets":[
+      "UCR-95106 Zobraz stav bridge",
+      "UCR-95107 Prohlédni změny poslední dávky",
+      "UCR-95108 Nasaď kód bridge do modelu",
+      "UCR-95109 Ukliď automatické zálohy"
+     ],
+     "packages":[
+      "UC-95106 Zobraz stav bridge",
+      "UC-95107 Prohlédni změny poslední dávky",
+      "UC-95108 Nasaď kód bridge do modelu",
+      "UC-95109 Ukliď automatické zálohy"
+     ],
+     "diagrams":[],
+     "pairs":[],
+     "owners":[
+      "UCR-95106 Zobraz stav bridge",
+      "UCR-95107 Prohlédni změny poslední dávky",
+      "UCR-95108 Nasaď kód bridge do modelu",
+      "UCR-95109 Ukliď automatické zálohy"
+     ]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":12,
+   "createOps":0,
+   "updatedExisting":12,
+   "deleteTargets":0,
+   "affectedElements":16,
+   "affectedPackages":4,
+   "affectedDiagrams":0,
+   "moveOps":12,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":1977,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"c5577ecd09d4f7b99315b3d31d41692b5e1b8805a8e41f5e96fe8afb8fbac631",
+  "payloadHash":"222efd0f88913b919ef820decf752866822b12d1c5fc73d2ead03b7eaaf906dc",
+  "hashMs":3,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:20:55"
+  }
+ },
+ "baseline":{
+  "decision":"skipped",
+  "reason":"velikost neznama (move_elements[0].elements[0].package: chybi package)",
+  "posture":"unknown",
+  "postureReasons":[
+   "velikost neznama (scope: move_elements[0].elements[0].package: chybi package)"
+  ],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+    "packageName":"UC-95106 Zobraz stav bridge",
+    "subtreeCount":7,
+    "probeMs":8,
+    "status":"ok"
+   },
+   {
+    "guid":"{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+    "packageName":"UC-95107 Prohlédni změny poslední dávky",
+    "subtreeCount":6,
+    "probeMs":8,
+    "status":"ok"
+   },
+   {
+    "guid":"{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+    "packageName":"UC-95108 Nasaď kód bridge do modelu",
+    "subtreeCount":7,
+    "probeMs":7,
+    "status":"ok"
+   },
+   {
+    "guid":"{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy",
+    "packageName":"UC-95109 Ukliď automatické zálohy",
+    "subtreeCount":6,
+    "probeMs":7,
+    "status":"ok"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":30,
+  "elapsedMs":1223,
+  "action":"guided",
+  "lines":[
+   "BEZ AUTOMATICKE ZALOHY (bez pre-image): velikost neznama (move_elements[0].elements[0].package: chybi package).",
+   "Nalezena cerstva rucni baseline: RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge; RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu) - po potvrzeni se davka provede."
+  ],
+  "manual":{
+   "ok":true,
+   "found":[
+    "RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge",
+    "RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu)"
+   ],
+   "missing":[]
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":28,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{D8A28FF9-5408-4327-8690-C3C6D47B0DF5}"
+ }
+}

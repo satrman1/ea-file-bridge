@@ -1,0 +1,30 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-14-img-1196",
+ "status":"done",
+ "results":[
+  {
+   "op":"get_diagram_image",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "diagramID":1196,
+     "guid":"{148679EB-4970-4269-A5F0-4A6F7E8F2996}",
+     "name":"SR ProcessRequest",
+     "file":"C:\\GIT\\ea-file-bridge\\responses\\images\\SR_ProcessRequest-1196.png",
+     "size":220739
+    }
+   ],
+   "guid":"{148679EB-4970-4269-A5F0-4A6F7E8F2996}",
+   "id":1196,
+   "file":"C:\\GIT\\ea-file-bridge\\responses\\images\\SR_ProcessRequest-1196.png"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 17:44:16",
+ "audit":{
+  "aiLogGuid":"{05E5A093-88DB-4ff3-A8CB-20B27B32F5C6}"
+ }
+}

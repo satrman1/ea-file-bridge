@@ -1,0 +1,142 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-25-blocked-vycet",
+ "status":"error",
+ "results":[
+  {
+   "op":"create_or_update_elements",
+   "status":"skipped"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:04:03",
+ "risk":{
+  "riskLevel":"BLOCKED",
+  "riskReasons":[
+   "Prah BLOCKED prekrocen: affectedPackages 6 > 5 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge)",
+   "Prah ELEVATED prekrocen: affectedPackages 6 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge)"
+  ],
+  "reasonItems":[
+   {
+    "code":"THRESHOLD_BLOCKED",
+    "text":"Prah BLOCKED prekrocen: affectedPackages 6 > 5 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge)",
+    "args":{
+     "key":"affectedPackages",
+     "value":6,
+     "limit":5,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 6 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge)",
+    "args":{
+     "key":"affectedPackages",
+     "value":6,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge"
+     ],
+     "packagesMore":0
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "create_or_update_elements":1
+   },
+   "targets":[
+    "UC-95101 Zpracuj dávku agenta přes pumpu",
+    "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "UC-95103 Zpracuj dávku ze schránky",
+    "UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "UC-95105 Předej agentovi kontext výběru",
+    "UC-95106 Zobraz stav bridge"
+   ],
+   "packages":[
+    "UC-95101 Zpracuj dávku agenta přes pumpu",
+    "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "UC-95103 Zpracuj dávku ze schránky",
+    "UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "UC-95105 Předej agentovi kontext výběru",
+    "UC-95106 Zobraz stav bridge"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge"
+   ],
+   "diagrams":[],
+   "paths":[],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"create_or_update_elements",
+     "items":6,
+     "create":0,
+     "update":6,
+     "targets":[
+      "UC-95101 Zpracuj dávku agenta přes pumpu",
+      "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+      "UC-95103 Zpracuj dávku ze schránky",
+      "UC-95104 Zpracuj dávky ze složky bez pumpy",
+      "UC-95105 Předej agentovi kontext výběru",
+      "UC-95106 Zobraz stav bridge"
+     ],
+     "packages":[],
+     "diagrams":[],
+     "pairs":[]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":6,
+   "createOps":0,
+   "updatedExisting":6,
+   "deleteTargets":0,
+   "affectedElements":6,
+   "affectedPackages":6,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":480,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"9ef7cb81b899e66cf1308810e24e97faff56b3f67bc12467a2770cdbb40ede9d",
+  "payloadHash":"038b7789cb5b7f3fcc8dd5a4de32e4bf1df468632d34b33951e22325150a5bec",
+  "hashMs":1,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":false
+  }
+ },
+ "code":"E_RISK_BLOCKED",
+ "message":"Risk Gate: davka BLOCKED - Prah BLOCKED prekrocen: affectedPackages 6 > 5 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge); Prah ELEVATED prekrocen: affectedPackages 6 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge) Zadny jednoklikovy override; cesta ven = zmena FB_RiskPolicy (deploy_src/rucne) nebo rucni prace v EA.",
+ "audit":{
+  "aiLogGuid":"{8D958BDA-D6DF-4242-A4FA-95A9BCCCE158}"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-35-boundary-survey",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "1141",
+     "type": "Boundary",
+     "name": "EA File Bridge"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1227,
+   "elementPlacements": [
+    {
+     "element": "$0",
+     "x": 260,
+     "y": 5,
+     "width": 1060,
+     "height": 460
+    }
+   ]
+  },
+  {
+   "op": "reload_diagrams",
+   "diagrams": [
+    1227
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT x.Object_ID, o.Object_Type, o.Name, x.RectLeft, x.RectTop, x.RectRight, x.RectBottom, x.Sequence FROM t_diagramobjects x INNER JOIN t_object o ON o.Object_ID = x.Object_ID WHERE x.Diagram_ID = 1227 AND o.Object_Type = 'Boundary'",
+   "maxRows": 5
+  }
+ ]
+}

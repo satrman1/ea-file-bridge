@@ -1,0 +1,908 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-48-ls-rozestupy-2",
+ "status":"done",
+ "results":[
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1222,
+   "guid":"{3672A1B1-C2F1-4884-B9AB-B878A082E403}",
+   "count":3,
+   "moved":3,
+   "items":[
+    {
+     "elementID":12046,
+     "guid":"{7C03AB11-73BE-43c9-897C-22F98C49A3F2}",
+     "x":330,
+     "y":60,
+     "width":320,
+     "height":100,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":60,
+      "width":320,
+      "height":100
+     }
+    },
+    {
+     "elementID":12064,
+     "guid":"{4A01965B-779F-46e9-8246-40131112874F}",
+     "x":330,
+     "y":200,
+     "width":320,
+     "height":70,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":200,
+      "width":320,
+      "height":70
+     }
+    },
+    {
+     "elementID":12069,
+     "guid":"{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "x":300,
+     "y":310,
+     "width":400,
+     "height":200,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":300,
+      "width":320,
+      "height":60
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5070,
+     "hidden":false
+    },
+    {
+     "connectorID":5069,
+     "hidden":false
+    },
+    {
+     "connectorID":5073,
+     "hidden":false
+    },
+    {
+     "connectorID":5071,
+     "hidden":false
+    },
+    {
+     "connectorID":5072,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1223,
+   "guid":"{299ECBDE-C611-4cac-9200-06CF13F5ADBE}",
+   "count":4,
+   "moved":4,
+   "items":[
+    {
+     "elementID":12047,
+     "guid":"{4883656A-8060-436c-8418-2591FFAFD5C3}",
+     "x":330,
+     "y":60,
+     "width":320,
+     "height":100,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":60,
+      "width":320,
+      "height":100
+     }
+    },
+    {
+     "elementID":12065,
+     "guid":"{DF5B480C-238E-46a3-900A-FCE0C77779D7}",
+     "x":330,
+     "y":200,
+     "width":320,
+     "height":70,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":200,
+      "width":320,
+      "height":70
+     }
+    },
+    {
+     "elementID":12072,
+     "guid":"{A70907E8-4AF9-41ae-8662-13B5B8EFB213}",
+     "x":300,
+     "y":310,
+     "width":400,
+     "height":200,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":300,
+      "width":320,
+      "height":60
+     }
+    },
+    {
+     "elementID":12069,
+     "guid":"{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "x":300,
+     "y":540,
+     "width":400,
+     "height":200,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":380,
+      "width":320,
+      "height":60
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5077,
+     "hidden":false
+    },
+    {
+     "connectorID":5081,
+     "hidden":false
+    },
+    {
+     "connectorID":5082,
+     "hidden":false
+    },
+    {
+     "connectorID":5078,
+     "hidden":false
+    },
+    {
+     "connectorID":5080,
+     "hidden":false
+    },
+    {
+     "connectorID":5079,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1224,
+   "guid":"{4F8C9356-ABED-4533-901F-FCD705FD0721}",
+   "count":3,
+   "moved":3,
+   "items":[
+    {
+     "elementID":12048,
+     "guid":"{A3608D2E-15F9-4476-B303-FBAE19E94501}",
+     "x":330,
+     "y":60,
+     "width":320,
+     "height":100,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":60,
+      "width":320,
+      "height":100
+     }
+    },
+    {
+     "elementID":12066,
+     "guid":"{52506C0D-C6E1-4ca8-93E2-F6580F469D9C}",
+     "x":330,
+     "y":200,
+     "width":320,
+     "height":70,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":200,
+      "width":320,
+      "height":70
+     }
+    },
+    {
+     "elementID":12073,
+     "guid":"{6540B370-DAF0-4714-9098-ED790B1BBF20}",
+     "x":300,
+     "y":310,
+     "width":400,
+     "height":200,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":300,
+      "width":320,
+      "height":60
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5086,
+     "hidden":false
+    },
+    {
+     "connectorID":5089,
+     "hidden":false
+    },
+    {
+     "connectorID":5087,
+     "hidden":false
+    },
+    {
+     "connectorID":5088,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1225,
+   "guid":"{38DC80AE-0D96-4dc8-AA80-FACE501F7ADC}",
+   "count":3,
+   "moved":3,
+   "items":[
+    {
+     "elementID":12049,
+     "guid":"{54B20143-5DE4-4d98-ACAE-F490D6E82328}",
+     "x":330,
+     "y":60,
+     "width":320,
+     "height":100,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":60,
+      "width":320,
+      "height":100
+     }
+    },
+    {
+     "elementID":12067,
+     "guid":"{97111295-A9A5-41c5-B112-8F69DD9FF7F0}",
+     "x":330,
+     "y":200,
+     "width":320,
+     "height":70,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":200,
+      "width":320,
+      "height":70
+     }
+    },
+    {
+     "elementID":12070,
+     "guid":"{C27CF193-628D-4c9a-AC12-A09D83DE19FC}",
+     "x":300,
+     "y":310,
+     "width":400,
+     "height":200,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":300,
+      "width":320,
+      "height":60
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5092,
+     "hidden":false
+    },
+    {
+     "connectorID":5095,
+     "hidden":false
+    },
+    {
+     "connectorID":5096,
+     "hidden":false
+    },
+    {
+     "connectorID":5097,
+     "hidden":false
+    },
+    {
+     "connectorID":5093,
+     "hidden":false
+    },
+    {
+     "connectorID":5094,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1226,
+   "guid":"{58D66708-5842-4e2d-9082-22E00CECA61E}",
+   "count":3,
+   "moved":3,
+   "items":[
+    {
+     "elementID":12050,
+     "guid":"{027292BE-4D6B-41ca-BB16-93B62383316C}",
+     "x":330,
+     "y":60,
+     "width":320,
+     "height":100,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":60,
+      "width":320,
+      "height":100
+     }
+    },
+    {
+     "elementID":12068,
+     "guid":"{357F5777-D003-4d7d-8DFD-D9DB32F568D7}",
+     "x":330,
+     "y":200,
+     "width":320,
+     "height":70,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":200,
+      "width":320,
+      "height":70
+     }
+    },
+    {
+     "elementID":12069,
+     "guid":"{C44CB8F1-C470-4e25-BB21-D164D01D57B6}",
+     "x":300,
+     "y":310,
+     "width":400,
+     "height":200,
+     "moved":true,
+     "from":{
+      "x":330,
+      "y":300,
+      "width":320,
+      "height":60
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5102,
+     "hidden":false
+    },
+    {
+     "connectorID":5105,
+     "hidden":false
+    },
+    {
+     "connectorID":5103,
+     "hidden":false
+    },
+    {
+     "connectorID":5104,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1222,
+   "guid":"{3672A1B1-C2F1-4884-B9AB-B878A082E403}",
+   "count":1,
+   "moved":1,
+   "items":[
+    {
+     "elementID":12103,
+     "guid":"{517F08E2-FC5F-4fb3-81A8-5E1E5BF62904}",
+     "x":220,
+     "y":20,
+     "width":540,
+     "height":560,
+     "moved":true,
+     "from":{
+      "x":220,
+      "y":20,
+      "width":540,
+      "height":410
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5070,
+     "hidden":false
+    },
+    {
+     "connectorID":5069,
+     "hidden":false
+    },
+    {
+     "connectorID":5073,
+     "hidden":false
+    },
+    {
+     "connectorID":5071,
+     "hidden":false
+    },
+    {
+     "connectorID":5072,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1223,
+   "guid":"{299ECBDE-C611-4cac-9200-06CF13F5ADBE}",
+   "count":1,
+   "moved":1,
+   "items":[
+    {
+     "elementID":12108,
+     "guid":"{7D387A5C-85C1-4397-B78F-AC71D540945D}",
+     "x":220,
+     "y":20,
+     "width":540,
+     "height":790,
+     "moved":true,
+     "from":{
+      "x":220,
+      "y":20,
+      "width":540,
+      "height":490
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5077,
+     "hidden":false
+    },
+    {
+     "connectorID":5081,
+     "hidden":false
+    },
+    {
+     "connectorID":5082,
+     "hidden":false
+    },
+    {
+     "connectorID":5078,
+     "hidden":false
+    },
+    {
+     "connectorID":5080,
+     "hidden":false
+    },
+    {
+     "connectorID":5079,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1224,
+   "guid":"{4F8C9356-ABED-4533-901F-FCD705FD0721}",
+   "count":1,
+   "moved":1,
+   "items":[
+    {
+     "elementID":12113,
+     "guid":"{396FE015-D111-493a-A06E-FA680B2C77E5}",
+     "x":220,
+     "y":20,
+     "width":540,
+     "height":560,
+     "moved":true,
+     "from":{
+      "x":220,
+      "y":20,
+      "width":540,
+      "height":410
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5086,
+     "hidden":false
+    },
+    {
+     "connectorID":5089,
+     "hidden":false
+    },
+    {
+     "connectorID":5087,
+     "hidden":false
+    },
+    {
+     "connectorID":5088,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1225,
+   "guid":"{38DC80AE-0D96-4dc8-AA80-FACE501F7ADC}",
+   "count":1,
+   "moved":1,
+   "items":[
+    {
+     "elementID":12117,
+     "guid":"{12912A52-128D-4264-A33B-058776722D30}",
+     "x":220,
+     "y":20,
+     "width":540,
+     "height":560,
+     "moved":true,
+     "from":{
+      "x":220,
+      "y":20,
+      "width":540,
+      "height":410
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5092,
+     "hidden":false
+    },
+    {
+     "connectorID":5095,
+     "hidden":false
+    },
+    {
+     "connectorID":5096,
+     "hidden":false
+    },
+    {
+     "connectorID":5097,
+     "hidden":false
+    },
+    {
+     "connectorID":5093,
+     "hidden":false
+    },
+    {
+     "connectorID":5094,
+     "hidden":false
+    }
+   ]
+  },
+  {
+   "op":"place_elements_on_diagram",
+   "status":"ok",
+   "diagramID":1226,
+   "guid":"{58D66708-5842-4e2d-9082-22E00CECA61E}",
+   "count":1,
+   "moved":1,
+   "items":[
+    {
+     "elementID":12123,
+     "guid":"{51994C8E-38E1-4dfc-A9A1-6C1248D77D2D}",
+     "x":220,
+     "y":20,
+     "width":540,
+     "height":560,
+     "moved":true,
+     "from":{
+      "x":220,
+      "y":20,
+      "width":540,
+      "height":410
+     }
+    }
+   ],
+   "connectorsOnDiagram":[
+    {
+     "connectorID":5102,
+     "hidden":false
+    },
+    {
+     "connectorID":5105,
+     "hidden":false
+    },
+    {
+     "connectorID":5103,
+     "hidden":false
+    },
+    {
+     "connectorID":5104,
+     "hidden":false
+    }
+   ]
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:24:22",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Prah ELEVATED prekrocen: writeOps 21 > 20",
+   "Prah ELEVATED prekrocen: affectedPackages 5 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy)",
+   "Prah ELEVATED prekrocen: foreignDiagrams 5 > 0"
+  ],
+  "reasonItems":[
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: writeOps 21 > 20",
+    "args":{
+     "key":"writeOps",
+     "value":21,
+     "limit":20
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 5 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy)",
+    "args":{
+     "key":"affectedPackages",
+     "value":5,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: foreignDiagrams 5 > 0",
+    "args":{
+     "key":"foreignDiagrams",
+     "value":5,
+     "limit":0
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "place_elements_on_diagram":10
+   },
+   "targets":[
+    "UC-95105 Předej agentovi kontext výběru",
+    "UCR-95105 Předej agentovi kontext výběru",
+    "LS95100-1 Menu AI Bridge",
+    "UC-95106 Zobraz stav bridge",
+    "UCR-95106 Zobraz stav bridge",
+    "LS95106-1 Dialog Stav bridge",
+    "UC-95107 Prohlédni změny poslední dávky",
+    "UCR-95107 Prohlédni změny poslední dávky",
+    "LS95107-1 Output tab AI Bridge",
+    "UC-95108 Nasaď kód bridge do modelu",
+    "UCR-95108 Nasaď kód bridge do modelu",
+    "LS95102-1 Potvrzovací okno pumpy",
+    "..."
+   ],
+   "packages":[
+    "UC-95105 Předej agentovi kontext výběru",
+    "UC-95106 Zobraz stav bridge",
+    "UC-95107 Prohlédni změny poslední dávky",
+    "UC-95108 Nasaď kód bridge do modelu",
+    "UC-95109 Ukliď automatické zálohy"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy"
+   ],
+   "diagrams":[
+    "UC-95105 Předej agentovi kontext výběru",
+    "UC-95106 Zobraz stav bridge",
+    "UC-95107 Prohlédni změny poslední dávky",
+    "UC-95108 Nasaď kód bridge do modelu",
+    "UC-95109 Ukliď automatické zálohy"
+   ],
+   "paths":[],
+   "targetsMore":3,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"place_elements_on_diagram",
+     "items":21,
+     "create":0,
+     "update":0,
+     "targets":[
+      "UC-95105 Předej agentovi kontext výběru",
+      "UCR-95105 Předej agentovi kontext výběru",
+      "LS95100-1 Menu AI Bridge",
+      "UC-95106 Zobraz stav bridge",
+      "UCR-95106 Zobraz stav bridge",
+      "LS95106-1 Dialog Stav bridge",
+      "UC-95107 Prohlédni změny poslední dávky",
+      "UCR-95107 Prohlédni změny poslední dávky",
+      "LS95107-1 Output tab AI Bridge",
+      "UC-95108 Nasaď kód bridge do modelu",
+      "UCR-95108 Nasaď kód bridge do modelu",
+      "LS95102-1 Potvrzovací okno pumpy"
+     ],
+     "packages":[],
+     "diagrams":[
+      "UC-95105 Předej agentovi kontext výběru",
+      "UC-95106 Zobraz stav bridge",
+      "UC-95107 Prohlédni změny poslední dávky",
+      "UC-95108 Nasaď kód bridge do modelu",
+      "UC-95109 Ukliď automatické zálohy"
+     ],
+     "pairs":[],
+     "targetsMore":7
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":21,
+   "createOps":0,
+   "updatedExisting":0,
+   "deleteTargets":0,
+   "affectedElements":19,
+   "affectedPackages":5,
+   "affectedDiagrams":5,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":455,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"c454d45a1e634e0e2dc21551c74495182b69df219173fcc8a2d84d146ac71d98",
+  "payloadHash":"ddf80a6841fb6f72bffd10d0639924c7ab1215bfad1146ea2700b80495e6ca36",
+  "hashMs":6,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:24:40"
+  }
+ },
+ "baseline":{
+  "decision":"reused",
+  "reason":"reuse session",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:22:47",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+    "packageName":"UC-95105 Předej agentovi kontext výběru",
+    "subtreeCount":6,
+    "probeMs":12,
+    "status":"ok",
+    "baselineGuid":"{4167E2A9-04A9-4201-B1BB-BF671553200F}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:24",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+    "packageName":"UC-95106 Zobraz stav bridge",
+    "subtreeCount":7,
+    "probeMs":10,
+    "status":"ok",
+    "baselineGuid":"{68F5608D-D040-4e24-8DE6-4F91E3C6A4B1}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:26",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+    "packageName":"UC-95107 Prohlédni změny poslední dávky",
+    "subtreeCount":6,
+    "probeMs":78,
+    "status":"ok",
+    "baselineGuid":"{FAFED531-4BF9-45df-8C3C-1E68A1A841C7}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:28",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+    "packageName":"UC-95108 Nasaď kód bridge do modelu",
+    "subtreeCount":7,
+    "probeMs":10,
+    "status":"ok",
+    "baselineGuid":"{FFA6CB81-0B07-485f-BC74-EA81C03D8884}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:30",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy",
+    "packageName":"UC-95109 Ukliď automatické zálohy",
+    "subtreeCount":6,
+    "probeMs":11,
+    "status":"ok",
+    "baselineGuid":"{27A62F29-AFD0-4754-9064-1A448033CA33}",
+    "result":"reused",
+    "reuse":"reuse session"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":122,
+  "elapsedMs":194,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru (6 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge (7 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky (6 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu (7 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy (6 prvku)"
+  ],
+  "created":[],
+  "reused":[
+   "FB-AUTO - s20261015-1 2026-10-15 18:22:47",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:24",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:26",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:28",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:30"
+  ],
+  "journal":{
+   "targets":0,
+   "covered":[],
+   "uncovered":[
+    "place_elements_on_diagram[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[1]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[2]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[3]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[4]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[5]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[6]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[7]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[8]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "place_elements_on_diagram[9]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"",
+   "why":"zadny cil v rozsahu journalu"
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":28,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{8C0C34D2-5826-485a-88F5-798C99583BBF}"
+ }
+}

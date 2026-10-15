@@ -1,0 +1,98 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-27-return-sonda",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":2,
+   "rows":[
+    {
+     "Connector_ID":"5109",
+     "Name":"ProcessRequest",
+     "PDATA1":"Synchronous",
+     "PDATA2":"paramsDlgs=;params=req;retval=",
+     "PDATA3":"Call",
+     "SeqNo":"1"
+    },
+    {
+     "Connector_ID":"5110",
+     "PDATA1":"Synchronous",
+     "PDATA2":"paramsDlgs=;params=;retval=res",
+     "PDATA3":"Call",
+     "SeqNo":"2"
+    }
+   ],
+   "maxRows":5
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":46,
+   "rows":[
+    {
+     "Connector_ID":"4576",
+     "Name":"fourth.return",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4577",
+     "Name":"fourth return",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4579",
+     "Name":"fifth return",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4582",
+     "Name":"return confirmation",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4584",
+     "Name":"return confirmation",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4593",
+     "Name":"return true",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4595",
+     "Name":"return",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4660",
+     "Name":"bValidDevice = true",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4672",
+     "Name":"readPort(255)",
+     "PDATA4":"1"
+    },
+    {
+     "Connector_ID":"4673",
+     "Name":"bDataRead = false",
+     "PDATA4":"1"
+    }
+   ],
+   "maxRows":10,
+   "truncated":true,
+   "warnings":[
+    "vysledek oriznut: dotaz vratil 46 radku, v odpovedi je prvnich 10 (maxRows); rowCount = skutecny pocet. Zuz dotaz (WHERE / TOP) nebo zvys maxRows (max 5000)"
+   ]
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:05:29",
+ "audit":{
+  "aiLogGuid":"{E2A49980-FA7D-49d2-AF91-49036036D4A5}"
+ }
+}

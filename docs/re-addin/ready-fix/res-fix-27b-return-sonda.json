@@ -1,0 +1,47 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-27b-return-sonda",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":3,
+   "rows":[
+    {
+     "Connector_ID":"4576",
+     "Name":"fourth.return",
+     "PDATA2":"retval=void;",
+     "PDATA3":"Call",
+     "PDATA4":"1",
+     "PDATA5":"SX=0;SY=5;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;"
+    },
+    {
+     "Connector_ID":"4593",
+     "Name":"return true",
+     "PDATA1":"Synchronous",
+     "PDATA2":"retval=void;",
+     "PDATA3":"Call",
+     "PDATA4":"1",
+     "PDATA5":"SX=0;SY=-66;EX=0;EY=0;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;"
+    },
+    {
+     "Connector_ID":"4595",
+     "Name":"return",
+     "PDATA1":"Synchronous",
+     "PDATA2":"retval=void;",
+     "PDATA3":"Signal",
+     "PDATA4":"1",
+     "PDATA5":"SX=0;SY=-53;EX=0;EY=0;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;"
+    }
+   ],
+   "maxRows":5
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:05:45",
+ "audit":{
+  "aiLogGuid":"{67414D27-90A8-4bde-BC14-AA38E06BFE9F}"
+ }
+}

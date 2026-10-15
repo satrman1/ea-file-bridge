@@ -1,0 +1,352 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-34-return-poradi",
+ "status":"done",
+ "results":[
+  {
+   "op":"create_or_update_messages",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "guid":"{AE36FC08-77E1-46a5-A62C-1521C51BF5A6}",
+     "id":5112,
+     "name":"",
+     "created":false,
+     "index":0,
+     "pdata":{
+      "SeqNo":"14",
+      "DiagramID":"1196",
+      "PDATA1":"Synchronous",
+      "PDATA2":"paramsDlgs=;params=;retval=string",
+      "PDATA3":"Call",
+      "PDATA4":"1"
+     }
+    }
+   ],
+   "guid":"{AE36FC08-77E1-46a5-A62C-1521C51BF5A6}",
+   "id":5112
+  },
+  {
+   "op":"create_or_update_messages",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "guid":"{917DA5FE-5D5F-4203-9541-8B63149446F7}",
+     "id":5113,
+     "name":"",
+     "created":false,
+     "index":0,
+     "pdata":{
+      "SeqNo":"5",
+      "DiagramID":"1198",
+      "PDATA1":"Synchronous",
+      "PDATA2":"paramsDlgs=;params=;retval=PingResult",
+      "PDATA3":"Call"
+     }
+    }
+   ],
+   "guid":"{917DA5FE-5D5F-4203-9541-8B63149446F7}",
+   "id":5113
+  },
+  {
+   "op":"create_or_update_messages",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "guid":"{C714492B-D27B-417f-BE87-77E766CCDAF0}",
+     "id":5114,
+     "name":"",
+     "created":false,
+     "index":0,
+     "pdata":{
+      "SeqNo":"10",
+      "DiagramID":"1200",
+      "PDATA1":"Synchronous",
+      "PDATA2":"paramsDlgs=;params=;retval=OpResult",
+      "PDATA3":"Call"
+     }
+    }
+   ],
+   "guid":"{C714492B-D27B-417f-BE87-77E766CCDAF0}",
+   "id":5114
+  },
+  {
+   "op":"create_or_update_messages",
+   "status":"ok",
+   "count":1,
+   "items":[
+    {
+     "guid":"{75748EB4-8FFF-43bd-94FB-66055A91616E}",
+     "id":5115,
+     "name":"",
+     "created":false,
+     "index":0,
+     "pdata":{
+      "SeqNo":"9",
+      "DiagramID":"1202",
+      "PDATA1":"Synchronous",
+      "PDATA2":"paramsDlgs=;params=;retval=OpResult",
+      "PDATA3":"Call"
+     }
+    }
+   ],
+   "guid":"{75748EB4-8FFF-43bd-94FB-66055A91616E}",
+   "id":5115
+  },
+  {
+   "op":"reload_diagrams",
+   "status":"ok",
+   "reloaded":[
+    1196,
+    1198,
+    1200,
+    1202
+   ],
+   "count":4
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":4,
+   "rows":[
+    {
+     "Connector_ID":"5112",
+     "DiagramID":"1196",
+     "SeqNo":"14",
+     "PDATA2":"paramsDlgs=;params=;retval=string",
+     "PDATA4":"1",
+     "SubType":"Return"
+    },
+    {
+     "Connector_ID":"5113",
+     "DiagramID":"1198",
+     "SeqNo":"5",
+     "PDATA2":"paramsDlgs=;params=;retval=PingResult",
+     "SubType":"Return"
+    },
+    {
+     "Connector_ID":"5114",
+     "DiagramID":"1200",
+     "SeqNo":"10",
+     "PDATA2":"paramsDlgs=;params=;retval=OpResult",
+     "SubType":"Return"
+    },
+    {
+     "Connector_ID":"5115",
+     "DiagramID":"1202",
+     "SeqNo":"9",
+     "PDATA2":"paramsDlgs=;params=;retval=OpResult",
+     "SubType":"Return"
+    }
+   ],
+   "maxRows":10
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:11:37",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel)",
+   "Prah ELEVATED prekrocen: foreignDiagrams 4 > 0"
+  ],
+  "reasonItems":[
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel)",
+    "args":{
+     "key":"affectedPackages",
+     "value":4,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest",
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping",
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements",
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: foreignDiagrams 4 > 0",
+    "args":{
+     "key":"foreignDiagrams",
+     "value":4,
+     "limit":0
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "create_or_update_messages":4
+   },
+   "targets":[],
+   "packages":[
+    "ProcessRequest",
+    "Ping",
+    "CreateOrUpdateElements",
+    "DeleteFromModel"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel"
+   ],
+   "diagrams":[
+    "SR ProcessRequest",
+    "SR Ping",
+    "SR CreateOrUpdateElements",
+    "SR DeleteFromModel"
+   ],
+   "paths":[],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"create_or_update_messages",
+     "items":4,
+     "create":0,
+     "update":0,
+     "targets":[],
+     "packages":[],
+     "diagrams":[
+      "SR ProcessRequest",
+      "SR Ping",
+      "SR CreateOrUpdateElements",
+      "SR DeleteFromModel"
+     ],
+     "pairs":[]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":4,
+   "createOps":0,
+   "updatedExisting":0,
+   "deleteTargets":0,
+   "affectedElements":0,
+   "affectedPackages":4,
+   "affectedDiagrams":4,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":467,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"1091e193af6d99dfc63207c042e2ce01f80dbe032d03046e748d1ac759d378f3",
+  "payloadHash":"1e9889d2131d75b0846cb3182c94e70777297f9b51709e9fe51301ff8de10648",
+  "hashMs":19,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:11:54"
+  }
+ },
+ "baseline":{
+  "decision":"reused",
+  "reason":"reuse session",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{7259144D-99F3-4827-BAED-AF732380DDF5}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 17:46:16",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest",
+    "packageName":"ProcessRequest",
+    "subtreeCount":17,
+    "probeMs":10,
+    "status":"ok",
+    "baselineGuid":"{98C9E969-36E0-4826-BFEE-618616C97550}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:07:34",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping",
+    "packageName":"Ping",
+    "subtreeCount":9,
+    "probeMs":22,
+    "status":"ok",
+    "baselineGuid":"{577374C8-F8C2-48a4-8530-74F3179843F0}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:07:37",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements",
+    "packageName":"CreateOrUpdateElements",
+    "subtreeCount":11,
+    "probeMs":10,
+    "status":"ok",
+    "baselineGuid":"{19D3F741-DBF2-43d6-8DC8-61FA08F7423C}",
+    "result":"reused",
+    "reuse":"reuse session"
+   },
+   {
+    "guid":"{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:07:39",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel",
+    "packageName":"DeleteFromModel",
+    "subtreeCount":12,
+    "probeMs":8,
+    "status":"ok",
+    "baselineGuid":"{554EED35-F39D-48d2-B6F2-34622957A360}",
+    "result":"reused",
+    "reuse":"reuse session"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":50,
+  "elapsedMs":153,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest (17 prvku), AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping (9 prvku), AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements (11 prvku), AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel (12 prvku)"
+  ],
+  "created":[],
+  "reused":[
+   "FB-AUTO - s20261015-1 2026-10-15 17:46:16",
+   "FB-AUTO - s20261015-1 2026-10-15 18:07:34",
+   "FB-AUTO - s20261015-1 2026-10-15 18:07:37",
+   "FB-AUTO - s20261015-1 2026-10-15 18:07:39"
+  ],
+  "journal":{
+   "targets":0,
+   "covered":[],
+   "uncovered":[
+    "create_or_update_messages[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "create_or_update_messages[1]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "create_or_update_messages[2]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "create_or_update_messages[3]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"",
+   "why":"zadny cil v rozsahu journalu"
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":26,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{BC5CB39E-E039-4cd0-AFF3-4B40CD1BD458}"
+ }
+}

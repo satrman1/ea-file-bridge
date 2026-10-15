@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "fix-44-baseline-predci", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_baseline", "package": 1129, "name": "RE-fix pred presunem lifelin SR", "notes": "rucni zaloha pred move_elements owningElement (Z261014b-1)" },
+ { "op": "create_baseline", "package": 1139, "name": "RE-fix pred presunem lifelin UCR", "notes": "rucni zaloha pred move_elements owningElement (Z261014b-1)" } ] }

@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "fix-27c-return-sonda", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT Connector_ID, Name, Stereotype, PDATA1, PDATA2, PDATA3, PDATA4, SubType, StyleEx FROM t_connector WHERE Connector_ID IN (5110, 5111)", "maxRows": 5 },
+ { "op": "query", "sql": "SELECT Connector_ID, Name, PDATA3, PDATA4, SubType FROM t_connector WHERE Connector_Type = 'Sequence' AND DiagramID IN (1200, 1202) ORDER BY SeqNo", "maxRows": 30 }
+] }

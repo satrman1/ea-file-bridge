@@ -1,0 +1,6 @@
+{ "protocol": "eafb/0.2", "id": "fix-24-presun-pod-ucr-2", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_package", "parent": 1153, "name": "_sub" },
+ { "op": "create_or_update_elements", "elements": [ { "package": "$0", "type": "Object", "name": "", "classifierID": 11919 } ] },
+ { "op": "move_elements", "owningElement": "12146", "elements": [12147, 12157, "$1"] },
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID FROM t_object WHERE Object_ID IN (12147, 12148, 12157) OR Package_ID = 1153 AND Object_ID > 12157", "maxRows": 20 }
+] }

@@ -1,0 +1,698 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-41-pod-ucr-1",
+ "status":"done",
+ "results":[
+  {
+   "op":"move_elements",
+   "status":"ok",
+   "count":19,
+   "moved":19,
+   "withChildren":true,
+   "items":[
+    {
+     "guid":"{39129E6C-8B49-4168-82DB-A4E2DB8FDE4B}",
+     "id":12080,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1144,
+     "fromPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "toPackageID":1144,
+     "toPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12060,
+     "toOwner":"UCR-95101 Zpracuj dávku agenta přes pumpu"
+    },
+    {
+     "guid":"{5D305E27-4615-4084-9A38-012401628708}",
+     "id":12081,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1144,
+     "fromPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "toPackageID":1144,
+     "toPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12060,
+     "toOwner":"UCR-95101 Zpracuj dávku agenta přes pumpu"
+    },
+    {
+     "guid":"{F92AA736-50FD-4e09-BF09-7E5C453DC363}",
+     "id":12083,
+     "name":"ref SR ProcessRequest",
+     "moved":true,
+     "fromPackageID":1144,
+     "fromPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "toPackageID":1144,
+     "toPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12060,
+     "toOwner":"UCR-95101 Zpracuj dávku agenta přes pumpu"
+    },
+    {
+     "guid":"{32D4ED6E-22C0-40b8-82AF-1C7A06AC6DC9}",
+     "id":12082,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1144,
+     "fromPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "toPackageID":1144,
+     "toPackage":"UC-95101 Zpracuj dávku agenta přes pumpu",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12060,
+     "toOwner":"UCR-95101 Zpracuj dávku agenta přes pumpu"
+    },
+    {
+     "guid":"{F333B91E-F567-4176-8F09-DD5E30B9B927}",
+     "id":12086,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1145,
+     "fromPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "toPackageID":1145,
+     "toPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12061,
+     "toOwner":"UCR-95102 Rozhodni o dávce vyžadující potvrzení"
+    },
+    {
+     "guid":"{ADDB1918-AC10-41ed-87B0-FB24FFE3148C}",
+     "id":12087,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1145,
+     "fromPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "toPackageID":1145,
+     "toPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12061,
+     "toOwner":"UCR-95102 Rozhodni o dávce vyžadující potvrzení"
+    },
+    {
+     "guid":"{92A3AC1B-040B-4cad-AA3E-E817B3E8A837}",
+     "id":12089,
+     "name":"ref SR ProcessRequest",
+     "moved":true,
+     "fromPackageID":1145,
+     "fromPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "toPackageID":1145,
+     "toPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12061,
+     "toOwner":"UCR-95102 Rozhodni o dávce vyžadující potvrzení"
+    },
+    {
+     "guid":"{45B7F10E-3D6F-46e9-BE23-5CB54C80ABCF}",
+     "id":12088,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1145,
+     "fromPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "toPackageID":1145,
+     "toPackage":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12061,
+     "toOwner":"UCR-95102 Rozhodni o dávce vyžadující potvrzení"
+    },
+    {
+     "guid":"{B02DBEE1-099A-43a7-BF92-0F2147827B95}",
+     "id":12092,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1146,
+     "fromPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "toPackageID":1146,
+     "toPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12062,
+     "toOwner":"UCR-95103 Zpracuj dávku ze schránky"
+    },
+    {
+     "guid":"{107E4EB9-3723-49d5-939F-F490FDC8C4BD}",
+     "id":12093,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1146,
+     "fromPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "toPackageID":1146,
+     "toPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12062,
+     "toOwner":"UCR-95103 Zpracuj dávku ze schránky"
+    },
+    {
+     "guid":"{E5688CCB-56FB-4527-8017-A6D9FCB1F83B}",
+     "id":12095,
+     "name":"ref SR ProcessRequest",
+     "moved":true,
+     "fromPackageID":1146,
+     "fromPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "toPackageID":1146,
+     "toPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12062,
+     "toOwner":"UCR-95103 Zpracuj dávku ze schránky"
+    },
+    {
+     "guid":"{A744474A-970F-45c2-96DF-E9ADBE1AE5C4}",
+     "id":12094,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1146,
+     "fromPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "toPackageID":1146,
+     "toPackage":"UC-95103 Zpracuj dávku ze schránky",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12062,
+     "toOwner":"UCR-95103 Zpracuj dávku ze schránky"
+    },
+    {
+     "guid":"{06AD15F8-2F17-451e-ADB7-E96818B787C5}",
+     "id":12098,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1147,
+     "fromPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "toPackageID":1147,
+     "toPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12063,
+     "toOwner":"UCR-95104 Zpracuj dávky ze složky bez pumpy"
+    },
+    {
+     "guid":"{D36B0103-AB95-4c7a-9471-57AF061D7F0A}",
+     "id":12099,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1147,
+     "fromPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "toPackageID":1147,
+     "toPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12063,
+     "toOwner":"UCR-95104 Zpracuj dávky ze složky bez pumpy"
+    },
+    {
+     "guid":"{99178FD4-F3B6-4f67-A1A3-2F6D3DBF84A9}",
+     "id":12101,
+     "name":"ref SR ProcessRequest",
+     "moved":true,
+     "fromPackageID":1147,
+     "fromPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "toPackageID":1147,
+     "toPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12063,
+     "toOwner":"UCR-95104 Zpracuj dávky ze složky bez pumpy"
+    },
+    {
+     "guid":"{EC65C4D9-5CFF-4d1c-931D-0E4AE15B0036}",
+     "id":12100,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1147,
+     "fromPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "toPackageID":1147,
+     "toPackage":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12063,
+     "toOwner":"UCR-95104 Zpracuj dávky ze složky bez pumpy"
+    },
+    {
+     "guid":"{AD8D672E-8739-4959-B9CD-8071398E4F2E}",
+     "id":12104,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1148,
+     "fromPackage":"UC-95105 Předej agentovi kontext výběru",
+     "toPackageID":1148,
+     "toPackage":"UC-95105 Předej agentovi kontext výběru",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12064,
+     "toOwner":"UCR-95105 Předej agentovi kontext výběru"
+    },
+    {
+     "guid":"{529FBCA7-A97F-4a54-BB39-1228A8FCD6B5}",
+     "id":12105,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1148,
+     "fromPackage":"UC-95105 Předej agentovi kontext výběru",
+     "toPackageID":1148,
+     "toPackage":"UC-95105 Předej agentovi kontext výběru",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12064,
+     "toOwner":"UCR-95105 Předej agentovi kontext výběru"
+    },
+    {
+     "guid":"{26433541-D4D4-45f4-BB26-AEF8634C7F2C}",
+     "id":12106,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1148,
+     "fromPackage":"UC-95105 Předej agentovi kontext výběru",
+     "toPackageID":1148,
+     "toPackage":"UC-95105 Předej agentovi kontext výběru",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":12064,
+     "toOwner":"UCR-95105 Předej agentovi kontext výběru"
+    }
+   ],
+   "readback":{
+    "elements":[
+     {
+      "Object_ID":"12080",
+      "Package_ID":"1144",
+      "ParentID":"12060"
+     },
+     {
+      "Object_ID":"12081",
+      "Package_ID":"1144",
+      "ParentID":"12060"
+     },
+     {
+      "Object_ID":"12082",
+      "Package_ID":"1144",
+      "ParentID":"12060"
+     },
+     {
+      "Object_ID":"12083",
+      "Name":"ref SR ProcessRequest",
+      "Package_ID":"1144",
+      "ParentID":"12060"
+     },
+     {
+      "Object_ID":"12086",
+      "Package_ID":"1145",
+      "ParentID":"12061"
+     },
+     {
+      "Object_ID":"12087",
+      "Package_ID":"1145",
+      "ParentID":"12061"
+     },
+     {
+      "Object_ID":"12088",
+      "Package_ID":"1145",
+      "ParentID":"12061"
+     },
+     {
+      "Object_ID":"12089",
+      "Name":"ref SR ProcessRequest",
+      "Package_ID":"1145",
+      "ParentID":"12061"
+     },
+     {
+      "Object_ID":"12092",
+      "Package_ID":"1146",
+      "ParentID":"12062"
+     },
+     {
+      "Object_ID":"12093",
+      "Package_ID":"1146",
+      "ParentID":"12062"
+     },
+     {
+      "Object_ID":"12094",
+      "Package_ID":"1146",
+      "ParentID":"12062"
+     },
+     {
+      "Object_ID":"12095",
+      "Name":"ref SR ProcessRequest",
+      "Package_ID":"1146",
+      "ParentID":"12062"
+     },
+     {
+      "Object_ID":"12098",
+      "Package_ID":"1147",
+      "ParentID":"12063"
+     },
+     {
+      "Object_ID":"12099",
+      "Package_ID":"1147",
+      "ParentID":"12063"
+     },
+     {
+      "Object_ID":"12100",
+      "Package_ID":"1147",
+      "ParentID":"12063"
+     },
+     {
+      "Object_ID":"12101",
+      "Name":"ref SR ProcessRequest",
+      "Package_ID":"1147",
+      "ParentID":"12063"
+     },
+     {
+      "Object_ID":"12104",
+      "Package_ID":"1148",
+      "ParentID":"12064"
+     },
+     {
+      "Object_ID":"12105",
+      "Package_ID":"1148",
+      "ParentID":"12064"
+     },
+     {
+      "Object_ID":"12106",
+      "Package_ID":"1148",
+      "ParentID":"12064"
+     }
+    ]
+   },
+   "guid":"{39129E6C-8B49-4168-82DB-A4E2DB8FDE4B}",
+   "id":12080
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:18:08",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Operace 'move_elements' je politikou klasifikovana ELEVATED",
+   "Prah ELEVATED prekrocen: updatedExisting 19 > 10",
+   "Prah ELEVATED prekrocen: affectedPackages 5 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru)",
+   "Prah ELEVATED prekrocen: moveOps 19 > 0",
+   "bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge; RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 5 dohledanych cilu)) - po potvrzeni se zapise"
+  ],
+  "reasonItems":[
+   {
+    "code":"CLASS_ELEVATED",
+    "text":"Operace 'move_elements' je politikou klasifikovana ELEVATED",
+    "args":{
+     "op":"move_elements"
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: updatedExisting 19 > 10",
+    "args":{
+     "key":"updatedExisting",
+     "value":19,
+     "limit":10
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 5 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru)",
+    "args":{
+     "key":"affectedPackages",
+     "value":5,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: moveOps 19 > 0",
+    "args":{
+     "key":"moveOps",
+     "value":19,
+     "limit":0
+    }
+   },
+   {
+    "code":"BASELINE_GUIDED",
+    "text":"bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge; RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 5 dohledanych cilu)) - po potvrzeni se zapise",
+    "args":{
+     "manualOk":true
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "move_elements":1
+   },
+   "targets":[
+    "",
+    "UCR-95101 Zpracuj dávku agenta přes pumpu",
+    "ref SR ProcessRequest",
+    "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+    "UCR-95103 Zpracuj dávku ze schránky",
+    "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+    "UCR-95105 Předej agentovi kontext výběru"
+   ],
+   "packages":[
+    "UC-95101 Zpracuj dávku agenta přes pumpu",
+    "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "UC-95103 Zpracuj dávku ze schránky",
+    "UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "UC-95105 Předej agentovi kontext výběru"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru"
+   ],
+   "diagrams":[],
+   "paths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu.ref SR ProcessRequest",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení.ref SR ProcessRequest",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky.",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky.ref SR ProcessRequest",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky.",
+    "..."
+   ],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"move_elements",
+     "items":19,
+     "create":0,
+     "update":0,
+     "targets":[
+      "UCR-95101 Zpracuj dávku agenta přes pumpu",
+      "ref SR ProcessRequest",
+      "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+      "UCR-95103 Zpracuj dávku ze schránky",
+      "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+      "UCR-95105 Předej agentovi kontext výběru"
+     ],
+     "packages":[
+      "UC-95101 Zpracuj dávku agenta přes pumpu",
+      "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+      "UC-95103 Zpracuj dávku ze schránky",
+      "UC-95104 Zpracuj dávky ze složky bez pumpy",
+      "UC-95105 Předej agentovi kontext výběru"
+     ],
+     "diagrams":[],
+     "pairs":[],
+     "owners":[
+      "UCR-95101 Zpracuj dávku agenta přes pumpu",
+      "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+      "UCR-95103 Zpracuj dávku ze schránky",
+      "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+      "UCR-95105 Předej agentovi kontext výběru"
+     ]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":19,
+   "createOps":0,
+   "updatedExisting":19,
+   "deleteTargets":0,
+   "affectedElements":24,
+   "affectedPackages":5,
+   "affectedDiagrams":0,
+   "moveOps":19,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":2762,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"f39a8e02827c8b172cf21a04f7cb231b8a03d031ff1797e193706c9295e9eee5",
+  "payloadHash":"9a6ff13fa706cd9ba2b5392cc0bf1480362bfcc84206c61cf2ed51072fff9012",
+  "hashMs":6,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:18:38"
+  }
+ },
+ "baseline":{
+  "decision":"skipped",
+  "reason":"velikost neznama (move_elements[0].elements[0].package: chybi package)",
+  "posture":"unknown",
+  "postureReasons":[
+   "velikost neznama (scope: move_elements[0].elements[0].package: chybi package)"
+  ],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+    "packageName":"UC-95101 Zpracuj dávku agenta přes pumpu",
+    "subtreeCount":7,
+    "probeMs":10,
+    "status":"ok"
+   },
+   {
+    "guid":"{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "packageName":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "subtreeCount":8,
+    "probeMs":10,
+    "status":"ok"
+   },
+   {
+    "guid":"{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+    "packageName":"UC-95103 Zpracuj dávku ze schránky",
+    "subtreeCount":8,
+    "probeMs":11,
+    "status":"ok"
+   },
+   {
+    "guid":"{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "packageName":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "subtreeCount":7,
+    "probeMs":9,
+    "status":"ok"
+   },
+   {
+    "guid":"{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+    "packageName":"UC-95105 Předej agentovi kontext výběru",
+    "subtreeCount":6,
+    "probeMs":10,
+    "status":"ok"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":50,
+  "elapsedMs":1008,
+  "action":"guided",
+  "lines":[
+   "BEZ AUTOMATICKE ZALOHY (bez pre-image): velikost neznama (move_elements[0].elements[0].package: chybi package).",
+   "Nalezena cerstva rucni baseline: RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge; RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 5 dohledanych cilu) - po potvrzeni se davka provede."
+  ],
+  "manual":{
+   "ok":true,
+   "found":[
+    "RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge",
+    "RE-fix pred presunem lifelin UCR nad AI Test.Reverse Addinu.Business Applications.EA File Bridge (nejblizsi spolecny predek 5 dohledanych cilu)"
+   ],
+   "missing":[]
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":25,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{66310CE9-90DD-4929-9A55-1BAA7674D79E}"
+ }
+}

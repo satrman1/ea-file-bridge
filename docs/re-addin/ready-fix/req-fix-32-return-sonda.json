@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "fix-32-return-sonda", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT Connector_ID, SeqNo, Stereotype, Direction, PDATA1, PDATA2, PDATA3, PDATA4, PDATA5, SubType, StyleEx, Btm_Mid_Label, Top_Mid_Label, Top_Start_Label FROM t_connector WHERE Connector_ID IN (5112, 5113)", "maxRows": 5 },
+ { "op": "query", "sql": "SELECT XrefID, Name, Type, Behavior, Description, Client FROM t_xref WHERE Client IN (SELECT ea_guid FROM t_connector WHERE Connector_ID IN (5110, 5111, 5112, 5113))", "maxRows": 10 }
+] }

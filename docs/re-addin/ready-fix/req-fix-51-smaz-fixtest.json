@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "fix-51-smaz-fixtest", "repo":"EAEXAMPLE", "ops": [
+ { "op": "delete_from_model", "targets": [ { "type": "Package", "id": 1153 } ] },
+ { "op": "query", "sql": "SELECT COUNT(*) AS zbytek FROM t_object WHERE Package_ID IN (1153, 1154)", "maxRows": 2 }
+] }

@@ -1,0 +1,436 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-46-akteri-ucr-2",
+ "status":"done",
+ "results":[
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1233,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12109,
+     "name":"",
+     "classifier":"Analytik",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12110,
+     "name":"",
+     "classifier":"EAFB Add-in UI",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12111,
+     "name":"",
+     "classifier":"EAFB Request Manager",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Manager",
+     "stereotype":"IDS-Manager",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1234,
+   "count":2,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12114,
+     "name":"",
+     "classifier":"Analytik",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12115,
+     "name":"",
+     "classifier":"EAFB Add-in UI",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1235,
+   "count":4,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12118,
+     "name":"",
+     "classifier":"Správce bridge",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12119,
+     "name":"",
+     "classifier":"EAFB Pump",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12120,
+     "name":"",
+     "classifier":"EAFB Request Manager",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Manager",
+     "stereotype":"IDS-Manager",
+     "changed":false
+    },
+    {
+     "elementID":12121,
+     "name":"",
+     "classifier":"EAFB Code Access",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Resource Access",
+     "stereotype":"IDS-Resource Access",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1236,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12124,
+     "name":"",
+     "classifier":"Správce bridge",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12125,
+     "name":"",
+     "classifier":"EAFB Add-in UI",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12126,
+     "name":"",
+     "classifier":"EAFB Baseline Policy Engine",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Engine",
+     "stereotype":"IDS-Engine",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "cnt":"0"
+    }
+   ],
+   "maxRows":2
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":9,
+   "rows":[
+    {
+     "Object_ID":"12080",
+     "Object_Type":"Actor",
+     "Package_ID":"1144",
+     "Classifier":"12039"
+    },
+    {
+     "Object_ID":"12086",
+     "Object_Type":"Actor",
+     "Package_ID":"1145",
+     "Classifier":"12040"
+    },
+    {
+     "Object_ID":"12092",
+     "Object_Type":"Actor",
+     "Package_ID":"1146",
+     "Classifier":"12040"
+    },
+    {
+     "Object_ID":"12098",
+     "Object_Type":"Actor",
+     "Package_ID":"1147",
+     "Classifier":"12040"
+    },
+    {
+     "Object_ID":"12104",
+     "Object_Type":"Actor",
+     "Package_ID":"1148",
+     "Classifier":"12040"
+    },
+    {
+     "Object_ID":"12109",
+     "Object_Type":"Actor",
+     "Package_ID":"1149",
+     "Classifier":"12040"
+    },
+    {
+     "Object_ID":"12114",
+     "Object_Type":"Actor",
+     "Package_ID":"1150",
+     "Classifier":"12040"
+    },
+    {
+     "Object_ID":"12118",
+     "Object_Type":"Actor",
+     "Package_ID":"1151",
+     "Classifier":"12041"
+    },
+    {
+     "Object_ID":"12124",
+     "Object_Type":"Actor",
+     "Package_ID":"1152",
+     "Classifier":"12041"
+    }
+   ],
+   "maxRows":20
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:23:00",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy)",
+   "Prah ELEVATED prekrocen: foreignDiagrams 4 > 0"
+  ],
+  "reasonItems":[
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy)",
+    "args":{
+     "key":"affectedPackages",
+     "value":4,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: foreignDiagrams 4 > 0",
+    "args":{
+     "key":"foreignDiagrams",
+     "value":4,
+     "limit":0
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "apply_classifier_stereotypes":4
+   },
+   "targets":[],
+   "packages":[
+    "UC-95106 Zobraz stav bridge",
+    "UC-95107 Prohlédni změny poslední dávky",
+    "UC-95108 Nasaď kód bridge do modelu",
+    "UC-95109 Ukliď automatické zálohy"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy"
+   ],
+   "diagrams":[
+    "UCR-95106 Zobraz stav bridge",
+    "UCR-95107 Prohlédni změny poslední dávky",
+    "UCR-95108 Nasaď kód bridge do modelu",
+    "UCR-95109 Ukliď automatické zálohy"
+   ],
+   "paths":[],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"apply_classifier_stereotypes",
+     "items":4,
+     "create":0,
+     "update":0,
+     "targets":[],
+     "packages":[],
+     "diagrams":[
+      "UCR-95106 Zobraz stav bridge",
+      "UCR-95107 Prohlédni změny poslední dávky",
+      "UCR-95108 Nasaď kód bridge do modelu",
+      "UCR-95109 Ukliď automatické zálohy"
+     ],
+     "pairs":[]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":4,
+   "createOps":0,
+   "updatedExisting":0,
+   "deleteTargets":0,
+   "affectedElements":0,
+   "affectedPackages":4,
+   "affectedDiagrams":4,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":276,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"47d7037260f48879182e30d2e3a4d1acfb5fcd8cc0c1833830fbd6453fa047c7",
+  "payloadHash":"b1985b8406ce9511710d2aa580cf7ba509f525a4ae8eaff4d4cab31836fbe921",
+  "hashMs":2,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:23:24"
+  }
+ },
+ "baseline":{
+  "decision":"created",
+  "reason":"pod prahem",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{08F7022A-C618-46f7-A64C-C3B569EBFA08}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:24",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge",
+    "packageName":"UC-95106 Zobraz stav bridge",
+    "subtreeCount":7,
+    "probeMs":10,
+    "status":"ok",
+    "baselineGuid":"{68F5608D-D040-4e24-8DE6-4F91E3C6A4B1}",
+    "result":"created"
+   },
+   {
+    "guid":"{304CA127-A821-4dc0-92F5-C3D546BD3C1C}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:26",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky",
+    "packageName":"UC-95107 Prohlédni změny poslední dávky",
+    "subtreeCount":6,
+    "probeMs":23,
+    "status":"ok",
+    "baselineGuid":"{FAFED531-4BF9-45df-8C3C-1E68A1A841C7}",
+    "result":"created"
+   },
+   {
+    "guid":"{30C7981F-B48C-4581-A145-C36C4421B9EE}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:28",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu",
+    "packageName":"UC-95108 Nasaď kód bridge do modelu",
+    "subtreeCount":7,
+    "probeMs":111,
+    "status":"ok",
+    "baselineGuid":"{FFA6CB81-0B07-485f-BC74-EA81C03D8884}",
+    "result":"created"
+   },
+   {
+    "guid":"{C05EBDE0-15E5-408d-9CDE-8395BB5A034F}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:23:30",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy",
+    "packageName":"UC-95109 Ukliď automatické zálohy",
+    "subtreeCount":6,
+    "probeMs":10,
+    "status":"ok",
+    "baselineGuid":"{27A62F29-AFD0-4754-9064-1A448033CA33}",
+    "result":"created"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":154,
+  "elapsedMs":7921,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95106 Zobraz stav bridge (7 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95107 Prohlédni změny poslední dávky (6 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95108 Nasaď kód bridge do modelu (7 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95109 Ukliď automatické zálohy (6 prvku)"
+  ],
+  "created":[
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:24",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:26",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:28",
+   "FB-AUTO - s20261015-1 2026-10-15 18:23:30"
+  ],
+  "reused":[],
+  "journal":{
+   "targets":0,
+   "covered":[],
+   "uncovered":[
+    "apply_classifier_stereotypes[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[1]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[2]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[3]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"",
+   "why":"zadny cil v rozsahu journalu"
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":29,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{71DF1062-60A3-4901-BDA5-874C4DCF9B03}"
+ }
+}

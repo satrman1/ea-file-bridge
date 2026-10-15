@@ -1,0 +1,563 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-36-rozhrani-pod-komponenty",
+ "status":"done",
+ "results":[
+  {
+   "op":"move_elements",
+   "status":"ok",
+   "count":14,
+   "moved":14,
+   "withChildren":true,
+   "items":[
+    {
+     "guid":"{E6226645-67D3-4694-9C33-805FB3C1B749}",
+     "id":11937,
+     "name":"EAFB Request Manager Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11921,
+     "toOwner":"EAFB Request Manager"
+    },
+    {
+     "guid":"{38BB576C-CFF9-4ffe-8E7D-192073C910D4}",
+     "id":11938,
+     "name":"EAFB Batch Validation Engine Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11922,
+     "toOwner":"EAFB Batch Validation Engine"
+    },
+    {
+     "guid":"{09C33928-F1DB-467f-AB06-15FF5EE0FE8C}",
+     "id":11939,
+     "name":"EAFB Write Scope Engine Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11923,
+     "toOwner":"EAFB Write Scope Engine"
+    },
+    {
+     "guid":"{0B679E1F-3541-414d-AB6E-98979E928879}",
+     "id":11940,
+     "name":"EAFB Risk Gate Engine Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11924,
+     "toOwner":"EAFB Risk Gate Engine"
+    },
+    {
+     "guid":"{5F932850-04F1-4282-914C-30FEB4AF0555}",
+     "id":11941,
+     "name":"EAFB Baseline Policy Engine Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11925,
+     "toOwner":"EAFB Baseline Policy Engine"
+    },
+    {
+     "guid":"{8A5F6038-D7F7-420a-BB4A-F691CD3F355E}",
+     "id":11942,
+     "name":"EAFB Quality Check Engine Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11926,
+     "toOwner":"EAFB Quality Check Engine"
+    },
+    {
+     "guid":"{FBBDB372-B25B-4d6c-B36B-65851FAFFF5B}",
+     "id":11943,
+     "name":"EAFB ITAN Methodology Engine Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11927,
+     "toOwner":"EAFB ITAN Methodology Engine"
+    },
+    {
+     "guid":"{568EE192-E281-4b18-8C91-18AB8E6FF0F9}",
+     "id":11944,
+     "name":"EAFB Model Element Access Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11928,
+     "toOwner":"EAFB Model Element Access"
+    },
+    {
+     "guid":"{553274C3-29AC-4ded-8672-6FD6938FE7E4}",
+     "id":11945,
+     "name":"EAFB Diagram Access Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11929,
+     "toOwner":"EAFB Diagram Access"
+    },
+    {
+     "guid":"{D2237F28-41D9-4de4-9364-B614FA1CED23}",
+     "id":11946,
+     "name":"EAFB Baseline Access Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11930,
+     "toOwner":"EAFB Baseline Access"
+    },
+    {
+     "guid":"{AC03F3B2-5B99-4872-89A4-F5C1F33C5619}",
+     "id":11947,
+     "name":"EAFB Audit Access Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11931,
+     "toOwner":"EAFB Audit Access"
+    },
+    {
+     "guid":"{5EE89B7F-5521-4814-95D6-6DE3F2E7141E}",
+     "id":11948,
+     "name":"EAFB Code Access Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11932,
+     "toOwner":"EAFB Code Access"
+    },
+    {
+     "guid":"{BAC3DC59-2EF6-4a87-B98F-4F224D59FDED}",
+     "id":11949,
+     "name":"EAFB Exchange Folder Access Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11933,
+     "toOwner":"EAFB Exchange Folder Access"
+    },
+    {
+     "guid":"{36C94531-6260-4c7f-B7E3-5A146A2444F7}",
+     "id":11950,
+     "name":"EAFB Utilities Interface",
+     "moved":true,
+     "fromPackageID":1127,
+     "fromPackage":"EA File Bridge",
+     "toPackageID":1127,
+     "toPackage":"EA File Bridge",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11936,
+     "toOwner":"EAFB Utilities"
+    }
+   ],
+   "readback":{
+    "elements":[
+     {
+      "Object_ID":"11937",
+      "Name":"EAFB Request Manager Interface",
+      "Package_ID":"1127",
+      "ParentID":"11921"
+     },
+     {
+      "Object_ID":"11938",
+      "Name":"EAFB Batch Validation Engine Interface",
+      "Package_ID":"1127",
+      "ParentID":"11922"
+     },
+     {
+      "Object_ID":"11939",
+      "Name":"EAFB Write Scope Engine Interface",
+      "Package_ID":"1127",
+      "ParentID":"11923"
+     },
+     {
+      "Object_ID":"11940",
+      "Name":"EAFB Risk Gate Engine Interface",
+      "Package_ID":"1127",
+      "ParentID":"11924"
+     },
+     {
+      "Object_ID":"11941",
+      "Name":"EAFB Baseline Policy Engine Interface",
+      "Package_ID":"1127",
+      "ParentID":"11925"
+     },
+     {
+      "Object_ID":"11942",
+      "Name":"EAFB Quality Check Engine Interface",
+      "Package_ID":"1127",
+      "ParentID":"11926"
+     },
+     {
+      "Object_ID":"11943",
+      "Name":"EAFB ITAN Methodology Engine Interface",
+      "Package_ID":"1127",
+      "ParentID":"11927"
+     },
+     {
+      "Object_ID":"11944",
+      "Name":"EAFB Model Element Access Interface",
+      "Package_ID":"1127",
+      "ParentID":"11928"
+     },
+     {
+      "Object_ID":"11945",
+      "Name":"EAFB Diagram Access Interface",
+      "Package_ID":"1127",
+      "ParentID":"11929"
+     },
+     {
+      "Object_ID":"11946",
+      "Name":"EAFB Baseline Access Interface",
+      "Package_ID":"1127",
+      "ParentID":"11930"
+     },
+     {
+      "Object_ID":"11947",
+      "Name":"EAFB Audit Access Interface",
+      "Package_ID":"1127",
+      "ParentID":"11931"
+     },
+     {
+      "Object_ID":"11948",
+      "Name":"EAFB Code Access Interface",
+      "Package_ID":"1127",
+      "ParentID":"11932"
+     },
+     {
+      "Object_ID":"11949",
+      "Name":"EAFB Exchange Folder Access Interface",
+      "Package_ID":"1127",
+      "ParentID":"11933"
+     },
+     {
+      "Object_ID":"11950",
+      "Name":"EAFB Utilities Interface",
+      "Package_ID":"1127",
+      "ParentID":"11936"
+     }
+    ]
+   },
+   "guid":"{E6226645-67D3-4694-9C33-805FB3C1B749}",
+   "id":11937
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "cnt":"0"
+    }
+   ],
+   "maxRows":2
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:12:35",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Operace 'move_elements' je politikou klasifikovana ELEVATED",
+   "Prah ELEVATED prekrocen: updatedExisting 14 > 10",
+   "Prah ELEVATED prekrocen: moveOps 14 > 0",
+   "bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge; RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge (dohledany cil davky)) - po potvrzeni se zapise"
+  ],
+  "reasonItems":[
+   {
+    "code":"CLASS_ELEVATED",
+    "text":"Operace 'move_elements' je politikou klasifikovana ELEVATED",
+    "args":{
+     "op":"move_elements"
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: updatedExisting 14 > 10",
+    "args":{
+     "key":"updatedExisting",
+     "value":14,
+     "limit":10
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: moveOps 14 > 0",
+    "args":{
+     "key":"moveOps",
+     "value":14,
+     "limit":0
+    }
+   },
+   {
+    "code":"BASELINE_GUIDED",
+    "text":"bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge; RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge (dohledany cil davky)) - po potvrzeni se zapise",
+    "args":{
+     "manualOk":true
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "move_elements":1
+   },
+   "targets":[
+    "EAFB Request Manager Interface",
+    "EAFB Request Manager",
+    "EAFB Batch Validation Engine Interface",
+    "EAFB Batch Validation Engine",
+    "EAFB Write Scope Engine Interface",
+    "EAFB Write Scope Engine",
+    "EAFB Risk Gate Engine Interface",
+    "EAFB Risk Gate Engine",
+    "EAFB Baseline Policy Engine Interface",
+    "EAFB Baseline Policy Engine",
+    "EAFB Quality Check Engine Interface",
+    "EAFB Quality Check Engine",
+    "..."
+   ],
+   "packages":[
+    "EA File Bridge"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge"
+   ],
+   "diagrams":[],
+   "paths":[
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Request Manager Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Batch Validation Engine Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Write Scope Engine Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Risk Gate Engine Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Baseline Policy Engine Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Quality Check Engine Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB ITAN Methodology Engine Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Model Element Access Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Diagram Access Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Baseline Access Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Audit Access Interface",
+    "AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge.EAFB Code Access Interface",
+    "..."
+   ],
+   "targetsMore":16,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"move_elements",
+     "items":14,
+     "create":0,
+     "update":0,
+     "targets":[
+      "EAFB Request Manager Interface",
+      "EAFB Request Manager",
+      "EAFB Batch Validation Engine Interface",
+      "EAFB Batch Validation Engine",
+      "EAFB Write Scope Engine Interface",
+      "EAFB Write Scope Engine",
+      "EAFB Risk Gate Engine Interface",
+      "EAFB Risk Gate Engine",
+      "EAFB Baseline Policy Engine Interface",
+      "EAFB Baseline Policy Engine",
+      "EAFB Quality Check Engine Interface",
+      "EAFB Quality Check Engine"
+     ],
+     "packages":[
+      "EA File Bridge"
+     ],
+     "diagrams":[],
+     "pairs":[],
+     "owners":[
+      "EAFB Request Manager",
+      "EAFB Batch Validation Engine",
+      "EAFB Write Scope Engine",
+      "EAFB Risk Gate Engine",
+      "EAFB Baseline Policy Engine",
+      "EAFB Quality Check Engine",
+      "EAFB ITAN Methodology Engine",
+      "EAFB Model Element Access",
+      "EAFB Diagram Access",
+      "EAFB Baseline Access",
+      "EAFB Audit Access",
+      "EAFB Code Access"
+     ],
+     "targetsMore":16
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":14,
+   "createOps":0,
+   "updatedExisting":14,
+   "deleteTargets":0,
+   "affectedElements":28,
+   "affectedPackages":1,
+   "affectedDiagrams":0,
+   "moveOps":14,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":2060,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"0920c477d022797e03066cad39856de9e2e16da2975f90e08be61f168e6d60ab",
+  "payloadHash":"10263bd4b2a5567d7f6a7f9afe0f53297a438fd7241c872b63ed2dfd37b92048",
+  "hashMs":27,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:13:46"
+  }
+ },
+ "baseline":{
+  "decision":"skipped",
+  "reason":"velikost neznama (move_elements[0].elements[0].package: chybi package)",
+  "posture":"unknown",
+  "postureReasons":[
+   "velikost neznama (scope: move_elements[0].elements[0].package: chybi package)"
+  ],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{4E731E8B-2A31-4a96-AD92-C0D7444DF155}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge",
+    "packageName":"EA File Bridge",
+    "subtreeCount":32,
+    "probeMs":11,
+    "status":"ok"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":11,
+  "elapsedMs":303,
+  "action":"guided",
+  "lines":[
+   "BEZ AUTOMATICKE ZALOHY (bez pre-image): velikost neznama (move_elements[0].elements[0].package: chybi package).",
+   "Nalezena cerstva rucni baseline: RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge; RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge (dohledany cil davky) - po potvrzeni se davka provede."
+  ],
+  "manual":{
+   "ok":true,
+   "found":[
+    "RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge",
+    "RE-fix pred presunem rozhrani nad AI Test.Reverse Addinu.Catalogues.Solution Artefacts.EA File Bridge (dohledany cil davky)"
+   ],
+   "missing":[]
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":4,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{67D3DC3B-D7F2-4374-944B-C6BFCB802DC3}"
+ }
+}

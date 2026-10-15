@@ -1,0 +1,13 @@
+{ "protocol": "eafb/0.2", "id": "fix-10-gate-jmeno", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_elements", "elements": [
+   { "owningElement": "12136", "type": "Object", "name": "", "classifierID": 11919, "stereotypes": ["manager"] },
+   { "owningElement": "12136", "type": "DiagramGate", "name": "" } ] },
+ { "op": "place_elements_on_diagram", "diagram": 1243, "elementPlacements": [
+   { "element": "$0[1]", "x": 20, "y": 80, "width": 24, "height": 24 },
+   { "element": "$0[0]", "x": 200, "y": 40, "width": 110, "height": 320 } ] },
+ { "op": "create_or_update_messages", "diagram": 1243, "messages": [
+   { "source": "$0[1]", "target": "$0[0]", "name": "ProcessRequest", "arguments": "req", "seqNo": 1 },
+   { "source": "$0[0]", "target": "$0[1]", "name": "", "returnValue": "res", "isReturn": true, "seqNo": 2 } ] },
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID, NType, Classifier FROM t_object WHERE Package_ID = 1153", "maxRows": 50 },
+ { "op": "query", "sql": "SELECT Connector_ID, Connector_Type, Name, Start_Object_ID, End_Object_ID, PDATA4, SeqNo FROM t_connector WHERE DiagramID = 1243", "maxRows": 50 }
+] }

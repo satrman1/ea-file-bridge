@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "fix-03-deploy", "repo":"EAEXAMPLE", "ops": [ { "op": "deploy_src" } ] }

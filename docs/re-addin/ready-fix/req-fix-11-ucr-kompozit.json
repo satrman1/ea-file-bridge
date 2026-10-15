@@ -1,0 +1,11 @@
+{ "protocol": "eafb/0.2", "id": "fix-11-ucr-kompozit", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_elements", "elements": [
+   { "package": "1153", "type": "CSOB-ITAN::Use Case Realization", "name": "UCR-FixTest" },
+   { "package": "1153", "type": "Object", "name": "", "classifierID": 11919 },
+   { "package": "1153", "type": "InteractionOccurrence", "name": "", "classifierID": 12136 } ] },
+ { "op": "place_elements_on_diagram", "diagram": "$0[0].compositeDiagram", "elementPlacements": [
+   { "element": "$0[1]", "x": 100, "y": 40, "width": 110, "height": 300 },
+   { "element": "$0[2]", "x": 60, "y": 200, "width": 260, "height": 50 } ] },
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID, Classifier, PDATA1, PDATA2, PDATA3 FROM t_object WHERE Package_ID = 1153 AND Object_ID > 12143", "maxRows": 50 },
+ { "op": "query", "sql": "SELECT Diagram_ID, Name, Diagram_Type, ParentID FROM t_diagram WHERE Package_ID = 1153", "maxRows": 50 }
+] }

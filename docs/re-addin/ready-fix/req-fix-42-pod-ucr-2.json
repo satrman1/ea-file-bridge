@@ -1,0 +1,60 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-42-pod-ucr-2",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "move_elements",
+   "elements": [
+    {
+     "element": 12109,
+     "owningElement": "12065"
+    },
+    {
+     "element": 12110,
+     "owningElement": "12065"
+    },
+    {
+     "element": 12111,
+     "owningElement": "12065"
+    },
+    {
+     "element": 12114,
+     "owningElement": "12066"
+    },
+    {
+     "element": 12115,
+     "owningElement": "12066"
+    },
+    {
+     "element": 12118,
+     "owningElement": "12067"
+    },
+    {
+     "element": 12119,
+     "owningElement": "12067"
+    },
+    {
+     "element": 12120,
+     "owningElement": "12067"
+    },
+    {
+     "element": 12121,
+     "owningElement": "12067"
+    },
+    {
+     "element": 12124,
+     "owningElement": "12068"
+    },
+    {
+     "element": 12125,
+     "owningElement": "12068"
+    },
+    {
+     "element": 12126,
+     "owningElement": "12068"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "fix-12-qc-sonda", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT o.Object_ID, o.Object_Type FROM t_object o INNER JOIN t_package p ON o.Package_ID = p.Package_ID WHERE p.Name IN ('_FIX-TEST') AND (o.Name IS NULL OR o.Name = '')", "maxRows": 50 },
+ { "op": "query", "sql": "SELECT Object_ID, Name FROM t_object WHERE Package_ID = 1153 AND Name IS NULL", "maxRows": 50 },
+ { "op": "query", "sql": "SELECT Object_ID, LENGTH(Name) AS ln FROM t_object WHERE Package_ID = 1153", "maxRows": 50 }
+] }

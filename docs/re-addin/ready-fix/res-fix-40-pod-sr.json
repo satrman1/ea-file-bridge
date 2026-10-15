@@ -1,0 +1,835 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-40-pod-sr",
+ "status":"done",
+ "results":[
+  {
+   "op":"move_elements",
+   "status":"ok",
+   "count":25,
+   "moved":25,
+   "withChildren":true,
+   "items":[
+    {
+     "guid":"{F12943E1-050B-4e0e-AD5A-181BFA2A769D}",
+     "id":11993,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{D56CD985-BDB4-4fa1-8A91-A1F6D2EEF10C}",
+     "id":11994,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{F031C2FF-B130-4664-B73D-ABB523B9DC8F}",
+     "id":11995,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{51007DAE-49E4-450c-A6CD-928977810E5D}",
+     "id":11996,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{7BCB46D9-C9C0-4611-8455-6E11FAEC791F}",
+     "id":11997,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{C5DDF728-7CE1-4054-94D4-05B6C84B8141}",
+     "id":11998,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{C9A312F1-900F-46bb-BE5F-35236083379C}",
+     "id":12002,
+     "name":"ref SR CreateOrUpdateElements",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{43330BCB-AC19-412b-A657-3FBB258A28EC}",
+     "id":11999,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{3DCA9C1B-A432-4619-A6E7-A6649678A369}",
+     "id":12000,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{16474FEC-020B-41b5-A52B-9A1EC2231BA1}",
+     "id":12003,
+     "name":"ref SR DeleteFromModel",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{4F325DC5-5CE7-4bc0-B039-648100C59A1D}",
+     "id":12001,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1132,
+     "fromPackage":"ProcessRequest",
+     "toPackageID":1132,
+     "toPackage":"ProcessRequest",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11961,
+     "toOwner":"SR ProcessRequest"
+    },
+    {
+     "guid":"{B127BF8A-8708-43fd-BF11-365065A97B60}",
+     "id":12004,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1133,
+     "fromPackage":"Ping",
+     "toPackageID":1133,
+     "toPackage":"Ping",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11965,
+     "toOwner":"SR Ping"
+    },
+    {
+     "guid":"{96AAF9FA-4A35-4fca-806B-6AEE1F59D3F6}",
+     "id":12005,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1133,
+     "fromPackage":"Ping",
+     "toPackageID":1133,
+     "toPackage":"Ping",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11965,
+     "toOwner":"SR Ping"
+    },
+    {
+     "guid":"{FAFE127A-B0FC-4473-9D95-1B8334DF5959}",
+     "id":12006,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1133,
+     "fromPackage":"Ping",
+     "toPackageID":1133,
+     "toPackage":"Ping",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11965,
+     "toOwner":"SR Ping"
+    },
+    {
+     "guid":"{84212DA3-07BD-44d5-8E72-7DE4354D1D3D}",
+     "id":12007,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1134,
+     "fromPackage":"CreateOrUpdateElements",
+     "toPackageID":1134,
+     "toPackage":"CreateOrUpdateElements",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11969,
+     "toOwner":"SR CreateOrUpdateElements"
+    },
+    {
+     "guid":"{3767F93A-DE82-4884-A66E-36580E605DE6}",
+     "id":12008,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1134,
+     "fromPackage":"CreateOrUpdateElements",
+     "toPackageID":1134,
+     "toPackage":"CreateOrUpdateElements",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11969,
+     "toOwner":"SR CreateOrUpdateElements"
+    },
+    {
+     "guid":"{19698458-912A-4c85-8019-B628E2C75E06}",
+     "id":12009,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1134,
+     "fromPackage":"CreateOrUpdateElements",
+     "toPackageID":1134,
+     "toPackage":"CreateOrUpdateElements",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11969,
+     "toOwner":"SR CreateOrUpdateElements"
+    },
+    {
+     "guid":"{03E318F1-F4D7-422c-AB95-368E3E629C43}",
+     "id":12010,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1134,
+     "fromPackage":"CreateOrUpdateElements",
+     "toPackageID":1134,
+     "toPackage":"CreateOrUpdateElements",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11969,
+     "toOwner":"SR CreateOrUpdateElements"
+    },
+    {
+     "guid":"{2852822A-FA7A-4de0-B4C8-5CC52CCAE6F3}",
+     "id":12011,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1134,
+     "fromPackage":"CreateOrUpdateElements",
+     "toPackageID":1134,
+     "toPackage":"CreateOrUpdateElements",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11969,
+     "toOwner":"SR CreateOrUpdateElements"
+    },
+    {
+     "guid":"{3A5CF06B-2E97-4c43-9D70-076C2A001D3C}",
+     "id":12012,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1135,
+     "fromPackage":"DeleteFromModel",
+     "toPackageID":1135,
+     "toPackage":"DeleteFromModel",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11973,
+     "toOwner":"SR DeleteFromModel"
+    },
+    {
+     "guid":"{FC6B1C63-9B69-4e6b-A58F-8CCE2D0430F5}",
+     "id":12013,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1135,
+     "fromPackage":"DeleteFromModel",
+     "toPackageID":1135,
+     "toPackage":"DeleteFromModel",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11973,
+     "toOwner":"SR DeleteFromModel"
+    },
+    {
+     "guid":"{AFA4BC3A-0799-4dce-8CC6-9A7011EC12D7}",
+     "id":12014,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1135,
+     "fromPackage":"DeleteFromModel",
+     "toPackageID":1135,
+     "toPackage":"DeleteFromModel",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11973,
+     "toOwner":"SR DeleteFromModel"
+    },
+    {
+     "guid":"{0B8B5A72-8CD0-441d-9ABA-A0F502F1F332}",
+     "id":12015,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1135,
+     "fromPackage":"DeleteFromModel",
+     "toPackageID":1135,
+     "toPackage":"DeleteFromModel",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11973,
+     "toOwner":"SR DeleteFromModel"
+    },
+    {
+     "guid":"{AEE12E6A-A53F-4e91-BECB-90939C4DDB57}",
+     "id":12016,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1135,
+     "fromPackage":"DeleteFromModel",
+     "toPackageID":1135,
+     "toPackage":"DeleteFromModel",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11973,
+     "toOwner":"SR DeleteFromModel"
+    },
+    {
+     "guid":"{AB8039E6-ABDC-4e38-BEAA-DF24AA02A67F}",
+     "id":12017,
+     "name":"",
+     "moved":true,
+     "fromPackageID":1135,
+     "fromPackage":"DeleteFromModel",
+     "toPackageID":1135,
+     "toPackage":"DeleteFromModel",
+     "fromOwnerID":0,
+     "children":0,
+     "childrenFixed":0,
+     "diagrams":0,
+     "diagramsFixed":0,
+     "toOwnerID":11973,
+     "toOwner":"SR DeleteFromModel"
+    }
+   ],
+   "readback":{
+    "elements":[
+     {
+      "Object_ID":"11993",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"11994",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"11995",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"11996",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"11997",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"11998",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"11999",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"12000",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"12001",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"12002",
+      "Name":"ref SR CreateOrUpdateElements",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"12003",
+      "Name":"ref SR DeleteFromModel",
+      "Package_ID":"1132",
+      "ParentID":"11961"
+     },
+     {
+      "Object_ID":"12004",
+      "Package_ID":"1133",
+      "ParentID":"11965"
+     },
+     {
+      "Object_ID":"12005",
+      "Package_ID":"1133",
+      "ParentID":"11965"
+     },
+     {
+      "Object_ID":"12006",
+      "Package_ID":"1133",
+      "ParentID":"11965"
+     },
+     {
+      "Object_ID":"12007",
+      "Package_ID":"1134",
+      "ParentID":"11969"
+     },
+     {
+      "Object_ID":"12008",
+      "Package_ID":"1134",
+      "ParentID":"11969"
+     },
+     {
+      "Object_ID":"12009",
+      "Package_ID":"1134",
+      "ParentID":"11969"
+     },
+     {
+      "Object_ID":"12010",
+      "Package_ID":"1134",
+      "ParentID":"11969"
+     },
+     {
+      "Object_ID":"12011",
+      "Package_ID":"1134",
+      "ParentID":"11969"
+     },
+     {
+      "Object_ID":"12012",
+      "Package_ID":"1135",
+      "ParentID":"11973"
+     },
+     {
+      "Object_ID":"12013",
+      "Package_ID":"1135",
+      "ParentID":"11973"
+     },
+     {
+      "Object_ID":"12014",
+      "Package_ID":"1135",
+      "ParentID":"11973"
+     },
+     {
+      "Object_ID":"12015",
+      "Package_ID":"1135",
+      "ParentID":"11973"
+     },
+     {
+      "Object_ID":"12016",
+      "Package_ID":"1135",
+      "ParentID":"11973"
+     },
+     {
+      "Object_ID":"12017",
+      "Package_ID":"1135",
+      "ParentID":"11973"
+     }
+    ]
+   },
+   "guid":"{F12943E1-050B-4e0e-AD5A-181BFA2A769D}",
+   "id":11993
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "cnt":"0"
+    }
+   ],
+   "maxRows":2
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:14:45",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Operace 'move_elements' je politikou klasifikovana ELEVATED",
+   "Prah ELEVATED prekrocen: writeOps 25 > 20",
+   "Prah ELEVATED prekrocen: updatedExisting 25 > 10",
+   "Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel)",
+   "Prah ELEVATED prekrocen: moveOps 25 > 0",
+   "bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge; RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu)) - po potvrzeni se zapise"
+  ],
+  "reasonItems":[
+   {
+    "code":"CLASS_ELEVATED",
+    "text":"Operace 'move_elements' je politikou klasifikovana ELEVATED",
+    "args":{
+     "op":"move_elements"
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: writeOps 25 > 20",
+    "args":{
+     "key":"writeOps",
+     "value":25,
+     "limit":20
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: updatedExisting 25 > 10",
+    "args":{
+     "key":"updatedExisting",
+     "value":25,
+     "limit":10
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 4 > 1 (AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements, AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel)",
+    "args":{
+     "key":"affectedPackages",
+     "value":4,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest",
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping",
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements",
+      "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: moveOps 25 > 0",
+    "args":{
+     "key":"moveOps",
+     "value":25,
+     "limit":0
+    }
+   },
+   {
+    "code":"BASELINE_GUIDED",
+    "text":"bez pre-image - velikost neznama (move_elements[0].elements[0].package: chybi package); nalezena cerstva rucni baseline (RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge; RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu)) - po potvrzeni se zapise",
+    "args":{
+     "manualOk":true
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "move_elements":1
+   },
+   "targets":[
+    "",
+    "SR ProcessRequest",
+    "ref SR CreateOrUpdateElements",
+    "ref SR DeleteFromModel",
+    "SR Ping",
+    "SR CreateOrUpdateElements",
+    "SR DeleteFromModel"
+   ],
+   "packages":[
+    "ProcessRequest",
+    "Ping",
+    "CreateOrUpdateElements",
+    "DeleteFromModel"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel"
+   ],
+   "diagrams":[],
+   "paths":[
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.ref SR CreateOrUpdateElements",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.ref SR DeleteFromModel",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest.",
+    "AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping.",
+    "..."
+   ],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"move_elements",
+     "items":25,
+     "create":0,
+     "update":0,
+     "targets":[
+      "SR ProcessRequest",
+      "ref SR CreateOrUpdateElements",
+      "ref SR DeleteFromModel",
+      "SR Ping",
+      "SR CreateOrUpdateElements",
+      "SR DeleteFromModel"
+     ],
+     "packages":[
+      "ProcessRequest",
+      "Ping",
+      "CreateOrUpdateElements",
+      "DeleteFromModel"
+     ],
+     "diagrams":[],
+     "pairs":[],
+     "owners":[
+      "SR ProcessRequest",
+      "SR Ping",
+      "SR CreateOrUpdateElements",
+      "SR DeleteFromModel"
+     ]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":25,
+   "createOps":0,
+   "updatedExisting":25,
+   "deleteTargets":0,
+   "affectedElements":29,
+   "affectedPackages":4,
+   "affectedDiagrams":0,
+   "moveOps":25,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":4407,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"625c82b3fea6955ddcb47ceda31ddfa848229a4482be9341750c1715dce61739",
+  "payloadHash":"b0600940050590bf03466f500ca8f313439de78ef19ae770e1a51db50d8958d2",
+  "hashMs":7,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:16:30"
+  }
+ },
+ "baseline":{
+  "decision":"skipped",
+  "reason":"velikost neznama (move_elements[0].elements[0].package: chybi package)",
+  "posture":"unknown",
+  "postureReasons":[
+   "velikost neznama (scope: move_elements[0].elements[0].package: chybi package)"
+  ],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{7259144D-99F3-4827-BAED-AF732380DDF5}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.ProcessRequest",
+    "packageName":"ProcessRequest",
+    "subtreeCount":17,
+    "probeMs":17,
+    "status":"ok"
+   },
+   {
+    "guid":"{125D2B46-CC85-479c-82D2-4AFFD52E5DA2}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Request Manager.Ping",
+    "packageName":"Ping",
+    "subtreeCount":9,
+    "probeMs":10,
+    "status":"ok"
+   },
+   {
+    "guid":"{B8BA6D1E-EDF8-440e-B044-05605DEAFDC7}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.CreateOrUpdateElements",
+    "packageName":"CreateOrUpdateElements",
+    "subtreeCount":11,
+    "probeMs":9,
+    "status":"ok"
+   },
+   {
+    "guid":"{B93AC786-00EF-4604-B4B3-80E09DDA00BD}",
+    "name":"",
+    "path":"AI Test.Reverse Addinu.Logical Design.EA File Bridge.EAFB Model Element Access.DeleteFromModel",
+    "packageName":"DeleteFromModel",
+    "subtreeCount":12,
+    "probeMs":16,
+    "status":"ok"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":52,
+  "elapsedMs":1279,
+  "action":"guided",
+  "lines":[
+   "BEZ AUTOMATICKE ZALOHY (bez pre-image): velikost neznama (move_elements[0].elements[0].package: chybi package).",
+   "Nalezena cerstva rucni baseline: RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge; RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu) - po potvrzeni se davka provede."
+  ],
+  "manual":{
+   "ok":true,
+   "found":[
+    "RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge",
+    "RE-fix pred presunem lifelin SR nad AI Test.Reverse Addinu.Logical Design.EA File Bridge (nejblizsi spolecny predek 4 dohledanych cilu)"
+   ],
+   "missing":[]
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":61,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{FEAD3779-25B5-4ea7-94DD-39D4D66CE933}"
+ }
+}

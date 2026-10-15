@@ -1,0 +1,8 @@
+{ "protocol": "eafb/0.2", "id": "fix-34-return-poradi", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_messages", "diagram": 1196, "messages": [ { "connectorID": 5112, "seqNo": 14, "returnValue": "string", "isReturn": true } ] },
+ { "op": "create_or_update_messages", "diagram": 1198, "messages": [ { "connectorID": 5113, "seqNo": 5, "isReturn": true } ] },
+ { "op": "create_or_update_messages", "diagram": 1200, "messages": [ { "connectorID": 5114, "seqNo": 10, "isReturn": true } ] },
+ { "op": "create_or_update_messages", "diagram": 1202, "messages": [ { "connectorID": 5115, "seqNo": 9, "isReturn": true } ] },
+ { "op": "reload_diagrams", "diagrams": [1196,1198,1200,1202] },
+ { "op": "query", "sql": "SELECT Connector_ID, DiagramID, SeqNo, PDATA2, PDATA4, SubType FROM t_connector WHERE Connector_ID IN (5112,5113,5114,5115)", "maxRows": 10 }
+] }

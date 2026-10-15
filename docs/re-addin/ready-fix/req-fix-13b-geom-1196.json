@@ -1,0 +1,17 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-13b-geom-1196",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT d.Object_ID, o.Name, o.Object_Type, d.RectLeft, d.RectTop, d.RectRight, d.RectBottom FROM t_diagramobjects d INNER JOIN t_object o ON o.Object_ID = d.Object_ID WHERE d.Diagram_ID = 1196 ORDER BY d.RectLeft",
+   "maxRows": 60
+  },
+  {
+   "op": "query",
+   "sql": "SELECT c.Connector_ID, c.Name, c.SeqNo, c.Start_Object_ID, c.End_Object_ID, l.Geometry FROM t_connector c LEFT JOIN t_diagramlinks l ON l.ConnectorID = c.Connector_ID AND l.DiagramID = 1196 WHERE c.DiagramID = 1196 ORDER BY c.SeqNo",
+   "maxRows": 60
+  }
+ ]
+}

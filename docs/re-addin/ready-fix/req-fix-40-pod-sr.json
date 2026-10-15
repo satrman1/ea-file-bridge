@@ -1,0 +1,117 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-40-pod-sr",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "move_elements",
+   "elements": [
+    {
+     "element": 11993,
+     "owningElement": "11961"
+    },
+    {
+     "element": 11994,
+     "owningElement": "11961"
+    },
+    {
+     "element": 11995,
+     "owningElement": "11961"
+    },
+    {
+     "element": 11996,
+     "owningElement": "11961"
+    },
+    {
+     "element": 11997,
+     "owningElement": "11961"
+    },
+    {
+     "element": 11998,
+     "owningElement": "11961"
+    },
+    {
+     "element": 12002,
+     "owningElement": "11961"
+    },
+    {
+     "element": 11999,
+     "owningElement": "11961"
+    },
+    {
+     "element": 12000,
+     "owningElement": "11961"
+    },
+    {
+     "element": 12003,
+     "owningElement": "11961"
+    },
+    {
+     "element": 12001,
+     "owningElement": "11961"
+    },
+    {
+     "element": 12004,
+     "owningElement": "11965"
+    },
+    {
+     "element": 12005,
+     "owningElement": "11965"
+    },
+    {
+     "element": 12006,
+     "owningElement": "11965"
+    },
+    {
+     "element": 12007,
+     "owningElement": "11969"
+    },
+    {
+     "element": 12008,
+     "owningElement": "11969"
+    },
+    {
+     "element": 12009,
+     "owningElement": "11969"
+    },
+    {
+     "element": 12010,
+     "owningElement": "11969"
+    },
+    {
+     "element": 12011,
+     "owningElement": "11969"
+    },
+    {
+     "element": 12012,
+     "owningElement": "11973"
+    },
+    {
+     "element": 12013,
+     "owningElement": "11973"
+    },
+    {
+     "element": 12014,
+     "owningElement": "11973"
+    },
+    {
+     "element": 12015,
+     "owningElement": "11973"
+    },
+    {
+     "element": 12016,
+     "owningElement": "11973"
+    },
+    {
+     "element": 12017,
+     "owningElement": "11973"
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS cnt FROM t_object WHERE Package_ID BETWEEN 1132 AND 1135 AND Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint') AND Classifier > 0 AND ParentID = 0",
+   "maxRows": 2
+  }
+ ]
+}

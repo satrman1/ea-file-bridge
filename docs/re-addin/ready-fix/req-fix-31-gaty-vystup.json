@@ -1,0 +1,147 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-31-gaty-vystup",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "11961",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "11965",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "11969",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "11973",
+     "type": "DiagramGate",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1196,
+   "elementPlacements": [
+    {
+     "element": "$0[0]",
+     "x": 6,
+     "y": 620,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1196,
+   "messages": [
+    {
+     "connectorID": 5112,
+     "target": "$0[0]",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1198,
+   "elementPlacements": [
+    {
+     "element": "$0[1]",
+     "x": 6,
+     "y": 620,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1198,
+   "messages": [
+    {
+     "connectorID": 5113,
+     "target": "$0[1]",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1200,
+   "elementPlacements": [
+    {
+     "element": "$0[2]",
+     "x": 6,
+     "y": 620,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1200,
+   "messages": [
+    {
+     "connectorID": 5114,
+     "target": "$0[2]",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1202,
+   "elementPlacements": [
+    {
+     "element": "$0[3]",
+     "x": 6,
+     "y": 620,
+     "width": 20,
+     "height": 20
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1202,
+   "messages": [
+    {
+     "connectorID": 5115,
+     "target": "$0[3]",
+     "isReturn": true
+    }
+   ]
+  },
+  {
+   "op": "reload_diagrams",
+   "diagrams": [
+    1196,
+    1198,
+    1200,
+    1202
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, DiagramID, SeqNo, Start_Object_ID, End_Object_ID, PDATA2, PDATA4, SubType FROM t_connector WHERE Connector_ID IN (5112,5113,5114,5115)",
+   "maxRows": 10
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS cnt FROM t_object WHERE Object_Type LIKE '%Gate%' OR (Object_Type = 'MessageEndpoint' AND NType = 2 AND Package_ID IN (1132,1133,1134,1135))",
+   "maxRows": 2
+  }
+ ]
+}

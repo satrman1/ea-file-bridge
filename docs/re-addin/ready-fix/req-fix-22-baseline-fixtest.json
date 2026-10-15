@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "fix-22-baseline-fixtest", "repo":"EAEXAMPLE", "ops": [ { "op": "create_baseline", "package": 1153, "name": "RE-fix pred presunem", "notes": "rucni zaloha pred move_elements owningElement (Z261014b-1)" } ] }

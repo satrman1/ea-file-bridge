@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "fix-14-img-1196", "repo":"EAEXAMPLE", "ops": [ { "op": "get_diagram_image", "diagrams": [1196] } ] }

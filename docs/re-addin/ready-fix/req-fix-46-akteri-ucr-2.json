@@ -1,0 +1,33 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "fix-46-akteri-ucr-2",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1233
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1234
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1235
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1236
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS cnt FROM t_object WHERE Package_ID BETWEEN 1132 AND 1152 AND Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint') AND Classifier > 0 AND ParentID = 0",
+   "maxRows": 2
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Object_Type, Package_ID, Classifier FROM t_object WHERE Object_Type = 'Actor' AND Classifier > 0 AND Package_ID BETWEEN 1144 AND 1152",
+   "maxRows": 20
+  }
+ ]
+}

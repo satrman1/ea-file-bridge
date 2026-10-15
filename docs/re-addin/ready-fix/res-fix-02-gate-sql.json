@@ -1,0 +1,51 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-02-gate-sql",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":3,
+   "rows":[
+    {
+     "Object_ID":"12136",
+     "Object_Type":"Collaboration",
+     "Name":"SR FixTest",
+     "ParentID":"0",
+     "Package_ID":"1153",
+     "NType":"8",
+     "Classifier":"0",
+     "Stereotype":"service",
+     "ea_guid":"{625D8170-76FC-43ff-BE52-738FB2C15F2A}"
+    },
+    {
+     "Object_ID":"12137",
+     "Object_Type":"Artifact",
+     "Name":"FB fix-01b-testpkg",
+     "ParentID":"0",
+     "Package_ID":"1055",
+     "NType":"0",
+     "Classifier":"0",
+     "ea_guid":"{A781180C-09CB-4e63-86D5-96ED7D62008C}"
+    },
+    {
+     "Object_ID":"12138",
+     "Object_Type":"MessageEndpoint",
+     "ParentID":"12136",
+     "Package_ID":"1153",
+     "NType":"2",
+     "Classifier":"0",
+     "ea_guid":"{916FE8DB-03B9-4a3c-8A14-18DBDAAF4B6F}"
+    }
+   ],
+   "maxRows":50
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 14:26:29",
+ "audit":{
+  "aiLogGuid":"{8108FF32-AE57-42fa-9CF6-D47C461C0371}"
+ }
+}

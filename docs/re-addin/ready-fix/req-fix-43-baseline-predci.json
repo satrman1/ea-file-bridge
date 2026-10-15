@@ -1,0 +1,2 @@
+{ "protocol": "eafb/0.2", "id": "fix-43-baseline-predci", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Package_ID IN (1131, 1139) OR (Parent_ID IN (1128, 1138))", "maxRows": 10 } ] }

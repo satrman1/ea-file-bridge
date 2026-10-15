@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "fix-28-ops-sonda", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT OperationID, Name, Type, Object_ID FROM t_operation WHERE OperationID IN (1289, 1293, 1323, 1332)", "maxRows": 10 },
+ { "op": "query", "sql": "SELECT Object_ID, Name FROM t_object WHERE Object_ID IN (11961, 11965, 11969, 11973, 11919, 11921, 11993, 12004, 12007, 12012)", "maxRows": 20 },
+ { "op": "query", "sql": "SELECT Connector_ID, PDATA5 FROM t_connector WHERE Connector_ID IN (4987, 4988, 5000, 5004, 5013)", "maxRows": 10 }
+] }

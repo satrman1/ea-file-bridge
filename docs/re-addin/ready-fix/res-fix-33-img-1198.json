@@ -1,0 +1,45 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-33-img-1198",
+ "status":"done",
+ "results":[
+  {
+   "op":"reload_diagrams",
+   "status":"ok",
+   "reloaded":[
+    1198
+   ],
+   "count":1
+  },
+  {
+   "op":"get_diagram_image",
+   "status":"ok",
+   "count":2,
+   "items":[
+    {
+     "diagramID":1198,
+     "guid":"{06C12518-CC17-45d0-8F0F-6B931768A589}",
+     "name":"SR Ping",
+     "file":"C:\\GIT\\ea-file-bridge\\responses\\images\\SR_Ping-1198.png",
+     "size":63070
+    },
+    {
+     "diagramID":1196,
+     "guid":"{148679EB-4970-4269-A5F0-4A6F7E8F2996}",
+     "name":"SR ProcessRequest",
+     "file":"C:\\GIT\\ea-file-bridge\\responses\\images\\SR_ProcessRequest-1196.png",
+     "size":210512
+    }
+   ],
+   "guid":"{06C12518-CC17-45d0-8F0F-6B931768A589}",
+   "id":1198,
+   "file":"C:\\GIT\\ea-file-bridge\\responses\\images\\SR_Ping-1198.png"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:10:10",
+ "audit":{
+  "aiLogGuid":"{C5DBA3AA-B84B-4ebf-BD97-740799FE8426}"
+ }
+}

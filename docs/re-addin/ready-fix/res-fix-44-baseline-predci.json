@@ -1,0 +1,114 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-44-baseline-predci",
+ "status":"done",
+ "results":[
+  {
+   "op":"create_baseline",
+   "status":"ok",
+   "packageGuid":"{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+   "packageID":1129,
+   "name":"RE-fix pred presunem lifelin SR",
+   "baselineGuid":"{C72064A8-A1C0-487c-88E8-A863AFB66422}",
+   "guid":"{C72064A8-A1C0-487c-88E8-A863AFB66422}"
+  },
+  {
+   "op":"create_baseline",
+   "status":"ok",
+   "packageGuid":"{53B96C5A-666F-46e9-B2B6-DE27BD0FA025}",
+   "packageID":1139,
+   "name":"RE-fix pred presunem lifelin UCR",
+   "baselineGuid":"{6282F519-EB86-4fe7-AF93-B387087BBFB7}",
+   "guid":"{6282F519-EB86-4fe7-AF93-B387087BBFB7}"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:15:37",
+ "risk":{
+  "riskLevel":"LOW",
+  "riskReasons":[],
+  "reasonItems":[],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "create_baseline":2
+   },
+   "targets":[],
+   "packages":[],
+   "packagePaths":[],
+   "diagrams":[],
+   "paths":[],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"create_baseline",
+     "items":2,
+     "create":0,
+     "update":0,
+     "targets":[
+      "RE-fix pred presunem lifelin SR",
+      "RE-fix pred presunem lifelin UCR"
+     ],
+     "packages":[],
+     "diagrams":[],
+     "pairs":[]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":2,
+   "createOps":0,
+   "updatedExisting":0,
+   "deleteTargets":0,
+   "affectedElements":0,
+   "affectedPackages":0,
+   "affectedDiagrams":0,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":12,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"6ff95ab6cc17ab971481ecd5dc4b0c529d24a067d6a00b3e5e21baa63d5ff073",
+  "payloadHash":"1c07c343e1ca71b25065c346c245de7aeaf9609b6813a770800ae298dcd6e8fe",
+  "hashMs":11,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":false
+  }
+ },
+ "baseline":{
+  "decision":"none",
+  "reason":"cisty create",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":false,
+  "packages":[],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":0,
+  "elapsedMs":7,
+  "action":"none",
+  "lines":[
+   "Bez zalohy - davka jen vytvari (undo = smazani dle razitek)."
+  ]
+ },
+ "qc":{
+  "checks":0,
+  "findings":[],
+  "elapsedMs":1,
+  "skippedScope":1,
+  "status":"bez_kontrol",
+  "reason":"zadna kontrola se netykala teto zmeny (scope balicku neznamy)"
+ },
+ "audit":{
+  "aiLogGuid":"{6C8D3631-8ECF-4b7f-8720-1C4BF28E253B}"
+ }
+}

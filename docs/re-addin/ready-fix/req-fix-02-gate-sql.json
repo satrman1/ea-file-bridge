@@ -1,0 +1,3 @@
+{ "protocol": "eafb/0.2", "id": "fix-02-gate-sql", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID, PDATA1, PDATA2, PDATA3, PDATA4, PDATA5, NType, Classifier, Stereotype, Style, ea_guid FROM t_object WHERE Object_ID >= 12136", "maxRows": 50 }
+] }

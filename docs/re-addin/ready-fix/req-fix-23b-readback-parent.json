@@ -1,0 +1,4 @@
+{ "protocol": "eafb/0.2", "id": "fix-23b-readback-parent", "repo":"EAEXAMPLE", "ops": [
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID FROM t_object WHERE Object_ID IN (12147, 12148, 12157)", "maxRows": 10 },
+ { "op": "get_elements_information", "elements": [12147] }
+] }

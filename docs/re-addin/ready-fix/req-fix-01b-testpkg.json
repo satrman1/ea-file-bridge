@@ -1,0 +1,5 @@
+{ "protocol": "eafb/0.2", "id": "fix-01b-testpkg", "repo":"EAEXAMPLE", "ops": [
+ { "op": "create_or_update_package", "parent": 1124, "name": "_FIX-TEST" },
+ { "op": "create_or_update_elements", "elements": [ { "package": "$0", "type": "Collaboration", "name": "SR FixTest", "stereotypes": ["service"], "isComposite": true } ] },
+ { "op": "create_or_update_diagram", "diagrams": [ { "owningElement": "$1", "name": "SR FixTest", "type": "Sequence" } ] }
+] }

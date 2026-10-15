@@ -1,0 +1,1 @@
+{ "protocol": "eafb/0.2", "id": "fix-37-baseline-katalog", "repo":"EAEXAMPLE", "ops": [ { "op": "create_baseline", "package": 1127, "name": "RE-fix pred presunem rozhrani", "notes": "rucni zaloha pred move_elements owningElement (Z261014b-1)" } ] }

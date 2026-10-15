@@ -1,0 +1,8 @@
+{ "protocol": "eafb/0.2", "id": "fix-20-posun-refu-1196", "repo":"EAEXAMPLE", "ops": [
+ { "op": "open_diagrams", "diagrams": [1196] },
+ { "op": "place_elements_on_diagram", "diagram": 1196, "elementPlacements": [
+   { "elementID": 12002, "x": 1020, "y": 414, "width": 260, "height": 30 },
+   { "elementID": 12003, "x": 1290, "y": 414, "width": 230, "height": 30 } ] },
+ { "op": "reload_diagrams", "diagrams": [1196] },
+ { "op": "query", "sql": "SELECT d.Object_ID, d.RectLeft, d.RectTop, d.RectRight, d.RectBottom FROM t_diagramobjects d WHERE d.Diagram_ID = 1196 AND d.Object_ID IN (12002, 12003)", "maxRows": 10 }
+] }

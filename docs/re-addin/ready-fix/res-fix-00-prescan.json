@@ -1,0 +1,220 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-00-prescan",
+ "status":"done",
+ "results":[
+  {
+   "op":"ping",
+   "status":"ok",
+   "eaVersion":"1715",
+   "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+   "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+   "time":"2026-10-15 14:24:51",
+   "writeScope":{
+    "mode":"blacklist",
+    "securityEnabled":false,
+    "repoKnown":true,
+    "cascadeDelete":"allow",
+    "summary":"Zapis: blacklist (1 chranenych vetvi) | EA security vypnuta | chraneno: Example Model.FBT-CHRANENE [test blacklistu (Z261004b-10, Example Model.FBT-CHRANENE)] | bridge chrani i sam sebe: Example Model.Model Based Add-Ins.EA Addins.#AI-LOG, Example Model.Model Based Add-Ins.EA File Bridge | kaskady mazani do chranene casti: povoleny s varovanim v okne (cascadeDelete = allow)",
+    "blacklist":[
+     {
+      "guid":"{4B73153D-3736-4092-92A0-F3857B623954}",
+      "name":"FBT-CHRANENE",
+      "path":"Example Model.FBT-CHRANENE",
+      "note":"test blacklistu (Z261004b-10, Example Model.FBT-CHRANENE)",
+      "found":true,
+      "allowIncomingRefs":true
+     }
+    ],
+    "implicit":[
+     {
+      "kind":"audit",
+      "guid":"{8DF101C4-14A9-4b89-927E-833EA58D9F3C}",
+      "name":"#AI-LOG",
+      "path":"Example Model.Model Based Add-Ins.EA Addins.#AI-LOG",
+      "note":"balicek auditu bridge"
+     },
+     {
+      "kind":"addin",
+      "guid":"{EE3798D1-3B6D-4097-B4D8-1EE3022DBCF4}",
+      "name":"EA File Bridge",
+      "path":"Example Model.Model Based Add-Ins.EA File Bridge",
+      "note":"balicek add-inu"
+     }
+    ],
+    "problems":[],
+    "warnings":[
+     "EA security je vypnuta - jedinou hranici zapisu je blacklist a implicitni ochrana (O2 = b)"
+    ],
+    "agentNotes":[
+     "Kam psat: kamkoli, kam pusti EA security, krome chranenych vetvi (blacklist dedicne na podstrom + balicek auditu a balicek add-inu). Pred prvnim zapisem rekni cloveku jednou vetou 'Zapisu do: <plna cesta>'.",
+     "E_BLACKLIST prijde uz v predbezne kontrole (pred oknem i zalohou): davku neopakuj ani nedel, pozadej cloveka o jiny cil. E_AMBIGUOUS: vyber kandidata GUIDem nebo cestou {path: [...]}.",
+     "Vazba (i zprava) je chranena, JEN kdyz jsou OBA jeji konce v chranene casti - s jednim koncem venku se da zalozit, zmenit i smazat, at vede kterymkoli smerem; presmerovani se posuzuje nad novym parem koncu.",
+     "Zamky EA (security) hlidaji prvky (E_PERMISSION pri zalozeni, E_LOCKED pri zmene), vazby ne - most zamky u vazeb nekontroluje (rozhodnuti 12. 10. 2026): vazbu z/do zamceneho prvku jde zalozit, zmenit i smazat. Po E_PERMISSION/E_LOCKED cti items + partial, nepokracuj naslepo.",
+     "Jmena v zapisove davce se dohledavaji PRED provedenim - na prvek zalozeny drivejsi operaci teze davky odkazuj $N, jmenem ho nenajdes (E_NOT_FOUND).",
+     "Mazani volneho objektu, ktere by kaskadou EA sahlo do chranene casti (lezi na chranenem diagramu / je klasifikatorem chranene instance), PROJDE - clovek dostane vycet kaskad v potvrzovacim okne a odpoved nese warnings[]; zaloha chraneny balicek nekryje."
+    ]
+   },
+   "riskPolicy":{
+    "available":true,
+    "classes":{
+     "create_element":"LOW",
+     "create_or_update_elements":"LOW",
+     "create_or_update_package":"LOW",
+     "create_or_update_connectors":"LOW",
+     "create_or_update_attributes":"LOW",
+     "create_or_update_operations":"LOW",
+     "create_or_update_messages":"LOW",
+     "update_diagram_properties":"LOW",
+     "set_diagram_object_style":"LOW",
+     "place_elements_on_diagram":"LOW",
+     "layout_connectors":"LOW",
+     "change_connector_visibility":"LOW",
+     "create_or_update_diagram":"LOW",
+     "apply_classifier_stereotypes":"LOW",
+     "find_or_create_referencing_sr":"LOW",
+     "create_baseline":"LOW",
+     "delete_from_model":"ELEVATED",
+     "delete_taggedvalue_from_model":"ELEVATED",
+     "remove_elements_from_diagram":"ELEVATED",
+     "import_element_linked_documents":"ELEVATED",
+     "clone_package":"ELEVATED",
+     "clone_elements":"ELEVATED",
+     "create_or_update_scenarios":"ELEVATED",
+     "create_or_update_constraints":"ELEVATED",
+     "create_or_update_requirements":"ELEVATED",
+     "move_elements":"ELEVATED",
+     "deploy_src":"ELEVATED"
+    },
+    "confirmAlways":[
+     "clone_elements",
+     "clone_package",
+     "create_or_update_constraints",
+     "create_or_update_requirements",
+     "create_or_update_scenarios",
+     "delete_from_model",
+     "delete_taggedvalue_from_model",
+     "deploy_src",
+     "import_element_linked_documents",
+     "move_elements",
+     "remove_elements_from_diagram"
+    ],
+    "blocked":[],
+    "low":[
+     "apply_classifier_stereotypes",
+     "change_connector_visibility",
+     "create_baseline",
+     "create_element",
+     "create_or_update_attributes",
+     "create_or_update_connectors",
+     "create_or_update_diagram",
+     "create_or_update_elements",
+     "create_or_update_messages",
+     "create_or_update_operations",
+     "create_or_update_package",
+     "find_or_create_referencing_sr",
+     "layout_connectors",
+     "place_elements_on_diagram",
+     "set_diagram_object_style",
+     "update_diagram_properties"
+    ],
+    "elevate":{
+     "deleteTargets":0,
+     "writeOps":20,
+     "updatedExisting":10,
+     "affectedPackages":1,
+     "foreignDiagrams":0,
+     "moveOps":0
+    },
+    "block":{
+     "deleteTargets":100,
+     "writeOps":500,
+     "updatedExisting":100,
+     "affectedPackages":5
+    },
+    "confirmMaxAgeMin":480,
+    "ownSessionLow":true,
+    "note":"okno vzdy = confirmAlways; okno pri prekroceni prahu elevate (napr. writeOps > 20); blocked = odmitnuto bez okna; cekajici davka vyprsi po confirmMaxAgeMin; ownSessionLow = vlastni prvky/diagramy teto session pumpy bez okna"
+   },
+   "codeInfo":{
+    "found":true,
+    "fingerprint":"c37e5f8a4c1aa751a8c8d83be41d4d63ea84f56baea3790b519244db1d5cca62",
+    "short":"c37e5f8a4c1a",
+    "files":132,
+    "deployedAt":"2026-10-12 21:21:12",
+    "deployedBy":"deploy_src",
+    "text":"Otisk kodu v modelu: c37e5f8a4c1a (132 souboru bez konfigurace, nasazeno 2026-10-12 21:21:12 deploy_src)"
+   },
+   "pump":{
+    "version":"0.6",
+    "fingerprint":"943a3941ff628dd72a8b375ce596d271209848de0e6cf3ae0e9493fb73330b09",
+    "short":"943a3941ff62",
+    "path":"C:\\GIT\\ea-file-bridge\\pump.wsf",
+    "status":"responses\\pump-status.json (faze, soubor, tep, aliveUntil - kit: pumpa nebezi, kdyz aliveUntil minul)"
+   },
+   "access":{
+    "securityEnabled":false,
+    "login":"",
+    "access":"write",
+    "groups":[],
+    "reason":"EA security je vypnuta - write ficury povoleny (FB_AccessGroups se neuplatnuje)"
+   }
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":0,
+   "rows":[],
+   "maxRows":50,
+   "warnings":[
+    "0 radku: EA vratilo obalku <EADATA> bez datasetu. Stejne muze vypadat i CHYBNY dotaz (neexistujici sloupec/tabulka) - ten se pozna podle dialogu 'SQL API Open FAILED' v EA. Nez z nuly vyvodis zaver, over nazvy sloupcu (INFORMATION_SCHEMA / sqlite_master)."
+   ],
+   "raw":"<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\" ?>\r\n<EADATA version=\"1.0\" exporter=\"Enterprise Architect\">\n</EADATA>"
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":4,
+   "rows":[
+    {
+     "Package_ID":"1124",
+     "Name":"Reverse Addinu",
+     "Parent_ID":"1123"
+    },
+    {
+     "Package_ID":"1125",
+     "Name":"Catalogues",
+     "Parent_ID":"1124"
+    },
+    {
+     "Package_ID":"1128",
+     "Name":"Logical Design",
+     "Parent_ID":"1124"
+    },
+    {
+     "Package_ID":"1138",
+     "Name":"Business Applications",
+     "Parent_ID":"1124"
+    }
+   ],
+   "maxRows":50
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":1,
+   "rows":[
+    {
+     "cnt":"0"
+    }
+   ],
+   "maxRows":5
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 14:24:51",
+ "audit":{
+  "aiLogGuid":"{5588D421-013A-45d0-A52D-0F4556E1BF1F}"
+ }
+}

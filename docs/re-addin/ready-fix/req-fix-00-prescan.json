@@ -1,0 +1,6 @@
+{ "protocol": "eafb/0.2", "id": "fix-00-prescan", "repo":"EAEXAMPLE", "ops": [
+ { "op": "ping" },
+ { "op": "query", "sql": "SELECT Object_ID, Object_Type, Name, ParentID, Package_ID, PDATA1, PDATA2, PDATA3, PDATA4, PDATA5, NType, Classifier FROM t_object WHERE Object_Type LIKE '%Gate%'", "maxRows": 50 },
+ { "op": "query", "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Package_ID = 1124 OR Parent_ID = 1124", "maxRows": 50 },
+ { "op": "query", "sql": "SELECT COUNT(*) AS cnt FROM t_object WHERE Name='Object' AND Package_ID BETWEEN 1124 AND 1152", "maxRows": 5 }
+] }

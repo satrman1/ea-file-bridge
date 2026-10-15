@@ -1,0 +1,52 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-32-return-sonda",
+ "status":"done",
+ "results":[
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":2,
+   "rows":[
+    {
+     "Connector_ID":"5112",
+     "SeqNo":"1",
+     "Direction":"Source -> Destination",
+     "PDATA1":"Synchronous",
+     "PDATA2":"paramsDlgs=;params=;retval=",
+     "PDATA3":"Call",
+     "PDATA4":"1",
+     "PDATA5":"$LLB=;LLT=;LMT=CX=26:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=0:DIR=0:ROT=0;LMB=;LRT=;LRB=;IRHS=;ILHS=;",
+     "SubType":"Return"
+    },
+    {
+     "Connector_ID":"5113",
+     "SeqNo":"0",
+     "Direction":"Source -> Destination",
+     "PDATA1":"Synchronous",
+     "PDATA2":"paramsDlgs=;params=;retval=PingResult",
+     "PDATA3":"Call",
+     "SubType":"Return"
+    }
+   ],
+   "maxRows":5
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":0,
+   "rows":[],
+   "maxRows":10,
+   "warnings":[
+    "0 radku: EA vratilo obalku <EADATA> bez datasetu. Stejne muze vypadat i CHYBNY dotaz (neexistujici sloupec/tabulka) - ten se pozna podle dialogu 'SQL API Open FAILED' v EA. Nez z nuly vyvodis zaver, over nazvy sloupcu (INFORMATION_SCHEMA / sqlite_master)."
+   ],
+   "raw":"<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\" ?>\r\n<EADATA version=\"1.0\" exporter=\"Enterprise Architect\">\n</EADATA>"
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:09:40",
+ "audit":{
+  "aiLogGuid":"{9202B06A-5EB3-462e-AB47-223BC7412587}"
+ }
+}

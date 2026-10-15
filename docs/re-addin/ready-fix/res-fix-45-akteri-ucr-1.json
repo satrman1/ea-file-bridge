@@ -1,0 +1,516 @@
+﻿{
+ "protocol":"eafb/0.2",
+ "id":"fix-45-akteri-ucr-1",
+ "status":"done",
+ "results":[
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1228,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12080,
+     "name":"",
+     "classifier":"AI agent",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12081,
+     "name":"",
+     "classifier":"EAFB Pump",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12082,
+     "name":"",
+     "classifier":"EAFB Request Manager",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Manager",
+     "stereotype":"IDS-Manager",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1229,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12086,
+     "name":"",
+     "classifier":"Analytik",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12087,
+     "name":"",
+     "classifier":"EAFB Pump",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12088,
+     "name":"",
+     "classifier":"EAFB Request Manager",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Manager",
+     "stereotype":"IDS-Manager",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1230,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12092,
+     "name":"",
+     "classifier":"Analytik",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12093,
+     "name":"",
+     "classifier":"EAFB Add-in UI",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12094,
+     "name":"",
+     "classifier":"EAFB Request Manager",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Manager",
+     "stereotype":"IDS-Manager",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1231,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12098,
+     "name":"",
+     "classifier":"Analytik",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12099,
+     "name":"",
+     "classifier":"EAFB Add-in UI",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12100,
+     "name":"",
+     "classifier":"EAFB Request Manager",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Manager",
+     "stereotype":"IDS-Manager",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"apply_classifier_stereotypes",
+   "status":"ok",
+   "diagramID":1232,
+   "count":3,
+   "changedCount":1,
+   "items":[
+    {
+     "elementID":12104,
+     "name":"",
+     "classifier":"Analytik",
+     "oldType":"Object",
+     "newType":"Actor",
+     "oldStereotype":"",
+     "stereotype":"",
+     "changed":true
+    },
+    {
+     "elementID":12105,
+     "name":"",
+     "classifier":"EAFB Add-in UI",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Client",
+     "stereotype":"IDS-Client",
+     "changed":false
+    },
+    {
+     "elementID":12106,
+     "name":"",
+     "classifier":"EAFB Model Element Access",
+     "oldType":"Component",
+     "newType":"Component",
+     "oldStereotype":"IDS-Resource Access",
+     "stereotype":"IDS-Resource Access",
+     "changed":false
+    }
+   ]
+  },
+  {
+   "op":"create_or_update_elements",
+   "status":"ok",
+   "count":4,
+   "items":[
+    {
+     "guid":"{F92AA736-50FD-4e09-BF09-7E5C453DC363}",
+     "id":12083,
+     "name":"ref SR ProcessRequest",
+     "created":false,
+     "index":0,
+     "refDiagramID":1196
+    },
+    {
+     "guid":"{92A3AC1B-040B-4cad-AA3E-E817B3E8A837}",
+     "id":12089,
+     "name":"ref SR ProcessRequest",
+     "created":false,
+     "index":1,
+     "refDiagramID":1196
+    },
+    {
+     "guid":"{E5688CCB-56FB-4527-8017-A6D9FCB1F83B}",
+     "id":12095,
+     "name":"ref SR ProcessRequest",
+     "created":false,
+     "index":2,
+     "refDiagramID":1196
+    },
+    {
+     "guid":"{99178FD4-F3B6-4f67-A1A3-2F6D3DBF84A9}",
+     "id":12101,
+     "name":"ref SR ProcessRequest",
+     "created":false,
+     "index":3,
+     "refDiagramID":1196
+    }
+   ],
+   "guid":"{F92AA736-50FD-4e09-BF09-7E5C453DC363}",
+   "id":12083
+  },
+  {
+   "op":"query",
+   "status":"ok",
+   "rowCount":4,
+   "rows":[
+    {
+     "Object_ID":"12083",
+     "Name":"ref SR ProcessRequest",
+     "Classifier":"11961",
+     "PDATA1":"1196",
+     "ParentID":"12060"
+    },
+    {
+     "Object_ID":"12089",
+     "Name":"ref SR ProcessRequest",
+     "Classifier":"11961",
+     "PDATA1":"1196",
+     "ParentID":"12061"
+    },
+    {
+     "Object_ID":"12095",
+     "Name":"ref SR ProcessRequest",
+     "Classifier":"11961",
+     "PDATA1":"1196",
+     "ParentID":"12062"
+    },
+    {
+     "Object_ID":"12101",
+     "Name":"ref SR ProcessRequest",
+     "Classifier":"11961",
+     "PDATA1":"1196",
+     "ParentID":"12063"
+    }
+   ],
+   "maxRows":5
+  }
+ ],
+ "repository":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "connection":"C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+ "since":"2026-10-15 18:22:18",
+ "risk":{
+  "riskLevel":"ELEVATED",
+  "riskReasons":[
+   "Prah ELEVATED prekrocen: affectedPackages 5 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru)",
+   "Prah ELEVATED prekrocen: foreignDiagrams 5 > 0"
+  ],
+  "reasonItems":[
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: affectedPackages 5 > 1 (AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy, AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru)",
+    "args":{
+     "key":"affectedPackages",
+     "value":5,
+     "limit":1,
+     "packages":[
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+      "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru"
+     ],
+     "packagesMore":0
+    }
+   },
+   {
+    "code":"THRESHOLD_ELEVATED",
+    "text":"Prah ELEVATED prekrocen: foreignDiagrams 5 > 0",
+    "args":{
+     "key":"foreignDiagrams",
+     "value":5,
+     "limit":0
+    }
+   }
+  ],
+  "policyValid":true,
+  "baselinePolicyValid":true,
+  "summary":{
+   "ops":{
+    "apply_classifier_stereotypes":5,
+    "create_or_update_elements":1
+   },
+   "targets":[
+    "ref SR ProcessRequest"
+   ],
+   "packages":[
+    "UC-95101 Zpracuj dávku agenta přes pumpu",
+    "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "UC-95103 Zpracuj dávku ze schránky",
+    "UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "UC-95105 Předej agentovi kontext výběru"
+   ],
+   "packagePaths":[
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru"
+   ],
+   "diagrams":[
+    "UCR-95101 Zpracuj dávku agenta přes pumpu",
+    "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+    "UCR-95103 Zpracuj dávku ze schránky",
+    "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+    "UCR-95105 Předej agentovi kontext výběru"
+   ],
+   "paths":[],
+   "targetsMore":0,
+   "packagesMore":0,
+   "diagramsMore":0,
+   "deletes":[],
+   "actions":[
+    {
+     "op":"apply_classifier_stereotypes",
+     "items":5,
+     "create":0,
+     "update":0,
+     "targets":[],
+     "packages":[],
+     "diagrams":[
+      "UCR-95101 Zpracuj dávku agenta přes pumpu",
+      "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+      "UCR-95103 Zpracuj dávku ze schránky",
+      "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+      "UCR-95105 Předej agentovi kontext výběru"
+     ],
+     "pairs":[]
+    },
+    {
+     "op":"create_or_update_elements",
+     "items":4,
+     "create":0,
+     "update":4,
+     "targets":[
+      "ref SR ProcessRequest"
+     ],
+     "packages":[],
+     "diagrams":[],
+     "pairs":[]
+    }
+   ]
+  },
+  "metrics":{
+   "writeOps":9,
+   "createOps":0,
+   "updatedExisting":4,
+   "deleteTargets":0,
+   "affectedElements":4,
+   "affectedPackages":5,
+   "affectedDiagrams":5,
+   "moveOps":0,
+   "updatedExistingApprox":0,
+   "metricsComplete":true
+  },
+  "elapsedMs":510,
+  "budgetMs":8000,
+  "hashMaxChars":2000000,
+  "summaryHash":"bfeb2819431c4d16bca6b448d49ebde912220158bf684fb45440f652c84cbe81",
+  "payloadHash":"6aa5d5473a766db1e08dc78a893a4b0858df47004788bd7f67adaa2751b17926",
+  "hashMs":4,
+  "hashSource":"raw-bytes",
+  "confirm":{
+   "required":true,
+   "confirmedByUser":true,
+   "channel":"pumpa",
+   "timestamp":"2026-10-15 18:22:38"
+  }
+ },
+ "baseline":{
+  "decision":"created",
+  "reason":"pod prahem",
+  "posture":"full",
+  "postureReasons":[],
+  "needsBaseline":true,
+  "packages":[
+   {
+    "guid":"{FA7F32E0-EF8E-4e9c-8511-0ED6F2C1F28E}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:22:38",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu",
+    "packageName":"UC-95101 Zpracuj dávku agenta přes pumpu",
+    "subtreeCount":7,
+    "probeMs":8,
+    "status":"ok",
+    "baselineGuid":"{4AE2250F-B3D2-4820-88E0-F171ED67C53D}",
+    "result":"created"
+   },
+   {
+    "guid":"{1B4714B4-18EA-4f78-B4EC-AD939C36550C}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:22:41",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "packageName":"UC-95102 Rozhodni o dávce vyžadující potvrzení",
+    "subtreeCount":8,
+    "probeMs":9,
+    "status":"ok",
+    "baselineGuid":"{7AA3BEB2-FD6E-489e-9477-C29A1BEDE6D5}",
+    "result":"created"
+   },
+   {
+    "guid":"{EBDAD751-06F2-4b5b-9F4F-4107ADB71CDE}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:22:42",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky",
+    "packageName":"UC-95103 Zpracuj dávku ze schránky",
+    "subtreeCount":8,
+    "probeMs":9,
+    "status":"ok",
+    "baselineGuid":"{B67A1BB1-4F31-42f8-93C1-DAE8F5319055}",
+    "result":"created"
+   },
+   {
+    "guid":"{219D16CA-E512-4d81-98FB-4182D29F9E80}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:22:45",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "packageName":"UC-95104 Zpracuj dávky ze složky bez pumpy",
+    "subtreeCount":7,
+    "probeMs":12,
+    "status":"ok",
+    "baselineGuid":"{0C4160DF-D092-4284-A2C5-F1DB14840491}",
+    "result":"created"
+   },
+   {
+    "guid":"{D0682A09-1BCA-401c-9DE0-DDBC610301D3}",
+    "name":"FB-AUTO - s20261015-1 2026-10-15 18:22:47",
+    "path":"AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru",
+    "packageName":"UC-95105 Předej agentovi kontext výběru",
+    "subtreeCount":6,
+    "probeMs":13,
+    "status":"ok",
+    "baselineGuid":"{4167E2A9-04A9-4201-B1BB-BF671553200F}",
+    "result":"created"
+   }
+  ],
+  "subtreeMax":5000,
+  "maxBaselineElements":10000,
+  "thresholdsShadow":true,
+  "probeMs":52,
+  "elapsedMs":10065,
+  "action":"create",
+  "lines":[
+   "Zaloha pred zapisem: AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95101 Zpracuj dávku agenta přes pumpu (7 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95102 Rozhodni o dávce vyžadující potvrzení (8 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95103 Zpracuj dávku ze schránky (8 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95104 Zpracuj dávky ze složky bez pumpy (7 prvku), AI Test.Reverse Addinu.Business Applications.EA File Bridge.UC-95105 Předej agentovi kontext výběru (6 prvku)"
+  ],
+  "created":[
+   "FB-AUTO - s20261015-1 2026-10-15 18:22:38",
+   "FB-AUTO - s20261015-1 2026-10-15 18:22:41",
+   "FB-AUTO - s20261015-1 2026-10-15 18:22:42",
+   "FB-AUTO - s20261015-1 2026-10-15 18:22:45",
+   "FB-AUTO - s20261015-1 2026-10-15 18:22:47"
+  ],
+  "reused":[],
+  "journal":{
+   "targets":4,
+   "covered":[
+    "{F92AA736-50FD-4e09-BF09-7E5C453DC363}",
+    "{92A3AC1B-040B-4cad-AA3E-E817B3E8A837}",
+    "{E5688CCB-56FB-4527-8017-A6D9FCB1F83B}",
+    "{99178FD4-F3B6-4f67-A1A3-2F6D3DBF84A9}"
+   ],
+   "uncovered":[
+    "apply_classifier_stereotypes[0]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[1]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[2]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[3]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)",
+    "apply_classifier_stereotypes[4]: operace mimo rozsah minimalniho journalu (kryje ji jen baseline)"
+   ],
+   "manifestRef":"C:\\GIT\\ea-file-bridge\\journal\\fix-45-akteri-ucr-1.json"
+  }
+ },
+ "qc":{
+  "checks":1,
+  "findings":[],
+  "elapsedMs":24,
+  "status":"ciste"
+ },
+ "audit":{
+  "aiLogGuid":"{896B530D-266F-4031-AA57-7A0F703A9E62}"
+ }
+}
