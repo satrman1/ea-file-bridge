@@ -1,8 +1,8 @@
-build-vscode.py 1.3 — 2026-10-12
-  kanon:    /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/CLAUDE/IT-ANALYSIS/Skilly
-  šablony:  /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/CLAUDE/IT-ANALYSIS/Skilly/_vscode
-  výstup:   /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/ea-file-bridge/.github
-  profil:   doma (/sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/ea-file-bridge/config/vscode-profile.doma.json)
+build-vscode.py 1.3 — 2026-10-15
+  kanon:    /sessions/rcw-01mtagdj6zretbqikipzrmyf/kit/Skilly
+  šablony:  /sessions/rcw-01mtagdj6zretbqikipzrmyf/kit/Skilly/_vscode
+  výstup:   /sessions/rcw-01mtagdj6zretbqikipzrmyf/kit/repo/.github
+  profil:   doma (/sessions/rcw-01mtagdj6zretbqikipzrmyf/kit/repo/config/vscode-profile.doma.json)
   sada:     full
   terminál: off (profil)
 
@@ -44,7 +44,7 @@ Skilly:
   šablona skills/eafb-bridge (4 souborů)
   šablona skills/e2e-f0-f1 (3 souborů)
 
-Přepisy odkazů (mimo strom skillu → kopie / ukazatel / „mimo workspace“): 102
+Přepisy odkazů (mimo strom skillu → kopie / ukazatel / „mimo workspace“): 106
 | Soubor | Původně | Nově | Typ |
 |---|---|---|---|
 | skills/prevzeti-zadani/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
@@ -72,7 +72,9 @@ Přepisy odkazů (mimo strom skillu → kopie / ukazatel / „mimo workspace“)
 | skills/emr-qa/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
 | skills/emr-qa/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
 | skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
 | skills/emr-qa/SKILL.md | _shared/emr-zapis-pravidla.md | `emr-zapis-pravidla.md` (skill `emr-konvence`, references/emr-zapis-pravidla.md) | backtick |
+| skills/emr-qa/SKILL.md | _shared/qa-checklisty.md | `qa-checklisty.md` (skill `emr-konvence`, references/qa-checklisty.md) | backtick |
 | skills/logicka-obrazovka/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
 | skills/logicka-obrazovka/SKILL.md | ../../EA-Repozitar-Kontext.md | `EA-Repozitar-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
 | skills/logicka-obrazovka/SKILL.md | ../../podklady/ls-rules.png | `ls-rules.png` (mimo workspace — vyžádej od uživatele) | backtick |
@@ -145,6 +147,8 @@ Přepisy odkazů (mimo strom skillu → kopie / ukazatel / „mimo workspace“)
 | skills/emr-konvence/references/emr-zapis-pravidla.md | ../../_archiv/mcp-vendor/ | mcp-vendor (mimo workspace) | zbytkové ../../ |
 | skills/emr-konvence/references/qa-checklisty.md | ../../_archiv/Feedback-Metodika-v2-Integrace.md | `Feedback-Metodika-v2-Integrace.md` (mimo workspace — vyžádej od uživatele) | backtick |
 | skills/emr-konvence/references/qa-checklisty.md | ../use-case-analyst/references/scenario-rules.md | `references/scenario-rules.md` (skill `use-case-analyst`) | backtick |
+| skills/emr-konvence/references/qa-checklisty.md | ../../UI-Vystupy-EA-File-Bridge.md | `UI-Vystupy-EA-File-Bridge.md` (mimo workspace — vyžádej od uživatele) | backtick |
+| skills/emr-konvence/references/qa-checklisty.md | ../../UI-Vystupy-EA-File-Bridge.md | `UI-Vystupy-EA-File-Bridge.md` (mimo workspace — vyžádej od uživatele) | backtick |
 | skills/emr-konvence/references/qc-verzovani.sql | ../../Verzovani-Kritika-a-Redesign.md | Verzovani-Kritika-a-Redesign.md (mimo workspace) | zbytkové ../../ |
 | skills/emr-konvence/references/sar-pravidla.md | ../../IDesign/IDesign-MDG-Kontext.md | `IDesign-MDG-Kontext.md` (mimo workspace — vyžádej od uživatele) | backtick |
 | skills/emr-konvence/references/sar-pravidla.md | ../../IDesign/IDesign-v-Bance-Delta.md | `IDesign-v-Bance-Delta.md` (mimo workspace — vyžádej od uživatele) | backtick |
@@ -153,13 +157,13 @@ Backtick → markdown link uvnitř stromu skillu: 185
 
 Sweep B1 (T6; profil doma; hodnoty profilu povoleny):
   povoleno  81× — kódy metodiky (UC/BRU/LS číslování, scénářové kódy PRE/PST/ASU/AF/EF/BE, kontrolní body K/SA/SH/IF, UTF-8) a jmenné vzory s XXXXX — ne Jira ID (např. skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:26 BRU91001-1; skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:60 WF-101; skills/e2e-f0-f1/references/UC-Pravidla-Scenare.md:71 PREXXXXX-1)
-  povoleno  13× — slovo password/token v próze bez přiřazení hodnoty (UC příklady Cockburn, DDL EA [Password]) — ne credential (např. copilot-instructions.md:26 token; skills/ea-sql-expert/references/EASchema_1558_SQLServer.sql:1921 Passw; skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md:67 token)
+  povoleno  13× — slovo password/token v próze bez přiřazení hodnoty (UC příklady Cockburn, DDL EA [Password]) — ne credential (např. copilot-instructions.md:26 token; skills/ea-sql-expert/references/EASchema_1558_SQLServer.sql:1921 Passw; skills/eafb-bridge/references/EAFB-Pravidla-Agenta.md:68 token)
   povoleno   1× — syntetický příklad Jira klíče DEMO-nnnnn v kanonu (prevzeti-zadani) — ne reálný projekt (např. skills/prevzeti-zadani/SKILL.md:9 DEMO-27698)
-  povoleno   2× — syntetický příklad URL s placeholderem <org> (ir-format, emr-zapis-pravidla) — ne reálná adresa (např. skills/emr-konvence/references/emr-zapis-pravidla.md:261 https://github.com/<org; skills/emr-konvence/references/ir-format.md:27 https://github.com/<org)
+  povoleno   2× — syntetický příklad URL s placeholderem <org> (ir-format, emr-zapis-pravidla) — ne reálná adresa (např. skills/emr-konvence/references/emr-zapis-pravidla.md:262 https://github.com/<org; skills/emr-konvence/references/ir-format.md:27 https://github.com/<org)
   NEOŠETŘENÉ nálezy: 0
 
 Počty (AK-1): copilot-instructions 1 · agents 1 · instructions 2 · skillů 22 · souborů 103
   skilly: e2e-f0-f1, ea-addin-developer, ea-sql-expert, eafb-bridge, emr-konvence, emr-qa, emr-scaffold, katalog-komponent, logicka-obrazovka, logicky-datovy-model, prevzeti-zadani, realizace-sluzby, realizace-uc, sar-architektura-zapis, sar-prevzeti-zadani, sar-validace-call-chains, sar-volatilita-dekompozice, solution-architect, structural-modeller, use-case-analyst, use-case-model, verzovani-release
   [WARN] možné uříznutí uprostřed věty: skills/use-case-analyst/references/scenario-phrases.md — končí „…hou nastat v libovolném pořadí“
 
-[OK] zapsáno do /sessions/rcw-01pxuka4lrzaz1vy4afccejs/mnt/ea-file-bridge/.github (103 souborů)
+[OK] zapsáno do /sessions/rcw-01mtagdj6zretbqikipzrmyf/kit/repo/.github (103 souborů)
