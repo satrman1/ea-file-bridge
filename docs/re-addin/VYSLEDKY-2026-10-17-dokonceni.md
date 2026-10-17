@@ -117,7 +117,7 @@ Dávka `IT-ANALYSIS/zaprah-vlaken-2026-10-17.md` (Z261017-1…5). Tento soubor p
 - Rebuild scénářů jen u UC, jejichž kroky mají `uses` s měněným pravidlem; UC jen s Usage na pravidlo (bez kroku) scénáře nepotřebuje.
 - Pořadí v `F.BRU` je vázané na `res-re-30` (`zip` v `gen.load_r5`) — nová pravidla vždy na konec.
 
-### 1.6 Návrhy do kanonu (needitováno — čeká na pokyn Miloše)
+### 1.6 Návrhy do kanonu — propsáno 17. 10. 2026 12:55 (schválil Miloš „ano“; changelog `IT-ANALYSIS/Skilly/_shared/emr-zapis-changelog.md`, dodatek 17. 10.; kity se přegenerují při příštím buildu)
 
 - `IT-ANALYSIS/Skilly/_shared/emr-zapis-pravidla.md` §7e, odrážka „DTO vnitřní struktura“ — doplnit na konec větu: „Přes bridge (v0.22) zakládej Req/Res rovnou pod DTO (`owningElement` = DTO, v téže dávce odkazem `$N[i]` na DTO); existující Req/Res ležící vedle DTO přesuň `move_elements` s cílem `owningElement` (ELEVATED). Jména bez mezery: `<Služba>Req`, `<Služba>Res`.“
 - `IT-ANALYSIS/EA-Repozitar-Kontext.md` §6, odrážka „DTO zapouzdřuje Request/Response“ — doplnit: „(ve stromu pod DTO jako `<Služba>Req` / `<Služba>Res` — šablona §13; DTO —«refine»→ SR)“.
