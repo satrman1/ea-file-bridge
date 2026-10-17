@@ -1,0 +1,16 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-02-notes-operaci",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT OperationID, Object_ID, Name, Notes FROM t_operation WHERE OperationID IN (1289,1295,1296,1298,1303,1304,1305,1307,1311,1313,1323,1324,1340,1342)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT OperationID, Object_ID, Name FROM t_operation WHERE Object_ID BETWEEN 11937 AND 11950",
+   "maxRows": 200
+  }
+ ]
+}

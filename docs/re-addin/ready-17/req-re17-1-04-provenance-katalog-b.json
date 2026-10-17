@@ -1,0 +1,879 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-04-provenance-katalog-b",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_operations",
+   "element": 11944,
+   "operations": [
+    {
+     "operationID": 1315,
+     "name": "Query",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1316,
+     "name": "GetSelectedContext",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1317,
+     "name": "FindElementsByName",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1318,
+     "name": "FindPackagesByName",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1319,
+     "name": "GetElementsInformation",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1320,
+     "name": "GetPackagesInformation",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1321,
+     "name": "GetConnectorsInformation",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1322,
+     "name": "CreateElement",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1323,
+     "name": "CreateOrUpdateElements",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Protokolová operace create_or_update_elements (zápis). Create/update prvků přes Automation API, dedup, tagged values.\nv0.22: type DiagramGate/Gate = MessageEndpoint Subtype 2 pod owningElement; jméno \"\" se zapíše už při create; ref s classifierem dostane jméno a kompozitní odkaz classifieru; items nesou compositeDiagramID/GUID (N-RE-1, 2, 4, 11)."
+    },
+    {
+     "operationID": 1324,
+     "name": "MoveElements",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Protokolová operace move_elements (zápis).\nv0.22: cíl owningElement = přesun pod prvek (ParentID + balíček vlastníka, kaskáda potomků a diagramů, readback ParentID; package a owningElement současně = E_ARGS) (N-RE-17)."
+    },
+    {
+     "operationID": 1325,
+     "name": "CreateOrUpdatePackage",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1326,
+     "name": "CreateOrUpdateConnectors",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1327,
+     "name": "CreateOrUpdateAttributes",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1328,
+     "name": "CreateOrUpdateOperations",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1329,
+     "name": "CreateOrUpdateScenarios",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1330,
+     "name": "CreateOrUpdateConstraints",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1331,
+     "name": "CreateOrUpdateRequirements",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1332,
+     "name": "DeleteFromModel",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1333,
+     "name": "DeleteTaggedvalueFromModel",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1334,
+     "name": "ClonePackage",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1335,
+     "name": "CloneElements",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1336,
+     "name": "ExportElementLinkedDocuments",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1337,
+     "name": "ImportElementLinkedDocuments",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11945,
+   "operations": [
+    {
+     "operationID": 1338,
+     "name": "GetDiagramsInformation",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1339,
+     "name": "CreateOrUpdateDiagram",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1340,
+     "name": "PlaceElementsOnDiagram",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Protokolová operace place_elements_on_diagram (zápis).\nv0.22: prvek, který už na diagramu je, se přesune (moved, from) místo chyby Update (N-RE-3)."
+    },
+    {
+     "operationID": 1341,
+     "name": "RemoveElementsFromDiagram",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1342,
+     "name": "CreateOrUpdateMessages",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Protokolová operace create_or_update_messages (zápis).\nv0.22: přesměrování konce zprávy bez seqNo zachová pořadí zpráv (EA jinak SeqNo nuluje)."
+    },
+    {
+     "operationID": 1343,
+     "name": "LayoutConnectors",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1344,
+     "name": "ChangeConnectorVisibility",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1345,
+     "name": "OpenDiagrams",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1346,
+     "name": "ReloadDiagrams",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1347,
+     "name": "UpdateDiagramProperties",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1348,
+     "name": "SetDiagramObjectStyle",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1349,
+     "name": "GetDiagramImage",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11946,
+   "operations": [
+    {
+     "operationID": 1350,
+     "name": "GetBaselines",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1351,
+     "name": "BaselineDiff",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1352,
+     "name": "CreateBaseline",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1353,
+     "name": "CreateAutoBaseline",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1354,
+     "name": "WriteJournal",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11947,
+   "operations": [
+    {
+     "operationID": 1355,
+     "name": "WriteAudit",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1356,
+     "name": "WriteRiskAuditTags",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1357,
+     "name": "LogChanges",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11948,
+   "operations": [
+    {
+     "operationID": 1358,
+     "name": "DeploySrc",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1359,
+     "name": "GetCodeInfo",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11949,
+   "operations": [
+    {
+     "operationID": 1360,
+     "name": "ReadRequestBytes",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1361,
+     "name": "ReadWriteState",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1362,
+     "name": "UpdatePendingIndex",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1363,
+     "name": "IsPumpAlive",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1364,
+     "name": "ResolveBaseDir",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11950,
+   "operations": [
+    {
+     "operationID": 1365,
+     "name": "ParseJson",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1366,
+     "name": "StringifyJson",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1367,
+     "name": "Sha256",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1368,
+     "name": "EncodeBase64",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1369,
+     "name": "DecodeBase64",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1370,
+     "name": "DecodeUtf8",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1371,
+     "name": "ParseXmlRows",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1372,
+     "name": "CreateComObject",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1373,
+     "name": "GetElementPath",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

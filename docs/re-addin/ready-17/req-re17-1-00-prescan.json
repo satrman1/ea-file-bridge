@@ -1,0 +1,40 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-00-prescan",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "ping"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Package_ID BETWEEN 1124 AND 1400",
+   "maxRows": 2000
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, Object_Type, Stereotype, ParentID, Package_ID, Classifier, NType FROM t_object WHERE Package_ID BETWEEN 1124 AND 1400",
+   "maxRows": 3000
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Diagram_ID, Name, Diagram_Type, Package_ID, ParentID FROM t_diagram WHERE Package_ID BETWEEN 1124 AND 1400",
+   "maxRows": 2000
+  },
+  {
+   "op": "query",
+   "sql": "SELECT c.Connector_Type, c.SubType, COUNT(*) AS N FROM t_connector c INNER JOIN t_object o ON c.Start_Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1400 GROUP BY c.Connector_Type, c.SubType",
+   "maxRows": 200
+  },
+  {
+   "op": "query",
+   "sql": "SELECT p.Object_ID, p.Property, p.Value FROM t_objectproperties p INNER JOIN t_object o ON p.Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1400 AND p.Property IN ('code-ref','code-verified','code-path','505-1 Operation Link')",
+   "maxRows": 3000
+  },
+  {
+   "op": "query",
+   "sql": "SELECT p.OperationID, p.Name, x.Property, x.Value FROM t_operationtag x INNER JOIN t_operation p ON x.ElementID = p.OperationID INNER JOIN t_object o ON p.Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1400 AND x.Property IN ('code-ref','code-verified')",
+   "maxRows": 3000
+  }
+ ]
+}

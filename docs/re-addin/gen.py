@@ -457,6 +457,202 @@ def _r8(id_, ucs):
 def r8a(): return _r8("re-34a-ls-rozestupy", [u for u in F.UC if u["ls"]][:3])
 def r8b(): return _r8("re-34b-ls-rozestupy", [u for u in F.UC if u["ls"]][3:])
 
+
+# =====================================================================
+# Z261017-1 reverse dorovnani modelu (2026-10-17) - davky do ready-17/
+# =====================================================================
+def write17(b):
+    s = json.dumps(b, ensure_ascii=False, indent=1)
+    io.open("ready-17/req-%s.json" % b["id"], "w", encoding="utf-8").write(s)
+    return s
+
+def svc_ops(s, pkg_ref, op_id, codepath, first_index):
+    """Pravidlo metodiky (EA-Repozitar-Kontext §6, vzor DoBind; Milos 17. 10. 2026):
+    <Sluzba> Request / Response jsou CASTI DTO -> ve stromu lezi POD DTO (owningElement = DTO),
+    ne vedle nej v service package. Kompozice DTO -> Req/Res zustava.
+    Vraci 3 operace: [SR + DTO] (package), [Request + Response] (owningElement = DTO z predchozi op),
+    [kompozice]. first_index = index prvni z nich v ops[] davky (pro $N). Pouziva Z261017-2 pro dalsi sluzby;
+    r3() vyse je historicka davka re-12 (14. 10.) a zustava, jak byla provedena."""
+    i0 = first_index
+    els = [
+     {"package": pkg_ref, "type":"CSOB-ITAN::Service Realization", "name":"SR "+s["name"],
+      "taggedValues":[{"name":"505-1 Operation Link","ids":[{"type":"Operation","id":op_id}]}] + tv(codepath)},
+     {"package": pkg_ref, "type":"CSOB-ITAN::Data Transfer Object", "name":"DTO "+s["name"],
+      "notes":"DTO služby %s. Kontrakt žije v kódu (contractAuthority physical): %s; DTO je logický komentář, ne kopie." % (s["name"], codepath),
+      "taggedValues": tv(codepath)}]
+    # kanon emr-zapis-pravidla par. 7e + EA-Repozitar-Kontext par. 13: jmena <Sluzba>Req / <Sluzba>Res; DTO -<<refine>>-> SR
+    parts = [{"owningElement":"$%d[1]" % i0, "type":"Class", "name":s["name"]+"Req", "notes":"Request služby %s." % s["name"]},
+             {"owningElement":"$%d[1]" % i0, "type":"Class", "name":s["name"]+"Res", "notes":"Response služby %s." % s["name"]}]
+    comp = [{"source":"$%d[1]" % i0, "target":"$%d[%d]" % (i0+1, k), "type":"Aggregation",
+             "sourceEnd":{"aggregation":2}, "targetEnd":{"multiplicity":"1"}} for k in (0, 1)]
+    comp.append({"source":"$%d[1]" % i0, "target":"$%d[0]" % i0, "type":"Dependency", "stereotypes":"refine", "direction":"FromSourceToTarget"})
+    return [{"op":"create_or_update_elements","elements":els},
+            {"op":"create_or_update_elements","elements":parts},
+            {"op":"create_or_update_connectors","connectors":comp}]
+
+DTO_PARTS = {11962:(11963,11964), 11966:(11967,11968), 11970:(11971,11972), 11974:(11975,11976)}
+def r17_1():
+    """Krok 1: Request/Response pod DTO (move_elements, cil owningElement)."""
+    mv = [{"element": p, "owningElement": str(dto)} for dto, ps in DTO_PARTS.items() for p in ps]
+    ids = ",".join(str(p) for ps in DTO_PARTS.values() for p in ps)
+    return batch("re17-1-01-reqres-pod-dto", [
+        {"op":"move_elements","elements":mv},
+        {"op":"query","sql":"SELECT Object_ID, Name, ParentID, Package_ID FROM t_object WHERE Object_ID IN (%s)" % ids},
+        {"op":"query","sql":"SELECT c.Connector_ID, c.Connector_Type, c.Start_Object_ID, c.End_Object_ID, c.SourceIsAggregate, c.DestIsAggregate FROM t_connector c WHERE c.End_Object_ID IN (%s) AND c.Connector_Type = 'Aggregation'" % ids},
+        {"op":"query","sql":"SELECT Diagram_ID, Object_ID FROM t_diagramobjects WHERE Diagram_ID IN (1197,1199,1201,1203)"}])
+
+def tvp():
+    return [{"name":"code-ref","value":I.REF},{"name":"code-verified","value":I.VERIFIED}]
+
+def _r17_2_data():
+    st = json.load(io.open("stav-2026-10-17.json", encoding="utf-8"))
+    d = json.load(io.open("../../responses/res-re17-1-02-notes-operaci.json", encoding="utf-8-sig"))
+    notes = {r["Name"]: (r["OperationID"], r.get("Notes", "")) for r in d["results"][0]["rows"]}
+    ops_by_if = {}
+    for r in d["results"][1]["rows"]:
+        ops_by_if.setdefault(int(r["Object_ID"]), []).append((int(r["OperationID"]), r["Name"]))
+    elref = sorted({int(r["Object_ID"]) for r in st["tvElements"] if r["Property"] == "code-ref"})
+    pkg = {int(r["Object_ID"]): int(r["Package_ID"]) for r in st["elements"]}
+    return notes, ops_by_if, elref, pkg
+
+def _ops_upd(iface_ids, ops_by_if, notes):
+    out = []
+    for ifc in iface_ids:
+        lst = []
+        for oid, nm in ops_by_if.get(ifc, []):
+            o = {"operationID": oid, "name": nm, "taggedValues": tvp()}   # name povinne v P2 (E_ARGS bez nej, re17-1-03)
+            if nm in I.V022_NOTES:
+                old = notes[nm][1]
+                o["notes"] = (old + "\n" if old else "") + I.V022_NOTES[nm]
+            lst.append(o)
+        if lst: out.append({"op":"create_or_update_operations","element":ifc,"operations":lst})
+    return out
+
+def r17_2a():
+    """Krok 2a: provenance v0.22 - 18 komponent + operace rozhrani 11937-11943 (balicek katalogu 1127)."""
+    notes, obi, elref, pkg = _r17_2_data()
+    comps = [e for e in elref if pkg[e] == 1127]
+    ops = [{"op":"create_or_update_elements","elements":[{"elementID":e,"taggedValues":tvp()} for e in comps]}]
+    ops += _ops_upd(range(11937, 11944), obi, notes)
+    return batch("re17-1-03b-provenance-katalog-a", ops)
+
+def r17_2b():
+    notes, obi, elref, pkg = _r17_2_data()
+    return batch("re17-1-04-provenance-katalog-b", _ops_upd(range(11944, 11951), obi, notes))
+
+def r17_2c():
+    """SR + DTO ve 4 service packages."""
+    notes, obi, elref, pkg = _r17_2_data()
+    els = [e for e in elref if pkg[e] in (1132, 1133, 1134, 1135)]
+    return batch("re17-1-05-provenance-sr-dto", [{"op":"create_or_update_elements","elements":[{"elementID":e,"taggedValues":tvp()} for e in els]}])
+
+def r17_3():
+    """Krok 3: BRU-9501 -> 9501 Tridy operaci (prejmenovani 12051) + 9510 Prahy metrik + 9511 Eskalace podle obsahu;
+    Usage UC -> 9510/9511 u kazdeho UC s Usage na 9501; umisteni na UC detail (vpravo, 75 px); rebuild scenaru UC s uses 9501;
+    provenance v0.22 vsech BRU a dotcenych UC. Balicky: RULES + 4 UC = 5 (BLOCKED az > 5)."""
+    P_, ucp, actors, uc, ucd, survey, bru, ucr, ls = load_r5()
+    pos = json.load(io.open("../../responses/res-re17-1-06-bru-pozice.json", encoding="utf-8-sig"))["results"][0]["rows"]
+    rules = P_["rules"]["guid"]
+    B = {b[0]: b for b in F.BRU}
+    def bru_el(code, **kw):
+        c, n, cp, t = B[code]
+        e = {"name": c+" "+n, "notes": t, "taggedValues": tv(cp)}; e.update(kw); return e
+    ops = [{"op":"create_or_update_elements","elements":[bru_el("BRU-9501", elementID=bru["BRU-9501"]["id"])]},
+           {"op":"create_or_update_elements","elements":[bru_el(c, package=rules, type="CSOB-ITAN::Behavioral Rule") for c in ("BRU-9510","BRU-9511")]}]
+    newi = 1
+    touched = [u for u in F.UC if "BRU-9510" in u["bru"]]
+    ops.append({"op":"create_or_update_connectors","connectors":[
+        {"source":uc[u["code"]]["guid"],"target":"$%d[%d]" % (newi, k),"type":"Usage","direction":"FromSourceToTarget"}
+        for u in touched for k in (0, 1)]})
+    for u in touched:
+        dg = ucd[u["code"]]["id"]
+        y0 = max(-int(r["RectBottom"]) for r in pos if int(r["Diagram_ID"]) == dg) + 15
+        ops.append({"op":"place_elements_on_diagram","diagram":dg,"elementPlacements":[
+            {"element":"$%d[%d]" % (newi, k),"x":820,"y":y0 + 75*k,"width":300,"height":60} for k in (0, 1)]})
+    for u in touched:
+        if any("BRU-9501" in st.get("uses","") for sc in u["scen"] for st in sc["steps"]):
+            ops.append({"op":"create_or_update_scenarios","element":uc[u["code"]]["guid"],"scenarios":u["scen"]})
+    ops.append({"op":"create_or_update_elements","elements":
+        [{"elementID":bru[c]["id"],"taggedValues":tvp()} for c in bru if c != "BRU-9501"] +
+        [{"elementID":uc[u["code"]]["id"],"taggedValues":tvp()} for u in touched]})
+    return batch("re17-1-07-bru-split", ops)
+
+def r17_3b():
+    """Provenance v0.22 zbylych 5 UC (balicky 1147-1150, 1152)."""
+    P_, ucp, actors, uc, ucd, survey, bru, ucr, ls = load_r5()
+    rest = [u for u in F.UC if "BRU-9510" not in u["bru"]]
+    return batch("re17-1-08-provenance-uc", [{"op":"create_or_update_elements","elements":[{"elementID":uc[u["code"]]["id"],"taggedValues":tvp()} for u in rest]}])
+
+def r17_4():
+    """Krok 4: atributy 8 entit LDM of EA Repository = sloupce, ktere bridge cte/pise (extract_ldm.py nad src/ @ v0.22)."""
+    import extract_ldm
+    A = extract_ldm.build()
+    ids = dict(zip([e[0] for e in I.ENTITIES], range(11977, 11985)))
+    ops = []
+    for n, t, nt in I.ENTITIES:
+        ops.append({"op":"create_or_update_attributes","element":ids[n],"attributes":A[n]})
+    ops.append({"op":"create_or_update_elements","elements":[
+        {"elementID":ids[n],"notes":nt+" Fyzická tabulka: %s.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ %s), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)." % (t, I.REF)}
+        for n, t, nt in I.ENTITIES]})
+    return batch("re17-1-09-ldm-atributy", ops)
+
+IMPACT_A = [(12060, 11961), (12061, 11961), (12062, 11961), (12063, 11961)]           # UCR-95101..95104 -> SR ProcessRequest
+IMPACT_B = [(12065, 11965), (11961, 11969), (11961, 11973)]                        # UCR-95106 -> SR Ping; SR ProcessRequest -> SR CUE / SR DFM
+def _imp(id_, pairs):
+    """Krok 5: impact vazby (EA-Repozitar-Kontext par. 3, emr-zapis-pravidla par. 7f: Usage kopiruje ref retez), bez umisteni na diagramy."""
+    return batch(id_, [{"op":"create_or_update_connectors","connectors":[
+        {"source":s,"target":t,"type":"Usage","direction":"FromSourceToTarget","notes":"Impact: Usage kopíruje ref řetěz (ref v kompozitní sekvenci zdroje vede na cíl)."} for s, t in pairs]},
+        {"op":"query","sql":"SELECT Connector_ID, Connector_Type, Direction, Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_Type = 'Usage' AND Start_Object_ID IN (12060,12061,12062,12063,12065,11961)"}])
+def r17_5a(): return _imp("re17-1-10-impact-ucr", IMPACT_A)
+def r17_5b(): return _imp("re17-1-11-impact-sr", IMPACT_B)
+
+KONTROLY = [
+ ("rozhrani ParentID=0 v 1127", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type = 'Interface' AND Package_ID = 1127 AND ParentID = 0"),
+ ("instance s classifierem ParentID=0 (sluzby + UC)", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type IN ('Object','Component','Actor','InteractionOccurrence','MessageEndpoint') AND Classifier > 0 AND ParentID = 0 AND (Package_ID BETWEEN 1132 AND 1135 OR Package_ID BETWEEN 1144 AND 1152)"),
+ ("gaty bez vlastnika (sluzby + UC)", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type = 'MessageEndpoint' AND ParentID = 0 AND (Package_ID BETWEEN 1132 AND 1135 OR Package_ID BETWEEN 1144 AND 1152)"),
+ ("prvky se jmenem Object", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Name = 'Object' AND Package_ID BETWEEN 1124 AND 1152"),
+ ("Request/Response pod DTO", 8, "SELECT COUNT(*) AS N FROM t_object c INNER JOIN t_object p ON c.ParentID = p.Object_ID WHERE p.Stereotype = 'Data Transfer Object' AND p.Package_ID BETWEEN 1132 AND 1135 AND (c.Name LIKE '%Req' OR c.Name LIKE '%Res')"),
+ ("DTO -refine-> SR", 4, "SELECT COUNT(*) AS N FROM t_connector WHERE Connector_Type = 'Dependency' AND Stereotype = 'refine' AND Start_Object_ID IN (11962,11966,11970,11974) AND End_Object_ID IN (11961,11965,11969,11973)"),
+ ("SR s TV 505-1", 4, "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_objectproperties t ON t.Object_ID = o.Object_ID WHERE o.Stereotype = 'Service Realization' AND o.Package_ID BETWEEN 1132 AND 1135 AND t.Property = '505-1 Operation Link' AND t.Value LIKE '{%'"),
+ ("SR s kompozitnim diagramem", 4, "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_diagram d ON d.ParentID = o.Object_ID WHERE o.Stereotype = 'Service Realization' AND o.Package_ID BETWEEN 1132 AND 1135"),
+ ("UC s Basic Path", 9, "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_objectscenarios s ON s.Object_ID = o.Object_ID WHERE o.Object_Type = 'UseCase' AND o.Package_ID BETWEEN 1144 AND 1152 AND s.ScenarioType = 'Basic Path'"),
+ ("UC s podminkou", 9, "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_objectconstraint c ON c.Object_ID = o.Object_ID WHERE o.Object_Type = 'UseCase' AND o.Package_ID BETWEEN 1144 AND 1152"),
+ ("Usage UC -> BRU-9501/9510/9511", 12, "SELECT COUNT(*) AS N FROM t_connector WHERE Connector_Type = 'Usage' AND End_Object_ID IN (12051,12207,12208)"),
+ ("BRU-9510/9511 na UC detailech", 8, "SELECT COUNT(*) AS N FROM t_diagramobjects WHERE Object_ID IN (12207,12208) AND Diagram_ID BETWEEN 1218 AND 1226"),
+ ("impact Usage UCR/SR -> SR", 7, "SELECT COUNT(*) AS N FROM t_connector c INNER JOIN t_object e ON c.End_Object_ID = e.Object_ID WHERE c.Connector_Type = 'Usage' AND e.Stereotype = 'Service Realization' AND c.Start_Object_ID IN (12060,12061,12062,12063,12065,11961)"),
+ ("TV code-ref v0.21 (zbytek)", 0, "SELECT COUNT(*) AS N FROM t_objectproperties t INNER JOIN t_object o ON t.Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1152 AND t.Property = 'code-ref' AND t.Value LIKE 'v0.21%'"),
+ ("TV code-ref v0.22 prvky", 46, "SELECT COUNT(*) AS N FROM t_objectproperties t INNER JOIN t_object o ON t.Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1152 AND t.Property = 'code-ref' AND t.Value = 'v0.22 (0c3e207)'"),
+ ("TV code-ref operaci v0.21 (zbytek)", 0, "SELECT COUNT(*) AS N FROM t_operationtag x INNER JOIN t_operation p ON x.ElementID = p.OperationID WHERE p.Object_ID BETWEEN 11937 AND 11950 AND x.Property = 'code-ref' AND x.VALUE LIKE 'v0.21%'"),
+ ("TV code-ref operaci v0.22", 85, "SELECT COUNT(*) AS N FROM t_operationtag x INNER JOIN t_operation p ON x.ElementID = p.OperationID WHERE p.Object_ID BETWEEN 11937 AND 11950 AND x.Property = 'code-ref' AND x.VALUE = 'v0.22 (0c3e207)'"),
+ ("atributy entit LDM", 73, "SELECT COUNT(*) AS N FROM t_attribute WHERE Object_ID BETWEEN 11977 AND 11984"),
+ ("prazdne diagramy v katalogu 1127", None, "SELECT d.Diagram_ID, d.Name FROM t_diagram d WHERE d.Package_ID = 1127 AND d.Diagram_ID NOT IN (SELECT Diagram_ID FROM t_diagramobjects WHERE Diagram_ID BETWEEN 1170 AND 1250)"),
+]
+def r17_7(id_="re17-1-13-kontrola"):
+    return batch(id_, [{"op":"query","sql":q} for _, _, q in KONTROLY])
+
+def r17_7fix():
+    """Nalez kroku 7: kompozit 1193 'EA Repository' (IDS-DB Resource) je prazdny - doplnit komponentu (jako 1178/1179 u klientu bez rozhrani)."""
+    return batch("re17-1-14-kompozit-1193", [
+        {"op":"place_elements_on_diagram","diagram":1193,"elementPlacements":[{"elementID":11934,"x":60,"y":60,"width":200,"height":90}]},
+        {"op":"query","sql":"SELECT Diagram_ID, Object_ID FROM t_diagramobjects WHERE Diagram_ID = 1193"}])
+def r17_8(id_="re17-1-15-obrazky"):
+    """Krok 8: obrazky ke kontrole okem (img-17/)."""
+    return batch(id_, [{"op":"reload_diagrams","diagrams":[1197,1218,1180,1193]},{"op":"get_diagram_image","diagrams":[1197,1218,1180,1193]}])
+
+SR_DTO = {11961: 11962, 11965: 11966, 11969: 11970, 11973: 11974}
+def r17_7kanon():
+    """Nalezy kroku 7 proti kanonu (emr-zapis-pravidla par. 7e): Req/Res se jmenuji <Sluzba>Req / <Sluzba>Res
+    (model mel '<Sluzba> Request/Response') a DTO ma Dependency <<refine>> na SR (v modelu chybela)."""
+    S = {11962:"ProcessRequest", 11966:"Ping", 11970:"CreateOrUpdateElements", 11974:"DeleteFromModel"}
+    ren = []
+    for dto, (rq, rs) in DTO_PARTS.items():
+        ren += [{"elementID":rq,"name":S[dto]+"Req"},{"elementID":rs,"name":S[dto]+"Res"}]
+    return batch("re17-1-16-dto-kanon", [
+        {"op":"create_or_update_elements","elements":ren},
+        {"op":"create_or_update_connectors","connectors":[{"source":dto,"target":sr,"type":"Dependency","stereotypes":"refine","direction":"FromSourceToTarget"} for sr, dto in SR_DTO.items()]},
+        {"op":"query","sql":"SELECT Object_ID, Name, ParentID FROM t_object WHERE Object_ID IN (11963,11964,11967,11968,11971,11972,11975,11976)"},
+        {"op":"query","sql":"SELECT Connector_ID, Connector_Type, Stereotype, Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_Type = 'Dependency' AND Start_Object_ID IN (11962,11966,11970,11974)"}])
+
 if __name__ == "__main__":
     which = sys.argv[1]
     b = globals()[which]()

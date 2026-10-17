@@ -1,0 +1,662 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-03b-provenance-katalog-a",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11919,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11920,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11921,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11922,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11923,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11924,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11925,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11926,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11927,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11928,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11929,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11930,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11931,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11932,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11933,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11934,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11935,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "elementID": 11936,
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11937,
+   "operations": [
+    {
+     "operationID": 1289,
+     "name": "ProcessRequest",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Zpracuje jednu dávku eafb/0.2 a vrátí JSON odpověď (status done | error | confirm_required, results[], risk, qc, audit).\nv0.22: odkaz $N[i].compositeDiagram; auto-kompozit MDG prvku založený touto session pumpy se počítá jako vlastní diagram (N-RE-6, N-RE-11)."
+    },
+    {
+     "operationID": 1290,
+     "name": "ConfirmPending",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1291,
+     "name": "SweepPending",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1292,
+     "name": "StartSession",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1293,
+     "name": "Ping",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1294,
+     "name": "GetStatus",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11938,
+   "operations": [
+    {
+     "operationID": 1295,
+     "name": "PrecheckBatch",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Dvoufázová předběžná kontrola dávky; vrací jednu chybu s problems[] (E_UNKNOWN_OP, E_ARGS, ...) nebo ok.\nv0.22: kontroluje i odkazy $N[i].compositeDiagram a cíl move_elements owningElement."
+    },
+    {
+     "operationID": 1296,
+     "name": "CheckFields",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Kontrola polí operací: aliasy přepsané v dávce, neznámé pole = varování s nápovědou, chybné taggedValues = E_ARGS.\nv0.22: move_elements zná pole owningElement (aliasy owner, parent)."
+    },
+    {
+     "operationID": 1297,
+     "name": "InterpretError",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11939,
+   "operations": [
+    {
+     "operationID": 1298,
+     "name": "PrecheckTargets",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Kontrola cílů celé zápisové dávky před zápisem, oknem i zálohou (E_BLACKLIST v P2), výpočet kaskád mazání.\nv0.22: u move_elements s cílem owningElement kontroluje balíček vlastníka; zná odkaz $N[i].compositeDiagram."
+    },
+    {
+     "operationID": 1299,
+     "name": "CheckWrite",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1300,
+     "name": "CheckWriteElement",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1301,
+     "name": "CheckUserAccess",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1302,
+     "name": "DescribeScope",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11940,
+   "operations": [
+    {
+     "operationID": 1303,
+     "name": "ClassifyBatch",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Metriky (počty zápisů, mazání, cizí prvky, rozsah) a úroveň rizika s důvody reasonItems[].\nv0.22: práh affectedPackages vyjmenuje dotčené balíčky tečkovou cestou (summary.packagePaths, max. 10); přesun pod prvek se počítá do balíčku vlastníka."
+    },
+    {
+     "operationID": 1304,
+     "name": "BuildConfirmSummary",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Text potvrzovacího okna: co se stane a kde, záloha, důvody větami, legenda.\nv0.22: přesun pod jiný prvek ve stromu má vlastní větu okna („PRESUNOUT … pod jiný prvek ve stromu“)."
+    },
+    {
+     "operationID": 1305,
+     "name": "DescribeReason",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Kód důvodu risk gate -> věta pro člověka.\nv0.22: důvod prahu affectedPackages nese výčet balíčků."
+    },
+    {
+     "operationID": 1306,
+     "name": "IssueNonce",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11941,
+   "operations": [
+    {
+     "operationID": 1307,
+     "name": "PlanBaseline",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Plán zálohy dávky: scope balíčků, sonda, nejistota.\nv0.22: u move_elements s cílem owningElement je cílem zálohy balíček vlastníka (FB_BaselinePolicy)."
+    },
+    {
+     "operationID": 1308,
+     "name": "DecideBaseline",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1309,
+     "name": "EvaluateRecoveryPosture",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    },
+    {
+     "operationID": 1310,
+     "name": "CleanupBaselines",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11942,
+   "operations": [
+    {
+     "operationID": 1311,
+     "name": "RunQc",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Spustí kontroly nad dotčenými balíčky: ciste | nalez | nedobehlo | bez_kontrol.\nv0.22: kontrola QC-DEMO-001 (prvek bez jména) vynechává instance s classifierem, refy, hranice a gaty (N-RE-9)."
+    },
+    {
+     "operationID": 1312,
+     "name": "DescribeQc",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": 11943,
+   "operations": [
+    {
+     "operationID": 1313,
+     "name": "ApplyClassifierStereotypes",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ],
+     "notes": "Protokolová operace apply_classifier_stereotypes - port ITAN-Apply Classifier Stereotypes on SD.vbs.\nv0.22: lifeline s classifierem Actor dostane Type Actor + stereotyp classifieru (nad rámec VBS originálu, N-RE-18)."
+    },
+    {
+     "operationID": 1314,
+     "name": "FindOrCreateReferencingSR",
+     "taggedValues": [
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

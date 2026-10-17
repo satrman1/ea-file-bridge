@@ -1,0 +1,27 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-12-scd-kontrola",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT d.Diagram_ID, d.Name, d.ParentID FROM t_diagram d WHERE d.Diagram_ID BETWEEN 1178 AND 1194"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT x.Diagram_ID, x.Object_ID, x.RectLeft, x.RectTop, x.RectRight, x.RectBottom FROM t_diagramobjects x WHERE x.Diagram_ID BETWEEN 1178 AND 1194"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT l.DiagramID, l.ConnectorID, l.Hidden FROM t_diagramlinks l WHERE l.DiagramID BETWEEN 1178 AND 1194"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_Type = 'Realisation' AND Start_Object_ID BETWEEN 11919 AND 11936"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT l.DiagramID, l.ConnectorID FROM t_diagramlinks l WHERE l.ConnectorID BETWEEN 5124 AND 5130"
+  }
+ ]
+}

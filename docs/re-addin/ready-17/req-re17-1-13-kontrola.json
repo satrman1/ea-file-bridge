@@ -1,0 +1,79 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-13-kontrola",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type = 'Interface' AND Package_ID = 1127 AND ParentID = 0"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type IN ('Object','Component','Actor','InteractionOccurrence','MessageEndpoint') AND Classifier > 0 AND ParentID = 0 AND (Package_ID BETWEEN 1132 AND 1135 OR Package_ID BETWEEN 1144 AND 1152)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type = 'MessageEndpoint' AND ParentID = 0 AND (Package_ID BETWEEN 1132 AND 1135 OR Package_ID BETWEEN 1144 AND 1152)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Name = 'Object' AND Package_ID BETWEEN 1124 AND 1152"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object c INNER JOIN t_object p ON c.ParentID = p.Object_ID WHERE p.Stereotype = 'Data Transfer Object' AND p.Package_ID BETWEEN 1132 AND 1135 AND (c.Name LIKE '% Request' OR c.Name LIKE '% Response')"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_objectproperties t ON t.Object_ID = o.Object_ID WHERE o.Stereotype = 'Service Realization' AND o.Package_ID BETWEEN 1132 AND 1135 AND t.Property = '505-1 Operation Link' AND t.Value LIKE '{%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_diagram d ON d.ParentID = o.Object_ID WHERE o.Stereotype = 'Service Realization' AND o.Package_ID BETWEEN 1132 AND 1135"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_objectscenarios s ON s.Object_ID = o.Object_ID WHERE o.Object_Type = 'UseCase' AND o.Package_ID BETWEEN 1144 AND 1152 AND s.ScenarioType = 'Basic Path'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(DISTINCT o.Object_ID) AS N FROM t_object o INNER JOIN t_objectconstraint c ON c.Object_ID = o.Object_ID WHERE o.Object_Type = 'UseCase' AND o.Package_ID BETWEEN 1144 AND 1152"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_connector WHERE Connector_Type = 'Usage' AND End_Object_ID IN (12051,12207,12208)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_diagramobjects WHERE Object_ID IN (12207,12208) AND Diagram_ID BETWEEN 1218 AND 1226"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_connector c INNER JOIN t_object e ON c.End_Object_ID = e.Object_ID WHERE c.Connector_Type = 'Usage' AND e.Stereotype = 'Service Realization' AND c.Start_Object_ID IN (12060,12061,12062,12063,12065,11961)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_objectproperties t INNER JOIN t_object o ON t.Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1152 AND t.Property = 'code-ref' AND t.Value LIKE 'v0.21%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_objectproperties t INNER JOIN t_object o ON t.Object_ID = o.Object_ID WHERE o.Package_ID BETWEEN 1124 AND 1152 AND t.Property = 'code-ref' AND t.Value = 'v0.22 (0c3e207)'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_operationtag x INNER JOIN t_operation p ON x.ElementID = p.OperationID WHERE p.Object_ID BETWEEN 11937 AND 11950 AND x.Property = 'code-ref' AND x.VALUE LIKE 'v0.21%'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_operationtag x INNER JOIN t_operation p ON x.ElementID = p.OperationID WHERE p.Object_ID BETWEEN 11937 AND 11950 AND x.Property = 'code-ref' AND x.VALUE = 'v0.22 (0c3e207)'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_attribute WHERE Object_ID BETWEEN 11977 AND 11984"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT d.Diagram_ID, d.Name FROM t_diagram d WHERE d.Package_ID = 1127 AND d.Diagram_ID NOT IN (SELECT Diagram_ID FROM t_diagramobjects WHERE Diagram_ID BETWEEN 1170 AND 1250)"
+  }
+ ]
+}

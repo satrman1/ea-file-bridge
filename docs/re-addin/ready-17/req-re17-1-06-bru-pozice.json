@@ -1,0 +1,15 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-06-bru-pozice",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT d.Diagram_ID, d.Object_ID, o.Name, d.RectLeft, d.RectTop, d.RectRight, d.RectBottom FROM t_diagramobjects d INNER JOIN t_object o ON d.Object_ID = o.Object_ID WHERE d.Diagram_ID IN (1218,1219,1220,1225) AND o.Object_ID BETWEEN 12051 AND 12059"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, Start_Object_ID, End_Object_ID, Connector_Type FROM t_connector WHERE End_Object_ID = 12051"
+  }
+ ]
+}

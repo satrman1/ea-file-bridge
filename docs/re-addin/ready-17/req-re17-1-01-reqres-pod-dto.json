@@ -1,0 +1,56 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-01-reqres-pod-dto",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "move_elements",
+   "elements": [
+    {
+     "element": 11963,
+     "owningElement": "11962"
+    },
+    {
+     "element": 11964,
+     "owningElement": "11962"
+    },
+    {
+     "element": 11967,
+     "owningElement": "11966"
+    },
+    {
+     "element": 11968,
+     "owningElement": "11966"
+    },
+    {
+     "element": 11971,
+     "owningElement": "11970"
+    },
+    {
+     "element": 11972,
+     "owningElement": "11970"
+    },
+    {
+     "element": 11975,
+     "owningElement": "11974"
+    },
+    {
+     "element": 11976,
+     "owningElement": "11974"
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, ParentID, Package_ID FROM t_object WHERE Object_ID IN (11963,11964,11967,11968,11971,11972,11975,11976)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT c.Connector_ID, c.Connector_Type, c.Start_Object_ID, c.End_Object_ID, c.SourceIsAggregate, c.DestIsAggregate FROM t_connector c WHERE c.End_Object_ID IN (11963,11964,11967,11968,11971,11972,11975,11976) AND c.Connector_Type = 'Aggregation'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Diagram_ID, Object_ID FROM t_diagramobjects WHERE Diagram_ID IN (1197,1199,1201,1203)"
+  }
+ ]
+}

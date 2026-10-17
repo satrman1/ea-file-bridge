@@ -1,0 +1,457 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-09-ldm-atributy",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 11977,
+   "attributes": [
+    {
+     "name": "Package_ID",
+     "type": "number",
+     "notes": "SQL: FB_Audit, FB_BaselinePolicy, FB_OpClonePackage, FB_OpDelete, FB_OpFindPackages, FB_QcConfig, FB_ResolvePath, FB_ScopePrecheck, FB_SubtreeCount, FB_TargetCache, FB_WriteScopeCfg, ProcessRequests; API: FB_OpDelete, FB_OpDeleteTag, FB_OpFindElements, FB_OpFindOrCreateSR, FB_OpFindPackages, FB_OpMoveElements, FB_OpPackage, FB_OpSelectedContext"
+    },
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "SQL: FB_Audit, FB_BaselinePolicy, FB_OpFindPackages, FB_OpPackage, FB_QcConfig, FB_ResolvePath, FB_TargetCache, FB_WriteScopeCfg, ProcessRequests; API: FB_OpPackage"
+    },
+    {
+     "name": "Parent_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpClonePackage, FB_OpDelete, FB_OpFindPackages, FB_OpPackage, FB_ResolvePath, FB_ScopePrecheck, FB_SubtreeCount, FB_TargetCache, FB_WriteScopeCfg; API: FB_OpDelete, FB_OpMoveElements, FB_OpPackage, FB_OpSelectedContext"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpPackage"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "SQL: FB_Audit, FB_BaselineCleanup, FB_BaselinePolicy, FB_OpFindPackages, FB_OpPackage, FB_ResolvePath, FB_TargetCache, FB_WriteScopeCfg; API: FB_OpFindElements, FB_OpFindOrCreateSR, FB_OpFindPackages, FB_OpPackage, FB_OpSelectedContext"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11978,
+   "attributes": [
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_Changes, FB_CodeInfo, FB_DedupFind, FB_Main, FB_NavProbe, FB_OpDelete, FB_OpDeploySrc, FB_OpFindElements, FB_OpFindOrCreateSR, FB_OpMoveElements, FB_QcConfig, FB_RiskGate, FB_ScopePrecheck, FB_SubtreeCount, FB_TargetCache, FB_WriteScopeCfg; API: FB_OpApplyClassifierStereotypes, FB_OpConnectors, FB_OpDelete, FB_OpElements, FB_OpFindOrCreateSR, FB_OpGetConnectors, FB_OpGetDiagrams, FB_OpGetElements, FB_OpMessages, FB_OpMoveElements, FB_OpPla …"
+    },
+    {
+     "name": "Object_Type",
+     "type": "string",
+     "notes": "SQL: FB_Changes, FB_Main, FB_OpDeploySrc, FB_OpFindElements, FB_QcConfig, FB_SubtreeCount, FB_TargetCache; API: FB_OpElements"
+    },
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "SQL: FB_BaselinePolicy, FB_Changes, FB_CodeInfo, FB_Main, FB_NavProbe, FB_OpDeploySrc, FB_OpFindElements, FB_OpFindOrCreateSR, FB_OpMoveElements, FB_QcConfig, FB_RiskGate, FB_TargetCache, FB_WriteScopeCfg, FindTargetMethod; API: FB_OpElements, FB_OpMoveElements"
+    },
+    {
+     "name": "Alias",
+     "type": "string",
+     "notes": "API: FB_OpElements, FB_OpGetElements"
+    },
+    {
+     "name": "Author",
+     "type": "string",
+     "notes": "SQL: FB_OpFindOrCreateSR"
+    },
+    {
+     "name": "Note",
+     "type": "string",
+     "notes": "API: FB_OpElements"
+    },
+    {
+     "name": "Package_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_NavProbe, FB_OpClonePackage, FB_OpDelete, FB_OpElements, FB_OpFindElements, FB_OpMoveElements, FB_QcConfig, FB_ScopePrecheck, FB_SubtreeCount, FB_TargetCache, FB_WriteScopeCfg; API: FB_OpDelete, FB_OpDeleteTag, FB_OpElements, FB_OpFindOrCreateSR, FB_OpGetDiagrams, FB_OpGetElements, FB_OpMoveElements, FB_OpSelectedContext"
+    },
+    {
+     "name": "Stereotype",
+     "type": "string",
+     "notes": "SQL: FB_Changes, FB_CodeInfo, FB_NavProbe, FB_OpDeploySrc, FB_OpFindElements, FB_OpFindOrCreateSR, FB_RiskGate, FB_WriteScopeCfg; API: FB_OpElements"
+    },
+    {
+     "name": "NType",
+     "type": "number",
+     "notes": "API: FB_OpElements"
+    },
+    {
+     "name": "Classifier",
+     "type": "number",
+     "notes": "SQL: FB_OpDelete, FB_QcConfig, FB_ScopePrecheck; API: FB_OpApplyClassifierStereotypes, FB_OpElements, FB_OpGetDiagrams, FB_OpGetElements"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "SQL: FB_BaselinePolicy, FB_Changes, FB_DedupFind, FB_Main, FB_NavProbe, FB_OpDeploySrc, FB_OpElements, FB_OpFindElements, FB_OpFindOrCreateSR, FB_RiskGate, FB_TargetCache, FB_WriteScopeCfg, FindTargetMethod; API: FB_OpElements, FB_OpFindOrCreateSR, FB_OpGetElements, FB_OpMoveElements, FB_OpPlaceElements, FB_OpSelectedContext"
+    },
+    {
+     "name": "ParentID",
+     "type": "number",
+     "notes": "SQL: FB_OpElements, FB_OpMoveElements, FB_RiskGate, FB_TargetCache, FB_WriteScopeCfg; API: FB_OpDelete, FB_OpElements, FB_OpGetDiagrams, FB_OpGetElements, FB_OpMoveElements, FB_OpSelectedContext"
+    },
+    {
+     "name": "CreatedDate",
+     "type": "datetime",
+     "notes": "SQL: FB_OpFindOrCreateSR"
+    },
+    {
+     "name": "ModifiedDate",
+     "type": "datetime",
+     "notes": "SQL: FB_OpFindOrCreateSR"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11979,
+   "attributes": [
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_Changes, FB_CodeInfo, FB_DedupFind, FB_Main, FB_OpFindOrCreateSR, FB_ScopePrecheck"
+    },
+    {
+     "name": "Property",
+     "type": "string",
+     "notes": "SQL: FB_BaselinePolicy, FB_Changes, FB_CodeInfo, FB_DedupFind, FB_Main, FB_OpFindOrCreateSR, FB_ScopePrecheck"
+    },
+    {
+     "name": "Value",
+     "type": "string",
+     "notes": "SQL: FB_BaselinePolicy, FB_Changes, FB_CodeInfo, FB_DedupFind, FB_Main, FB_OpFindOrCreateSR, FB_ScopePrecheck; API: FB_OpFindOrCreateSR"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "SQL: FB_OpFindOrCreateSR"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11980,
+   "attributes": [
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpDeleteTag, FB_ScopePrecheck"
+    },
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "LowerBound",
+     "type": "number",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "UpperBound",
+     "type": "number",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpDeleteTag, FB_ScopePrecheck; API: FB_OpAttributes"
+    },
+    {
+     "name": "Pos",
+     "type": "number",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "Classifier",
+     "type": "number",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "Default",
+     "type": "string",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "Type",
+     "type": "string",
+     "notes": "API: FB_OpAttributes"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "API: FB_OpAttributes"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11981,
+   "attributes": [
+    {
+     "name": "OperationID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpDelete, FB_OpDeleteTag, FB_ScopePrecheck; API: FB_OpDelete, FB_OpGetElements, FB_OpOperations"
+    },
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpDelete, FB_OpDeleteTag, FB_OpFindOrCreateSR, FB_ScopePrecheck"
+    },
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "API: FB_OpOperations"
+    },
+    {
+     "name": "Type",
+     "type": "string",
+     "notes": "API: FB_OpGetElements, FB_OpMessages, FB_OpOperations"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpOperations"
+    },
+    {
+     "name": "Classifier",
+     "type": "number",
+     "notes": "API: FB_OpOperations"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "API: FB_OpDeploySrc"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "SQL: FB_OpFindOrCreateSR, FB_ScopePrecheck; API: FB_OpFindOrCreateSR, FB_OpGetElements, FB_OpMessages, FB_OpOperations"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11982,
+   "attributes": [
+    {
+     "name": "Connector_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_DedupFind, FB_OpMessages, FB_OpPlaceElements, FB_ScopePrecheck; API: FB_OpConnectors, FB_OpDelete, FB_OpFindOrCreateSR, FB_OpGetConnectors, FB_OpGetDiagrams, FB_OpMessages"
+    },
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "API: FB_OpConnectors, FB_OpMessages"
+    },
+    {
+     "name": "Direction",
+     "type": "string",
+     "notes": "API: FB_OpConnectors, FB_OpGetConnectors"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpConnectors, FB_OpMessages"
+    },
+    {
+     "name": "Connector_Type",
+     "type": "string",
+     "notes": "SQL: FB_OpGetDiagrams, FB_OpMessages, FB_ScopePrecheck; API: FB_OpConnectors"
+    },
+    {
+     "name": "SubType",
+     "type": "string",
+     "notes": "API: FB_OpMessages"
+    },
+    {
+     "name": "Start_Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpConnectors, FB_OpPlaceElements, FB_ScopePrecheck; API: FB_OpConnectors, FB_OpDelete, FB_OpDeleteTag, FB_OpGetConnectors, FB_OpMessages"
+    },
+    {
+     "name": "End_Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_ScopePrecheck; API: FB_OpConnectors, FB_OpDelete, FB_OpFindOrCreateSR, FB_OpGetConnectors, FB_OpMessages"
+    },
+    {
+     "name": "SeqNo",
+     "type": "number",
+     "notes": "SQL: FB_OpGetDiagrams, FB_OpMessages; API: FB_OpGetConnectors, FB_OpMessages"
+    },
+    {
+     "name": "PDATA1",
+     "type": "string",
+     "notes": "SQL: FB_OpMessages"
+    },
+    {
+     "name": "PDATA2",
+     "type": "string",
+     "notes": "SQL: FB_OpMessages"
+    },
+    {
+     "name": "PDATA3",
+     "type": "string",
+     "notes": "SQL: FB_OpMessages"
+    },
+    {
+     "name": "PDATA4",
+     "type": "string",
+     "notes": "SQL: FB_OpMessages"
+    },
+    {
+     "name": "DiagramID",
+     "type": "number",
+     "notes": "SQL: FB_OpMessages, FB_ScopePrecheck"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "SQL: FB_BaselinePolicy, FB_DedupFind, FB_OpConnectors, FB_ScopePrecheck; API: FB_OpConnectors, FB_OpFindOrCreateSR, FB_OpGetConnectors, FB_OpMessages"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11983,
+   "attributes": [
+    {
+     "name": "Diagram_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpElements, FB_OpMoveElements, FB_TargetCache; API: FB_OpApplyClassifierStereotypes, FB_OpConnectorVisibility, FB_OpDelete, FB_OpDiagram, FB_OpDiagramImage, FB_OpDiagramObjectStyle, FB_OpElements, FB_OpFindOrCreateSR, FB_OpGetDiagrams, FB_OpLayoutConnectors, FB_OpMessages, FB_OpOpenDiagrams, FB_OpPlaceElements, FB_OpRemoveFromDiagram, FB_OpUpdateDiagramProps"
+    },
+    {
+     "name": "Package_ID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_SubtreeCount, FB_TargetCache"
+    },
+    {
+     "name": "ParentID",
+     "type": "number",
+     "notes": "SQL: FB_OpElements, FB_OpMoveElements, FB_TargetCache"
+    },
+    {
+     "name": "Diagram_Type",
+     "type": "string",
+     "notes": "API: FB_OpDiagram"
+    },
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpGetDiagrams, FB_OpMoveElements, FB_OpOpenDiagrams, FB_OpUpdateDiagramProps, FB_TargetCache; API: FB_OpDiagram"
+    },
+    {
+     "name": "Version",
+     "type": "string",
+     "notes": "API: FB_OpDiagram"
+    },
+    {
+     "name": "Author",
+     "type": "string",
+     "notes": "API: FB_OpDiagram"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpDiagram"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "SQL: FB_BaselinePolicy, FB_OpElements, FB_OpGetDiagrams, FB_OpOpenDiagrams, FB_OpUpdateDiagramProps, FB_TargetCache; API: FB_OpDiagram, FB_OpDiagramImage, FB_OpElements, FB_OpFindOrCreateSR, FB_OpGetDiagrams, FB_OpPlaceElements, FB_OpUpdateDiagramProps"
+    },
+    {
+     "name": "StyleEx",
+     "type": "string",
+     "notes": "API: FB_OpDiagram, FB_OpFindOrCreateSR, FB_OpGetDiagrams, FB_OpUpdateDiagramProps"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 11984,
+   "attributes": [
+    {
+     "name": "DocID",
+     "type": "number",
+     "notes": "SQL: FB_BaselineCleanup"
+    },
+    {
+     "name": "DocName",
+     "type": "string",
+     "notes": "SQL: FB_BaselineCleanup"
+    },
+    {
+     "name": "ElementID",
+     "type": "number",
+     "notes": "SQL: FB_BaselineCleanup, FB_BaselineDecide"
+    },
+    {
+     "name": "DocType",
+     "type": "string",
+     "notes": "SQL: FB_BaselineCleanup, FB_BaselineDecide"
+    },
+    {
+     "name": "Version",
+     "type": "string",
+     "notes": "SQL: FB_BaselineCleanup, FB_BaselineDecide"
+    },
+    {
+     "name": "DocDate",
+     "type": "datetime",
+     "notes": "SQL: FB_BaselineCleanup, FB_BaselineDecide"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11977,
+     "notes": "Balíček modelu (browser EA). Fyzická tabulka: t_package.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11978,
+     "notes": "Prvek modelu (třída, komponenta, objekt, artifact auditu ...). Fyzická tabulka: t_object.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11979,
+     "notes": "Tagged value prvku (vč. ai.*, fb.code.*, 505-1). Fyzická tabulka: t_objectproperties.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11980,
+     "notes": "Atribut prvku. Fyzická tabulka: t_attribute.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11981,
+     "notes": "Operace prvku (vč. kódu add-inu v Method.Code prvku AICodeBridge). Fyzická tabulka: t_operation.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11982,
+     "notes": "Vazba mezi prvky, vč. zpráv sekvenčních diagramů. Fyzická tabulka: t_connector.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11983,
+     "notes": "Diagram v balíčku nebo pod prvkem. Fyzická tabulka: t_diagram.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    },
+    {
+     "elementID": 11984,
+     "notes": "Baseline balíčku (DocType = Baseline). Fyzická tabulka: t_document.\nAtributy = sloupce, které bridge skutečně čte nebo píše (SQL i Automation API; docs/re-addin/extract_ldm.py nad src @ v0.22 (0c3e207)), typ prostým textem.\nTypování doménovými typy při přenosu do EMR (plán A/B/C, metodika §6.3)."
+    }
+   ]
+  }
+ ]
+}

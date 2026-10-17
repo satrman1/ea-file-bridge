@@ -1,0 +1,24 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-1-14-kompozit-1193",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1193,
+   "elementPlacements": [
+    {
+     "elementID": 11934,
+     "x": 60,
+     "y": 60,
+     "width": 200,
+     "height": 90
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Diagram_ID, Object_ID FROM t_diagramobjects WHERE Diagram_ID = 1193"
+  }
+ ]
+}

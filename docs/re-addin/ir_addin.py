@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 # IR reverse add-inu EA File Bridge dle metodiky SA (koncepce RE-FULL, R3).
 # Zdroj: src/ @ v0.21 (45de928), pump.wsf v0.6. Strukturu urcuje kod, popisy shrnuti.
+# 17. 10. 2026 (Z261017-1): provenance prepsana na v0.22 (0c3e207), overeno 2026-10-17; zmeny chovani
+# v0.21..v0.22 = V022_NOTES (veta navic do notes operace katalogu, ne prepis).
+# Pravidlo DTO (EA-Repozitar-Kontext par. 6, vzor DoBind): <Sluzba> Request / Response lezi ve stromu POD DTO
+# (owningElement = DTO), kompozice DTO -> Req/Res zustava; generator: gen.svc_ops().
 REPO = "https://github.com/satrman1/ea-file-bridge"
-REF = "v0.21 (45de928)"
-VERIFIED = "2026-10-14"
+REF = "v0.22 (0c3e207)"     # do 17. 10. 2026: "v0.21 (45de928)"
+VERIFIED = "2026-10-17"   # do 17. 10. 2026: "2026-10-14"
+REF_OLD = "v0.21 (45de928)"
+DTO_PARTS_UNDER_DTO = True
 
 def P(n, t="string", notes=""): return {"name": n, "type": t, "notes": notes}
 
@@ -319,4 +325,23 @@ SEQ = {
    ("mea","E:Package",("E","Package","D"),None,"Packages.DeleteAt"),
    ("mea","G","RETURN","OpResult (items[], removed[], cascades[])",""),
   ], refs=[], note="Kaskády do chráněné části: cascadeDelete block = E_BLACKLIST už v předběžné kontrole; allow = cascades[] v odpovědi a varování v okně."),
+}
+
+
+# ---- v0.21 -> v0.22 (git diff v0.21 v0.22 -- src/, 15 souboru): veta navic do notes operace katalogu ----
+V022_NOTES = {
+ "ProcessRequest": "v0.22: odkaz $N[i].compositeDiagram; auto-kompozit MDG prvku založený touto session pumpy se počítá jako vlastní diagram (N-RE-6, N-RE-11).",
+ "PrecheckBatch": "v0.22: kontroluje i odkazy $N[i].compositeDiagram a cíl move_elements owningElement.",
+ "CheckFields": "v0.22: move_elements zná pole owningElement (aliasy owner, parent).",
+ "PrecheckTargets": "v0.22: u move_elements s cílem owningElement kontroluje balíček vlastníka; zná odkaz $N[i].compositeDiagram.",
+ "ClassifyBatch": "v0.22: práh affectedPackages vyjmenuje dotčené balíčky tečkovou cestou (summary.packagePaths, max. 10); přesun pod prvek se počítá do balíčku vlastníka.",
+ "BuildConfirmSummary": "v0.22: přesun pod jiný prvek ve stromu má vlastní větu okna („PRESUNOUT … pod jiný prvek ve stromu“).",
+ "DescribeReason": "v0.22: důvod prahu affectedPackages nese výčet balíčků.",
+ "PlanBaseline": "v0.22: u move_elements s cílem owningElement je cílem zálohy balíček vlastníka (FB_BaselinePolicy).",
+ "RunQc": "v0.22: kontrola QC-DEMO-001 (prvek bez jména) vynechává instance s classifierem, refy, hranice a gaty (N-RE-9).",
+ "ApplyClassifierStereotypes": "v0.22: lifeline s classifierem Actor dostane Type Actor + stereotyp classifieru (nad rámec VBS originálu, N-RE-18).",
+ "CreateOrUpdateElements": "v0.22: type DiagramGate/Gate = MessageEndpoint Subtype 2 pod owningElement; jméno \"\" se zapíše už při create; ref s classifierem dostane jméno a kompozitní odkaz classifieru; items nesou compositeDiagramID/GUID (N-RE-1, 2, 4, 11).",
+ "MoveElements": "v0.22: cíl owningElement = přesun pod prvek (ParentID + balíček vlastníka, kaskáda potomků a diagramů, readback ParentID; package a owningElement současně = E_ARGS) (N-RE-17).",
+ "PlaceElementsOnDiagram": "v0.22: prvek, který už na diagramu je, se přesune (moved, from) místo chyby Update (N-RE-3).",
+ "CreateOrUpdateMessages": "v0.22: přesměrování konce zprávy bez seqNo zachová pořadí zpráv (EA jinak SeqNo nuluje).",
 }

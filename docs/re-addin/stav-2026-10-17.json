@@ -1,0 +1,4158 @@
+{
+ "datum": "2026-10-17",
+ "zdroj": "responses/res-re17-1-00-prescan.json",
+ "packages": [
+  {
+   "Package_ID": "1124",
+   "Name": "Reverse Addinu",
+   "Parent_ID": "1123"
+  },
+  {
+   "Package_ID": "1125",
+   "Name": "Catalogues",
+   "Parent_ID": "1124"
+  },
+  {
+   "Package_ID": "1126",
+   "Name": "Solution Artefacts",
+   "Parent_ID": "1125"
+  },
+  {
+   "Package_ID": "1127",
+   "Name": "EA File Bridge",
+   "Parent_ID": "1126"
+  },
+  {
+   "Package_ID": "1128",
+   "Name": "Logical Design",
+   "Parent_ID": "1124"
+  },
+  {
+   "Package_ID": "1129",
+   "Name": "EA File Bridge",
+   "Parent_ID": "1128"
+  },
+  {
+   "Package_ID": "1130",
+   "Name": "EAFB Request Manager",
+   "Parent_ID": "1129"
+  },
+  {
+   "Package_ID": "1131",
+   "Name": "EAFB Model Element Access",
+   "Parent_ID": "1129"
+  },
+  {
+   "Package_ID": "1132",
+   "Name": "ProcessRequest",
+   "Parent_ID": "1130"
+  },
+  {
+   "Package_ID": "1133",
+   "Name": "Ping",
+   "Parent_ID": "1130"
+  },
+  {
+   "Package_ID": "1134",
+   "Name": "CreateOrUpdateElements",
+   "Parent_ID": "1131"
+  },
+  {
+   "Package_ID": "1135",
+   "Name": "DeleteFromModel",
+   "Parent_ID": "1131"
+  },
+  {
+   "Package_ID": "1136",
+   "Name": "EA Repository",
+   "Parent_ID": "1129"
+  },
+  {
+   "Package_ID": "1137",
+   "Name": "LDM of EA Repository",
+   "Parent_ID": "1136"
+  },
+  {
+   "Package_ID": "1138",
+   "Name": "Business Applications",
+   "Parent_ID": "1124"
+  },
+  {
+   "Package_ID": "1139",
+   "Name": "EA File Bridge",
+   "Parent_ID": "1138"
+  },
+  {
+   "Package_ID": "1140",
+   "Name": "ACTORS",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1141",
+   "Name": "GLOBAL VIEWS",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1142",
+   "Name": "OTHER ELEMENTS",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1143",
+   "Name": "RULES (REUSABLE)",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1144",
+   "Name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1145",
+   "Name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1146",
+   "Name": "UC-95103 Zpracuj dávku ze schránky",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1147",
+   "Name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1148",
+   "Name": "UC-95105 Předej agentovi kontext výběru",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1149",
+   "Name": "UC-95106 Zobraz stav bridge",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1150",
+   "Name": "UC-95107 Prohlédni změny poslední dávky",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1151",
+   "Name": "UC-95108 Nasaď kód bridge do modelu",
+   "Parent_ID": "1139"
+  },
+  {
+   "Package_ID": "1152",
+   "Name": "UC-95109 Ukliď automatické zálohy",
+   "Parent_ID": "1139"
+  }
+ ],
+ "elements": [
+  {
+   "Object_ID": "11914",
+   "Name": "Catalogues",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1124",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11917",
+   "Name": "Logical Design",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1124",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12024",
+   "Name": "Business Applications",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1124",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11915",
+   "Name": "Solution Artefacts",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1125",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11916",
+   "Name": "EA File Bridge",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1126",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11919",
+   "Name": "EAFB Pump",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11920",
+   "Name": "EAFB Add-in UI",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11921",
+   "Name": "EAFB Request Manager",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11922",
+   "Name": "EAFB Batch Validation Engine",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11923",
+   "Name": "EAFB Write Scope Engine",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11924",
+   "Name": "EAFB Risk Gate Engine",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11925",
+   "Name": "EAFB Baseline Policy Engine",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11926",
+   "Name": "EAFB Quality Check Engine",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11927",
+   "Name": "EAFB ITAN Methodology Engine",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11928",
+   "Name": "EAFB Model Element Access",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11929",
+   "Name": "EAFB Diagram Access",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11930",
+   "Name": "EAFB Baseline Access",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11931",
+   "Name": "EAFB Audit Access",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11932",
+   "Name": "EAFB Code Access",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11933",
+   "Name": "EAFB Exchange Folder Access",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11934",
+   "Name": "EA Repository",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-DB Resource",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11935",
+   "Name": "EAFB Exchange Folder",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-File Resource",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11936",
+   "Name": "EAFB Utilities",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Utility",
+   "ParentID": "0",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11937",
+   "Name": "EAFB Request Manager Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11921",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11938",
+   "Name": "EAFB Batch Validation Engine Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11922",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11939",
+   "Name": "EAFB Write Scope Engine Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11923",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11940",
+   "Name": "EAFB Risk Gate Engine Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11924",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11941",
+   "Name": "EAFB Baseline Policy Engine Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11925",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11942",
+   "Name": "EAFB Quality Check Engine Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11926",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11943",
+   "Name": "EAFB ITAN Methodology Engine Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11927",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11944",
+   "Name": "EAFB Model Element Access Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11928",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11945",
+   "Name": "EAFB Diagram Access Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11929",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11946",
+   "Name": "EAFB Baseline Access Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11930",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11947",
+   "Name": "EAFB Audit Access Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11931",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11948",
+   "Name": "EAFB Code Access Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11932",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11949",
+   "Name": "EAFB Exchange Folder Access Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11933",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11950",
+   "Name": "EAFB Utilities Interface",
+   "Object_Type": "Interface",
+   "ParentID": "11936",
+   "Package_ID": "1127",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11918",
+   "Name": "EA File Bridge",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1128",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11953",
+   "Name": "EAFB Request Manager",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1129",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11954",
+   "Name": "EAFB Model Element Access",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1129",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11959",
+   "Name": "EA Repository",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1129",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11955",
+   "Name": "ProcessRequest",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1130",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11956",
+   "Name": "Ping",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1130",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11957",
+   "Name": "CreateOrUpdateElements",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1131",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11958",
+   "Name": "DeleteFromModel",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1131",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11961",
+   "Name": "SR ProcessRequest",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Service Realization",
+   "ParentID": "0",
+   "Package_ID": "1132",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11962",
+   "Name": "DTO ProcessRequest",
+   "Object_Type": "Class",
+   "Stereotype": "Data Transfer Object",
+   "ParentID": "0",
+   "Package_ID": "1132",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11963",
+   "Name": "ProcessRequest Request",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1132",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11964",
+   "Name": "ProcessRequest Response",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1132",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11993",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11994",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11922",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11995",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11923",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11996",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11924",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11997",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11925",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11998",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11930",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11999",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11928",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12000",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11926",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12001",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11931",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12002",
+   "Name": "ref SR CreateOrUpdateElements",
+   "Object_Type": "InteractionOccurrence",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11969",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12003",
+   "Name": "ref SR DeleteFromModel",
+   "Object_Type": "InteractionOccurrence",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "11973",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12171",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "12176",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11961",
+   "Package_ID": "1132",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "11965",
+   "Name": "SR Ping",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Service Realization",
+   "ParentID": "0",
+   "Package_ID": "1133",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11966",
+   "Name": "DTO Ping",
+   "Object_Type": "Class",
+   "Stereotype": "Data Transfer Object",
+   "ParentID": "0",
+   "Package_ID": "1133",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11967",
+   "Name": "Ping Request",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1133",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11968",
+   "Name": "Ping Response",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1133",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12004",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "11965",
+   "Package_ID": "1133",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12005",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11965",
+   "Package_ID": "1133",
+   "Classifier": "11923",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12006",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "11965",
+   "Package_ID": "1133",
+   "Classifier": "11932",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12172",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11965",
+   "Package_ID": "1133",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "12177",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11965",
+   "Package_ID": "1133",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "11969",
+   "Name": "SR CreateOrUpdateElements",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Service Realization",
+   "ParentID": "0",
+   "Package_ID": "1134",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11970",
+   "Name": "DTO CreateOrUpdateElements",
+   "Object_Type": "Class",
+   "Stereotype": "Data Transfer Object",
+   "ParentID": "0",
+   "Package_ID": "1134",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11971",
+   "Name": "CreateOrUpdateElements Request",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1134",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11972",
+   "Name": "CreateOrUpdateElements Response",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1134",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12007",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "11928",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12008",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "11923",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12009",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "11977",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12010",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "11978",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12011",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "11979",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12173",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "12178",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11969",
+   "Package_ID": "1134",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "11973",
+   "Name": "SR DeleteFromModel",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Service Realization",
+   "ParentID": "0",
+   "Package_ID": "1135",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11974",
+   "Name": "DTO DeleteFromModel",
+   "Object_Type": "Class",
+   "Stereotype": "Data Transfer Object",
+   "ParentID": "0",
+   "Package_ID": "1135",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "11975",
+   "Name": "DeleteFromModel Request",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1135",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11976",
+   "Name": "DeleteFromModel Response",
+   "Object_Type": "Class",
+   "ParentID": "0",
+   "Package_ID": "1135",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12012",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "11928",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12013",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "11923",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12014",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "11978",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12015",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "11982",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12016",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "11983",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12017",
+   "Object_Type": "Object",
+   "Stereotype": "entity",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "11977",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12174",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "12179",
+   "Object_Type": "MessageEndpoint",
+   "ParentID": "11973",
+   "Package_ID": "1135",
+   "Classifier": "0",
+   "NType": "2"
+  },
+  {
+   "Object_ID": "11960",
+   "Name": "LDM of EA Repository",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1136",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11977",
+   "Name": "Package",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11978",
+   "Name": "Element",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11979",
+   "Name": "TaggedValue",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11980",
+   "Name": "Attribute",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11981",
+   "Name": "Operation",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11982",
+   "Name": "Connector",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11983",
+   "Name": "Diagram",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "11984",
+   "Name": "Baseline",
+   "Object_Type": "Class",
+   "Stereotype": "entity",
+   "ParentID": "0",
+   "Package_ID": "1137",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12025",
+   "Name": "EA File Bridge",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1138",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12026",
+   "Name": "ACTORS",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12027",
+   "Name": "GLOBAL VIEWS",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12028",
+   "Name": "OTHER ELEMENTS",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12029",
+   "Name": "RULES (REUSABLE)",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12030",
+   "Name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12031",
+   "Name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12032",
+   "Name": "UC-95103 Zpracuj dávku ze schránky",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12033",
+   "Name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12034",
+   "Name": "UC-95105 Předej agentovi kontext výběru",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12035",
+   "Name": "UC-95106 Zobraz stav bridge",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12036",
+   "Name": "UC-95107 Prohlédni změny poslední dávky",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12037",
+   "Name": "UC-95108 Nasaď kód bridge do modelu",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12038",
+   "Name": "UC-95109 Ukliď automatické zálohy",
+   "Object_Type": "Package",
+   "ParentID": "0",
+   "Package_ID": "1139",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12039",
+   "Name": "AI agent",
+   "Object_Type": "Actor",
+   "ParentID": "0",
+   "Package_ID": "1140",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12040",
+   "Name": "Analytik",
+   "Object_Type": "Actor",
+   "ParentID": "0",
+   "Package_ID": "1140",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12041",
+   "Name": "Správce bridge",
+   "Object_Type": "Actor",
+   "ParentID": "0",
+   "Package_ID": "1140",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12184",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1141",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12069",
+   "Name": "LS95100-1 Menu AI Bridge",
+   "Object_Type": "Class",
+   "Stereotype": "Logical Screen",
+   "ParentID": "0",
+   "Package_ID": "1142",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12051",
+   "Name": "BRU-9501 Klasifikace rizika dávky",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12052",
+   "Name": "BRU-9502 Cíl zápisu - blacklist",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12053",
+   "Name": "BRU-9503 Záloha před zápisem (baseline politika)",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12054",
+   "Name": "BRU-9504 Identita a stav dávky",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12055",
+   "Name": "BRU-9505 Předběžná kontrola bez okna",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12056",
+   "Name": "BRU-9506 Potvrzení dávky člověkem",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12057",
+   "Name": "BRU-9507 Audit a kontrola kvality každé dávky",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12058",
+   "Name": "BRU-9508 Přístup uživatele a povolené operace",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12059",
+   "Name": "BRU-9509 Stop-on-error a částečný výsledek",
+   "Object_Type": "Requirement",
+   "Stereotype": "Behavioral Rule",
+   "ParentID": "0",
+   "Package_ID": "1143",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12042",
+   "Name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1144",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12060",
+   "Name": "UCR-95101 Zpracuj dávku agenta přes pumpu",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1144",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12079",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1144",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12080",
+   "Object_Type": "Actor",
+   "ParentID": "12060",
+   "Package_ID": "1144",
+   "Classifier": "12039",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12081",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12060",
+   "Package_ID": "1144",
+   "Classifier": "11919",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12082",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "12060",
+   "Package_ID": "1144",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12083",
+   "Name": "ref SR ProcessRequest",
+   "Object_Type": "InteractionOccurrence",
+   "ParentID": "12060",
+   "Package_ID": "1144",
+   "Classifier": "11961",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12043",
+   "Name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1145",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12061",
+   "Name": "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1145",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12070",
+   "Name": "LS95102-1 Potvrzovací okno pumpy",
+   "Object_Type": "Class",
+   "Stereotype": "Logical Screen",
+   "ParentID": "0",
+   "Package_ID": "1145",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12085",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1145",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12086",
+   "Object_Type": "Actor",
+   "ParentID": "12061",
+   "Package_ID": "1145",
+   "Classifier": "12040",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12087",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12061",
+   "Package_ID": "1145",
+   "Classifier": "11919",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12088",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "12061",
+   "Package_ID": "1145",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12089",
+   "Name": "ref SR ProcessRequest",
+   "Object_Type": "InteractionOccurrence",
+   "ParentID": "12061",
+   "Package_ID": "1145",
+   "Classifier": "11961",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12044",
+   "Name": "UC-95103 Zpracuj dávku ze schránky",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1146",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12062",
+   "Name": "UCR-95103 Zpracuj dávku ze schránky",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1146",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12071",
+   "Name": "LS95103-1 Dialog schránkového importu",
+   "Object_Type": "Class",
+   "Stereotype": "Logical Screen",
+   "ParentID": "0",
+   "Package_ID": "1146",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12091",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1146",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12092",
+   "Object_Type": "Actor",
+   "ParentID": "12062",
+   "Package_ID": "1146",
+   "Classifier": "12040",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12093",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12062",
+   "Package_ID": "1146",
+   "Classifier": "11920",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12094",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "12062",
+   "Package_ID": "1146",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12095",
+   "Name": "ref SR ProcessRequest",
+   "Object_Type": "InteractionOccurrence",
+   "ParentID": "12062",
+   "Package_ID": "1146",
+   "Classifier": "11961",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12045",
+   "Name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1147",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12063",
+   "Name": "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1147",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12097",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1147",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12098",
+   "Object_Type": "Actor",
+   "ParentID": "12063",
+   "Package_ID": "1147",
+   "Classifier": "12040",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12099",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12063",
+   "Package_ID": "1147",
+   "Classifier": "11920",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12100",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "12063",
+   "Package_ID": "1147",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12101",
+   "Name": "ref SR ProcessRequest",
+   "Object_Type": "InteractionOccurrence",
+   "ParentID": "12063",
+   "Package_ID": "1147",
+   "Classifier": "11961",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12046",
+   "Name": "UC-95105 Předej agentovi kontext výběru",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1148",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12064",
+   "Name": "UCR-95105 Předej agentovi kontext výběru",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1148",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12103",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1148",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12104",
+   "Object_Type": "Actor",
+   "ParentID": "12064",
+   "Package_ID": "1148",
+   "Classifier": "12040",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12105",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12064",
+   "Package_ID": "1148",
+   "Classifier": "11920",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12106",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "12064",
+   "Package_ID": "1148",
+   "Classifier": "11928",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12047",
+   "Name": "UC-95106 Zobraz stav bridge",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1149",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12065",
+   "Name": "UCR-95106 Zobraz stav bridge",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1149",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12072",
+   "Name": "LS95106-1 Dialog Stav bridge",
+   "Object_Type": "Class",
+   "Stereotype": "Logical Screen",
+   "ParentID": "0",
+   "Package_ID": "1149",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12108",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1149",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12109",
+   "Object_Type": "Actor",
+   "ParentID": "12065",
+   "Package_ID": "1149",
+   "Classifier": "12040",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12110",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12065",
+   "Package_ID": "1149",
+   "Classifier": "11920",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12111",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "12065",
+   "Package_ID": "1149",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12048",
+   "Name": "UC-95107 Prohlédni změny poslední dávky",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1150",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12066",
+   "Name": "UCR-95107 Prohlédni změny poslední dávky",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1150",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12073",
+   "Name": "LS95107-1 Output tab AI Bridge",
+   "Object_Type": "Class",
+   "Stereotype": "Logical Screen",
+   "ParentID": "0",
+   "Package_ID": "1150",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12113",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1150",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12114",
+   "Object_Type": "Actor",
+   "ParentID": "12066",
+   "Package_ID": "1150",
+   "Classifier": "12040",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12115",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12066",
+   "Package_ID": "1150",
+   "Classifier": "11920",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12049",
+   "Name": "UC-95108 Nasaď kód bridge do modelu",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1151",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12067",
+   "Name": "UCR-95108 Nasaď kód bridge do modelu",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1151",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12117",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1151",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12118",
+   "Object_Type": "Actor",
+   "ParentID": "12067",
+   "Package_ID": "1151",
+   "Classifier": "12041",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12119",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12067",
+   "Package_ID": "1151",
+   "Classifier": "11919",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12120",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Manager",
+   "ParentID": "12067",
+   "Package_ID": "1151",
+   "Classifier": "11921",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12121",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Resource Access",
+   "ParentID": "12067",
+   "Package_ID": "1151",
+   "Classifier": "11932",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12050",
+   "Name": "UC-95109 Ukliď automatické zálohy",
+   "Object_Type": "UseCase",
+   "ParentID": "0",
+   "Package_ID": "1152",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12068",
+   "Name": "UCR-95109 Ukliď automatické zálohy",
+   "Object_Type": "Collaboration",
+   "Stereotype": "Use Case Realization",
+   "ParentID": "0",
+   "Package_ID": "1152",
+   "Classifier": "0",
+   "NType": "8"
+  },
+  {
+   "Object_ID": "12123",
+   "Name": "EA File Bridge",
+   "Object_Type": "Boundary",
+   "ParentID": "0",
+   "Package_ID": "1152",
+   "Classifier": "0",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12124",
+   "Object_Type": "Actor",
+   "ParentID": "12068",
+   "Package_ID": "1152",
+   "Classifier": "12041",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12125",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Client",
+   "ParentID": "12068",
+   "Package_ID": "1152",
+   "Classifier": "11920",
+   "NType": "0"
+  },
+  {
+   "Object_ID": "12126",
+   "Object_Type": "Component",
+   "Stereotype": "IDS-Engine",
+   "ParentID": "12068",
+   "Package_ID": "1152",
+   "Classifier": "11925",
+   "NType": "0"
+  }
+ ],
+ "diagrams": [
+  {
+   "Diagram_ID": "1178",
+   "Name": "EAFB Pump",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11919"
+  },
+  {
+   "Diagram_ID": "1179",
+   "Name": "EAFB Add-in UI",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11920"
+  },
+  {
+   "Diagram_ID": "1180",
+   "Name": "EAFB Request Manager",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11921"
+  },
+  {
+   "Diagram_ID": "1181",
+   "Name": "EAFB Batch Validation Engine",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11922"
+  },
+  {
+   "Diagram_ID": "1182",
+   "Name": "EAFB Write Scope Engine",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11923"
+  },
+  {
+   "Diagram_ID": "1183",
+   "Name": "EAFB Risk Gate Engine",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11924"
+  },
+  {
+   "Diagram_ID": "1184",
+   "Name": "EAFB Baseline Policy Engine",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11925"
+  },
+  {
+   "Diagram_ID": "1185",
+   "Name": "EAFB Quality Check Engine",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11926"
+  },
+  {
+   "Diagram_ID": "1186",
+   "Name": "EAFB ITAN Methodology Engine",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11927"
+  },
+  {
+   "Diagram_ID": "1187",
+   "Name": "EAFB Model Element Access",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11928"
+  },
+  {
+   "Diagram_ID": "1188",
+   "Name": "EAFB Diagram Access",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11929"
+  },
+  {
+   "Diagram_ID": "1189",
+   "Name": "EAFB Baseline Access",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11930"
+  },
+  {
+   "Diagram_ID": "1190",
+   "Name": "EAFB Audit Access",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11931"
+  },
+  {
+   "Diagram_ID": "1191",
+   "Name": "EAFB Code Access",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11932"
+  },
+  {
+   "Diagram_ID": "1192",
+   "Name": "EAFB Exchange Folder Access",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11933"
+  },
+  {
+   "Diagram_ID": "1193",
+   "Name": "EA Repository",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1127",
+   "ParentID": "11934"
+  },
+  {
+   "Diagram_ID": "1194",
+   "Name": "EAFB Utilities",
+   "Diagram_Type": "CompositeStructure",
+   "Package_ID": "1127",
+   "ParentID": "11936"
+  },
+  {
+   "Diagram_ID": "1195",
+   "Name": "EA File Bridge - Component Overview",
+   "Diagram_Type": "Component",
+   "Package_ID": "1127",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1196",
+   "Name": "SR ProcessRequest",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1132",
+   "ParentID": "11961"
+  },
+  {
+   "Diagram_ID": "1197",
+   "Name": "DTO ProcessRequest",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1132",
+   "ParentID": "11962"
+  },
+  {
+   "Diagram_ID": "1204",
+   "Name": "version_ProcessRequest",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1132",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1198",
+   "Name": "SR Ping",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1133",
+   "ParentID": "11965"
+  },
+  {
+   "Diagram_ID": "1199",
+   "Name": "DTO Ping",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1133",
+   "ParentID": "11966"
+  },
+  {
+   "Diagram_ID": "1205",
+   "Name": "version_Ping",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1133",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1200",
+   "Name": "SR CreateOrUpdateElements",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1134",
+   "ParentID": "11969"
+  },
+  {
+   "Diagram_ID": "1201",
+   "Name": "DTO CreateOrUpdateElements",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1134",
+   "ParentID": "11970"
+  },
+  {
+   "Diagram_ID": "1206",
+   "Name": "version_CreateOrUpdateElements",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1134",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1202",
+   "Name": "SR DeleteFromModel",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1135",
+   "ParentID": "11973"
+  },
+  {
+   "Diagram_ID": "1203",
+   "Name": "DTO DeleteFromModel",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1135",
+   "ParentID": "11974"
+  },
+  {
+   "Diagram_ID": "1207",
+   "Name": "version_DeleteFromModel",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1135",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1208",
+   "Name": "LDM of EA Repository",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1137",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1227",
+   "Name": "Use Case Survey of EA File Bridge",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1141",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1237",
+   "Name": "LS95100-1 Menu AI Bridge",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1142",
+   "ParentID": "12069"
+  },
+  {
+   "Diagram_ID": "1209",
+   "Name": "version_UC-95101 Zpracuj dávku agenta přes pumpu",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1144",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1218",
+   "Name": "UC-95101 Zpracuj dávku agenta přes pumpu",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1144",
+   "ParentID": "12042"
+  },
+  {
+   "Diagram_ID": "1228",
+   "Name": "UCR-95101 Zpracuj dávku agenta přes pumpu",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1144",
+   "ParentID": "12060"
+  },
+  {
+   "Diagram_ID": "1210",
+   "Name": "version_UC-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1145",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1219",
+   "Name": "UC-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1145",
+   "ParentID": "12043"
+  },
+  {
+   "Diagram_ID": "1229",
+   "Name": "UCR-95102 Rozhodni o dávce vyžadující potvrzení",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1145",
+   "ParentID": "12061"
+  },
+  {
+   "Diagram_ID": "1238",
+   "Name": "LS95102-1 Potvrzovací okno pumpy",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1145",
+   "ParentID": "12070"
+  },
+  {
+   "Diagram_ID": "1211",
+   "Name": "version_UC-95103 Zpracuj dávku ze schránky",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1146",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1220",
+   "Name": "UC-95103 Zpracuj dávku ze schránky",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1146",
+   "ParentID": "12044"
+  },
+  {
+   "Diagram_ID": "1230",
+   "Name": "UCR-95103 Zpracuj dávku ze schránky",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1146",
+   "ParentID": "12062"
+  },
+  {
+   "Diagram_ID": "1239",
+   "Name": "LS95103-1 Dialog schránkového importu",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1146",
+   "ParentID": "12071"
+  },
+  {
+   "Diagram_ID": "1212",
+   "Name": "version_UC-95104 Zpracuj dávky ze složky bez pumpy",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1147",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1221",
+   "Name": "UC-95104 Zpracuj dávky ze složky bez pumpy",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1147",
+   "ParentID": "12045"
+  },
+  {
+   "Diagram_ID": "1231",
+   "Name": "UCR-95104 Zpracuj dávky ze složky bez pumpy",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1147",
+   "ParentID": "12063"
+  },
+  {
+   "Diagram_ID": "1213",
+   "Name": "version_UC-95105 Předej agentovi kontext výběru",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1148",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1222",
+   "Name": "UC-95105 Předej agentovi kontext výběru",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1148",
+   "ParentID": "12046"
+  },
+  {
+   "Diagram_ID": "1232",
+   "Name": "UCR-95105 Předej agentovi kontext výběru",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1148",
+   "ParentID": "12064"
+  },
+  {
+   "Diagram_ID": "1214",
+   "Name": "version_UC-95106 Zobraz stav bridge",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1149",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1223",
+   "Name": "UC-95106 Zobraz stav bridge",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1149",
+   "ParentID": "12047"
+  },
+  {
+   "Diagram_ID": "1233",
+   "Name": "UCR-95106 Zobraz stav bridge",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1149",
+   "ParentID": "12065"
+  },
+  {
+   "Diagram_ID": "1240",
+   "Name": "LS95106-1 Dialog Stav bridge",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1149",
+   "ParentID": "12072"
+  },
+  {
+   "Diagram_ID": "1215",
+   "Name": "version_UC-95107 Prohlédni změny poslední dávky",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1150",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1224",
+   "Name": "UC-95107 Prohlédni změny poslední dávky",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1150",
+   "ParentID": "12048"
+  },
+  {
+   "Diagram_ID": "1234",
+   "Name": "UCR-95107 Prohlédni změny poslední dávky",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1150",
+   "ParentID": "12066"
+  },
+  {
+   "Diagram_ID": "1241",
+   "Name": "LS95107-1 Output tab AI Bridge",
+   "Diagram_Type": "Logical",
+   "Package_ID": "1150",
+   "ParentID": "12073"
+  },
+  {
+   "Diagram_ID": "1216",
+   "Name": "version_UC-95108 Nasaď kód bridge do modelu",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1151",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1225",
+   "Name": "UC-95108 Nasaď kód bridge do modelu",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1151",
+   "ParentID": "12049"
+  },
+  {
+   "Diagram_ID": "1235",
+   "Name": "UCR-95108 Nasaď kód bridge do modelu",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1151",
+   "ParentID": "12067"
+  },
+  {
+   "Diagram_ID": "1217",
+   "Name": "version_UC-95109 Ukliď automatické zálohy",
+   "Diagram_Type": "Custom",
+   "Package_ID": "1152",
+   "ParentID": "0"
+  },
+  {
+   "Diagram_ID": "1226",
+   "Name": "UC-95109 Ukliď automatické zálohy",
+   "Diagram_Type": "Use Case",
+   "Package_ID": "1152",
+   "ParentID": "12050"
+  },
+  {
+   "Diagram_ID": "1236",
+   "Name": "UCR-95109 Ukliď automatické zálohy",
+   "Diagram_Type": "Sequence",
+   "Package_ID": "1152",
+   "ParentID": "12068"
+  }
+ ],
+ "connectorsByType": [
+  {
+   "Connector_Type": "Aggregation",
+   "N": "8"
+  },
+  {
+   "Connector_Type": "Association",
+   "N": "21"
+  },
+  {
+   "Connector_Type": "Dependency",
+   "N": "11"
+  },
+  {
+   "Connector_Type": "Realisation",
+   "N": "23"
+  },
+  {
+   "Connector_Type": "Sequence",
+   "N": "61"
+  },
+  {
+   "Connector_Type": "Sequence",
+   "SubType": "Return",
+   "N": "4"
+  },
+  {
+   "Connector_Type": "Usage",
+   "N": "58"
+  }
+ ],
+ "tvElements": [
+  {
+   "Object_ID": "11961",
+   "Property": "505-1 Operation Link",
+   "Value": "{4F291DCE-51AA-4185-A34C-5C0636E0A047}"
+  },
+  {
+   "Object_ID": "11965",
+   "Property": "505-1 Operation Link",
+   "Value": "{AE65F25A-DBC8-4038-A331-C13DFBF8F9F5}"
+  },
+  {
+   "Object_ID": "11969",
+   "Property": "505-1 Operation Link",
+   "Value": "{DA5E5FCE-22BB-4259-A8D5-E10E733B5E0E}"
+  },
+  {
+   "Object_ID": "11973",
+   "Property": "505-1 Operation Link",
+   "Value": "{EA00DC88-A9A6-4699-B2D1-68FE1CD232CC}"
+  },
+  {
+   "Object_ID": "11919",
+   "Property": "code-path",
+   "Value": "pump.wsf"
+  },
+  {
+   "Object_ID": "11920",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.EA_*.js; FB_ClipboardImport; FB_ClipboardContext; FB_ProcessFolder; FB_Status; FB_Changes"
+  },
+  {
+   "Object_ID": "11921",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Main.js"
+  },
+  {
+   "Object_ID": "11922",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Precheck.js; FB_FieldCheck; FB_InterpretError"
+  },
+  {
+   "Object_ID": "11923",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_ScopePrecheck.js; FB_ScopeCheck; FB_CheckWrite; FB_CheckWriteEl; FB_WriteScope(Cfg); FB_UserAccess; FB_AccessGroups; FB_OpsAllowed; FB_ScopeText"
+  },
+  {
+   "Object_ID": "11924",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_RiskGate.js; FB_RiskPolicy; FB_ConfirmSummary; FB_ReasonText; FB_Nonce; FB_RiskNote"
+  },
+  {
+   "Object_ID": "11925",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_BaselinePlan.js; FB_BaselinePolicy; FB_BaselineDecide; FB_BaselineConfig; FB_BaselineName; FB_RecoveryPosture; FB_SubtreeCount; FB_BaselineCleanup"
+  },
+  {
+   "Object_ID": "11926",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_QcRun.js; FB_QcConfig; FB_QcText"
+  },
+  {
+   "Object_ID": "11927",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpApplyClassifierStereotypes.js; FB_OpFindOrCreateSR; FB_ScaffoldConfig"
+  },
+  {
+   "Object_ID": "11928",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Op*.js (prvky, balíčky, vazby); FB_ResolveEl; FB_ResolvePkg; FB_ResolvePath; FB_TargetCache; FB_TagRead; FB_TagWrite; FB_DedupFind"
+  },
+  {
+   "Object_ID": "11929",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpDiagram*.js; FB_OpPlaceElements; FB_OpMessages; FB_OpLayoutConnectors; ..."
+  },
+  {
+   "Object_ID": "11930",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpBaseline*.js; FB_AutoBaseline; FB_Journal; FB_BaselineNameReserved"
+  },
+  {
+   "Object_ID": "11931",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Audit.js; FB_AuditText; FB_RiskAuditTags; FB_LogChanges; Log; FB_OutputFlush"
+  },
+  {
+   "Object_ID": "11932",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpDeploySrc.js; FB_CodeInfo; FB_CodeFingerprint; DeployRequest; ExportRequest"
+  },
+  {
+   "Object_ID": "11933",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_FileBytes.js; FB_StateFile; FB_PendingIndex; FB_PumpAlive; FB_ResolveBaseDir"
+  },
+  {
+   "Object_ID": "11935",
+   "Property": "code-path",
+   "Value": "requests\\, responses\\, state-*.txt"
+  },
+  {
+   "Object_ID": "11936",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_JsonParse.js; FB_JsonStringify; FB_Sha256; B64Encode; B64Decode; FB_Utf8Decode; FB_XmlRows; FB_ComObj; FB_ElementPath"
+  },
+  {
+   "Object_ID": "11961",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Main.js"
+  },
+  {
+   "Object_ID": "11962",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Main.js"
+  },
+  {
+   "Object_ID": "11965",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpPing.js"
+  },
+  {
+   "Object_ID": "11966",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpPing.js"
+  },
+  {
+   "Object_ID": "11969",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpElements.js"
+  },
+  {
+   "Object_ID": "11970",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpElements.js"
+  },
+  {
+   "Object_ID": "11973",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpDelete.js"
+  },
+  {
+   "Object_ID": "11974",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_OpDelete.js"
+  },
+  {
+   "Object_ID": "12051",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_RiskGate.js; FB_RiskPolicy"
+  },
+  {
+   "Object_ID": "12052",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_WriteScope.js; FB_WriteScopeCfg; FB_ScopePrecheck; FB_CheckWrite; FB_CheckWriteEl"
+  },
+  {
+   "Object_ID": "12053",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_BaselinePlan.js; FB_BaselinePolicy; FB_BaselineDecide; FB_AutoBaseline; FB_RecoveryPosture"
+  },
+  {
+   "Object_ID": "12054",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Main.js; FB_Precheck; pump.wsf"
+  },
+  {
+   "Object_ID": "12055",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Precheck.js; FB_FieldCheck; FB_ScopePrecheck"
+  },
+  {
+   "Object_ID": "12056",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_ConfirmPending.js; FB_ConfirmSummary; FB_Nonce; FB_PendingSweep; pump.wsf"
+  },
+  {
+   "Object_ID": "12057",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Audit.js; FB_AuditText; FB_RiskAuditTags; FB_QcRun; FB_QcText"
+  },
+  {
+   "Object_ID": "12058",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_UserAccess.js; FB_AccessGroups; FB_OpsAllowed"
+  },
+  {
+   "Object_ID": "12059",
+   "Property": "code-path",
+   "Value": "src/AICodeBridge.FB_Main.js; FB_OpElements; FB_InterpretError"
+  },
+  {
+   "Object_ID": "11919",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11920",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11921",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11922",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11923",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11924",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11925",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11926",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11927",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11928",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11929",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11930",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11931",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11932",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11933",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11934",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11935",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11936",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11961",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11962",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11965",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11966",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11969",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11970",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11973",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11974",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12042",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12043",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12044",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12045",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12046",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12047",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12048",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12049",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12050",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12051",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12052",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12053",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12054",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12055",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12056",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12057",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12058",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "12059",
+   "Property": "code-ref",
+   "Value": "v0.21 (45de928)"
+  },
+  {
+   "Object_ID": "11919",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11920",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11921",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11922",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11923",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11924",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11925",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11926",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11927",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11928",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11929",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11930",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11931",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11932",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11933",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11934",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11935",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11936",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11961",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11962",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11965",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11966",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11969",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11970",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11973",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "11974",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12042",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12043",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12044",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12045",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12046",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12047",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12048",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12049",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12050",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12051",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12052",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12053",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12054",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12055",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12056",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12057",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12058",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  },
+  {
+   "Object_ID": "12059",
+   "Property": "code-verified",
+   "Value": "2026-10-14"
+  }
+ ],
+ "tvOperations": [
+  {
+   "OperationID": "1289",
+   "Name": "ProcessRequest",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1290",
+   "Name": "ConfirmPending",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1291",
+   "Name": "SweepPending",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1292",
+   "Name": "StartSession",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1293",
+   "Name": "Ping",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1294",
+   "Name": "GetStatus",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1295",
+   "Name": "PrecheckBatch",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1296",
+   "Name": "CheckFields",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1297",
+   "Name": "InterpretError",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1298",
+   "Name": "PrecheckTargets",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1299",
+   "Name": "CheckWrite",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1300",
+   "Name": "CheckWriteElement",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1301",
+   "Name": "CheckUserAccess",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1302",
+   "Name": "DescribeScope",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1303",
+   "Name": "ClassifyBatch",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1304",
+   "Name": "BuildConfirmSummary",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1305",
+   "Name": "DescribeReason",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1306",
+   "Name": "IssueNonce",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1307",
+   "Name": "PlanBaseline",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1308",
+   "Name": "DecideBaseline",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1309",
+   "Name": "EvaluateRecoveryPosture",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1310",
+   "Name": "CleanupBaselines",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1311",
+   "Name": "RunQc",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1312",
+   "Name": "DescribeQc",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1313",
+   "Name": "ApplyClassifierStereotypes",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1314",
+   "Name": "FindOrCreateReferencingSR",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1315",
+   "Name": "Query",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1316",
+   "Name": "GetSelectedContext",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1317",
+   "Name": "FindElementsByName",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1318",
+   "Name": "FindPackagesByName",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1319",
+   "Name": "GetElementsInformation",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1320",
+   "Name": "GetPackagesInformation",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1321",
+   "Name": "GetConnectorsInformation",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1322",
+   "Name": "CreateElement",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1323",
+   "Name": "CreateOrUpdateElements",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1324",
+   "Name": "MoveElements",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1325",
+   "Name": "CreateOrUpdatePackage",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1326",
+   "Name": "CreateOrUpdateConnectors",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1327",
+   "Name": "CreateOrUpdateAttributes",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1328",
+   "Name": "CreateOrUpdateOperations",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1329",
+   "Name": "CreateOrUpdateScenarios",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1330",
+   "Name": "CreateOrUpdateConstraints",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1331",
+   "Name": "CreateOrUpdateRequirements",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1332",
+   "Name": "DeleteFromModel",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1333",
+   "Name": "DeleteTaggedvalueFromModel",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1334",
+   "Name": "ClonePackage",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1335",
+   "Name": "CloneElements",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1336",
+   "Name": "ExportElementLinkedDocuments",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1337",
+   "Name": "ImportElementLinkedDocuments",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1338",
+   "Name": "GetDiagramsInformation",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1339",
+   "Name": "CreateOrUpdateDiagram",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1340",
+   "Name": "PlaceElementsOnDiagram",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1341",
+   "Name": "RemoveElementsFromDiagram",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1342",
+   "Name": "CreateOrUpdateMessages",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1343",
+   "Name": "LayoutConnectors",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1344",
+   "Name": "ChangeConnectorVisibility",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1345",
+   "Name": "OpenDiagrams",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1346",
+   "Name": "ReloadDiagrams",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1347",
+   "Name": "UpdateDiagramProperties",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1348",
+   "Name": "SetDiagramObjectStyle",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1349",
+   "Name": "GetDiagramImage",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1350",
+   "Name": "GetBaselines",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1351",
+   "Name": "BaselineDiff",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1352",
+   "Name": "CreateBaseline",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1353",
+   "Name": "CreateAutoBaseline",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1354",
+   "Name": "WriteJournal",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1355",
+   "Name": "WriteAudit",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1356",
+   "Name": "WriteRiskAuditTags",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1357",
+   "Name": "LogChanges",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1358",
+   "Name": "DeploySrc",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1359",
+   "Name": "GetCodeInfo",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1360",
+   "Name": "ReadRequestBytes",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1361",
+   "Name": "ReadWriteState",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1362",
+   "Name": "UpdatePendingIndex",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1363",
+   "Name": "IsPumpAlive",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1364",
+   "Name": "ResolveBaseDir",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1365",
+   "Name": "ParseJson",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1366",
+   "Name": "StringifyJson",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1367",
+   "Name": "Sha256",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1368",
+   "Name": "EncodeBase64",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1369",
+   "Name": "DecodeBase64",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1370",
+   "Name": "DecodeUtf8",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1371",
+   "Name": "ParseXmlRows",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1372",
+   "Name": "CreateComObject",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1373",
+   "Name": "GetElementPath",
+   "Property": "code-ref",
+   "VALUE": "v0.21 (45de928)"
+  },
+  {
+   "OperationID": "1289",
+   "Name": "ProcessRequest",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1290",
+   "Name": "ConfirmPending",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1291",
+   "Name": "SweepPending",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1292",
+   "Name": "StartSession",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1293",
+   "Name": "Ping",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1294",
+   "Name": "GetStatus",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1295",
+   "Name": "PrecheckBatch",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1296",
+   "Name": "CheckFields",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1297",
+   "Name": "InterpretError",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1298",
+   "Name": "PrecheckTargets",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1299",
+   "Name": "CheckWrite",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1300",
+   "Name": "CheckWriteElement",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1301",
+   "Name": "CheckUserAccess",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1302",
+   "Name": "DescribeScope",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1303",
+   "Name": "ClassifyBatch",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1304",
+   "Name": "BuildConfirmSummary",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1305",
+   "Name": "DescribeReason",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1306",
+   "Name": "IssueNonce",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1307",
+   "Name": "PlanBaseline",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1308",
+   "Name": "DecideBaseline",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1309",
+   "Name": "EvaluateRecoveryPosture",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1310",
+   "Name": "CleanupBaselines",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1311",
+   "Name": "RunQc",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1312",
+   "Name": "DescribeQc",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1313",
+   "Name": "ApplyClassifierStereotypes",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1314",
+   "Name": "FindOrCreateReferencingSR",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1315",
+   "Name": "Query",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1316",
+   "Name": "GetSelectedContext",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1317",
+   "Name": "FindElementsByName",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1318",
+   "Name": "FindPackagesByName",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1319",
+   "Name": "GetElementsInformation",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1320",
+   "Name": "GetPackagesInformation",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1321",
+   "Name": "GetConnectorsInformation",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1322",
+   "Name": "CreateElement",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1323",
+   "Name": "CreateOrUpdateElements",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1324",
+   "Name": "MoveElements",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1325",
+   "Name": "CreateOrUpdatePackage",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1326",
+   "Name": "CreateOrUpdateConnectors",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1327",
+   "Name": "CreateOrUpdateAttributes",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1328",
+   "Name": "CreateOrUpdateOperations",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1329",
+   "Name": "CreateOrUpdateScenarios",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1330",
+   "Name": "CreateOrUpdateConstraints",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1331",
+   "Name": "CreateOrUpdateRequirements",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1332",
+   "Name": "DeleteFromModel",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1333",
+   "Name": "DeleteTaggedvalueFromModel",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1334",
+   "Name": "ClonePackage",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1335",
+   "Name": "CloneElements",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1336",
+   "Name": "ExportElementLinkedDocuments",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1337",
+   "Name": "ImportElementLinkedDocuments",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1338",
+   "Name": "GetDiagramsInformation",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1339",
+   "Name": "CreateOrUpdateDiagram",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1340",
+   "Name": "PlaceElementsOnDiagram",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1341",
+   "Name": "RemoveElementsFromDiagram",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1342",
+   "Name": "CreateOrUpdateMessages",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1343",
+   "Name": "LayoutConnectors",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1344",
+   "Name": "ChangeConnectorVisibility",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1345",
+   "Name": "OpenDiagrams",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1346",
+   "Name": "ReloadDiagrams",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1347",
+   "Name": "UpdateDiagramProperties",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1348",
+   "Name": "SetDiagramObjectStyle",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1349",
+   "Name": "GetDiagramImage",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1350",
+   "Name": "GetBaselines",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1351",
+   "Name": "BaselineDiff",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1352",
+   "Name": "CreateBaseline",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1353",
+   "Name": "CreateAutoBaseline",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1354",
+   "Name": "WriteJournal",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1355",
+   "Name": "WriteAudit",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1356",
+   "Name": "WriteRiskAuditTags",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1357",
+   "Name": "LogChanges",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1358",
+   "Name": "DeploySrc",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1359",
+   "Name": "GetCodeInfo",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1360",
+   "Name": "ReadRequestBytes",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1361",
+   "Name": "ReadWriteState",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1362",
+   "Name": "UpdatePendingIndex",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1363",
+   "Name": "IsPumpAlive",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1364",
+   "Name": "ResolveBaseDir",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1365",
+   "Name": "ParseJson",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1366",
+   "Name": "StringifyJson",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1367",
+   "Name": "Sha256",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1368",
+   "Name": "EncodeBase64",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1369",
+   "Name": "DecodeBase64",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1370",
+   "Name": "DecodeUtf8",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1371",
+   "Name": "ParseXmlRows",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1372",
+   "Name": "CreateComObject",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  },
+  {
+   "OperationID": "1373",
+   "Name": "GetElementPath",
+   "Property": "code-verified",
+   "VALUE": "2026-10-14"
+  }
+ ],
+ "ping": {
+  "repository": "C:\\Users\\milos\\Box\\03.EAP\\MCP-AI\\EAExample.qea",
+  "codeInfo": {
+   "found": true,
+   "fingerprint": "ea47ee1a03a8de4509512f8bafc5995327bb5150cc5b465c94c60b43d76cf92f",
+   "short": "ea47ee1a03a8",
+   "files": 132,
+   "deployedAt": "2026-10-15 18:40:07",
+   "deployedBy": "deploy_src",
+   "text": "Otisk kodu v modelu: ea47ee1a03a8 (132 souboru bez konfigurace, nasazeno 2026-10-15 18:40:07 deploy_src)"
+  },
+  "riskPolicy": {
+   "available": true,
+   "classes": {
+    "create_element": "LOW",
+    "create_or_update_elements": "LOW",
+    "create_or_update_package": "LOW",
+    "create_or_update_connectors": "LOW",
+    "create_or_update_attributes": "LOW",
+    "create_or_update_operations": "LOW",
+    "create_or_update_messages": "LOW",
+    "update_diagram_properties": "LOW",
+    "set_diagram_object_style": "LOW",
+    "place_elements_on_diagram": "LOW",
+    "layout_connectors": "LOW",
+    "change_connector_visibility": "LOW",
+    "create_or_update_diagram": "LOW",
+    "apply_classifier_stereotypes": "LOW",
+    "find_or_create_referencing_sr": "LOW",
+    "create_baseline": "LOW",
+    "delete_from_model": "ELEVATED",
+    "delete_taggedvalue_from_model": "ELEVATED",
+    "remove_elements_from_diagram": "ELEVATED",
+    "import_element_linked_documents": "ELEVATED",
+    "clone_package": "ELEVATED",
+    "clone_elements": "ELEVATED",
+    "create_or_update_scenarios": "ELEVATED",
+    "create_or_update_constraints": "ELEVATED",
+    "create_or_update_requirements": "ELEVATED",
+    "move_elements": "ELEVATED",
+    "deploy_src": "ELEVATED"
+   },
+   "confirmAlways": [
+    "clone_elements",
+    "clone_package",
+    "create_or_update_constraints",
+    "create_or_update_requirements",
+    "create_or_update_scenarios",
+    "delete_from_model",
+    "delete_taggedvalue_from_model",
+    "deploy_src",
+    "import_element_linked_documents",
+    "move_elements",
+    "remove_elements_from_diagram"
+   ],
+   "blocked": [],
+   "low": [
+    "apply_classifier_stereotypes",
+    "change_connector_visibility",
+    "create_baseline",
+    "create_element",
+    "create_or_update_attributes",
+    "create_or_update_connectors",
+    "create_or_update_diagram",
+    "create_or_update_elements",
+    "create_or_update_messages",
+    "create_or_update_operations",
+    "create_or_update_package",
+    "find_or_create_referencing_sr",
+    "layout_connectors",
+    "place_elements_on_diagram",
+    "set_diagram_object_style",
+    "update_diagram_properties"
+   ],
+   "elevate": {
+    "deleteTargets": 0,
+    "writeOps": 20,
+    "updatedExisting": 10,
+    "affectedPackages": 1,
+    "foreignDiagrams": 0,
+    "moveOps": 0
+   },
+   "block": {
+    "deleteTargets": 100,
+    "writeOps": 500,
+    "updatedExisting": 100,
+    "affectedPackages": 5
+   },
+   "confirmMaxAgeMin": 480,
+   "ownSessionLow": true,
+   "note": "okno vzdy = confirmAlways; okno pri prekroceni prahu elevate (napr. writeOps > 20); blocked = odmitnuto bez okna; cekajici davka vyprsi po confirmMaxAgeMin; ownSessionLow = vlastni prvky/diagramy teto session pumpy bez okna"
+  }
+ }
+}
