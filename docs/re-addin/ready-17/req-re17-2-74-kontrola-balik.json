@@ -1,0 +1,97 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-74-kontrola-balik",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_connector c INNER JOIN t_object d ON d.Object_ID = c.Start_Object_ID WHERE c.Connector_Type = 'Aggregation' AND d.Stereotype = 'Data Transfer Object' AND d.Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_connector c INNER JOIN t_object d ON d.Object_ID = c.End_Object_ID WHERE c.Connector_Type = 'Aggregation' AND c.DestIsAggregate = 2 AND d.Stereotype = 'Data Transfer Object' AND d.Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(DISTINCT d.ParentID) AS N FROM t_diagram d WHERE d.Name LIKE '% Impact View' AND d.ParentID IN (SELECT Object_ID FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165)))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Package_ID = 1137 AND Stereotype = 'entity'"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_attribute a INNER JOIN t_object o ON o.Object_ID = a.Object_ID WHERE o.Package_ID = 1137"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_diagramobjects WHERE Diagram_ID = 1208"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Classifier BETWEEN 13144 AND 13151 AND ParentID IN (SELECT Object_ID FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165)))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_connector r WHERE r.Connector_Type = 'Sequence' AND r.Name LIKE '%%Res' AND r.DiagramID IN (1274,1310,1382,1390,1506,1394,1398,1402,1286) AND EXISTS (SELECT 1 FROM t_connector x WHERE x.DiagramID = r.DiagramID AND x.Connector_Type = 'Sequence' AND x.SeqNo > r.SeqNo)"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object s INNER JOIN t_objectproperties t ON t.Object_ID = s.Object_ID AND t.Property = '505-1 Operation Link' INNER JOIN t_operation p ON p.ea_guid = t.Value INNER JOIN t_object i ON i.Object_ID = p.Object_ID INNER JOIN t_package sp ON sp.Package_ID = s.Package_ID INNER JOIN t_package cp ON cp.Package_ID = sp.Parent_ID WHERE s.Stereotype = 'Service Realization' AND i.Name = cp.Name || ' Interface' AND s.Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_operation p INNER JOIN t_object i ON i.Object_ID = p.Object_ID WHERE i.Package_ID = 1127 AND i.Object_Type = 'Interface' AND i.Object_ID <> 11950 AND p.ea_guid NOT IN (SELECT Value FROM t_objectproperties WHERE Property = '505-1 Operation Link')"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Stereotype = 'Data Transfer Object' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object d WHERE d.Stereotype = 'Data Transfer Object' AND d.Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165)) AND EXISTS (SELECT 1 FROM t_object q WHERE q.ParentID = d.Object_ID AND q.Name LIKE '%Req') AND EXISTS (SELECT 1 FROM t_object r WHERE r.ParentID = d.Object_ID AND r.Name LIKE '%Res')"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint') AND ParentID = 0 AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Name = 'Object' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(DISTINCT ParentID) AS N FROM t_object WHERE Object_Type = 'MessageEndpoint' AND ParentID IN (SELECT Object_ID FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165)))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type = 'InteractionOccurrence' AND Classifier = 0 AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT COUNT(*) AS N FROM t_connector WHERE Connector_Type = 'Usage' AND Start_Object_ID IN (SELECT Object_ID FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165))) AND End_Object_ID IN (SELECT Object_ID FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165)))"
+  },
+  {
+   "op": "reload_diagrams",
+   "diagrams": [
+    1208,
+    1197,
+    1286,
+    1394
+   ]
+  },
+  {
+   "op": "get_diagram_image",
+   "diagrams": [
+    1208,
+    1197,
+    1286,
+    1394
+   ]
+  }
+ ]
+}

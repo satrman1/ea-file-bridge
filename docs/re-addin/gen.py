@@ -875,6 +875,114 @@ def z2_kontrola(id_="re17-2-62-kontrola"):
     ops.append({"op":"query","sql":"SELECT s.Object_ID, s.Name, (SELECT COUNT(*) FROM t_object l WHERE l.ParentID = s.Object_ID AND l.Object_Type IN ('Object','Component')) AS L, (SELECT COUNT(*) FROM t_object r WHERE r.ParentID = s.Object_ID AND r.Object_Type = 'InteractionOccurrence') AS R, (SELECT COUNT(*) FROM t_connector c INNER JOIN t_diagram d ON c.DiagramID = d.Diagram_ID WHERE d.ParentID = s.Object_ID AND c.Connector_Type = 'Sequence') AS M FROM t_object s WHERE s.Stereotype = 'Service Realization' AND s.Package_ID IN (%s)" % SVCPK, "maxRows":200})
     return batch(id_, ops)
 
+# ---- balik po Z261017-2 (Milos 17. 10. 21:27 „ano“ na kartu navrhy-po-sr-vsech-operaci): a) 4 stare SR na tvar scaffoldu, b) 8 entit LDM ----
+OLD_AGG = [4970, 4971, 4972, 4973, 4974, 4975, 4976, 4977]
+OLD_PARTS = {11962: (11963, 11964), 11966: (11967, 11968), 11970: (11971, 11972), 11974: (11975, 11976)}
+OLD_SR_DTO = {11961: ("ProcessRequest", 11962), 11965: ("Ping", 11966), 11969: ("CreateOrUpdateElements", 11970), 11973: ("DeleteFromModel", 11974)}
+IV_NOTES = "SABLONA Impact View: dopadovy pohled realizace. (fixture instrukcni text)"   # = FBT Impact View Template (dgm 1148), jako scaffold
+LDM_PKG = "{61C3C5BD-A918-4c6c-8485-93D63B556189}"   # LDM of EA Repository (1137)
+ENT_ID = {e[0]: 11977 + k for k, e in enumerate(I.ENTITIES)}
+NEW_ENT_POS = {"ObjectScenario": (40, 640), "ObjectConstraint": (230, 640), "ObjectRequirement": (420, 640), "OperationParameter": (610, 640),
+               "ConnectorTag": (800, 300), "SecurityUser": (800, 40), "SecurityGroup": (990, 40), "SecurityUserGroup": (895, 170)}
+NEW_ASSOCS = [("Element", "ObjectScenario", "1", "0..*", "nese"), ("Element", "ObjectConstraint", "1", "0..*", "nese"),
+              ("Element", "ObjectRequirement", "1", "0..*", "nese"), ("Operation", "OperationParameter", "1", "0..*", "nese"),
+              ("Connector", "ConnectorTag", "1", "0..*", "nese"), ("SecurityUser", "SecurityUserGroup", "1", "0..*", "je členem"),
+              ("SecurityGroup", "SecurityUserGroup", "1", "0..*", "má členy")]
+def z2_balik_a():
+    import extract_ldm as L
+    A = L.build_new(); names = list(L.ENT2)
+    ops = [{"op":"delete_from_model","targets":[{"type":"Connector","id":c} for c in OLD_AGG]}]
+    conns = []
+    for dto, parts in OLD_PARTS.items():
+        for p in parts: conns.append({"source":p,"target":dto,"type":"Aggregation","targetEnd":{"aggregation":2},"notes":"Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."})
+    ops.append({"op":"create_or_update_connectors","connectors":conns})
+    ops.append({"op":"create_or_update_diagram","diagrams":[{"owningElement":sr,"type":"CSOB-ITAN::LD-Behavioral","name":"%s Impact View" % n,
+        "styleEx":"MDGDgm=CSOB-ITAN::LD-Behavioral;MDGView=CSOB-ITAN::Realization Impact View;","notes":IV_NOTES,"author":"Claude via eafb","version":"1.0"}
+        for sr, (n, dto) in OLD_SR_DTO.items()]})
+    ops.append({"op":"create_or_update_elements","elements":[{"package":LDM_PKG,"type":"Class","stereotypes":"entity","name":e,"alias":L.ENT2[e],
+        "notes":"%s Fyzická tabulka: %s.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ %s), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26)." % (L.NOTES2[e], L.ENT2[e], I.REF),
+        "taggedValues":[{"name":"re-origin","value":"code"}]} for e in names]}); ei = len(ops) - 1
+    for k, e in enumerate(names):
+        ops.append({"op":"create_or_update_operations","element":"$%d[%d]" % (ei, k),"operations":[{"name":x,"returnType":"void"} for x in ("C","R","U","D")]})
+        if A[e]: ops.append({"op":"create_or_update_attributes","element":"$%d[%d]" % (ei, k),"attributes":A[e]})
+    def ref(n): return ENT_ID[n] if n in ENT_ID else "$%d[%d]" % (ei, names.index(n))
+    ops.append({"op":"create_or_update_connectors","connectors":[{"source":ref(a),"target":ref(b),"type":"Association","name":nm,
+        "sourceEnd":{"multiplicity":ma},"targetEnd":{"multiplicity":mb}} for a, b, ma, mb, nm in NEW_ASSOCS]})
+    ops.append({"op":"place_elements_on_diagram","diagram":1208,"elementPlacements":[{"element":"$%d[%d]" % (ei, k),"x":NEW_ENT_POS[e][0],"y":NEW_ENT_POS[e][1],"width":160,"height":110} for k, e in enumerate(names)]})
+    return batch("re17-2-71-balik-stare-sr-a-ldm", ops)
+
+NEW_ENT = ["ObjectScenario","ObjectConstraint","ObjectRequirement","OperationParameter","ConnectorTag","SecurityUser","SecurityGroup","SecurityUserGroup"]
+BALIK_OPS = ['PrecheckTargets','PlanBaseline','CreateOrUpdateConnectors','CreateOrUpdateOperations','DeploySrc','CreateOrUpdateScenarios','CreateOrUpdateConstraints','CreateOrUpdateRequirements','CheckUserAccess']
+def z2_balik_b():
+    """Dopsat nove entity LDM do sekvenci 9 SR (lifeline + zpravy na konec pred navratovou zpravu, posun refu dolu)."""
+    r71 = json.load(io.open("../../responses/res-re17-2-71-balik-stare-sr-a-ldm.json", encoding="utf-8-sig"))["results"]
+    eid = {it["name"]: it["id"] for it in r71[3]["items"]}
+    crud = {}
+    k = 4
+    for e in NEW_ENT:
+        for it in r71[k]["items"]: crud[(e, it["name"])] = it["id"]
+        k += 2 if e not in ("SecurityUserGroup",) or True else 1
+    r70 = json.load(io.open("../../responses/res-re17-2-70-cteni-balik.json", encoding="utf-8-sig"))["results"]
+    objs = r70[3]["rows"]; msgs = r70[4]["rows"]; dobs = r70[5]["rows"]
+    scaf = load_scaffold(); comp, iface, pk = load_ids()
+    ctype = {c["key"]: c["type"] for c in I.COMPONENTS}
+    out = []
+    for grp in (BALIK_OPS[:5], BALIK_OPS[5:]):
+        ops = []
+        for opn in grp:
+            o = [x for x in SR.OPS if x[0] == opn][0]; sc = scaf[opn]; sr = sc["sr"]; dg = sc["srDg"]
+            x = X.ir(opn)
+            newm = [m for m in x["msgs"] if "crud" in m and m["to"][2:] in NEW_ENT]
+            ents = []
+            for m in newm:
+                if m["to"][2:] not in ents: ents.append(m["to"][2:])
+            mine = [r for r in objs if int(r["ParentID"]) == sr]
+            lif = [r for r in mine if r["Object_Type"] in ("Object", "Component")]
+            entry = [r for r in lif if int(r["Classifier"]) == int(comp[o[1]]["id"])][0]
+            refs = [r for r in mine if r["Object_Type"] == "InteractionOccurrence"]
+            dm = sorted([r for r in msgs if int(r["DiagramID"]) == dg], key=lambda r: int(r["SeqNo"]))
+            ret = dm[-1]; nret = int(ret["SeqNo"])
+            ops.append({"op":"create_or_update_elements","elements":[{"owningElement":sc["srGuid"],"type":"Object","name":"","classifierID":eid[e],"stereotypes":"entity"} for e in ents]}); ei = len(ops) - 1
+            L = len(lif); n = len(newm)
+            pl = [{"element":"$%d[%d]" % (ei, j),"x":90 + (L + j)*170,"y":40,"width":130,"height":60} for j in range(len(ents))]
+            for r in refs:
+                rr = [d for d in dobs if int(d["Diagram_ID"]) == dg and int(d["Object_ID"]) == int(r["Object_ID"])][0]
+                pl.append({"elementID":int(r["Object_ID"]),"x":int(rr["RectLeft"]),"y":-int(rr["RectTop"]) + 34*n,"width":int(rr["RectRight"]) - int(rr["RectLeft"]),"height":int(rr["RectTop"]) - int(rr["RectBottom"])})
+            ops.append({"op":"place_elements_on_diagram","diagram":dg,"elementPlacements":pl})
+            mm = [{"connectorID":int(ret["Connector_ID"]),"seqNo":nret + n}]
+            for j, m in enumerate(newm):
+                mm.append({"source":int(entry["Object_ID"]),"target":"$%d[%d]" % (ei, ents.index(m["to"][2:])),"seqNo":nret + j,"operation":crud[(m["to"][2:], m["crud"])],"notes":"doplněno 17. 10. 2026 (balík N-RE-26)"})
+            ops.append({"op":"create_or_update_messages","diagram":dg,"messages":mm})
+            ops.append({"op":"apply_classifier_stereotypes","diagram":dg})
+            note = sr_note(o, x) + "\nZprávy na entity %s jsou doplněné 17. 10. 2026 (balík N-RE-26) na konec sekvence před návratovou zprávu; v kódu leží uprostřed operace (pořadí viz docs/re-addin/ir_sr_calls.json)." % ", ".join(ents)
+            ops.append({"op":"create_or_update_elements","elements":[{"elementID":sr,"notes":note}]})
+        out.append(batch("re17-2-%02d-balik-sekvence" % (72 + len(out)), ops))
+    return out
+
+def z2_balik_fix():
+    """Oprava po kontrole okem: (1) 8 novych kompozic 4 starych DTO: bridge zalozil Direction 'Destination -> Source' + Source Navigable
+    -> sipka u Req/Res; srovnat na tvar scaffoldu (Unspecified, Non-Navigable), updaty direction po jednom (FB_OpConnectors ř. 43);
+    (2) diagram LDM 1208: 16 entit do mrizky podle vysky (atributy + 4 operace), nic se neprekryva."""
+    r71 = json.load(io.open("../../responses/res-re17-2-71-balik-stare-sr-a-ldm.json", encoding="utf-8-sig"))["results"]
+    cids = [it["id"] for it in r71[1]["items"]]
+    ops = [{"op":"create_or_update_connectors","connectors":[{"connectorID":c,"direction":"Unspecified","sourceEnd":{"navigable":False}}]} for c in cids]
+    eid = dict(ENT_ID); eid.update({it["name"]: it["id"] for it in r71[3]["items"]})
+    NA = {"Package":5,"Element":14,"TaggedValue":4,"Attribute":11,"Operation":8,"Connector":15,"Diagram":10,"Baseline":6,
+          "ObjectScenario":6,"ObjectConstraint":5,"ObjectRequirement":8,"OperationParameter":6,"ConnectorTag":3,"SecurityUser":2,"SecurityGroup":2,"SecurityUserGroup":2}
+    h = {e: 40 + 16*(n + 4) for e, n in NA.items()}
+    X0 = [40, 240, 440, 640, 840, 1040]
+    rows = [[("Baseline",0),("Package",1),("Diagram",2),("SecurityUser",4),("SecurityGroup",5)],
+            [("TaggedValue",0),("Element",1),("Connector",2),("ConnectorTag",3),("SecurityUserGroup",5)],
+            [("ObjectScenario",0),("ObjectConstraint",1),("ObjectRequirement",2),("Attribute",3),("Operation",4),("OperationParameter",5)]]
+    pl = []; y = 40
+    for row in rows:
+        for e, c in row: pl.append({"elementID":eid[e],"x":X0[c],"y":y,"width":170,"height":h[e]})
+        y += max(h[e] for e, c in row) + 70
+    ops.append({"op":"place_elements_on_diagram","diagram":1208,"elementPlacements":pl})
+    ops.append({"op":"query","sql":"SELECT Connector_ID, Direction, SourceStyle FROM t_connector WHERE Connector_ID IN (%s)" % ",".join(map(str, cids))})
+    ops += [{"op":"reload_diagrams","diagrams":[1208,1197]},{"op":"get_diagram_image","diagrams":[1208,1197]}]
+    return batch("re17-2-76-balik-oprava", ops)
+
 if __name__ == "__main__":
     which = sys.argv[1]
     b = globals()[which]()

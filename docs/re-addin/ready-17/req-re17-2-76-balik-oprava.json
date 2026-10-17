@@ -1,0 +1,239 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-76-balik-oprava",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5961,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5962,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5963,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5964,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5965,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5966,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5967,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "connectorID": 5968,
+     "direction": "Unspecified",
+     "sourceEnd": {
+      "navigable": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1208,
+   "elementPlacements": [
+    {
+     "elementID": 11984,
+     "x": 40,
+     "y": 40,
+     "width": 170,
+     "height": 200
+    },
+    {
+     "elementID": 11977,
+     "x": 240,
+     "y": 40,
+     "width": 170,
+     "height": 184
+    },
+    {
+     "elementID": 11983,
+     "x": 440,
+     "y": 40,
+     "width": 170,
+     "height": 264
+    },
+    {
+     "elementID": 13149,
+     "x": 840,
+     "y": 40,
+     "width": 170,
+     "height": 136
+    },
+    {
+     "elementID": 13150,
+     "x": 1040,
+     "y": 40,
+     "width": 170,
+     "height": 136
+    },
+    {
+     "elementID": 11979,
+     "x": 40,
+     "y": 374,
+     "width": 170,
+     "height": 168
+    },
+    {
+     "elementID": 11978,
+     "x": 240,
+     "y": 374,
+     "width": 170,
+     "height": 328
+    },
+    {
+     "elementID": 11982,
+     "x": 440,
+     "y": 374,
+     "width": 170,
+     "height": 344
+    },
+    {
+     "elementID": 13148,
+     "x": 640,
+     "y": 374,
+     "width": 170,
+     "height": 152
+    },
+    {
+     "elementID": 13151,
+     "x": 1040,
+     "y": 374,
+     "width": 170,
+     "height": 136
+    },
+    {
+     "elementID": 13144,
+     "x": 40,
+     "y": 788,
+     "width": 170,
+     "height": 200
+    },
+    {
+     "elementID": 13145,
+     "x": 240,
+     "y": 788,
+     "width": 170,
+     "height": 184
+    },
+    {
+     "elementID": 13146,
+     "x": 440,
+     "y": 788,
+     "width": 170,
+     "height": 232
+    },
+    {
+     "elementID": 11980,
+     "x": 640,
+     "y": 788,
+     "width": 170,
+     "height": 280
+    },
+    {
+     "elementID": 11981,
+     "x": 840,
+     "y": 788,
+     "width": 170,
+     "height": 232
+    },
+    {
+     "elementID": 13147,
+     "x": 1040,
+     "y": 788,
+     "width": 170,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, Direction, SourceStyle FROM t_connector WHERE Connector_ID IN (5961,5962,5963,5964,5965,5966,5967,5968)"
+  },
+  {
+   "op": "reload_diagrams",
+   "diagrams": [
+    1208,
+    1197
+   ]
+  },
+  {
+   "op": "get_diagram_image",
+   "diagrams": [
+    1208,
+    1197
+   ]
+  }
+ ]
+}

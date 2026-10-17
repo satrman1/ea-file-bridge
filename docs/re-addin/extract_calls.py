@@ -87,7 +87,11 @@ NOSHOW = {"Log", "FB_OutputFlush"}       # pruzezovy vypis do Output
 # --- entity LDM ---------------------------------------------------------------------------------
 TABLE2ENT = {"t_package": "Package", "t_object": "Element", "t_objectproperties": "TaggedValue", "t_attribute": "Attribute",
              "t_operation": "Operation", "t_connector": "Connector", "t_diagram": "Diagram", "t_diagramobjects": "Diagram",
-             "t_diagramlinks": "Diagram", "t_document": "Baseline"}
+             "t_diagramlinks": "Diagram", "t_document": "Baseline",
+             # 17. 10. 2026 (balik N-RE-26): dalsich 8 entit LDM (extract_ldm.build_new)
+             "t_objectscenarios": "ObjectScenario", "t_objectconstraint": "ObjectConstraint", "t_objectrequires": "ObjectRequirement",
+             "t_operationparams": "OperationParameter", "t_connectortag": "ConnectorTag", "t_secuser": "SecurityUser",
+             "t_secgroup": "SecurityGroup", "t_secusergroup": "SecurityUserGroup"}
 AUTOMATION = [  # (regex, entita nebo tabulka kandidata, CRUD)
  (r"\.Packages\.AddNew\(", "Package", "C"), (r"\.Elements\.AddNew\(", "Element", "C"), (r"\.Diagrams\.AddNew\(", "Diagram", "C"),
  (r"\.Connectors\.AddNew\(", "Connector", "C"), (r"\.TaggedValues\.AddNew\(", "TaggedValue", "C"), (r"\.Attributes\.AddNew\(", "Attribute", "C"),

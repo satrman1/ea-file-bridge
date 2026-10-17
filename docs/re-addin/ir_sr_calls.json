@@ -459,6 +459,7 @@
    "E:Element",
    "E:Diagram",
    "E:Connector",
+   "E:ConnectorTag",
    "E:TaggedValue",
    "E:Attribute",
    "E:Operation"
@@ -486,6 +487,10 @@
     "crud": "R"
    },
    {
+    "to": "E:ConnectorTag",
+    "crud": "R"
+   },
+   {
     "to": "E:TaggedValue",
     "crud": "R"
    },
@@ -505,9 +510,7 @@
    "FB_Config": 1
   },
   "dynamic": 0,
-  "candidates": [
-   "t_connectortag"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Request",
@@ -662,20 +665,32 @@
   "comp": "scope",
   "fn": "FB_UserAccess",
   "lifelines": [
-   "scope"
+   "scope",
+   "E:SecurityGroup",
+   "E:SecurityUserGroup",
+   "E:SecurityUser"
   ],
-  "msgs": [],
+  "msgs": [
+   {
+    "to": "E:SecurityGroup",
+    "crud": "R"
+   },
+   {
+    "to": "E:SecurityUserGroup",
+    "crud": "R"
+   },
+   {
+    "to": "E:SecurityUser",
+    "crud": "R"
+   }
+  ],
   "refs": [],
   "skipped": {
    "FB_RepoId": 1,
    "FB_XmlRows": 1
   },
   "dynamic": 0,
-  "candidates": [
-   "t_secgroup",
-   "t_secusergroup",
-   "t_secuser"
-  ],
+  "candidates": [],
   "req": [],
   "res": [
    {
@@ -970,6 +985,7 @@
    "E:Package",
    "E:Diagram",
    "E:Connector",
+   "E:ConnectorTag",
    "E:Attribute",
    "E:Operation"
   ],
@@ -1015,6 +1031,10 @@
     "op": "CheckWrite"
    },
    {
+    "to": "E:ConnectorTag",
+    "crud": "R"
+   },
+   {
     "to": "E:Attribute",
     "crud": "R"
    },
@@ -1033,9 +1053,7 @@
    "FB_ElementPath": 2
   },
   "dynamic": 0,
-  "candidates": [
-   "t_connectortag"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Request",
@@ -2715,6 +2733,7 @@
    "E:Element",
    "E:Package",
    "E:Diagram",
+   "E:ConnectorTag",
    "E:TaggedValue",
    "E:Operation",
    "E:Attribute"
@@ -2750,6 +2769,10 @@
     "crud": "R"
    },
    {
+    "to": "E:ConnectorTag",
+    "crud": "R"
+   },
+   {
     "to": "E:TaggedValue",
     "crud": "R"
    },
@@ -2782,9 +2805,7 @@
    "B64Decode": 1
   },
   "dynamic": 0,
-  "candidates": [
-   "t_connectortag"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Op",
@@ -2992,6 +3013,7 @@
    "E:Diagram",
    "E:Element",
    "E:Operation",
+   "E:OperationParameter",
    "E:Attribute",
    "E:Connector",
    "E:TaggedValue"
@@ -3021,6 +3043,10 @@
    {
     "to": "E:Operation",
     "crud": "U"
+   },
+   {
+    "to": "E:OperationParameter",
+    "crud": "C"
    },
    {
     "to": "E:Operation",
@@ -3054,9 +3080,7 @@
    "FB_XmlRows": 2
   },
   "dynamic": 0,
-  "candidates": [
-   "t_operationparams"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Op",
@@ -3128,6 +3152,7 @@
    "E:Package",
    "E:Diagram",
    "E:Element",
+   "E:ObjectScenario",
    "E:TaggedValue"
   ],
   "msgs": [
@@ -3149,6 +3174,10 @@
     "op": "CheckWriteElement"
    },
    {
+    "to": "E:ObjectScenario",
+    "crud": "U"
+   },
+   {
     "to": "E:TaggedValue",
     "crud": "R"
    },
@@ -3159,6 +3188,10 @@
    {
     "to": "E:TaggedValue",
     "crud": "C"
+   },
+   {
+    "to": "E:ObjectScenario",
+    "crud": "R"
    }
   ],
   "refs": [
@@ -3168,9 +3201,7 @@
    "FB_XmlRows": 3
   },
   "dynamic": 0,
-  "candidates": [
-   "t_objectscenarios"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Op",
@@ -3252,6 +3283,7 @@
    "E:Package",
    "E:Diagram",
    "E:Element",
+   "E:ObjectConstraint",
    "E:TaggedValue"
   ],
   "msgs": [
@@ -3273,6 +3305,10 @@
     "op": "CheckWriteElement"
    },
    {
+    "to": "E:ObjectConstraint",
+    "crud": "U"
+   },
+   {
     "to": "E:TaggedValue",
     "crud": "R"
    },
@@ -3283,6 +3319,10 @@
    {
     "to": "E:TaggedValue",
     "crud": "C"
+   },
+   {
+    "to": "E:ObjectConstraint",
+    "crud": "R"
    }
   ],
   "refs": [
@@ -3292,9 +3332,7 @@
    "FB_XmlRows": 3
   },
   "dynamic": 0,
-  "candidates": [
-   "t_objectconstraint"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Op",
@@ -3366,6 +3404,7 @@
    "E:Package",
    "E:Diagram",
    "E:Element",
+   "E:ObjectRequirement",
    "E:TaggedValue"
   ],
   "msgs": [
@@ -3387,6 +3426,10 @@
     "op": "CheckWriteElement"
    },
    {
+    "to": "E:ObjectRequirement",
+    "crud": "U"
+   },
+   {
     "to": "E:TaggedValue",
     "crud": "R"
    },
@@ -3397,6 +3440,10 @@
    {
     "to": "E:TaggedValue",
     "crud": "C"
+   },
+   {
+    "to": "E:ObjectRequirement",
+    "crud": "R"
    }
   ],
   "refs": [
@@ -3406,9 +3453,7 @@
    "FB_XmlRows": 3
   },
   "dynamic": 0,
-  "candidates": [
-   "t_objectrequires"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Op",
@@ -5778,7 +5823,8 @@
    "code",
    "mea",
    "E:Element",
-   "E:Operation"
+   "E:Operation",
+   "E:OperationParameter"
   ],
   "msgs": [
    {
@@ -5798,6 +5844,10 @@
     "crud": "U"
    },
    {
+    "to": "E:OperationParameter",
+    "crud": "C"
+   },
+   {
     "to": "mea",
     "fn": "SetTag",
     "op": null
@@ -5811,9 +5861,7 @@
    "FB_Sha256": 1
   },
   "dynamic": 0,
-  "candidates": [
-   "t_operationparams"
-  ],
+  "candidates": [],
   "req": [
    {
     "name": "Op",

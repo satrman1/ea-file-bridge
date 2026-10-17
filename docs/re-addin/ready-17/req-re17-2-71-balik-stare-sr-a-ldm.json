@@ -1,0 +1,824 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-71-balik-stare-sr-a-ldm",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "delete_from_model",
+   "targets": [
+    {
+     "type": "Connector",
+     "id": 4970
+    },
+    {
+     "type": "Connector",
+     "id": 4971
+    },
+    {
+     "type": "Connector",
+     "id": 4972
+    },
+    {
+     "type": "Connector",
+     "id": 4973
+    },
+    {
+     "type": "Connector",
+     "id": 4974
+    },
+    {
+     "type": "Connector",
+     "id": 4975
+    },
+    {
+     "type": "Connector",
+     "id": 4976
+    },
+    {
+     "type": "Connector",
+     "id": 4977
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": 11963,
+     "target": 11962,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11964,
+     "target": 11962,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11967,
+     "target": 11966,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11968,
+     "target": 11966,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11971,
+     "target": 11970,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11972,
+     "target": 11970,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11975,
+     "target": 11974,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    },
+    {
+     "source": 11976,
+     "target": 11974,
+     "type": "Aggregation",
+     "targetEnd": {
+      "aggregation": 2
+     },
+     "notes": "Kompozice část → DTO (tvar scaffoldu find_or_create_referencing_sr, N-RE-23)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_diagram",
+   "diagrams": [
+    {
+     "owningElement": 11961,
+     "type": "CSOB-ITAN::LD-Behavioral",
+     "name": "ProcessRequest Impact View",
+     "styleEx": "MDGDgm=CSOB-ITAN::LD-Behavioral;MDGView=CSOB-ITAN::Realization Impact View;",
+     "notes": "SABLONA Impact View: dopadovy pohled realizace. (fixture instrukcni text)",
+     "author": "Claude via eafb",
+     "version": "1.0"
+    },
+    {
+     "owningElement": 11965,
+     "type": "CSOB-ITAN::LD-Behavioral",
+     "name": "Ping Impact View",
+     "styleEx": "MDGDgm=CSOB-ITAN::LD-Behavioral;MDGView=CSOB-ITAN::Realization Impact View;",
+     "notes": "SABLONA Impact View: dopadovy pohled realizace. (fixture instrukcni text)",
+     "author": "Claude via eafb",
+     "version": "1.0"
+    },
+    {
+     "owningElement": 11969,
+     "type": "CSOB-ITAN::LD-Behavioral",
+     "name": "CreateOrUpdateElements Impact View",
+     "styleEx": "MDGDgm=CSOB-ITAN::LD-Behavioral;MDGView=CSOB-ITAN::Realization Impact View;",
+     "notes": "SABLONA Impact View: dopadovy pohled realizace. (fixture instrukcni text)",
+     "author": "Claude via eafb",
+     "version": "1.0"
+    },
+    {
+     "owningElement": 11973,
+     "type": "CSOB-ITAN::LD-Behavioral",
+     "name": "DeleteFromModel Impact View",
+     "styleEx": "MDGDgm=CSOB-ITAN::LD-Behavioral;MDGView=CSOB-ITAN::Realization Impact View;",
+     "notes": "SABLONA Impact View: dopadovy pohled realizace. (fixture instrukcni text)",
+     "author": "Claude via eafb",
+     "version": "1.0"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "ObjectScenario",
+     "alias": "t_objectscenarios",
+     "notes": "Scénář prvku (Basic Path, Alternate, Exception; kroky v XMLContent). Fyzická tabulka: t_objectscenarios.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "ObjectConstraint",
+     "alias": "t_objectconstraint",
+     "notes": "Podmínka prvku (Pre-condition, Post-condition, Invariant). Fyzická tabulka: t_objectconstraint.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "ObjectRequirement",
+     "alias": "t_objectrequires",
+     "notes": "Interní požadavek prvku (lokální pravidlo, záložka Requirements). Fyzická tabulka: t_objectrequires.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "OperationParameter",
+     "alias": "t_operationparams",
+     "notes": "Parametr operace prvku (vč. parametrů operací kódu add-inu). Fyzická tabulka: t_operationparams.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "ConnectorTag",
+     "alias": "t_connectortag",
+     "notes": "Tagged value vazby (vč. razítek ai.* na vazbách). Fyzická tabulka: t_connectortag.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "SecurityUser",
+     "alias": "t_secuser",
+     "notes": "Uživatel EA security. Fyzická tabulka: t_secuser.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "SecurityGroup",
+     "alias": "t_secgroup",
+     "notes": "Skupina EA security. Fyzická tabulka: t_secgroup.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "package": "{61C3C5BD-A918-4c6c-8485-93D63B556189}",
+     "type": "Class",
+     "stereotypes": "entity",
+     "name": "SecurityUserGroup",
+     "alias": "t_secusergroup",
+     "notes": "Členství uživatele ve skupině EA security (vazební tabulka). Fyzická tabulka: t_secusergroup.\nAtributy = sloupce, které bridge skutečně čte nebo píše (docs/re-addin/extract_ldm.py build_new nad src @ v0.22 (0c3e207)), typ prostým textem.\nDoplněno 17. 10. 2026 (Z261017-2, balík N-RE-26).",
+     "taggedValues": [
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[0]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[0]",
+   "attributes": [
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_OpScenarios"
+    },
+    {
+     "name": "Scenario",
+     "type": "string",
+     "notes": "API: FB_OpScenarios"
+    },
+    {
+     "name": "ScenarioType",
+     "type": "string",
+     "notes": "API: FB_OpScenarios"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpScenarios"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "API: FB_OpScenarios"
+    },
+    {
+     "name": "XMLContent",
+     "type": "string",
+     "notes": "SQL: FB_OpScenarios; API: FB_OpScenarios"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[1]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[1]",
+   "attributes": [
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_OpConstraints"
+    },
+    {
+     "name": "Constraint",
+     "type": "string",
+     "notes": "API: FB_OpConstraints"
+    },
+    {
+     "name": "ConstraintType",
+     "type": "string",
+     "notes": "API: FB_OpConstraints"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpConstraints"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "API: FB_OpConstraints"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[2]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[2]",
+   "attributes": [
+    {
+     "name": "Object_ID",
+     "type": "number",
+     "notes": "SQL: FB_OpRequirements"
+    },
+    {
+     "name": "Requirement",
+     "type": "string",
+     "notes": "SQL: FB_OpRequirements; API: FB_OpRequirements"
+    },
+    {
+     "name": "ReqType",
+     "type": "string",
+     "notes": "API: FB_OpRequirements"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "API: FB_OpRequirements"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpRequirements"
+    },
+    {
+     "name": "Stability",
+     "type": "string",
+     "notes": "SQL: FB_OpRequirements; API: FB_OpRequirements"
+    },
+    {
+     "name": "Difficulty",
+     "type": "string",
+     "notes": "SQL: FB_OpRequirements; API: FB_OpRequirements"
+    },
+    {
+     "name": "Priority",
+     "type": "string",
+     "notes": "API: FB_OpRequirements"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[3]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[3]",
+   "attributes": [
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "API: FB_OpDelete, FB_OpDeploySrc, FB_OpGetElements, FB_OpMessages, FB_OpOperations"
+    },
+    {
+     "name": "Type",
+     "type": "string",
+     "notes": "API: FB_OpDeploySrc, FB_OpGetElements"
+    },
+    {
+     "name": "Default",
+     "type": "string",
+     "notes": "API: FB_OpGetElements, FB_OpOperations"
+    },
+    {
+     "name": "Notes",
+     "type": "string",
+     "notes": "API: FB_OpGetElements, FB_OpMessages, FB_OpOperations"
+    },
+    {
+     "name": "Pos",
+     "type": "number",
+     "notes": "API: FB_OpDeploySrc, FB_OpGetElements, FB_OpOperations"
+    },
+    {
+     "name": "ea_guid",
+     "type": "guid",
+     "notes": "API: FB_OpGetElements, FB_OpOperations"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[4]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[4]",
+   "attributes": [
+    {
+     "name": "ElementID",
+     "type": "number",
+     "notes": "SQL: FB_BaselinePolicy, FB_DedupFind, FB_ScopePrecheck"
+    },
+    {
+     "name": "Property",
+     "type": "string",
+     "notes": "SQL: FB_BaselinePolicy, FB_DedupFind, FB_ScopePrecheck"
+    },
+    {
+     "name": "VALUE",
+     "type": "string",
+     "notes": "SQL: FB_BaselinePolicy, FB_DedupFind, FB_ScopePrecheck"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[5]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[5]",
+   "attributes": [
+    {
+     "name": "UserID",
+     "type": "number",
+     "notes": "SQL: FB_UserAccess"
+    },
+    {
+     "name": "UserLogin",
+     "type": "string",
+     "notes": "SQL: FB_UserAccess"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[6]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[6]",
+   "attributes": [
+    {
+     "name": "GroupID",
+     "type": "number",
+     "notes": "SQL: FB_UserAccess"
+    },
+    {
+     "name": "GroupName",
+     "type": "string",
+     "notes": "SQL: FB_UserAccess"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_operations",
+   "element": "$3[7]",
+   "operations": [
+    {
+     "name": "C",
+     "returnType": "void"
+    },
+    {
+     "name": "R",
+     "returnType": "void"
+    },
+    {
+     "name": "U",
+     "returnType": "void"
+    },
+    {
+     "name": "D",
+     "returnType": "void"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": "$3[7]",
+   "attributes": [
+    {
+     "name": "UserID",
+     "type": "number",
+     "notes": "SQL: FB_UserAccess"
+    },
+    {
+     "name": "GroupID",
+     "type": "number",
+     "notes": "SQL: FB_UserAccess"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": 11978,
+     "target": "$3[0]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": 11978,
+     "target": "$3[1]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": 11978,
+     "target": "$3[2]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": 11981,
+     "target": "$3[3]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": 11982,
+     "target": "$3[4]",
+     "type": "Association",
+     "name": "nese",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$3[5]",
+     "target": "$3[7]",
+     "type": "Association",
+     "name": "je členem",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    },
+    {
+     "source": "$3[6]",
+     "target": "$3[7]",
+     "type": "Association",
+     "name": "má členy",
+     "sourceEnd": {
+      "multiplicity": "1"
+     },
+     "targetEnd": {
+      "multiplicity": "0..*"
+     }
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1208,
+   "elementPlacements": [
+    {
+     "element": "$3[0]",
+     "x": 40,
+     "y": 640,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[1]",
+     "x": 230,
+     "y": 640,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[2]",
+     "x": 420,
+     "y": 640,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[3]",
+     "x": 610,
+     "y": 640,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[4]",
+     "x": 800,
+     "y": 300,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[5]",
+     "x": 800,
+     "y": 40,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[6]",
+     "x": 990,
+     "y": 40,
+     "width": 160,
+     "height": 110
+    },
+    {
+     "element": "$3[7]",
+     "x": 895,
+     "y": 170,
+     "width": 160,
+     "height": 110
+    }
+   ]
+  }
+ ]
+}

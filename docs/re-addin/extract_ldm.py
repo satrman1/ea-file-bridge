@@ -120,3 +120,81 @@ if __name__ == "__main__":
     o = build()
     io.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ldm_atributy.json"), "w", encoding="utf-8").write(json.dumps(o, ensure_ascii=False, indent=1))
     for e, a in o.items(): print(e, len(a), [x["name"] for x in a])
+
+
+# =====================================================================
+# Z261017-2 (17. 10. 2026, balik N-RE-26 schvalen Milosem „ok“): 8 dalsich tabulek, na ktere bridge saha
+# (kandidati z extract_calls.py). Stejny postup jako vyse: SQL sken + Automation vlastnosti v souborech,
+# ktere entitu zjevne pouzivaji (MARK2). Puvodnich 8 entit (build) se nemeni.
+# =====================================================================
+ENT2 = {"ObjectScenario": "t_objectscenarios", "ObjectConstraint": "t_objectconstraint", "ObjectRequirement": "t_objectrequires",
+        "OperationParameter": "t_operationparams", "ConnectorTag": "t_connectortag", "SecurityUser": "t_secuser",
+        "SecurityGroup": "t_secgroup", "SecurityUserGroup": "t_secusergroup"}
+NOTES2 = {"ObjectScenario": "Scénář prvku (Basic Path, Alternate, Exception; kroky v XMLContent).",
+          "ObjectConstraint": "Podmínka prvku (Pre-condition, Post-condition, Invariant).",
+          "ObjectRequirement": "Interní požadavek prvku (lokální pravidlo, záložka Requirements).",
+          "OperationParameter": "Parametr operace prvku (vč. parametrů operací kódu add-inu).",
+          "ConnectorTag": "Tagged value vazby (vč. razítek ai.* na vazbách).",
+          "SecurityUser": "Uživatel EA security.", "SecurityGroup": "Skupina EA security.",
+          "SecurityUserGroup": "Členství uživatele ve skupině EA security (vazební tabulka)."}
+COLS2 = {
+ "t_objectscenarios": "Object_ID Scenario ScenarioType EValue Notes ea_guid XMLContent",
+ "t_objectconstraint": "Object_ID Constraint ConstraintType Weight Notes Status",
+ "t_objectrequires": "ReqID Object_ID Requirement ReqType Status Notes Stability Difficulty Priority LastUpdate",
+ "t_operationparams": "OperationID Name Type Default Notes Pos Const Style Kind Classifier ea_guid StyleEx",
+ "t_connectortag": "PropertyID ElementID Property VALUE NOTES ea_guid",
+ "t_secuser": "UserID UserLogin FirstName Surname Department Password",
+ "t_secgroup": "GroupID GroupName Description",
+ "t_secusergroup": "UserID GroupID",
+}
+COLS2 = {t: c.split() for t, c in COLS2.items()}
+MARK2 = {"ObjectScenario": r"Scenarios\.", "ObjectConstraint": r"Constraints\.", "ObjectRequirement": r"Requirements\.",
+         "OperationParameter": r"Parameters\.", "ConnectorTag": r"(?:conn|con|c|cn|connector)\w*\.TaggedValues\.", "SecurityUser": r"$^",
+         "SecurityGroup": r"$^", "SecurityUserGroup": r"$^"}
+API2 = {"ObjectScenario": {"Name": "Scenario", "Type": "ScenarioType", "Notes": "Notes", "XMLContent": "XMLContent", "ScenarioGUID": "ea_guid"},
+        "ObjectConstraint": {"Name": "Constraint", "Type": "ConstraintType", "Notes": "Notes", "Status": "Status", "Weight": "Weight"},
+        "ObjectRequirement": {"Name": "Requirement", "Type": "ReqType", "Status": "Status", "Notes": "Notes", "Stability": "Stability",
+                              "Difficulty": "Difficulty", "Priority": "Priority", "LastUpdate": "LastUpdate"},
+        "OperationParameter": {"Name": "Name", "Type": "Type", "Default": "Default", "Notes": "Notes", "Position": "Pos", "Kind": "Kind", "ParameterGUID": "ea_guid"},
+        "ConnectorTag": {"Name": "Property", "Value": "VALUE", "Notes": "NOTES", "TagGUID": "ea_guid"},
+        "SecurityUser": {}, "SecurityGroup": {}, "SecurityUserGroup": {}}
+
+def ctype2(c):
+    lc = c.lower()
+    if lc in ("lastupdate",): return "datetime"
+    if lc in ("weight", "pos", "classifier"): return "number"
+    return ctype(c)
+
+def build_new(src=SRC):
+    use = {e: {} for e in ENT2}
+    for f in sorted(glob.glob(os.path.join(src, "*.js"))):
+        short = os.path.basename(f).replace("AICodeBridge.", "").replace(".js", "")
+        txt = io.open(f, encoding="utf-8", errors="replace").read()
+        for e, t in ENT2.items():
+            canon = {c.lower(): c for c in COLS2[t]}
+            if re.search(r"\b%s\b" % t, txt, re.I):
+                aliases = set(m.group(2) for m in re.finditer(r"\b(%s)\s+(?:AS\s+)?([a-z]{1,3})\b(?!\s*\()" % t, txt, re.I)
+                              if m.group(2).upper() not in ("ON", "AS", "IN", "OR", "AND", "WHERE"))
+                for a in aliases:
+                    for m in re.finditer(r"\b%s\.([A-Za-z_0-9]+)" % re.escape(a), txt):
+                        c = canon.get(m.group(1).lower())
+                        if c: use[e].setdefault(c, set()).add("SQL:" + short)
+                for line in txt.splitlines():
+                    if re.search(r"\b%s\b" % t, line, re.I):
+                        for mw in re.finditer(r"(?<![.\w])([A-Za-z_][A-Za-z_0-9]*)", line):
+                            c = canon.get(mw.group(1).lower())
+                            if c and c not in ("Name", "Notes", "Type", "Status", "Style", "Default", "Description"):
+                                use[e].setdefault(c, set()).add("SQL:" + short)
+            if short.startswith("FB_Op") and re.search(MARK2[e], txt):
+                for prop, col in API2[e].items():
+                    if re.search(r"\.%s\b" % prop, txt):
+                        use[e].setdefault(col, set()).add("API:" + short)
+    out = {}
+    for e, t in ENT2.items():
+        attrs = []
+        for c in sorted(use[e], key=lambda x: COLS2[t].index(x) if x in COLS2[t] else 99):
+            sq = sorted(x[4:] for x in use[e][c] if x.startswith("SQL:")); ap = sorted(x[4:] for x in use[e][c] if x.startswith("API:"))
+            n = "; ".join(p for p in (("SQL: " + ", ".join(sq)) if sq else "", ("API: " + ", ".join(ap)) if ap else "") if p)
+            attrs.append({"name": c, "type": ctype2(c), "notes": n[:480]})
+        out[e] = attrs
+    return out
