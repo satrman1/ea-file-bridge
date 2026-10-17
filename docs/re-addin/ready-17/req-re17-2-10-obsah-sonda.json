@@ -1,0 +1,307 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-10-obsah-sonda",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 12238,
+   "attributes": [
+    {
+     "name": "Request",
+     "type": "object",
+     "notes": "parametr Request operace katalogu"
+    },
+    {
+     "name": "Phase",
+     "type": "string",
+     "notes": "shape | targets"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12239,
+   "attributes": [
+    {
+     "name": "Ok",
+     "type": "boolean",
+     "notes": "Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,"
+    },
+    {
+     "name": "Problems",
+     "type": "array",
+     "notes": "Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,"
+    },
+    {
+     "name": "Resolved",
+     "type": "array",
+     "notes": "(zadani cile zapisu v1.1 kap. 5.3, 5.7); resolved[]."
+    },
+    {
+     "name": "Cascades",
+     "type": "array",
+     "notes": "pole odpovědi cascades (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "pole odpovědi warnings (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Audit",
+     "type": "string",
+     "notes": "code, message, suggestions? } ], audit: bool }. Jedna chyba se SEZNAMEM VSECH"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12236,
+     "notes": "Servisní realizace operace EAFB Batch Validation Engine Interface.PrecheckBatch - průběh odvozený z kódu src/AICodeBridge.FB_Precheck.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nDvoufázová předběžná kontrola dávky; vrací jednu chybu s problems[] (E_UNKNOWN_OP, E_ARGS, ...) nebo ok.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Precheck.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12237,
+     "notes": "DTO služby PrecheckBatch. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_Precheck.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_Precheck.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12238,
+     "notes": "Request služby PrecheckBatch (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12239,
+     "notes": "Response služby PrecheckBatch (tvar odpovědi v kódu src/AICodeBridge.FB_Precheck.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1248,
+   "elementPlacements": [
+    {
+     "elementID": 12237,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12238,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 80
+    },
+    {
+     "elementID": 12239,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11922,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12262
+    },
+    {
+     "owningElement": "{9180946A-B22A-4862-A3B1-679272679EFD}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12272
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1246,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[1]",
+     "x": 0,
+     "y": 290,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[5]",
+     "x": 90,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    },
+    {
+     "element": "$4[6]",
+     "x": 370,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1246,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 1,
+     "operation": 1295,
+     "arguments": "Request, Phase"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 2,
+     "name": "FB_OpsAllowed"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[4]",
+     "seqNo": 3,
+     "name": "FB_TargetCache"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 4,
+     "operation": 1298
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[1]",
+     "seqNo": 5,
+     "isReturn": true,
+     "name": "PrecheckBatchRes",
+     "notes": "Ok, Problems, Resolved, Cascades, Warnings, Code, Audit, Message"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1246
+  }
+ ]
+}

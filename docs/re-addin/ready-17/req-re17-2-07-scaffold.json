@@ -1,0 +1,84 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-07-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1342,
+   "packageName": "CreateOrUpdateMessages",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1343,
+   "packageName": "LayoutConnectors",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1344,
+   "packageName": "ChangeConnectorVisibility",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1345,
+   "packageName": "OpenDiagrams",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1346,
+   "packageName": "ReloadDiagrams",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1347,
+   "packageName": "UpdateDiagramProperties",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1348,
+   "packageName": "SetDiagramObjectStyle",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1349,
+   "packageName": "GetDiagramImage",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1350,
+   "packageName": "GetBaselines",
+   "targetPackage": "{2667996B-D556-4c7b-9A6E-E8713479ECBB}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1351,
+   "packageName": "BaselineDiff",
+   "targetPackage": "{2667996B-D556-4c7b-9A6E-E8713479ECBB}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1352,
+   "packageName": "CreateBaseline",
+   "targetPackage": "{2667996B-D556-4c7b-9A6E-E8713479ECBB}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1353,
+   "packageName": "CreateAutoBaseline",
+   "targetPackage": "{2667996B-D556-4c7b-9A6E-E8713479ECBB}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1161,1162)",
+   "maxRows": 200
+  }
+ ]
+}

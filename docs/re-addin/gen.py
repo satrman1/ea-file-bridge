@@ -653,6 +653,228 @@ def r17_7kanon():
         {"op":"query","sql":"SELECT Object_ID, Name, ParentID FROM t_object WHERE Object_ID IN (11963,11964,11967,11968,11971,11972,11975,11976)"},
         {"op":"query","sql":"SELECT Connector_ID, Connector_Type, Stereotype, Start_Object_ID, End_Object_ID FROM t_connector WHERE Connector_Type = 'Dependency' AND Start_Object_ID IN (11962,11966,11970,11974)"}])
 
+
+# =====================================================================
+# Z261017-2 reverse SR vsech operaci (2026-10-17) - davky do ready-17/ (id re17-2-*)
+# =====================================================================
+def z2_00():
+    """Prescan: ping, katalog operaci (85 / 14 rozhrani), SR s TV 505-1, balicky Logical Design, sablony scaffoldu, lifeliny 4 SR."""
+    return batch("re17-2-00-prescan", [
+     {"op":"ping"},
+     {"op":"query","sql":"SELECT o.Object_ID, o.Name AS Iface, p.OperationID, p.Name, p.ea_guid FROM t_operation p INNER JOIN t_object o ON p.Object_ID = o.Object_ID WHERE o.Package_ID = 1127 AND o.Object_Type = 'Interface' ORDER BY o.Object_ID, p.Pos, p.OperationID","maxRows":200},
+     {"op":"query","sql":"SELECT o.Object_ID, o.Name, o.Package_ID, t.Value FROM t_object o INNER JOIN t_objectproperties t ON t.Object_ID = o.Object_ID WHERE t.Property = '505-1 Operation Link' AND o.Package_ID >= 1124","maxRows":200},
+     {"op":"query","sql":"SELECT Package_ID, Name, Parent_ID, ea_guid FROM t_package WHERE Parent_ID IN (1128, 1129, 1130, 1131, 1136) OR Package_ID >= 1153","maxRows":200},
+     {"op":"query","sql":"SELECT Package_ID, Name, ea_guid FROM t_package WHERE Package_ID IN (1059, 1060)"},
+     {"op":"query","sql":"SELECT Object_ID, Name, Object_Type, Package_ID FROM t_object WHERE ea_guid IN ('{9D3D6D34-DDDB-4ac6-87D8-1B7938C65F8C}','{73A46459-E3D6-4413-BEE8-557E45E17F1A}','{800A1529-918A-4dd8-8CDA-E65504A3420C}','{ECFCBB28-C4EC-40f3-9CD7-2AF4F87244C0}')"},
+     {"op":"query","sql":"SELECT o.Object_ID, o.Object_Type, o.Classifier, c.Name AS ClassifierName, o.ParentID, o.Package_ID FROM t_object o LEFT JOIN t_object c ON c.Object_ID = o.Classifier WHERE o.Package_ID BETWEEN 1132 AND 1135 AND o.Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint')","maxRows":200},
+     {"op":"query","sql":"SELECT Object_ID, Name, Notes FROM t_object WHERE Object_ID = 11950"},
+     {"op":"query","sql":"SELECT COUNT(*) AS N FROM t_object WHERE Package_ID >= 1124 AND Package_ID <= 1160"}])
+
+import ir_sr as SR
+LD_EAFB = "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}"   # Logical Design/EA File Bridge (1129)
+NEW_COMP_PKGS = ["val","scope","risk","bpol","qc","itan","dga","bla","aud","code","xfa"]
+UTIL_IFACE = 11950
+UTIL_NOTE = ("Rozhraní komponenty EAFB Utilities (reverse z kódu).\n"
+             "Servisní realizace se pro operace Utility nezakládají (Z261017-2): IDesign Utility je průřezová pomůcka volaná ze všech vrstev, ne služba; "
+             "v sekvencích ostatních SR se volání Utility nekreslí.")
+def z2_01():
+    """Balicky komponent v Logical Design (chybi 11) + veta o Utility do notes rozhrani 11950."""
+    C = {c["key"]: c for c in I.COMPONENTS}
+    return batch("re17-2-01-balicky-komponent", [
+     {"op":"query","sql":"SELECT Object_ID, Name, Note FROM t_object WHERE Object_ID = %d" % UTIL_IFACE},
+     {"op":"create_or_update_package","packages":[{"parent":LD_EAFB,"name":C[k]["name"],
+        "notes":"Service packages operací komponenty %s (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)." % C[k]["name"]} for k in NEW_COMP_PKGS]},
+     {"op":"create_or_update_elements","elements":[{"elementID":UTIL_IFACE,"name":"EAFB Utilities Interface","notes":UTIL_NOTE}]},
+     {"op":"query","sql":"SELECT Package_ID, Name, ea_guid FROM t_package WHERE Parent_ID = 1129 ORDER BY Package_ID"}])
+
+def _scaf(o):
+    pid, pg = SR.LD_PKG[o[1]]
+    return {"op":"find_or_create_referencing_sr","operation":o[4],"packageName":o[0],"targetPackage":pg}
+def _readback(parent_ids):
+    sub = "SELECT Package_ID FROM t_package WHERE Parent_ID IN (%s)" % ",".join(str(p) for p in parent_ids)
+    obj = "SELECT Object_ID FROM t_object WHERE Package_ID IN (%s)" % sub
+    return [
+     {"op":"query","sql":"SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (%s)" % ",".join(str(p) for p in parent_ids),"maxRows":200},
+     {"op":"query","sql":"SELECT Object_ID, Name, Object_Type, Stereotype, ParentID, Package_ID, Note FROM t_object WHERE Package_ID IN (%s)" % sub,"maxRows":500},
+     {"op":"query","sql":"SELECT t.Object_ID, t.Property, t.Value FROM t_objectproperties t WHERE t.Property = '505-1 Operation Link' AND t.Object_ID IN (%s)" % obj,"maxRows":200},
+     {"op":"query","sql":"SELECT Diagram_ID, Name, Diagram_Type, ParentID, Package_ID, StyleEx FROM t_diagram WHERE Package_ID IN (%s)" % sub,"maxRows":500},
+     {"op":"query","sql":"SELECT Connector_ID, Connector_Type, SubType, Stereotype, Start_Object_ID, End_Object_ID, SourceIsAggregate, DestIsAggregate FROM t_connector WHERE Start_Object_ID IN (%s)" % obj,"maxRows":500},
+     {"op":"query","sql":"SELECT Diagram_ID, Object_ID, RectLeft, RectTop, RectRight, RectBottom FROM t_diagramobjects WHERE Diagram_ID IN (SELECT Diagram_ID FROM t_diagram WHERE Package_ID IN (%s))" % sub,"maxRows":500}]
+def z2_02():
+    """Sonda: scaffold jedne operace (Batch Validation.PrecheckBatch) + readback struktury."""
+    o = [x for x in SR.TODO if x[0] == "PrecheckBatch"][0]
+    return batch("re17-2-02-sonda-scaffold", [_scaf(o)] + _readback([SR.LD_PKG["val"][0]]))
+
+def z2_scaffold_batches(maxops=12, maxpkg=5):
+    """Strukturni davky: find_or_create_referencing_sr po komponentach (<= maxops operaci, <= maxpkg cilovych balicku)."""
+    todo = [o for o in SR.TODO if o[0] != "PrecheckBatch"]
+    out, cur, pk = [], [], set()
+    for o in todo:
+        if cur and (len(cur) >= maxops or (o[1] not in pk and len(pk) >= maxpkg)):
+            out.append(cur); cur, pk = [], set()
+        cur.append(o); pk.add(o[1])
+    if cur: out.append(cur)
+    bs = []
+    for k, grp in enumerate(out):
+        pids = sorted({SR.LD_PKG[o[1]][0] for o in grp})
+        bs.append(batch("re17-2-%02d-scaffold" % (3 + k), [_scaf(o) for o in grp] +
+            [{"op":"query","sql":"SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (%s)" % ",".join(map(str, pids)),"maxRows":200}]))
+    return bs
+
+# ---- obsah SR (krok 4): atributy Req/Res, notes, DTO diagram, sekvence z extract_calls ----
+import extract_calls as X
+SCAF_RES = ["re17-2-02-sonda-scaffold"] + ["re17-2-%02d-scaffold" % k for k in range(3, 9)]
+def load_scaffold():
+    """op -> {pkg, pkgGuid, sr, srGuid, dto, req, res, srDg, dtoDg, verDg} z odpovedi scaffoldu."""
+    byguid = {o[5]: o[0] for o in SR.OPS}
+    out = {}
+    for rid in SCAF_RES:
+        p = "../../responses/res-%s.json" % rid
+        if not os.path.exists(p): continue
+        d = json.load(io.open(p, encoding="utf-8-sig"))
+        for r in d.get("results", []):
+            if r.get("op") != "find_or_create_referencing_sr" or r.get("status") != "ok" or r.get("found"): continue
+            c = r["created"]; el = {e["role"]: e for e in c["elements"]}; dg = {x["role"]: x for x in c["diagrams"]}
+            out[byguid[r["operation"]]] = {"pkg": c["servicePackage"]["id"], "pkgGuid": c["servicePackage"]["guid"],
+                "sr": el["sr"]["id"], "srGuid": el["sr"]["guid"], "dto": el["dto"]["id"], "req": el["req"]["id"], "res": el["res"]["id"],
+                "srDg": dg["sr"]["id"], "dtoDg": dg["dto"]["id"], "verDg": dg["version"]["id"]}
+    return out
+def sr_id_map(scaf):
+    m = dict(SR.EXISTING_SR)
+    for k, v in scaf.items(): m[k] = v["sr"]
+    return m
+LIFE_STEREO = {"IDS-IDesign::IDS-Manager":"IDS-Manager","IDS-IDesign::IDS-Engine":"IDS-Engine","IDS-IDesign::IDS-Resource Access":"IDS-Resource Access",
+               "IDS-IDesign::IDS-File Resource":"IDS-File Resource","IDS-IDesign::IDS-Client":"IDS-Client"}
+RA = ("mea","dga","bla","aud","code","xfa")
+ENG = ("val","scope","risk","bpol","qc","itan")
+def sr_note(o, x):
+    c = [k for k in I.COMPONENTS if k["key"] == o[1]][0]
+    cop = [k for k in c["ops"] if k[0] == o[0]][0]
+    s = ["Servisní realizace operace %s.%s - průběh odvozený z kódu %s (as-implemented, src @ %s; docs/re-addin/extract_calls.py)." % (c["name"] + " Interface", o[0], "src/AICodeBridge.%s.js" % o[3], I.REF),
+         cop[3]]
+    dev = []
+    if o[1] in RA and "scope" in x["lifelines"]: dev.append("Resource Access sám volá Write Scope Engine (nález A1)")
+    if o[1] in ENG and any(l.startswith("E:") for l in x["lifelines"]): dev.append("Engine čte repozitář přímo přes Repository.SQLQuery / Automation, ne přes Resource Access (nález A4)")
+    if o[0] == "Query": dev.append("SQL přichází z dávky, tabulky se v kódu nedají určit - jen čtení (SELECT/WITH)")
+    if o[1] == "code": dev.append("složku src\\ čte přímo souborovým systémem (není výměnná složka, v sekvenci nekresleno)")
+    if x["candidates"]: dev.append("sahá i na tabulky bez entity v LDM: %s (kandidát entity, VYSLEDKY-2026-10-17 kap. 2)" % ", ".join(x["candidates"]))
+    if dev: s.append("As-implemented: " + "; ".join(dev) + ".")
+    return "\n".join(s)
+
+def sr_content_ops(o, sc, srid, comp, ent, crud, ops, xir):
+    x = xir[o[0]]
+    i0 = len(ops)
+    cp = "src/AICodeBridge.%s.js" % o[3]
+    if x["req"]: ops.append({"op":"create_or_update_attributes","element":sc["req"],"attributes":x["req"]})   # bez parametru = Req bez atributu (P2 odmita prazdny seznam)
+    if x["res"]: ops.append({"op":"create_or_update_attributes","element":sc["res"],"attributes":x["res"]})
+    src = {"SPEC":"pole z FB_FieldCheck SPEC, význam z hlavičky %s" % cp, "code":"pole op.<x> z kódu %s (operace nemá záznam v FB_FieldCheck SPEC)" % cp,
+           "params":"parametry operace katalogu"}[x["fieldsFrom"]]
+    ops.append({"op":"create_or_update_elements","elements":[
+        {"elementID":sc["sr"],"notes":sr_note(o, x),"taggedValues":tv(cp)},
+        {"elementID":sc["dto"],"notes":"DTO služby %s. Kontrakt žije v kódu (contractAuthority physical): %s; DTO je logický komentář, ne kopie." % (o[0], cp),"taggedValues":tv(cp)},
+        {"elementID":sc["req"],"notes":("Request služby %s (%s)." % (o[0], src)) if x["req"] else "Request služby %s - operace nemá vstupní parametry." % o[0]},
+        {"elementID":sc["res"],"notes":"Response služby %s (tvar odpovědi v kódu %s)." % (o[0], cp)}]})
+    ops.append({"op":"place_elements_on_diagram","diagram":sc["dtoDg"],"elementPlacements":[
+        {"elementID":sc["dto"],"x":260,"y":30,"width":220,"height":70},
+        {"elementID":sc["req"],"x":40,"y":180,"width":300,"height":40+20*len(x["req"])},
+        {"elementID":sc["res"],"x":380,"y":180,"width":320,"height":40+20*len(x["res"])}]})
+    # sekvence
+    ctype = {c["key"]: c["type"] for c in I.COMPONENTS}
+    els = [{"owningElement":sc["srGuid"],"type":"DiagramGate","name":""},{"owningElement":sc["srGuid"],"type":"DiagramGate","name":""}]
+    for l in x["lifelines"]:
+        if l.startswith("E:"): els.append({"owningElement":sc["srGuid"],"type":"Object","name":"","classifierID":ent[l[2:]]["id"],"stereotypes":"entity"})
+        else: els.append({"owningElement":sc["srGuid"],"type":"Object","name":"","classifierID":comp[l]["id"],"stereotypes":LIFE_STEREO[ctype[l]]})
+    refs = [r for r in x["refs"] if r in srid]
+    for r in refs: els.append({"owningElement":sc["srGuid"],"type":"InteractionOccurrence","name":"","classifierID":srid[r]})
+    ops.append({"op":"create_or_update_elements","elements":els}); ei = len(ops) - 1
+    nl = len(x["lifelines"]); nm = len(x["msgs"])
+    ybot = 160 + 34 * (nm + 2)
+    pl = [{"element":"$%d[0]" % ei,"x":0,"y":110,"width":10,"height":10},{"element":"$%d[1]" % ei,"x":0,"y":ybot - 40,"width":10,"height":10}]
+    for k in range(nl): pl.append({"element":"$%d[%d]" % (ei, 2 + k),"x":90 + k*170,"y":40,"width":130,"height":60})
+    for j in range(len(refs)): pl.append({"element":"$%d[%d]" % (ei, 2 + nl + j),"x":90 + (j % 3)*280,"y":ybot + (j // 3)*70,"width":260,"height":50})
+    ops.append({"op":"place_elements_on_diagram","diagram":sc["srDg"],"elementPlacements":pl})
+    idx = {l: 2 + k for k, l in enumerate(x["lifelines"])}
+    me = "$%d[%d]" % (ei, idx[o[1]])
+    rqn = ", ".join(a["name"] for a in x["req"] if a["name"] != "Op")
+    msgs = [{"source":"$%d[0]" % ei,"target":me,"seqNo":1,"operation":o[4],"arguments":rqn[:250]}]
+    for m in x["msgs"]:
+        mm = {"source":me,"target":"$%d[%d]" % (ei, idx[m["to"]]),"seqNo":len(msgs) + 1}
+        if "crud" in m: mm["operation"] = crud[(m["to"][2:], m["crud"])]
+        elif "file" in m: mm["name"] = "čtení souboru" if m["file"] == "R" else "zápis souboru"
+        elif m["op"]: mm["operation"] = [k for k in SR.OPS if k[0] == m["op"] and k[1] == m["to"]][0][4]
+        else: mm["name"] = m["fn"]
+        msgs.append(mm)
+    resn = ", ".join(a["name"] for a in x["res"])[:200]
+    msgs.append({"source":me,"target":"$%d[1]" % ei,"seqNo":len(msgs) + 1,"isReturn":True,"name":"%sRes" % o[0],"notes":resn})
+    ops.append({"op":"create_or_update_messages","diagram":sc["srDg"],"messages":msgs})
+    ops.append({"op":"apply_classifier_stereotypes","diagram":sc["srDg"]})
+
+def z2_content_batches(per=5, only=None):
+    comp, iface, pk = load_ids(); svc, spk, ent, crud = load_r3()
+    scaf = load_scaffold(); srid = sr_id_map(scaf)
+    xir = json.load(io.open("ir_sr_calls.json", encoding="utf-8"))
+    todo = [o for o in SR.TODO if o[0] in scaf and (only is None or o[0] in only)]
+    bs = []
+    for k in range(0, len(todo), per):
+        grp = todo[k:k+per]; ops = []
+        for o in grp: sr_content_ops(o, scaf[o[0]], srid, comp, ent, crud, ops, xir)
+        bs.append(batch("re17-2-%02d-obsah" % (40 + k // per), ops))
+    return bs
+
+# ---- krok 5: ref retez -> Usage SR -> SR; notes SR ProcessRequest (vycet registru) + stare SR bez zastarale vety o gatech ----
+import re as _re
+def registry():
+    t = io.open("../../src/AICodeBridge.FB_Main.js", encoding="utf-8").read()
+    return _re.findall(r'"([a-z_]+)":\s*\{\s*fn:\s*"([A-Za-z_]+)"', t)
+def z2_usage():
+    scaf = load_scaffold(); srid = sr_id_map(scaf)
+    xir = json.load(io.open("ir_sr_calls.json", encoding="utf-8"))
+    have = {(11961, 11969), (11961, 11973)}
+    pairs = []
+    def add(a, b, why):
+        if a != b and (a, b) not in have: have.add((a, b)); pairs.append((a, b, why))
+    for o in SR.OPS:
+        if o[0] not in srid or o[0] == "ProcessRequest": continue
+        x = xir.get(o[0]) or X.ir(o[0])
+        for r in x["refs"]:
+            if r in srid: add(srid[o[0]], srid[r], "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR %s)." % o[0])
+    pr = X.ir("ProcessRequest")
+    for r in pr["refs"]:
+        if r in srid: add(11961, srid[r], "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest).")
+    reg = registry(); regops = []
+    for p, f in reg:
+        op = X.OPFN[f][0]; regops.append((p, op))
+        if op in srid: add(11961, srid[op], "Impact: exekuce operace %s z registru FB_Main (ref „exekuce operací dávky z registru“)." % p)
+    conns = [{"source": a, "target": b, "type": "Usage", "direction": "FromSourceToTarget", "notes": w} for a, b, w in pairs]
+    S0 = {s["name"]: s for s in I.SERVICES}
+    def oldnote(n, extra=""):
+        s = S0[n]
+        return ("Servisní realizace operace %s - průběh odvozený z kódu (as-implemented, src @ %s).\n%s%s" % (s["op"], I.REF, I.SEQ[n]["note"], extra))
+    reglist = ", ".join("%s → SR %s" % (p, op) for p, op in regops)
+    prn = oldnote("ProcessRequest", "\nExekuce z registru: FB_Main volá %d protokolových operací přes this[reg.fn] (dynamicky - extraktor ji nevidí). Na diagramu ji zastupuje jedna zpráva „exekuce operací dávky z registru“ a refy na SR CreateOrUpdateElements a DeleteFromModel; vazby na SR všech operací registru jsou Usage (impact): %s." % (len(regops), reglist))
+    els = [{"elementID": 11961, "notes": prn}] + [{"elementID": SR.EXISTING_SR[n], "notes": oldnote(n)} for n in ("Ping", "CreateOrUpdateElements", "DeleteFromModel")]
+    return batch("re17-2-61-usage-sr", [{"op":"create_or_update_connectors","connectors":conns},{"op":"create_or_update_elements","elements":els}]), pairs
+
+# ---- krok 6: overeni ----
+SVCPK = "SELECT Package_ID FROM t_package WHERE Parent_ID IN (1130,1131,1155,1156,1157,1158,1159,1160,1161,1162,1163,1164,1165)"
+SRQ = "SELECT Object_ID FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (%s)" % SVCPK
+KONTROLY2 = [
+ ("SR v Logical Design", 76, "SELECT COUNT(*) AS N FROM t_object WHERE Stereotype = 'Service Realization' AND Package_ID IN (%s)" % SVCPK),
+ ("SR s TV 505-1 na operaci komponenty sveho balicku", 76, "SELECT COUNT(*) AS N FROM t_object s INNER JOIN t_objectproperties t ON t.Object_ID = s.Object_ID AND t.Property = '505-1 Operation Link' INNER JOIN t_operation p ON p.ea_guid = t.Value INNER JOIN t_object i ON i.Object_ID = p.Object_ID INNER JOIN t_package sp ON sp.Package_ID = s.Package_ID INNER JOIN t_package cp ON cp.Package_ID = sp.Parent_ID WHERE s.Stereotype = 'Service Realization' AND i.Name = cp.Name || ' Interface' AND s.Package_ID IN (%s)" % SVCPK),
+ ("operace mimo Utility bez SR", 0, "SELECT COUNT(*) AS N FROM t_operation p INNER JOIN t_object i ON i.Object_ID = p.Object_ID WHERE i.Package_ID = 1127 AND i.Object_Type = 'Interface' AND i.Object_ID <> 11950 AND p.ea_guid NOT IN (SELECT Value FROM t_objectproperties WHERE Property = '505-1 Operation Link')"),
+ ("DTO", 76, "SELECT COUNT(*) AS N FROM t_object WHERE Stereotype = 'Data Transfer Object' AND Package_ID IN (%s)" % SVCPK),
+ ("DTO s Req i Res pod sebou", 76, "SELECT COUNT(*) AS N FROM t_object d WHERE d.Stereotype = 'Data Transfer Object' AND d.Package_ID IN (%s) AND EXISTS (SELECT 1 FROM t_object q WHERE q.ParentID = d.Object_ID AND q.Name LIKE '%%Req') AND EXISTS (SELECT 1 FROM t_object r WHERE r.ParentID = d.Object_ID AND r.Name LIKE '%%Res')" % SVCPK),
+ ("lifeliny/refy/gaty s ParentID 0", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type IN ('Object','Component','InteractionOccurrence','MessageEndpoint') AND ParentID = 0 AND Package_ID IN (%s)" % SVCPK),
+ ("prvky se jmenem Object", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Name = 'Object' AND Package_ID IN (%s)" % SVCPK),
+ ("SR s DiagramGate", 76, "SELECT COUNT(DISTINCT ParentID) AS N FROM t_object WHERE Object_Type = 'MessageEndpoint' AND ParentID IN (%s)" % SRQ),
+ ("refy bez classifieru", 0, "SELECT COUNT(*) AS N FROM t_object WHERE Object_Type = 'InteractionOccurrence' AND Classifier = 0 AND Package_ID IN (%s)" % SVCPK),
+ ("Usage SR -> SR", None, "SELECT COUNT(*) AS N FROM t_connector WHERE Connector_Type = 'Usage' AND Start_Object_ID IN (%s) AND End_Object_ID IN (%s)" % (SRQ, SRQ)),
+]
+def z2_kontrola(id_="re17-2-62-kontrola"):
+    ops = [{"op":"query","sql":q} for _, _, q in KONTROLY2]
+    ops.append({"op":"query","sql":"SELECT s.Object_ID, s.Name, (SELECT COUNT(*) FROM t_object l WHERE l.ParentID = s.Object_ID AND l.Object_Type IN ('Object','Component')) AS L, (SELECT COUNT(*) FROM t_object r WHERE r.ParentID = s.Object_ID AND r.Object_Type = 'InteractionOccurrence') AS R, (SELECT COUNT(*) FROM t_connector c INNER JOIN t_diagram d ON c.DiagramID = d.Diagram_ID WHERE d.ParentID = s.Object_ID AND c.Connector_Type = 'Sequence') AS M FROM t_object s WHERE s.Stereotype = 'Service Realization' AND s.Package_ID IN (%s)" % SVCPK, "maxRows":200})
+    return batch(id_, ops)
+
 if __name__ == "__main__":
     which = sys.argv[1]
     b = globals()[which]()

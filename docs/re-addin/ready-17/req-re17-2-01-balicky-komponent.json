@@ -1,0 +1,85 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-01-balicky-komponent",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, Note FROM t_object WHERE Object_ID = 11950"
+  },
+  {
+   "op": "create_or_update_package",
+   "packages": [
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Batch Validation Engine",
+     "notes": "Service packages operací komponenty EAFB Batch Validation Engine (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Write Scope Engine",
+     "notes": "Service packages operací komponenty EAFB Write Scope Engine (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Risk Gate Engine",
+     "notes": "Service packages operací komponenty EAFB Risk Gate Engine (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Baseline Policy Engine",
+     "notes": "Service packages operací komponenty EAFB Baseline Policy Engine (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Quality Check Engine",
+     "notes": "Service packages operací komponenty EAFB Quality Check Engine (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB ITAN Methodology Engine",
+     "notes": "Service packages operací komponenty EAFB ITAN Methodology Engine (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Diagram Access",
+     "notes": "Service packages operací komponenty EAFB Diagram Access (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Baseline Access",
+     "notes": "Service packages operací komponenty EAFB Baseline Access (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Audit Access",
+     "notes": "Service packages operací komponenty EAFB Audit Access (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Code Access",
+     "notes": "Service packages operací komponenty EAFB Code Access (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    },
+    {
+     "parent": "{ED168EFF-CD5F-4df8-98B3-27076C7DB175}",
+     "name": "EAFB Exchange Folder Access",
+     "notes": "Service packages operací komponenty EAFB Exchange Folder Access (reverse z kódu, as-implemented; zrcadlo Logical Design EMR)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11950,
+     "name": "EAFB Utilities Interface",
+     "notes": "Rozhraní komponenty EAFB Utilities (reverse z kódu).\nServisní realizace se pro operace Utility nezakládají (Z261017-2): IDesign Utility je průřezová pomůcka volaná ze všech vrstev, ne služba; v sekvencích ostatních SR se volání Utility nekreslí."
+    }
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, ea_guid FROM t_package WHERE Parent_ID = 1129 ORDER BY Package_ID"
+  }
+ ]
+}

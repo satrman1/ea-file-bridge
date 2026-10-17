@@ -1,0 +1,1344 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-30-obsah",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 12498,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: change_connector_visibility"
+    },
+    {
+     "name": "Diagram",
+     "type": "string",
+     "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno"
+    },
+    {
+     "name": "ConnectorIDs",
+     "type": "string",
+     "notes": "op.connectorIDs = [ id, ... ]"
+    },
+    {
+     "name": "Hidden",
+     "type": "string",
+     "notes": "op.hidden = true (skryt) | false (zobrazit)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12499,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "DiagramID",
+     "type": "number",
+     "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno"
+    },
+    {
+     "name": "Hidden",
+     "type": "string",
+     "notes": "op.hidden = true (skryt) | false (zobrazit)"
+    },
+    {
+     "name": "ConnectorIDs",
+     "type": "string",
+     "notes": "op.connectorIDs = [ id, ... ]"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12496,
+     "notes": "Servisní realizace operace EAFB Diagram Access Interface.ChangeConnectorVisibility - průběh odvozený z kódu src/AICodeBridge.FB_OpConnectorVisibility.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace change_connector_visibility (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConnectorVisibility.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12497,
+     "notes": "DTO služby ChangeConnectorVisibility. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpConnectorVisibility.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConnectorVisibility.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12498,
+     "notes": "Request služby ChangeConnectorVisibility (pole op.<x> z kódu src/AICodeBridge.FB_OpConnectorVisibility.js (operace nemá záznam v FB_FieldCheck SPEC))."
+    },
+    {
+     "elementID": 12499,
+     "notes": "Response služby ChangeConnectorVisibility (tvar odpovědi v kódu src/AICodeBridge.FB_OpConnectorVisibility.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1452,
+   "elementPlacements": [
+    {
+     "elementID": 12497,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12498,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 120
+    },
+    {
+     "elementID": 12499,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 180
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{CD4AB343-F327-48c8-93DB-C9A55D9C85CE}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{CD4AB343-F327-48c8-93DB-C9A55D9C85CE}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{CD4AB343-F327-48c8-93DB-C9A55D9C85CE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11929,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{CD4AB343-F327-48c8-93DB-C9A55D9C85CE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{CD4AB343-F327-48c8-93DB-C9A55D9C85CE}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{CD4AB343-F327-48c8-93DB-C9A55D9C85CE}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1450,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[1]",
+     "x": 0,
+     "y": 290,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[5]",
+     "x": 90,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1450,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 1,
+     "operation": 1344,
+     "arguments": "Diagram, ConnectorIDs, Hidden"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[4]",
+     "seqNo": 2,
+     "operation": 1399
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 3,
+     "operation": 1300
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[4]",
+     "seqNo": 4,
+     "operation": 1400
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[1]",
+     "seqNo": 5,
+     "isReturn": true,
+     "name": "ChangeConnectorVisibilityRes",
+     "notes": "Op, Status, Code, Message, DiagramID, Hidden, ConnectorIDs"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1450
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12503,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: open_diagrams"
+    },
+    {
+     "name": "Diagrams",
+     "type": "array",
+     "notes": "op.diagrams = [ diagramID | \"{GUID}\" | jmeno, ... ]"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12504,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Opened",
+     "type": "string",
+     "notes": "pole odpovědi opened (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Count",
+     "type": "number",
+     "notes": "počet položek"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12501,
+     "notes": "Servisní realizace operace EAFB Diagram Access Interface.OpenDiagrams - průběh odvozený z kódu src/AICodeBridge.FB_OpOpenDiagrams.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace open_diagrams (čtení). UI operace.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpOpenDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12502,
+     "notes": "DTO služby OpenDiagrams. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpOpenDiagrams.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpOpenDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12503,
+     "notes": "Request služby OpenDiagrams (pole op.<x> z kódu src/AICodeBridge.FB_OpOpenDiagrams.js (operace nemá záznam v FB_FieldCheck SPEC))."
+    },
+    {
+     "elementID": 12504,
+     "notes": "Response služby OpenDiagrams (tvar odpovědi v kódu src/AICodeBridge.FB_OpOpenDiagrams.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1456,
+   "elementPlacements": [
+    {
+     "elementID": 12502,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12503,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 80
+    },
+    {
+     "elementID": 12504,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 160
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{4902C86A-96E8-4dd6-BD63-F20A837C42B0}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{4902C86A-96E8-4dd6-BD63-F20A837C42B0}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{4902C86A-96E8-4dd6-BD63-F20A837C42B0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11929,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{4902C86A-96E8-4dd6-BD63-F20A837C42B0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1454,
+   "elementPlacements": [
+    {
+     "element": "$12[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[1]",
+     "x": 0,
+     "y": 222,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1454,
+   "messages": [
+    {
+     "source": "$12[0]",
+     "target": "$12[2]",
+     "seqNo": 1,
+     "operation": 1345,
+     "arguments": "Diagrams"
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[3]",
+     "seqNo": 2,
+     "operation": 1399
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[1]",
+     "seqNo": 3,
+     "isReturn": true,
+     "name": "OpenDiagramsRes",
+     "notes": "Op, Status, Code, Message, Opened, Count"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1454
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12508,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: reload_diagrams"
+    },
+    {
+     "name": "Diagrams",
+     "type": "array",
+     "notes": "op.diagrams = [ diagramID | \"{GUID}\", ... ]"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12509,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Reloaded",
+     "type": "string",
+     "notes": "pole odpovědi reloaded (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Count",
+     "type": "number",
+     "notes": "počet položek"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12506,
+     "notes": "Servisní realizace operace EAFB Diagram Access Interface.ReloadDiagrams - průběh odvozený z kódu src/AICodeBridge.FB_OpReloadDiagrams.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace reload_diagrams (čtení). UI operace.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpReloadDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12507,
+     "notes": "DTO služby ReloadDiagrams. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpReloadDiagrams.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpReloadDiagrams.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12508,
+     "notes": "Request služby ReloadDiagrams (pole op.<x> z kódu src/AICodeBridge.FB_OpReloadDiagrams.js (operace nemá záznam v FB_FieldCheck SPEC))."
+    },
+    {
+     "elementID": 12509,
+     "notes": "Response služby ReloadDiagrams (tvar odpovědi v kódu src/AICodeBridge.FB_OpReloadDiagrams.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1460,
+   "elementPlacements": [
+    {
+     "elementID": 12507,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12508,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 80
+    },
+    {
+     "elementID": 12509,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 160
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{9BF89451-F2BE-4315-B8D9-696202E12351}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{9BF89451-F2BE-4315-B8D9-696202E12351}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{9BF89451-F2BE-4315-B8D9-696202E12351}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11929,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{9BF89451-F2BE-4315-B8D9-696202E12351}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1458,
+   "elementPlacements": [
+    {
+     "element": "$20[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[1]",
+     "x": 0,
+     "y": 222,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1458,
+   "messages": [
+    {
+     "source": "$20[0]",
+     "target": "$20[2]",
+     "seqNo": 1,
+     "operation": 1346,
+     "arguments": "Diagrams"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[3]",
+     "seqNo": 2,
+     "operation": 1399
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[1]",
+     "seqNo": 3,
+     "isReturn": true,
+     "name": "ReloadDiagramsRes",
+     "notes": "Op, Status, Code, Message, Reloaded, Count"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1458
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12513,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: update_diagram_properties"
+    },
+    {
+     "name": "Diagrams",
+     "type": "array",
+     "notes": "op.diagrams = [ { diagram: id|\"{GUID}\"|jmeno, name, author, version, | položka: diagram, name, author, version, showDetails, styleEx"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12514,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Guid",
+     "type": "string",
+     "notes": "GUID hlavního výsledku"
+    },
+    {
+     "name": "Id",
+     "type": "number",
+     "notes": "ID hlavního výsledku"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12511,
+     "notes": "Servisní realizace operace EAFB Diagram Access Interface.UpdateDiagramProperties - průběh odvozený z kódu src/AICodeBridge.FB_OpUpdateDiagramProps.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace update_diagram_properties (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpUpdateDiagramProps.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12512,
+     "notes": "DTO služby UpdateDiagramProperties. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpUpdateDiagramProps.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpUpdateDiagramProps.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12513,
+     "notes": "Request služby UpdateDiagramProperties (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpUpdateDiagramProps.js)."
+    },
+    {
+     "elementID": 12514,
+     "notes": "Response služby UpdateDiagramProperties (tvar odpovědi v kódu src/AICodeBridge.FB_OpUpdateDiagramProps.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1464,
+   "elementPlacements": [
+    {
+     "elementID": 12512,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12513,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 80
+    },
+    {
+     "elementID": 12514,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 180
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{1C223D31-96C0-4362-B760-5D251FF4D883}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{1C223D31-96C0-4362-B760-5D251FF4D883}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{1C223D31-96C0-4362-B760-5D251FF4D883}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11929,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{1C223D31-96C0-4362-B760-5D251FF4D883}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{1C223D31-96C0-4362-B760-5D251FF4D883}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{1C223D31-96C0-4362-B760-5D251FF4D883}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1462,
+   "elementPlacements": [
+    {
+     "element": "$28[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[1]",
+     "x": 0,
+     "y": 290,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[5]",
+     "x": 90,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1462,
+   "messages": [
+    {
+     "source": "$28[0]",
+     "target": "$28[2]",
+     "seqNo": 1,
+     "operation": 1347,
+     "arguments": "Diagrams"
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[4]",
+     "seqNo": 2,
+     "operation": 1399
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[3]",
+     "seqNo": 3,
+     "operation": 1300
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[4]",
+     "seqNo": 4,
+     "operation": 1400
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[1]",
+     "seqNo": 5,
+     "isReturn": true,
+     "name": "UpdateDiagramPropertiesRes",
+     "notes": "Op, Status, Code, Message, Items, Guid, Id"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1462
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12518,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: set_diagram_object_style"
+    },
+    {
+     "name": "Diagram",
+     "type": "string",
+     "notes": "op.diagram = diagramID | \"{GUID}\""
+    },
+    {
+     "name": "Objects",
+     "type": "array",
+     "notes": "op.objects = [ { elementID, backgroundColor: {red,green,blue}, | položka: elementID, backgroundColor, fontColor, borderColor, borderWidth, reset"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12519,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "DiagramID",
+     "type": "number",
+     "notes": "op.diagram = diagramID | \"{GUID}\""
+    },
+    {
+     "name": "ChangedElementIDs",
+     "type": "string",
+     "notes": "pole odpovědi changedElementIDs (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Count",
+     "type": "number",
+     "notes": "počet položek"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12516,
+     "notes": "Servisní realizace operace EAFB Diagram Access Interface.SetDiagramObjectStyle - průběh odvozený z kódu src/AICodeBridge.FB_OpDiagramObjectStyle.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace set_diagram_object_style (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDiagramObjectStyle.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12517,
+     "notes": "DTO služby SetDiagramObjectStyle. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpDiagramObjectStyle.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDiagramObjectStyle.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12518,
+     "notes": "Request služby SetDiagramObjectStyle (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpDiagramObjectStyle.js)."
+    },
+    {
+     "elementID": 12519,
+     "notes": "Response služby SetDiagramObjectStyle (tvar odpovědi v kódu src/AICodeBridge.FB_OpDiagramObjectStyle.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1468,
+   "elementPlacements": [
+    {
+     "elementID": 12517,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12518,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12519,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 180
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{03BF3BC1-69D5-4eee-84F9-B9AFA46BC136}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{03BF3BC1-69D5-4eee-84F9-B9AFA46BC136}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{03BF3BC1-69D5-4eee-84F9-B9AFA46BC136}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11929,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{03BF3BC1-69D5-4eee-84F9-B9AFA46BC136}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{03BF3BC1-69D5-4eee-84F9-B9AFA46BC136}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{03BF3BC1-69D5-4eee-84F9-B9AFA46BC136}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1466,
+   "elementPlacements": [
+    {
+     "element": "$36[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[1]",
+     "x": 0,
+     "y": 290,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[5]",
+     "x": 90,
+     "y": 330,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1466,
+   "messages": [
+    {
+     "source": "$36[0]",
+     "target": "$36[2]",
+     "seqNo": 1,
+     "operation": 1348,
+     "arguments": "Diagram, Objects"
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[4]",
+     "seqNo": 2,
+     "operation": 1399
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[3]",
+     "seqNo": 3,
+     "operation": 1300
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[4]",
+     "seqNo": 4,
+     "operation": 1400
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[1]",
+     "seqNo": 5,
+     "isReturn": true,
+     "name": "SetDiagramObjectStyleRes",
+     "notes": "Op, Status, Code, Message, DiagramID, ChangedElementIDs, Count"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1466
+  }
+ ]
+}

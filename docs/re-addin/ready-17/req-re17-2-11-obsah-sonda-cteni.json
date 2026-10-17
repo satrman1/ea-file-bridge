@@ -1,0 +1,29 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-11-obsah-sonda-cteni",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "reload_diagrams",
+   "diagrams": [
+    1246,
+    1248
+   ]
+  },
+  {
+   "op": "get_diagram_image",
+   "diagrams": [
+    1246,
+    1248
+   ]
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, Object_Type, Stereotype, ParentID, Classifier, PDATA1 FROM t_object WHERE ParentID = 12236"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, Name, SeqNo, Start_Object_ID, End_Object_ID, PDATA1, PDATA2 FROM t_connector WHERE DiagramID = 1246 ORDER BY SeqNo"
+  }
+ ]
+}

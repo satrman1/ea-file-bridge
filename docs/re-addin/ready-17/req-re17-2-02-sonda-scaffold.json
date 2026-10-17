@@ -1,0 +1,43 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-02-sonda-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1295,
+   "packageName": "PrecheckBatch",
+   "targetPackage": "{839375D5-99F7-4e62-8A85-212F1898C37C}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1155)",
+   "maxRows": 200
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Object_ID, Name, Object_Type, Stereotype, ParentID, Package_ID, Note FROM t_object WHERE Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1155))",
+   "maxRows": 500
+  },
+  {
+   "op": "query",
+   "sql": "SELECT t.Object_ID, t.Property, t.Value FROM t_objectproperties t WHERE t.Property = '505-1 Operation Link' AND t.Object_ID IN (SELECT Object_ID FROM t_object WHERE Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1155)))",
+   "maxRows": 200
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Diagram_ID, Name, Diagram_Type, ParentID, Package_ID, StyleEx FROM t_diagram WHERE Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1155))",
+   "maxRows": 500
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Connector_ID, Connector_Type, SubType, Stereotype, Start_Object_ID, End_Object_ID, SourceIsAggregate, DestIsAggregate FROM t_connector WHERE Start_Object_ID IN (SELECT Object_ID FROM t_object WHERE Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1155)))",
+   "maxRows": 500
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Diagram_ID, Object_ID, RectLeft, RectTop, RectRight, RectBottom FROM t_diagramobjects WHERE Diagram_ID IN (SELECT Diagram_ID FROM t_diagram WHERE Package_ID IN (SELECT Package_ID FROM t_package WHERE Parent_ID IN (1155)))",
+   "maxRows": 500
+  }
+ ]
+}

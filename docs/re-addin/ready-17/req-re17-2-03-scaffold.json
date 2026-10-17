@@ -1,0 +1,84 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-03-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1290,
+   "packageName": "ConfirmPending",
+   "targetPackage": "{10FBED76-0E6A-4351-BCD1-B3FF199ADBF6}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1291,
+   "packageName": "SweepPending",
+   "targetPackage": "{10FBED76-0E6A-4351-BCD1-B3FF199ADBF6}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1292,
+   "packageName": "StartSession",
+   "targetPackage": "{10FBED76-0E6A-4351-BCD1-B3FF199ADBF6}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1294,
+   "packageName": "GetStatus",
+   "targetPackage": "{10FBED76-0E6A-4351-BCD1-B3FF199ADBF6}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1296,
+   "packageName": "CheckFields",
+   "targetPackage": "{839375D5-99F7-4e62-8A85-212F1898C37C}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1297,
+   "packageName": "InterpretError",
+   "targetPackage": "{839375D5-99F7-4e62-8A85-212F1898C37C}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1298,
+   "packageName": "PrecheckTargets",
+   "targetPackage": "{318C19BF-17F5-44ae-B771-3D21F7EAF9AE}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1299,
+   "packageName": "CheckWrite",
+   "targetPackage": "{318C19BF-17F5-44ae-B771-3D21F7EAF9AE}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1300,
+   "packageName": "CheckWriteElement",
+   "targetPackage": "{318C19BF-17F5-44ae-B771-3D21F7EAF9AE}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1301,
+   "packageName": "CheckUserAccess",
+   "targetPackage": "{318C19BF-17F5-44ae-B771-3D21F7EAF9AE}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1302,
+   "packageName": "DescribeScope",
+   "targetPackage": "{318C19BF-17F5-44ae-B771-3D21F7EAF9AE}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1303,
+   "packageName": "ClassifyBatch",
+   "targetPackage": "{8FD7F5D9-BDDD-4641-AF25-AF7B935BA32C}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1130,1155,1156,1157)",
+   "maxRows": 200
+  }
+ ]
+}

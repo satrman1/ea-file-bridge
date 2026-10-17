@@ -1,0 +1,215 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-34-obsah",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 12599,
+   "attributes": []
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12600,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "string",
+     "notes": "návratová hodnota (string): Kořen výměnné složky pro připojený repozitář."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12597,
+     "notes": "Servisní realizace operace EAFB Exchange Folder Access Interface.ResolveBaseDir - průběh odvozený z kódu src/AICodeBridge.FB_ResolveBaseDir.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nKořen výměnné složky pro připojený repozitář.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ResolveBaseDir.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12598,
+     "notes": "DTO služby ResolveBaseDir. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_ResolveBaseDir.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_ResolveBaseDir.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12599,
+     "notes": "Request služby ResolveBaseDir (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12600,
+     "notes": "Response služby ResolveBaseDir (tvar odpovědi v kódu src/AICodeBridge.FB_ResolveBaseDir.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1532,
+   "elementPlacements": [
+    {
+     "elementID": 12598,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12599,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 40
+    },
+    {
+     "elementID": 12600,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{4A8F23A8-9BC1-4367-93DC-EE0E330D1C21}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{4A8F23A8-9BC1-4367-93DC-EE0E330D1C21}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{4A8F23A8-9BC1-4367-93DC-EE0E330D1C21}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11933,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{4A8F23A8-9BC1-4367-93DC-EE0E330D1C21}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11935,
+     "stereotypes": "IDS-File Resource"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1530,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[1]",
+     "x": 0,
+     "y": 256,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1530,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 1,
+     "operation": 1364,
+     "arguments": ""
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 2,
+     "name": "zápis souboru"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 3,
+     "name": "čtení souboru"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[1]",
+     "seqNo": 4,
+     "isReturn": true,
+     "name": "ResolveBaseDirRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1530
+  }
+ ]
+}

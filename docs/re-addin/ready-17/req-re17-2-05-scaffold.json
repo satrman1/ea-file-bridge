@@ -1,0 +1,84 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-05-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1316,
+   "packageName": "GetSelectedContext",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1317,
+   "packageName": "FindElementsByName",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1318,
+   "packageName": "FindPackagesByName",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1319,
+   "packageName": "GetElementsInformation",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1320,
+   "packageName": "GetPackagesInformation",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1321,
+   "packageName": "GetConnectorsInformation",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1322,
+   "packageName": "CreateElement",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1324,
+   "packageName": "MoveElements",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1325,
+   "packageName": "CreateOrUpdatePackage",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1326,
+   "packageName": "CreateOrUpdateConnectors",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1327,
+   "packageName": "CreateOrUpdateAttributes",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1328,
+   "packageName": "CreateOrUpdateOperations",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1131)",
+   "maxRows": 200
+  }
+ ]
+}

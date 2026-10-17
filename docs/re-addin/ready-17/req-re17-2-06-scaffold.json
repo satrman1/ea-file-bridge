@@ -1,0 +1,84 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-06-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1329,
+   "packageName": "CreateOrUpdateScenarios",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1330,
+   "packageName": "CreateOrUpdateConstraints",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1331,
+   "packageName": "CreateOrUpdateRequirements",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1333,
+   "packageName": "DeleteTaggedvalueFromModel",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1334,
+   "packageName": "ClonePackage",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1335,
+   "packageName": "CloneElements",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1336,
+   "packageName": "ExportElementLinkedDocuments",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1337,
+   "packageName": "ImportElementLinkedDocuments",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1338,
+   "packageName": "GetDiagramsInformation",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1339,
+   "packageName": "CreateOrUpdateDiagram",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1340,
+   "packageName": "PlaceElementsOnDiagram",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1341,
+   "packageName": "RemoveElementsFromDiagram",
+   "targetPackage": "{6160A96A-4D2A-4c08-9729-FB6D277B2C50}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1131,1161)",
+   "maxRows": 200
+  }
+ ]
+}

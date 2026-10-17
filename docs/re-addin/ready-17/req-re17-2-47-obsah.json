@@ -1,0 +1,1943 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-47-obsah",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 12421,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: create_or_update_operations"
+    },
+    {
+     "name": "Element",
+     "type": "string",
+     "notes": "op.element = cilovy element (\"{GUID}\" | id | jmeno | $ref)"
+    },
+    {
+     "name": "Operations",
+     "type": "array",
+     "notes": "op.operations = [ { | položka: operationID, guid, name, returnType, returnClassifierID, returnClassifier, notes, description, stereotype, isStatic, isAbstract, parameters, taggedValues"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12422,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Guid",
+     "type": "string",
+     "notes": "GUID hlavního výsledku"
+    },
+    {
+     "name": "Id",
+     "type": "number",
+     "notes": "ID hlavního výsledku"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12419,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.CreateOrUpdateOperations - průběh odvozený z kódu src/AICodeBridge.FB_OpOperations.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace create_or_update_operations (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1); sahá i na tabulky bez entity v LDM: t_operationparams (kandidát entity, VYSLEDKY-2026-10-17 kap. 2).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpOperations.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12420,
+     "notes": "DTO služby CreateOrUpdateOperations. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpOperations.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpOperations.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12421,
+     "notes": "Request služby CreateOrUpdateOperations (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpOperations.js)."
+    },
+    {
+     "elementID": 12422,
+     "notes": "Response služby CreateOrUpdateOperations (tvar odpovědi v kódu src/AICodeBridge.FB_OpOperations.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1392,
+   "elementPlacements": [
+    {
+     "elementID": 12420,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12421,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12422,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11981,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11980,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11982,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{F09D4CB7-A4DF-41d6-8CDD-D7BB21358172}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1390,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[1]",
+     "x": 0,
+     "y": 596,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[7]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[8]",
+     "x": 1110,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[9]",
+     "x": 1280,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[10]",
+     "x": 1450,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[11]",
+     "x": 90,
+     "y": 636,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1390,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 1,
+     "operation": 1328,
+     "arguments": "Element, Operations"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[4]",
+     "seqNo": 2,
+     "operation": 1375
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[5]",
+     "seqNo": 3,
+     "operation": 1399
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[6]",
+     "seqNo": 4,
+     "operation": 1379
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 5,
+     "operation": 1300
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[7]",
+     "seqNo": 6,
+     "operation": 1390
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[7]",
+     "seqNo": 7,
+     "operation": 1392
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[7]",
+     "seqNo": 8,
+     "operation": 1391
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[8]",
+     "seqNo": 9,
+     "operation": 1387
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[9]",
+     "seqNo": 10,
+     "operation": 1395
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[10]",
+     "seqNo": 11,
+     "operation": 1383
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[10]",
+     "seqNo": 12,
+     "operation": 1384
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[10]",
+     "seqNo": 13,
+     "operation": 1382
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[1]",
+     "seqNo": 14,
+     "isReturn": true,
+     "name": "CreateOrUpdateOperationsRes",
+     "notes": "Op, Status, Code, Message, Items, Guid, Id, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1390
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12427,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: create_or_update_scenarios"
+    },
+    {
+     "name": "Element",
+     "type": "string",
+     "notes": "op.element = cilovy element (\"{GUID}\" | elementID | jmeno | $ref), typicky UseCase"
+    },
+    {
+     "name": "Scenarios",
+     "type": "array",
+     "notes": "op.scenarios = [ { | položka: name, type, notes, steps, attachTo, join"
+    },
+    {
+     "name": "Probe",
+     "type": "boolean",
+     "notes": "op.probe = true -> rozsireny readback (raw t_objectscenarios + XML snapshoty)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12428,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Removed",
+     "type": "array",
+     "notes": "pole odpovědi removed (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Guid",
+     "type": "string",
+     "notes": "GUID hlavního výsledku"
+    },
+    {
+     "name": "Id",
+     "type": "number",
+     "notes": "ID hlavního výsledku"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12425,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.CreateOrUpdateScenarios - průběh odvozený z kódu src/AICodeBridge.FB_OpScenarios.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace create_or_update_scenarios (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1); sahá i na tabulky bez entity v LDM: t_objectscenarios (kandidát entity, VYSLEDKY-2026-10-17 kap. 2).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpScenarios.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12426,
+     "notes": "DTO služby CreateOrUpdateScenarios. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpScenarios.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpScenarios.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12427,
+     "notes": "Request služby CreateOrUpdateScenarios (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpScenarios.js)."
+    },
+    {
+     "elementID": 12428,
+     "notes": "Response služby CreateOrUpdateScenarios (tvar odpovědi v kódu src/AICodeBridge.FB_OpScenarios.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1396,
+   "elementPlacements": [
+    {
+     "elementID": 12426,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12427,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 120
+    },
+    {
+     "elementID": 12428,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 220
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{4D510B85-4043-4e5a-9423-6D948B216F00}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1394,
+   "elementPlacements": [
+    {
+     "element": "$12[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[1]",
+     "x": 0,
+     "y": 426,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[7]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[8]",
+     "x": 90,
+     "y": 466,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1394,
+   "messages": [
+    {
+     "source": "$12[0]",
+     "target": "$12[2]",
+     "seqNo": 1,
+     "operation": 1329,
+     "arguments": "Element, Scenarios, Probe"
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[4]",
+     "seqNo": 2,
+     "operation": 1375
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[5]",
+     "seqNo": 3,
+     "operation": 1399
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[6]",
+     "seqNo": 4,
+     "operation": 1379
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[3]",
+     "seqNo": 5,
+     "operation": 1300
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[7]",
+     "seqNo": 6,
+     "operation": 1383
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[7]",
+     "seqNo": 7,
+     "operation": 1384
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[7]",
+     "seqNo": 8,
+     "operation": 1382
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[1]",
+     "seqNo": 9,
+     "isReturn": true,
+     "name": "CreateOrUpdateScenariosRes",
+     "notes": "Op, Status, Code, Message, Items, Removed, Guid, Id, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1394
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12432,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: create_or_update_constraints"
+    },
+    {
+     "name": "Element",
+     "type": "string",
+     "notes": "op.element = cilovy element (\"{GUID}\" | elementID | jmeno | $ref), typicky UseCase"
+    },
+    {
+     "name": "Constraints",
+     "type": "array",
+     "notes": "create_or_update_constraints - internal constraints elementu (zalozka | položka: name, type, notes, status"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12433,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Guid",
+     "type": "string",
+     "notes": "GUID hlavního výsledku"
+    },
+    {
+     "name": "Id",
+     "type": "number",
+     "notes": "ID hlavního výsledku"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12430,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.CreateOrUpdateConstraints - průběh odvozený z kódu src/AICodeBridge.FB_OpConstraints.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace create_or_update_constraints (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1); sahá i na tabulky bez entity v LDM: t_objectconstraint (kandidát entity, VYSLEDKY-2026-10-17 kap. 2).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConstraints.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12431,
+     "notes": "DTO služby CreateOrUpdateConstraints. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpConstraints.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpConstraints.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12432,
+     "notes": "Request služby CreateOrUpdateConstraints (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpConstraints.js)."
+    },
+    {
+     "elementID": 12433,
+     "notes": "Response služby CreateOrUpdateConstraints (tvar odpovědi v kódu src/AICodeBridge.FB_OpConstraints.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1400,
+   "elementPlacements": [
+    {
+     "elementID": 12431,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12432,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12433,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{EC67BAB4-CA25-4ea9-A0E6-347201762F94}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1398,
+   "elementPlacements": [
+    {
+     "element": "$20[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[1]",
+     "x": 0,
+     "y": 426,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[7]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[8]",
+     "x": 90,
+     "y": 466,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1398,
+   "messages": [
+    {
+     "source": "$20[0]",
+     "target": "$20[2]",
+     "seqNo": 1,
+     "operation": 1330,
+     "arguments": "Element, Constraints"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[4]",
+     "seqNo": 2,
+     "operation": 1375
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[5]",
+     "seqNo": 3,
+     "operation": 1399
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[6]",
+     "seqNo": 4,
+     "operation": 1379
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[3]",
+     "seqNo": 5,
+     "operation": 1300
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[7]",
+     "seqNo": 6,
+     "operation": 1383
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[7]",
+     "seqNo": 7,
+     "operation": 1384
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[7]",
+     "seqNo": 8,
+     "operation": 1382
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[1]",
+     "seqNo": 9,
+     "isReturn": true,
+     "name": "CreateOrUpdateConstraintsRes",
+     "notes": "Op, Status, Code, Message, Items, Guid, Id, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1398
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12437,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: create_or_update_requirements"
+    },
+    {
+     "name": "Element",
+     "type": "string",
+     "notes": "- local [Requirement internal]\"): lokalni BRU NENI samostatny element pod"
+    },
+    {
+     "name": "Requirements",
+     "type": "array",
+     "notes": "requirements elementu se SMAZOU a zapisi znovu v poradi davky - zadne | položka: name, notes, type, status, priority, difficulty, stability"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12438,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Guid",
+     "type": "string",
+     "notes": "GUID hlavního výsledku"
+    },
+    {
+     "name": "Id",
+     "type": "number",
+     "notes": "ID hlavního výsledku"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12435,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.CreateOrUpdateRequirements - průběh odvozený z kódu src/AICodeBridge.FB_OpRequirements.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace create_or_update_requirements (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1); sahá i na tabulky bez entity v LDM: t_objectrequires (kandidát entity, VYSLEDKY-2026-10-17 kap. 2).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpRequirements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12436,
+     "notes": "DTO služby CreateOrUpdateRequirements. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpRequirements.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpRequirements.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12437,
+     "notes": "Request služby CreateOrUpdateRequirements (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpRequirements.js)."
+    },
+    {
+     "elementID": 12438,
+     "notes": "Response služby CreateOrUpdateRequirements (tvar odpovědi v kódu src/AICodeBridge.FB_OpRequirements.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1404,
+   "elementPlacements": [
+    {
+     "elementID": 12436,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12437,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12438,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 200
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{64EF10D4-00AA-45b7-B37C-A3FCC3280CE3}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1402,
+   "elementPlacements": [
+    {
+     "element": "$28[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[1]",
+     "x": 0,
+     "y": 426,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[7]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[8]",
+     "x": 90,
+     "y": 466,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1402,
+   "messages": [
+    {
+     "source": "$28[0]",
+     "target": "$28[2]",
+     "seqNo": 1,
+     "operation": 1331,
+     "arguments": "Element, Requirements"
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[4]",
+     "seqNo": 2,
+     "operation": 1375
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[5]",
+     "seqNo": 3,
+     "operation": 1399
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[6]",
+     "seqNo": 4,
+     "operation": 1379
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[3]",
+     "seqNo": 5,
+     "operation": 1300
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[7]",
+     "seqNo": 6,
+     "operation": 1383
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[7]",
+     "seqNo": 7,
+     "operation": 1384
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[7]",
+     "seqNo": 8,
+     "operation": 1382
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[1]",
+     "seqNo": 9,
+     "isReturn": true,
+     "name": "CreateOrUpdateRequirementsRes",
+     "notes": "Op, Status, Code, Message, Items, Guid, Id, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1402
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12442,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: delete_taggedvalue_from_model"
+    },
+    {
+     "name": "Targets",
+     "type": "array",
+     "notes": "op.targets = [ { type: \"ElementTaggedValue|ConnectorTaggedValue|AttributeTaggedValue | položka: type, id, name"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12443,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Count",
+     "type": "number",
+     "notes": "počet položek"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12440,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.DeleteTaggedvalueFromModel - průběh odvozený z kódu src/AICodeBridge.FB_OpDeleteTag.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace delete_taggedvalue_from_model (zápis).\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDeleteTag.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12441,
+     "notes": "DTO služby DeleteTaggedvalueFromModel. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpDeleteTag.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpDeleteTag.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12442,
+     "notes": "Request služby DeleteTaggedvalueFromModel (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpDeleteTag.js)."
+    },
+    {
+     "elementID": 12443,
+     "notes": "Response služby DeleteTaggedvalueFromModel (tvar odpovědi v kódu src/AICodeBridge.FB_OpDeleteTag.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1408,
+   "elementPlacements": [
+    {
+     "elementID": 12441,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12442,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 80
+    },
+    {
+     "elementID": 12443,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 160
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11982,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11980,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11981,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    },
+    {
+     "owningElement": "{9C699FE1-E11B-4701-9E21-B3E6EB869DC0}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12277
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1406,
+   "elementPlacements": [
+    {
+     "element": "$36[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[1]",
+     "x": 0,
+     "y": 562,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[7]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[8]",
+     "x": 1110,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[9]",
+     "x": 1280,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[10]",
+     "x": 1450,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[11]",
+     "x": 90,
+     "y": 602,
+     "width": 260,
+     "height": 50
+    },
+    {
+     "element": "$36[12]",
+     "x": 370,
+     "y": 602,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1406,
+   "messages": [
+    {
+     "source": "$36[0]",
+     "target": "$36[2]",
+     "seqNo": 1,
+     "operation": 1333,
+     "arguments": "Targets"
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[4]",
+     "seqNo": 2,
+     "operation": 1375
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[5]",
+     "seqNo": 3,
+     "operation": 1399
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[6]",
+     "seqNo": 4,
+     "operation": 1379
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[7]",
+     "seqNo": 5,
+     "operation": 1395
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[8]",
+     "seqNo": 6,
+     "operation": 1387
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[9]",
+     "seqNo": 7,
+     "operation": 1391
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[3]",
+     "seqNo": 8,
+     "operation": 1300
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[3]",
+     "seqNo": 9,
+     "operation": 1299
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[10]",
+     "seqNo": 10,
+     "operation": 1383
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[10]",
+     "seqNo": 11,
+     "operation": 1384
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[10]",
+     "seqNo": 12,
+     "operation": 1382
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[1]",
+     "seqNo": 13,
+     "isReturn": true,
+     "name": "DeleteTaggedvalueFromModelRes",
+     "notes": "Op, Status, Code, Message, Items, Count"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1406
+  }
+ ]
+}

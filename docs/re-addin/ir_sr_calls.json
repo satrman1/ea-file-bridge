@@ -1,0 +1,6147 @@
+{
+ "ConfirmPending": {
+  "op": "ConfirmPending",
+  "comp": "rm",
+  "fn": "FB_ConfirmPending",
+  "lifelines": [
+   "rm",
+   "xfa",
+   "risk",
+   "aud",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "R"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   },
+   {
+    "to": "xfa",
+    "fn": "FB_PendingIndex",
+    "op": "UpdatePendingIndex"
+   },
+   {
+    "to": "risk",
+    "fn": "FB_RiskNote",
+    "op": null
+   },
+   {
+    "to": "aud",
+    "fn": "FB_AuditText",
+    "op": null
+   },
+   {
+    "to": "aud",
+    "fn": "FB_Audit",
+    "op": "WriteAudit"
+   },
+   {
+    "to": "aud",
+    "fn": "FB_RiskAuditTags",
+    "op": "WriteRiskAuditTags"
+   },
+   {
+    "to": "xfa",
+    "fn": "FB_FileBytes",
+    "op": "ReadRequestBytes"
+   }
+  ],
+  "refs": [
+   "UpdatePendingIndex",
+   "SweepPending",
+   "WriteAudit",
+   "WriteRiskAuditTags",
+   "ReadRequestBytes",
+   "ProcessRequest"
+  ],
+  "skipped": {
+   "FB_JsonStringify": 3,
+   "FB_ComObj": 2,
+   "FB_JsonParse": 1,
+   "Log": 7,
+   "FB_Sha256": 1,
+   "FB_Utf8Decode": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Path",
+    "type": "string",
+    "notes": "parametr Path operace katalogu"
+   },
+   {
+    "name": "Nonce",
+    "type": "string",
+    "notes": "parametr Nonce operace katalogu"
+   },
+   {
+    "name": "PayloadHash",
+    "type": "string",
+    "notes": "parametr PayloadHash operace katalogu"
+   },
+   {
+    "name": "Channel",
+    "type": "string",
+    "notes": "parametr Channel operace katalogu"
+   },
+   {
+    "name": "Approve",
+    "type": "boolean",
+    "notes": "parametr Approve operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Jediný vstupní bod potvrzení nebo zamítnutí čekající dávky ELEVATED; ověří nonce a otisk dávky, pak dávku provede nebo odmítne."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "SweepPending": {
+  "op": "SweepPending",
+  "comp": "rm",
+  "fn": "FB_PendingSweep",
+  "lifelines": [
+   "rm",
+   "risk",
+   "xfa",
+   "aud",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "R"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   },
+   {
+    "to": "risk",
+    "fn": "FB_RiskPolicy",
+    "op": null
+   },
+   {
+    "to": "xfa",
+    "fn": "FB_PendingIndex",
+    "op": "UpdatePendingIndex"
+   },
+   {
+    "to": "risk",
+    "fn": "FB_RiskNote",
+    "op": null
+   },
+   {
+    "to": "aud",
+    "fn": "FB_Audit",
+    "op": "WriteAudit"
+   },
+   {
+    "to": "aud",
+    "fn": "FB_RiskAuditTags",
+    "op": "WriteRiskAuditTags"
+   }
+  ],
+  "refs": [
+   "UpdatePendingIndex",
+   "WriteAudit",
+   "WriteRiskAuditTags"
+  ],
+  "skipped": {
+   "FB_ComObj": 3,
+   "FB_RepoId": 1,
+   "FB_JsonParse": 1,
+   "FB_JsonStringify": 1,
+   "Log": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "PendingDir",
+    "type": "string",
+    "notes": "parametr PendingDir operace katalogu"
+   },
+   {
+    "name": "NowMs",
+    "type": "number",
+    "notes": "parametr NowMs operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Expirace čekajících dávek starších než confirmMaxAgeMin (E_RISK_EXPIRED), nejstarší první."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "StartSession": {
+  "op": "StartSession",
+  "comp": "rm",
+  "fn": "FB_SessionStart",
+  "lifelines": [
+   "rm",
+   "bpol",
+   "scope",
+   "code",
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "bpol",
+    "fn": "FB_BaselineConfig",
+    "op": null
+   },
+   {
+    "to": "scope",
+    "fn": "FB_ScopeText",
+    "op": "DescribeScope"
+   },
+   {
+    "to": "code",
+    "fn": "FB_CodeInfo",
+    "op": "GetCodeInfo"
+   },
+   {
+    "to": "xfa",
+    "fn": "FB_FileBytes",
+    "op": "ReadRequestBytes"
+   },
+   {
+    "to": "xf",
+    "file": "R"
+   }
+  ],
+  "refs": [
+   "DescribeScope",
+   "GetCodeInfo",
+   "ReadRequestBytes"
+  ],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_ComObj": 1,
+   "FB_Utf8Decode": 1,
+   "FB_Sha256": 1,
+   "Log": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Start session pumpy: nová session baseline politiky, hlášení cíle zápisu, verze a otisk kódu, varování."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "GetStatus": {
+  "op": "GetStatus",
+  "comp": "rm",
+  "fn": "FB_Status",
+  "lifelines": [
+   "rm",
+   "scope",
+   "xfa"
+  ],
+  "msgs": [
+   {
+    "to": "scope",
+    "fn": "FB_ScopeText",
+    "op": "DescribeScope"
+   },
+   {
+    "to": "xfa",
+    "fn": "FB_ResolveBaseDir",
+    "op": "ResolveBaseDir"
+   }
+  ],
+  "refs": [
+   "DescribeScope",
+   "ResolveBaseDir"
+  ],
+  "skipped": {
+   "FB_RepoId": 1,
+   "Log": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Lidský přehled stavu bridge pro menu Stav bridge: repozitář, chráněné větve, EA security, složka výměny."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "PrecheckBatch": {
+  "op": "PrecheckBatch",
+  "comp": "val",
+  "fn": "FB_Precheck",
+  "lifelines": [
+   "val",
+   "scope",
+   "mea"
+  ],
+  "msgs": [
+   {
+    "to": "scope",
+    "fn": "FB_OpsAllowed",
+    "op": null
+   },
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "scope",
+    "fn": "FB_ScopePrecheck",
+    "op": "PrecheckTargets"
+   }
+  ],
+  "refs": [
+   "CheckFields",
+   "PrecheckTargets"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   },
+   {
+    "name": "Phase",
+    "type": "string",
+    "notes": "shape | targets"
+   }
+  ],
+  "res": [
+   {
+    "name": "Ok",
+    "type": "boolean",
+    "notes": "Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,"
+   },
+   {
+    "name": "Problems",
+    "type": "array",
+    "notes": "Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,"
+   },
+   {
+    "name": "Resolved",
+    "type": "array",
+    "notes": "(zadani cile zapisu v1.1 kap. 5.3, 5.7); resolved[]."
+   },
+   {
+    "name": "Cascades",
+    "type": "array",
+    "notes": "pole odpovědi cascades (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "pole odpovědi warnings (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Audit",
+    "type": "string",
+    "notes": "code, message, suggestions? } ], audit: bool }. Jedna chyba se SEZNAMEM VSECH"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "Vraci { ok: true } nebo { ok: false, code, message, problems: [ { op, path,"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "CheckFields": {
+  "op": "CheckFields",
+  "comp": "val",
+  "fn": "FB_FieldCheck",
+  "lifelines": [
+   "val"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Problems",
+    "type": "array",
+    "notes": "3. E_ARGS (problems[], davka se neprovede): taggedValues, ktere nejsou pole;"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "Vraci { problems: [{op, path, code, message}], warnings: [string], aliased: n }."
+   },
+   {
+    "name": "Aliased",
+    "type": "string",
+    "notes": "Vraci { problems: [{op, path, code, message}], warnings: [string], aliased: n }."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "InterpretError": {
+  "op": "InterpretError",
+  "comp": "val",
+  "fn": "FB_InterpretError",
+  "lifelines": [
+   "val"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "RawMessage",
+    "type": "string",
+    "notes": "parametr RawMessage operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "Vraci { code, message } kdyz chybu pozna, jinak null (-> zustane E_EXCEPTION)."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "PrecheckTargets": {
+  "op": "PrecheckTargets",
+  "comp": "scope",
+  "fn": "FB_ScopePrecheck",
+  "lifelines": [
+   "scope",
+   "mea",
+   "E:Package",
+   "E:Element",
+   "E:Diagram",
+   "E:Connector",
+   "E:TaggedValue",
+   "E:Attribute",
+   "E:Operation"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 2,
+   "FB_RepoId": 1,
+   "FB_Config": 1
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_connectortag"
+  ],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Problems",
+    "type": "array",
+    "notes": "Vraci { problems: [ { op, path, code, message, ... } ], resolved: [ { op,"
+   },
+   {
+    "name": "Resolved",
+    "type": "array",
+    "notes": "Vraci { problems: [ { op, path, code, message, ... } ], resolved: [ { op,"
+   },
+   {
+    "name": "Cascades",
+    "type": "array",
+    "notes": "path, ref, kind, guid, id, fullPath } ], cascades: [ { op, path, kind,"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "CheckWrite": {
+  "op": "CheckWrite",
+  "comp": "scope",
+  "fn": "FB_CheckWrite",
+  "lifelines": [
+   "scope",
+   "mea",
+   "E:Package",
+   "E:Element",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_XmlRows": 1,
+   "FB_Config": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "PackageRef",
+    "type": "string",
+    "notes": "parametr PackageRef operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "zustavaji (null = povoleno, jinak { code, message }), takze ~50 volajicich"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "CheckWriteElement": {
+  "op": "CheckWriteElement",
+  "comp": "scope",
+  "fn": "FB_CheckWriteEl",
+  "lifelines": [
+   "scope",
+   "mea",
+   "E:Package",
+   "E:Element",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_XmlRows": 1,
+   "FB_Config": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "ObjectRef",
+    "type": "string",
+    "notes": "parametr ObjectRef operace katalogu"
+   },
+   {
+    "name": "Kind",
+    "type": "string",
+    "notes": "parametr Kind operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "null = povoleno, jinak { code, message }. Jadro = FB_ScopeCheck (mezipamet"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "CheckUserAccess": {
+  "op": "CheckUserAccess",
+  "comp": "scope",
+  "fn": "FB_UserAccess",
+  "lifelines": [
+   "scope"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_XmlRows": 1
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_secgroup",
+   "t_secusergroup",
+   "t_secuser"
+  ],
+  "req": [],
+  "res": [
+   {
+    "name": "SecurityEnabled",
+    "type": "string",
+    "notes": "{ securityEnabled, login, access: \"write\" | \"read\", reason, groups[] }"
+   },
+   {
+    "name": "Login",
+    "type": "string",
+    "notes": "{ securityEnabled, login, access: \"write\" | \"read\", reason, groups[] }"
+   },
+   {
+    "name": "Access",
+    "type": "string",
+    "notes": "{ securityEnabled, login, access: \"write\" | \"read\", reason, groups[] }"
+   },
+   {
+    "name": "Reason",
+    "type": "string",
+    "notes": "{ securityEnabled, login, access: \"write\" | \"read\", reason, groups[] }"
+   },
+   {
+    "name": "Groups",
+    "type": "array",
+    "notes": "{ securityEnabled, login, access: \"write\" | \"read\", reason, groups[] }"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "DescribeScope": {
+  "op": "DescribeScope",
+  "comp": "scope",
+  "fn": "FB_ScopeText",
+  "lifelines": [
+   "scope",
+   "mea",
+   "E:Package",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 2,
+   "FB_XmlRows": 1,
+   "FB_Config": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Jedna lidská věta o cíli zápisu pro start session, menu Stav bridge a ping."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "ClassifyBatch": {
+  "op": "ClassifyBatch",
+  "comp": "risk",
+  "fn": "FB_RiskGate",
+  "lifelines": [
+   "risk",
+   "bpol",
+   "mea",
+   "bla",
+   "itan",
+   "xf",
+   "E:Element",
+   "E:Package",
+   "E:Connector"
+  ],
+  "msgs": [
+   {
+    "to": "bpol",
+    "fn": "FB_BaselineConfig",
+    "op": null
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "bpol",
+    "fn": "FB_SubtreeCount",
+    "op": null
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "bla",
+    "fn": "FB_BaselineNameReserved",
+    "op": null
+   },
+   {
+    "to": "itan",
+    "fn": "FB_ScaffoldConfig",
+    "op": null
+   },
+   {
+    "to": "xf",
+    "file": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 3,
+   "FB_XmlRows": 3,
+   "FB_ElementPath": 3,
+   "FB_Config": 1,
+   "FB_ComObj": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "RiskLevel",
+    "type": "string",
+    "notes": "Vraci { riskLevel: \"LOW\"|\"ELEVATED\"|\"BLOCKED\", riskReasons[], metrics{},"
+   },
+   {
+    "name": "RiskReasons",
+    "type": "array",
+    "notes": "Vraci { riskLevel: \"LOW\"|\"ELEVATED\"|\"BLOCKED\", riskReasons[], metrics{},"
+   },
+   {
+    "name": "Metrics",
+    "type": "object",
+    "notes": "Vraci { riskLevel: \"LOW\"|\"ELEVATED\"|\"BLOCKED\", riskReasons[], metrics{},"
+   },
+   {
+    "name": "Summary",
+    "type": "object",
+    "notes": "summary{ops,targets,packages,diagrams}, policyValid, elapsedMs,"
+   },
+   {
+    "name": "PolicyValid",
+    "type": "string",
+    "notes": "summary{ops,targets,packages,diagrams}, policyValid, elapsedMs,"
+   },
+   {
+    "name": "ElapsedMs",
+    "type": "number",
+    "notes": "summary{ops,targets,packages,diagrams}, policyValid, elapsedMs,"
+   },
+   {
+    "name": "BudgetMs",
+    "type": "number",
+    "notes": "budgetMs, hashMaxChars }."
+   },
+   {
+    "name": "HashMaxChars",
+    "type": "string",
+    "notes": "budgetMs, hashMaxChars }."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "BuildConfirmSummary": {
+  "op": "BuildConfirmSummary",
+  "comp": "risk",
+  "fn": "FB_ConfirmSummary",
+  "lifelines": [
+   "risk"
+  ],
+  "msgs": [],
+  "refs": [
+   "DescribeReason"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Response",
+    "type": "object",
+    "notes": "parametr Response operace katalogu"
+   },
+   {
+    "name": "AgeInfo",
+    "type": "string",
+    "notes": "parametr AgeInfo operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Text potvrzovacího okna: co se stane a kde, záloha, důvody větami, legenda."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "DescribeReason": {
+  "op": "DescribeReason",
+  "comp": "risk",
+  "fn": "FB_ReasonText",
+  "lifelines": [
+   "risk"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "ReasonItem",
+    "type": "object",
+    "notes": "parametr ReasonItem operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Kód důvodu risk gate -> věta pro člověka."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "IssueNonce": {
+  "op": "IssueNonce",
+  "comp": "risk",
+  "fn": "FB_Nonce",
+  "lifelines": [
+   "risk"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {
+   "FB_ComObj": 1,
+   "FB_Sha256": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Jednorázový autorizační token potvrzovacího okruhu."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "PlanBaseline": {
+  "op": "PlanBaseline",
+  "comp": "bpol",
+  "fn": "FB_BaselinePlan",
+  "lifelines": [
+   "bpol",
+   "risk",
+   "mea",
+   "scope",
+   "E:Element",
+   "E:TaggedValue",
+   "E:Package",
+   "E:Diagram",
+   "E:Connector",
+   "E:Attribute",
+   "E:Operation"
+  ],
+  "msgs": [
+   {
+    "to": "risk",
+    "fn": "FB_RiskPolicy",
+    "op": null
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_TargetCache",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_ScopeCheck",
+    "op": null
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   }
+  ],
+  "refs": [
+   "CheckWrite",
+   "EvaluateRecoveryPosture"
+  ],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_XmlRows": 2,
+   "FB_ElementPath": 2
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_connectortag"
+  ],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   },
+   {
+    "name": "Risk",
+    "type": "object",
+    "notes": "parametr Risk operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Cfg",
+    "type": "string",
+    "notes": "Vraci { cfg, cfgWarnings[], scope, probes[], posture, postureReasons[],"
+   },
+   {
+    "name": "CfgWarnings",
+    "type": "array",
+    "notes": "Vraci { cfg, cfgWarnings[], scope, probes[], posture, postureReasons[],"
+   },
+   {
+    "name": "Scope",
+    "type": "object",
+    "notes": "konfiguraci (FB_BaselineConfig), scope (FB_BaselinePolicy), sondu"
+   },
+   {
+    "name": "Probes",
+    "type": "array",
+    "notes": "Vraci { cfg, cfgWarnings[], scope, probes[], posture, postureReasons[],"
+   },
+   {
+    "name": "Posture",
+    "type": "object",
+    "notes": "Vraci { cfg, cfgWarnings[], scope, probes[], posture, postureReasons[],"
+   },
+   {
+    "name": "PostureReasons",
+    "type": "array",
+    "notes": "Vraci { cfg, cfgWarnings[], scope, probes[], posture, postureReasons[],"
+   },
+   {
+    "name": "NeedsBaseline",
+    "type": "string",
+    "notes": "needsBaseline, pureCreate, probeMs, section }."
+   },
+   {
+    "name": "PureCreate",
+    "type": "string",
+    "notes": "needsBaseline, pureCreate, probeMs, section }."
+   },
+   {
+    "name": "ProbeMs",
+    "type": "number",
+    "notes": "needsBaseline, pureCreate, probeMs, section }."
+   },
+   {
+    "name": "Section",
+    "type": "string",
+    "notes": "needsBaseline, pureCreate, probeMs, section }."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "DecideBaseline": {
+  "op": "DecideBaseline",
+  "comp": "bpol",
+  "fn": "FB_BaselineDecide",
+  "lifelines": [
+   "bpol",
+   "bla",
+   "E:Baseline",
+   "E:Package"
+  ],
+  "msgs": [
+   {
+    "to": "E:Baseline",
+    "crud": "R"
+   },
+   {
+    "to": "bla",
+    "fn": "FB_BaselineNameReserved",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlUnescape": 1,
+   "FB_XmlRows": 1,
+   "FB_ElementPath": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Plan",
+    "type": "object",
+    "notes": "parametr Plan operace katalogu"
+   },
+   {
+    "name": "Risk",
+    "type": "object",
+    "notes": "parametr Risk operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Action",
+    "type": "string",
+    "notes": "Vraci { action, reason, confirmReasons[], manual, lines[] }:"
+   },
+   {
+    "name": "Reason",
+    "type": "string",
+    "notes": "Vraci { action, reason, confirmReasons[], manual, lines[] }:"
+   },
+   {
+    "name": "ConfirmReasons",
+    "type": "array",
+    "notes": "Vraci { action, reason, confirmReasons[], manual, lines[] }:"
+   },
+   {
+    "name": "Manual",
+    "type": "string",
+    "notes": "Vraci { action, reason, confirmReasons[], manual, lines[] }:"
+   },
+   {
+    "name": "Lines",
+    "type": "array",
+    "notes": "Vraci { action, reason, confirmReasons[], manual, lines[] }:"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "EvaluateRecoveryPosture": {
+  "op": "EvaluateRecoveryPosture",
+  "comp": "bpol",
+  "fn": "FB_RecoveryPosture",
+  "lifelines": [
+   "bpol"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Metrics",
+    "type": "object",
+    "notes": "parametr Metrics operace katalogu"
+   },
+   {
+    "name": "Scope",
+    "type": "object",
+    "notes": "parametr Scope operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Jediná funkce nejistoty: full | partial | none."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "CleanupBaselines": {
+  "op": "CleanupBaselines",
+  "comp": "bpol",
+  "fn": "FB_BaselineCleanup",
+  "lifelines": [
+   "bpol",
+   "scope",
+   "aud",
+   "E:Baseline",
+   "E:Package"
+  ],
+  "msgs": [
+   {
+    "to": "scope",
+    "fn": "FB_UserAccess",
+    "op": "CheckUserAccess"
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_ScopeCheck",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "D"
+   },
+   {
+    "to": "aud",
+    "fn": "FB_Audit",
+    "op": "WriteAudit"
+   }
+  ],
+  "refs": [
+   "CheckUserAccess",
+   "WriteAudit"
+  ],
+  "skipped": {
+   "FB_XmlRows": 2,
+   "FB_XmlUnescape": 1,
+   "Log": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Mode",
+    "type": "string",
+    "notes": "report | delete"
+   },
+   {
+    "name": "Force",
+    "type": "boolean",
+    "notes": "parametr Force operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Mode",
+    "type": "string",
+    "notes": "AICodeBridge.FB_BaselineCleanup(Repository, cfg, mode, force, nowMs)"
+   },
+   {
+    "name": "RequestedMode",
+    "type": "string",
+    "notes": "Vraci { mode, requestedMode, total, candidates[], planned, deleted[],"
+   },
+   {
+    "name": "Total",
+    "type": "string",
+    "notes": "Vraci { mode, requestedMode, total, candidates[], planned, deleted[],"
+   },
+   {
+    "name": "Candidates",
+    "type": "array",
+    "notes": "Vraci { mode, requestedMode, total, candidates[], planned, deleted[],"
+   },
+   {
+    "name": "Planned",
+    "type": "string",
+    "notes": "Vraci { mode, requestedMode, total, candidates[], planned, deleted[],"
+   },
+   {
+    "name": "Deleted",
+    "type": "array",
+    "notes": "Vraci { mode, requestedMode, total, candidates[], planned, deleted[],"
+   },
+   {
+    "name": "Failed",
+    "type": "array",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   },
+   {
+    "name": "Remaining",
+    "type": "string",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   },
+   {
+    "name": "Anomaly",
+    "type": "string",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   },
+   {
+    "name": "Orphans",
+    "type": "string",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   },
+   {
+    "name": "Protected",
+    "type": "string",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   },
+   {
+    "name": "Note",
+    "type": "string",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   },
+   {
+    "name": "Text",
+    "type": "string",
+    "notes": "failed[], remaining, anomaly, orphans, protected, note, text }."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "RunQc": {
+  "op": "RunQc",
+  "comp": "qc",
+  "fn": "FB_QcRun",
+  "lifelines": [
+   "qc",
+   "E:Element",
+   "E:Package"
+  ],
+  "msgs": [
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_XmlRows": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   },
+   {
+    "name": "Response",
+    "type": "object",
+    "notes": "parametr Response operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Reason",
+    "type": "string",
+    "notes": "{ status: \"ciste\" | \"nalez\" | \"nedobehlo\", checks, findings[], reason, elapsedMs }"
+   },
+   {
+    "name": "Checks",
+    "type": "string",
+    "notes": "{ status: \"ciste\" | \"nalez\" | \"nedobehlo\", checks, findings[], reason, elapsedMs }"
+   },
+   {
+    "name": "Findings",
+    "type": "array",
+    "notes": "{ status: \"ciste\" | \"nalez\" | \"nedobehlo\", checks, findings[], reason, elapsedMs }"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "DescribeQc": {
+  "op": "DescribeQc",
+  "comp": "qc",
+  "fn": "FB_QcText",
+  "lifelines": [
+   "qc"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Qc",
+    "type": "object",
+    "notes": "parametr Qc operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Výsledek kontroly kvality jednou větou pro Output, dialog a audit."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "ApplyClassifierStereotypes": {
+  "op": "ApplyClassifierStereotypes",
+  "comp": "itan",
+  "fn": "FB_OpApplyClassifierStereotypes",
+  "lifelines": [
+   "itan",
+   "scope",
+   "mea",
+   "E:Diagram",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   },
+   {
+    "to": "mea",
+    "fn": "SetTag",
+    "op": null
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: apply_classifier_stereotypes"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "op.diagram = cilovy diagram (\"{GUID}\" | diagramID)"
+   },
+   {
+    "name": "ElementIDs",
+    "type": "array",
+    "notes": "op.elementIDs = volitelny filtr - jen tyto elementy (pole id)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "FindOrCreateReferencingSR": {
+  "op": "FindOrCreateReferencingSR",
+  "comp": "itan",
+  "fn": "FB_OpFindOrCreateSR",
+  "lifelines": [
+   "itan",
+   "mea",
+   "scope",
+   "E:Operation",
+   "E:Element",
+   "E:TaggedValue",
+   "E:Package",
+   "E:Diagram",
+   "E:Connector"
+  ],
+  "msgs": [
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolvePkg",
+    "op": null
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_ScopeCheck",
+    "op": null
+   },
+   {
+    "to": "E:Package",
+    "crud": "C"
+   },
+   {
+    "to": "E:Package",
+    "crud": "U"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "U"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "U"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "C"
+   },
+   {
+    "to": "E:Element",
+    "crud": "C"
+   },
+   {
+    "to": "mea",
+    "fn": "SetTag",
+    "op": null
+   },
+   {
+    "to": "E:Connector",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWrite"
+  ],
+  "skipped": {
+   "FB_XmlRows": 3,
+   "FB_RepoId": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: find_or_create_referencing_sr"
+   },
+   {
+    "name": "Operation",
+    "type": "string",
+    "notes": "op.operation = operace katalogu (\"{GUID}\" | operationID) - povinne"
+   },
+   {
+    "name": "PackageName",
+    "type": "string",
+    "notes": "op.packageName = jmeno noveho service package (povinne pri zakladani;"
+   },
+   {
+    "name": "Author",
+    "type": "string",
+    "notes": "(par. 7e/7g); (4) Author diagramu = op.author | \"Claude via eafb\""
+   },
+   {
+    "name": "TargetPackage",
+    "type": "string",
+    "notes": "op.targetPackage = volitelne prebiti cile (\"{GUID}\" | id | jmeno);"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Found",
+    "type": "boolean",
+    "notes": "Vysledek: found=true + items[] (nalezene SR) NEBO found=false + created"
+   },
+   {
+    "name": "Operation",
+    "type": "string",
+    "notes": "op.operation = operace katalogu (\"{GUID}\" | operationID) - povinne"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Created",
+    "type": "object",
+    "notes": "Vysledek: found=true + items[] (nalezene SR) NEBO found=false + created"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "Query": {
+  "op": "Query",
+  "comp": "mea",
+  "fn": "FB_OpQuery",
+  "lifelines": [
+   "mea"
+  ],
+  "msgs": [],
+  "refs": [],
+  "skipped": {
+   "B64Decode": 1,
+   "FB_XmlRows": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: query"
+   },
+   {
+    "name": "Sql",
+    "type": "string",
+    "notes": "pole sql (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "MaxRows",
+    "type": "number",
+    "notes": "- STROP RADKU op.maxRows (vychozi 500, max 5000; novy parametr -> jen"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Sql",
+    "type": "string",
+    "notes": "pole odpovědi sql (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Tables",
+    "type": "string",
+    "notes": "pole odpovědi tables (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "SuppressDialogs",
+    "type": "string",
+    "notes": "nekryje; pole suppressDialogs v E_SQL vysledku rika proc (viz sqlErr),"
+   },
+   {
+    "name": "Raw",
+    "type": "string",
+    "notes": "nevyrobi -> falesne pozitivni E_SQL. Proto E_SQL od 9. 9. nese `raw`"
+   },
+   {
+    "name": "RowCount",
+    "type": "number",
+    "notes": "typeof): rows se oriznou, truncated: true, rowCount = SKUTECNY pocet radku,"
+   },
+   {
+    "name": "Rows",
+    "type": "array",
+    "notes": "typeof): rows se oriznou, truncated: true, rowCount = SKUTECNY pocet radku,"
+   },
+   {
+    "name": "MaxRows",
+    "type": "number",
+    "notes": "- STROP RADKU op.maxRows (vychozi 500, max 5000; novy parametr -> jen"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "GetSelectedContext": {
+  "op": "GetSelectedContext",
+  "comp": "mea",
+  "fn": "FB_OpSelectedContext",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   }
+  ],
+  "refs": [
+   "CheckWrite",
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_ElementPath": 3
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_selected_context"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "OpResult",
+    "notes": "návratová hodnota (OpResult): Protokolová operace get_selected_context (čtení). Výběr v Project browseru a otevřený diagram jako kontext pro agenta."
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "FindElementsByName": {
+  "op": "FindElementsByName",
+  "comp": "mea",
+  "fn": "FB_OpFindElements",
+  "lifelines": [
+   "mea",
+   "E:Package",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 1,
+   "FB_ElementPath": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: find_elements_by_name"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole name (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "ExactMatch",
+    "type": "boolean",
+    "notes": "op.name = hledane jmeno; op.exactMatch = true (default) | false (podretezec)"
+   },
+   {
+    "name": "Scope",
+    "type": "object",
+    "notes": "op.scope (iterace 5, C - volitelne) = GUID | id package: vysledky se omezi"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Scope",
+    "type": "object",
+    "notes": "op.scope (iterace 5, C - volitelne) = GUID | id package: vysledky se omezi"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "FindPackagesByName": {
+  "op": "FindPackagesByName",
+  "comp": "mea",
+  "fn": "FB_OpFindPackages",
+  "lifelines": [
+   "mea",
+   "E:Package"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 1,
+   "FB_ElementPath": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: find_packages_by_name"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole name (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "ExactMatch",
+    "type": "boolean",
+    "notes": "op.name = hledane jmeno; op.exactMatch = true (default) | false (podretezec)"
+   },
+   {
+    "name": "Scope",
+    "type": "object",
+    "notes": "op.scope (iterace 5, C - volitelne) = GUID | id package: vysledky se omezi"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Scope",
+    "type": "object",
+    "notes": "op.scope (iterace 5, C - volitelne) = GUID | id package: vysledky se omezi"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "GetElementsInformation": {
+  "op": "GetElementsInformation",
+  "comp": "mea",
+  "fn": "FB_OpGetElements",
+  "lifelines": [
+   "mea",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:Operation",
+   "E:Attribute",
+   "E:Connector"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_elements_information"
+   },
+   {
+    "name": "Elements",
+    "type": "array",
+    "notes": "op.elements = [ \"{GUID}\" | elementID | jmeno | $ref, ... ]"
+   },
+   {
+    "name": "Brief",
+    "type": "boolean",
+    "notes": "Volitelne op.brief = true -> jen zakladni vlastnosti (bez kolekci)."
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "GetPackagesInformation": {
+  "op": "GetPackagesInformation",
+  "comp": "mea",
+  "fn": "FB_OpGetPackages",
+  "lifelines": [
+   "mea",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:Operation",
+   "E:Attribute",
+   "E:Connector"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_packages_information"
+   },
+   {
+    "name": "Packages",
+    "type": "array",
+    "notes": "rozprazene), pod-packages, elementy (souhrn) a diagramy."
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "GetConnectorsInformation": {
+  "op": "GetConnectorsInformation",
+  "comp": "mea",
+  "fn": "FB_OpGetConnectors",
+  "lifelines": [
+   "mea",
+   "E:Connector",
+   "E:Element",
+   "E:Operation",
+   "E:Attribute",
+   "E:Package",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_connectors_information"
+   },
+   {
+    "name": "Connectors",
+    "type": "array",
+    "notes": "op.connectors = [ connectorID | \"{GUID}\" | $ref, ... ]"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "CreateElement": {
+  "op": "CreateElement",
+  "comp": "mea",
+  "fn": "FB_OpCreateElement",
+  "lifelines": [
+   "mea"
+  ],
+  "msgs": [],
+  "refs": [
+   "CreateOrUpdateElements"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_element"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole name (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "Type",
+    "type": "string",
+    "notes": "pole type (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "Package",
+    "type": "string",
+    "notes": "pole package (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "Stereotype",
+    "type": "string",
+    "notes": "pole stereotype (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "Notes",
+    "type": "string",
+    "notes": "pole notes (FB_FieldCheck SPEC)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "ElementId",
+    "type": "number",
+    "notes": "pole odpovědi elementId (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole odpovědi name (tvar odpovědi v kódu)"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "MoveElements": {
+  "op": "MoveElements",
+  "comp": "mea",
+  "fn": "FB_OpMoveElements",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Element",
+   "E:Diagram",
+   "E:Package",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "scope",
+    "fn": "FB_ScopeCheck",
+    "op": null
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Package",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement",
+   "CheckWrite"
+  ],
+  "skipped": {
+   "FB_XmlRows": 4
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: move_elements"
+   },
+   {
+    "name": "Package",
+    "type": "string",
+    "notes": "PROC SAMOSTATNA OPERACE (rozhodnuti Milos 2026-08-21): pole `package`"
+   },
+   {
+    "name": "OwningElement",
+    "type": "string",
+    "notes": "op.owningElement = ALTERNATIVNI cil (N-RE-17, v0.22): presun POD PRVEK"
+   },
+   {
+    "name": "Elements",
+    "type": "array",
+    "notes": "op.elements = [ \"{GUID}\"|id|jmeno|$ref NEBO { element, package | owningElement } ]"
+   },
+   {
+    "name": "WithChildren",
+    "type": "boolean",
+    "notes": "op.withChildren = true (DEFAULT) - DOROVNA i vlastneny podstrom:"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdatePackage": {
+  "op": "CreateOrUpdatePackage",
+  "comp": "mea",
+  "fn": "FB_OpPackage",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:Operation",
+   "E:Attribute",
+   "E:Connector",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "E:Package",
+    "crud": "C"
+   },
+   {
+    "to": "E:Package",
+    "crud": "U"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWrite"
+  ],
+  "skipped": {
+   "FB_XmlRows": 3,
+   "B64Decode": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_package"
+   },
+   {
+    "name": "Packages",
+    "type": "array",
+    "notes": "create_or_update_package - zrcadlo MCP toolu. Podporuje i davku (packages[]). | položka: guid, packageID, parent, name, notes, description, notes_b64, author, version, taggedValues, matchByName"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "PackageID",
+    "type": "number",
+    "notes": "guid | packageID -> UPDATE; jinak CREATE"
+   },
+   {
+    "name": "Parent",
+    "type": "string",
+    "notes": "parent -> rodicovsky package pro create (\"{GUID}\" | id | jmeno | $ref)"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole name (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "Notes",
+    "type": "string",
+    "notes": "notes | description, notes_b64"
+   },
+   {
+    "name": "Description",
+    "type": "string",
+    "notes": "notes | description, notes_b64"
+   },
+   {
+    "name": "Author",
+    "type": "string",
+    "notes": "author, version -> bonus K6"
+   },
+   {
+    "name": "Version",
+    "type": "string",
+    "notes": "author, version -> bonus K6"
+   },
+   {
+    "name": "TaggedValues",
+    "type": "string",
+    "notes": "taggedValues -> pole [{name, value}] - zapisuje se na pkg.Element"
+   },
+   {
+    "name": "MatchByName",
+    "type": "boolean",
+    "notes": "matchByName: true -> OPT-IN (audit B2, K1): pred create hledani dle jmena"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guids",
+    "type": "array",
+    "notes": "pole odpovědi guids (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateConnectors": {
+  "op": "CreateOrUpdateConnectors",
+  "comp": "mea",
+  "fn": "FB_OpConnectors",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Connector",
+   "E:Element",
+   "E:Package",
+   "E:Diagram",
+   "E:TaggedValue",
+   "E:Operation",
+   "E:Attribute"
+  ],
+  "msgs": [
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "U"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "C"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 4,
+   "B64Decode": 1
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_connectortag"
+  ],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_connectors"
+   },
+   {
+    "name": "Connectors",
+    "type": "array",
+    "notes": "op.connectors = [ { | položka: guid, connectorID, source, target, type, stereotypes, name, notes, description, notes_b64, direction, sourceEnd, targetEnd, taggedValues, dedupKey, match"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guids",
+    "type": "array",
+    "notes": "pole odpovědi guids (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateAttributes": {
+  "op": "CreateOrUpdateAttributes",
+  "comp": "mea",
+  "fn": "FB_OpAttributes",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:Attribute",
+   "E:Operation",
+   "E:Connector",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "C"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "U"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_attributes"
+   },
+   {
+    "name": "Element",
+    "type": "string",
+    "notes": "op.element = cilovy element (\"{GUID}\" | id | jmeno | $ref)"
+   },
+   {
+    "name": "Attributes",
+    "type": "array",
+    "notes": "op.attributes = [ { | položka: attributeID, guid, name, type, classifierID, classifier, notes, description, stereotype, default, position, lowerBound, upperBound, taggedValues"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateOperations": {
+  "op": "CreateOrUpdateOperations",
+  "comp": "mea",
+  "fn": "FB_OpOperations",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:Operation",
+   "E:Attribute",
+   "E:Connector",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "C"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "U"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_operationparams"
+  ],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_operations"
+   },
+   {
+    "name": "Element",
+    "type": "string",
+    "notes": "op.element = cilovy element (\"{GUID}\" | id | jmeno | $ref)"
+   },
+   {
+    "name": "Operations",
+    "type": "array",
+    "notes": "op.operations = [ { | položka: operationID, guid, name, returnType, returnClassifierID, returnClassifier, notes, description, stereotype, isStatic, isAbstract, parameters, taggedValues"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateScenarios": {
+  "op": "CreateOrUpdateScenarios",
+  "comp": "mea",
+  "fn": "FB_OpScenarios",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 3
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_objectscenarios"
+  ],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_scenarios"
+   },
+   {
+    "name": "Element",
+    "type": "string",
+    "notes": "op.element = cilovy element (\"{GUID}\" | elementID | jmeno | $ref), typicky UseCase"
+   },
+   {
+    "name": "Scenarios",
+    "type": "array",
+    "notes": "op.scenarios = [ { | položka: name, type, notes, steps, attachTo, join"
+   },
+   {
+    "name": "Probe",
+    "type": "boolean",
+    "notes": "op.probe = true -> rozsireny readback (raw t_objectscenarios + XML snapshoty)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Removed",
+    "type": "array",
+    "notes": "pole odpovědi removed (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateConstraints": {
+  "op": "CreateOrUpdateConstraints",
+  "comp": "mea",
+  "fn": "FB_OpConstraints",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 3
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_objectconstraint"
+  ],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_constraints"
+   },
+   {
+    "name": "Element",
+    "type": "string",
+    "notes": "op.element = cilovy element (\"{GUID}\" | elementID | jmeno | $ref), typicky UseCase"
+   },
+   {
+    "name": "Constraints",
+    "type": "array",
+    "notes": "create_or_update_constraints - internal constraints elementu (zalozka | položka: name, type, notes, status"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateRequirements": {
+  "op": "CreateOrUpdateRequirements",
+  "comp": "mea",
+  "fn": "FB_OpRequirements",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 3
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_objectrequires"
+  ],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_requirements"
+   },
+   {
+    "name": "Element",
+    "type": "string",
+    "notes": "- local [Requirement internal]\"): lokalni BRU NENI samostatny element pod"
+   },
+   {
+    "name": "Requirements",
+    "type": "array",
+    "notes": "requirements elementu se SMAZOU a zapisi znovu v poradi davky - zadne | položka: name, notes, type, status, priority, difficulty, stability"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "DeleteTaggedvalueFromModel": {
+  "op": "DeleteTaggedvalueFromModel",
+  "comp": "mea",
+  "fn": "FB_OpDeleteTag",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:Connector",
+   "E:Attribute",
+   "E:Operation",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:Attribute",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement",
+   "CheckWrite"
+  ],
+  "skipped": {
+   "FB_XmlRows": 4
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: delete_taggedvalue_from_model"
+   },
+   {
+    "name": "Targets",
+    "type": "array",
+    "notes": "op.targets = [ { type: \"ElementTaggedValue|ConnectorTaggedValue|AttributeTaggedValue | položka: type, id, name"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "ClonePackage": {
+  "op": "ClonePackage",
+  "comp": "mea",
+  "fn": "FB_OpClonePackage",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_WriteScopeCfg",
+    "op": null
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWrite"
+  ],
+  "skipped": {
+   "FB_XmlRows": 4
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: clone_package"
+   },
+   {
+    "name": "Package",
+    "type": "string",
+    "notes": "clone_package (K3) - klon package pro verzovaci/release cyklus (_AREL forma)."
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole name (FB_FieldCheck SPEC)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole odpovědi name (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Volume",
+    "type": "string",
+    "notes": "chybu). Objem se dal VZDY vykazuje (volume) - ladeni limitu politiky."
+   },
+   {
+    "name": "SourceGuid",
+    "type": "string",
+    "notes": "pole odpovědi sourceGuid (tvar odpovědi v kódu)"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CloneElements": {
+  "op": "CloneElements",
+  "comp": "mea",
+  "fn": "FB_OpCloneElements",
+  "lifelines": [
+   "mea",
+   "scope",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWrite",
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: clone_elements"
+   },
+   {
+    "name": "Elements",
+    "type": "array",
+    "notes": "op.elements = [ \"{GUID}\" | id | $ref, ... ]"
+   },
+   {
+    "name": "Package",
+    "type": "string",
+    "notes": "op.package = cilovy package (volitelne - jinak klon zustava ve zdrojovem)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "ExportElementLinkedDocuments": {
+  "op": "ExportElementLinkedDocuments",
+  "comp": "mea",
+  "fn": "FB_OpLinkedDocExport",
+  "lifelines": [
+   "mea",
+   "xfa",
+   "xf",
+   "E:Package",
+   "E:Diagram",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "xfa",
+    "fn": "FB_ResolveBaseDir",
+    "op": "ResolveBaseDir"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   }
+  ],
+  "refs": [
+   "ResolveBaseDir"
+  ],
+  "skipped": {
+   "FB_Config": 1,
+   "FB_RepoId": 1,
+   "FB_ComObj": 2,
+   "FB_XmlRows": 2,
+   "B64Encode": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: export_element_linked_documents"
+   },
+   {
+    "name": "Elements",
+    "type": "array",
+    "notes": "op.elements = [ \"{GUID}\" | id | $ref, ... ]"
+   },
+   {
+    "name": "Inline",
+    "type": "string",
+    "notes": "op.inline = true -> RTF se vrati i base64 v response (rtf_b64)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "ImportElementLinkedDocuments": {
+  "op": "ImportElementLinkedDocuments",
+  "comp": "mea",
+  "fn": "FB_OpLinkedDocImport",
+  "lifelines": [
+   "mea",
+   "xfa",
+   "scope",
+   "xf",
+   "E:Package",
+   "E:Diagram",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "xfa",
+    "fn": "FB_ResolveBaseDir",
+    "op": "ResolveBaseDir"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   },
+   {
+    "to": "xf",
+    "file": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "U"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "ResolveBaseDir",
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_Config": 1,
+   "FB_RepoId": 1,
+   "FB_ComObj": 2,
+   "FB_XmlRows": 2,
+   "B64Decode": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: import_element_linked_documents"
+   },
+   {
+    "name": "Documents",
+    "type": "string",
+    "notes": "op.documents = [ {"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "GetDiagramsInformation": {
+  "op": "GetDiagramsInformation",
+  "comp": "dga",
+  "fn": "FB_OpGetDiagrams",
+  "lifelines": [
+   "dga",
+   "mea",
+   "E:Diagram",
+   "E:Element",
+   "E:Connector"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_TagRead",
+    "op": null
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_diagrams_information"
+   },
+   {
+    "name": "Diagrams",
+    "type": "array",
+    "notes": "op.diagrams = [ diagramID | \"{GUID}\" | jmeno, ... ]"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "CreateOrUpdateDiagram": {
+  "op": "CreateOrUpdateDiagram",
+  "comp": "dga",
+  "fn": "FB_OpDiagram",
+  "lifelines": [
+   "dga",
+   "scope",
+   "mea",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolveEl",
+    "op": null
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "C"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolvePkg",
+    "op": null
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement",
+   "CheckWrite"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_diagram"
+   },
+   {
+    "name": "Diagrams",
+    "type": "array",
+    "notes": "op.diagrams = [ { | položka: diagram, diagramID, guid, package, owningElement, type, name, notes, author, version, showDetails, styleEx"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "PlaceElementsOnDiagram": {
+  "op": "PlaceElementsOnDiagram",
+  "comp": "dga",
+  "fn": "FB_OpPlaceElements",
+  "lifelines": [
+   "dga",
+   "scope",
+   "mea",
+   "E:Diagram",
+   "E:Element",
+   "E:Connector"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolveEl",
+    "op": null
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: place_elements_on_diagram"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "Umisti EXISTUJICI elementy na diagram. Geometrie dle RE proti MCP (davka"
+   },
+   {
+    "name": "ElementPlacements",
+    "type": "array",
+    "notes": "op.elementPlacements = [ { elementID | element (\"{GUID}\"|$ref), x, y, | položka: elementID, element, x, y, width, height, style"
+   },
+   {
+    "name": "Elements",
+    "type": "array",
+    "notes": "width, height, style } ] (alias: op.elements) | položka: elementID, element, x, y, width, height, style"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "DiagramID",
+    "type": "number",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | $ref"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   },
+   {
+    "name": "Moved",
+    "type": "boolean",
+    "notes": "t_diagramobjects). Bez x/y zustava, kde je (moved:false). Item nese moved."
+   },
+   {
+    "name": "ConnectorsOnDiagram",
+    "type": "string",
+    "notes": "v connectorsOnDiagram (readback t_diagramlinks)."
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "RemoveElementsFromDiagram": {
+  "op": "RemoveElementsFromDiagram",
+  "comp": "dga",
+  "fn": "FB_OpRemoveFromDiagram",
+  "lifelines": [
+   "dga",
+   "scope",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: remove_elements_from_diagram"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno; op.elementIDs = [ id, ... ]"
+   },
+   {
+    "name": "ElementIDs",
+    "type": "array",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno; op.elementIDs = [ id, ... ]"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "DiagramID",
+    "type": "number",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno; op.elementIDs = [ id, ... ]"
+   },
+   {
+    "name": "RemovedElementIDs",
+    "type": "string",
+    "notes": "pole odpovědi removedElementIDs (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateOrUpdateMessages": {
+  "op": "CreateOrUpdateMessages",
+  "comp": "dga",
+  "fn": "FB_OpMessages",
+  "lifelines": [
+   "dga",
+   "scope",
+   "mea",
+   "E:Diagram",
+   "E:Operation",
+   "E:Connector",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolveEl",
+    "op": null
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolveFail",
+    "op": null
+   },
+   {
+    "to": "E:Operation",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "D"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "C"
+   },
+   {
+    "to": "E:Connector",
+    "crud": "U"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "U"
+   },
+   {
+    "to": "mea",
+    "fn": "SetTag",
+    "op": null
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {
+   "FB_XmlRows": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_or_update_messages"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "SeqNo, DiagramID = poradi + domovsky diagram zpravy"
+   },
+   {
+    "name": "Rebuild",
+    "type": "boolean",
+    "notes": "vzor V2d (deterministicky rebuild sekvencnich diagramu)."
+   },
+   {
+    "name": "Messages",
+    "type": "array",
+    "notes": "op.messages = [ { | položka: connectorID, guid, source, target, name, operation, isReturn, isAsynchronous, arguments, returnValue, notes, seqNo"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Removed",
+    "type": "array",
+    "notes": "guid/connectorID (cile prave smazane). Response nese removed."
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "LayoutConnectors": {
+  "op": "LayoutConnectors",
+  "comp": "dga",
+  "fn": "FB_OpLayoutConnectors",
+  "lifelines": [
+   "dga",
+   "scope",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: layout_connectors"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno"
+   },
+   {
+    "name": "Style",
+    "type": "string",
+    "notes": "op.style = \"direct\" | \"auto\" | \"custom\" | \"treeV\" | \"treeH\" | \"lateralV\" | \"lateralH\""
+   },
+   {
+    "name": "ConnectorIDs",
+    "type": "string",
+    "notes": "op.connectorIDs = volitelny filtr (jinak vsechny linky diagramu)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "DiagramID",
+    "type": "number",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno"
+   },
+   {
+    "name": "Style",
+    "type": "string",
+    "notes": "op.style = \"direct\" | \"auto\" | \"custom\" | \"treeV\" | \"treeH\" | \"lateralV\" | \"lateralH\""
+   },
+   {
+    "name": "Changed",
+    "type": "string",
+    "notes": "pole odpovědi changed (tvar odpovědi v kódu)"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "ChangeConnectorVisibility": {
+  "op": "ChangeConnectorVisibility",
+  "comp": "dga",
+  "fn": "FB_OpConnectorVisibility",
+  "lifelines": [
+   "dga",
+   "scope",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: change_connector_visibility"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno"
+   },
+   {
+    "name": "ConnectorIDs",
+    "type": "string",
+    "notes": "op.connectorIDs = [ id, ... ]"
+   },
+   {
+    "name": "Hidden",
+    "type": "string",
+    "notes": "op.hidden = true (skryt) | false (zobrazit)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "DiagramID",
+    "type": "number",
+    "notes": "op.diagram = diagramID | \"{GUID}\" | jmeno"
+   },
+   {
+    "name": "Hidden",
+    "type": "string",
+    "notes": "op.hidden = true (skryt) | false (zobrazit)"
+   },
+   {
+    "name": "ConnectorIDs",
+    "type": "string",
+    "notes": "op.connectorIDs = [ id, ... ]"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "OpenDiagrams": {
+  "op": "OpenDiagrams",
+  "comp": "dga",
+  "fn": "FB_OpOpenDiagrams",
+  "lifelines": [
+   "dga",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: open_diagrams"
+   },
+   {
+    "name": "Diagrams",
+    "type": "array",
+    "notes": "op.diagrams = [ diagramID | \"{GUID}\" | jmeno, ... ]"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Opened",
+    "type": "string",
+    "notes": "pole odpovědi opened (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "ReloadDiagrams": {
+  "op": "ReloadDiagrams",
+  "comp": "dga",
+  "fn": "FB_OpReloadDiagrams",
+  "lifelines": [
+   "dga",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: reload_diagrams"
+   },
+   {
+    "name": "Diagrams",
+    "type": "array",
+    "notes": "op.diagrams = [ diagramID | \"{GUID}\", ... ]"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Reloaded",
+    "type": "string",
+    "notes": "pole odpovědi reloaded (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "UpdateDiagramProperties": {
+  "op": "UpdateDiagramProperties",
+  "comp": "dga",
+  "fn": "FB_OpUpdateDiagramProps",
+  "lifelines": [
+   "dga",
+   "scope",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: update_diagram_properties"
+   },
+   {
+    "name": "Diagrams",
+    "type": "array",
+    "notes": "op.diagrams = [ { diagram: id|\"{GUID}\"|jmeno, name, author, version, | položka: diagram, name, author, version, showDetails, styleEx"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "SetDiagramObjectStyle": {
+  "op": "SetDiagramObjectStyle",
+  "comp": "dga",
+  "fn": "FB_OpDiagramObjectStyle",
+  "lifelines": [
+   "dga",
+   "scope",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWriteEl",
+    "op": "CheckWriteElement"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "U"
+   }
+  ],
+  "refs": [
+   "CheckWriteElement"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: set_diagram_object_style"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "op.diagram = diagramID | \"{GUID}\""
+   },
+   {
+    "name": "Objects",
+    "type": "array",
+    "notes": "op.objects = [ { elementID, backgroundColor: {red,green,blue}, | položka: elementID, backgroundColor, fontColor, borderColor, borderWidth, reset"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "DiagramID",
+    "type": "number",
+    "notes": "op.diagram = diagramID | \"{GUID}\""
+   },
+   {
+    "name": "ChangedElementIDs",
+    "type": "string",
+    "notes": "pole odpovědi changedElementIDs (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "GetDiagramImage": {
+  "op": "GetDiagramImage",
+  "comp": "dga",
+  "fn": "FB_OpDiagramImage",
+  "lifelines": [
+   "dga",
+   "xfa",
+   "xf",
+   "E:Diagram"
+  ],
+  "msgs": [
+   {
+    "to": "xfa",
+    "fn": "FB_ResolveBaseDir",
+    "op": "ResolveBaseDir"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   },
+   {
+    "to": "E:Diagram",
+    "crud": "R"
+   },
+   {
+    "to": "xf",
+    "file": "R"
+   }
+  ],
+  "refs": [
+   "ResolveBaseDir"
+  ],
+  "skipped": {
+   "FB_Config": 1,
+   "FB_RepoId": 1,
+   "FB_ComObj": 3
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_diagram_image"
+   },
+   {
+    "name": "Diagrams",
+    "type": "array",
+    "notes": "op.diagrams = [ diagramID | \"{GUID}\" | $ref, ... ] (alias: op.diagram = 1 kus)"
+   },
+   {
+    "name": "Diagram",
+    "type": "string",
+    "notes": "op.diagrams = [ diagramID | \"{GUID}\" | $ref, ... ] (alias: op.diagram = 1 kus)"
+   },
+   {
+    "name": "Inline",
+    "type": "string",
+    "notes": "MCP: MCP umel jen inline obrazek v odpovedi (bolest EDU pipeline), bridge"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Id",
+    "type": "number",
+    "notes": "ID hlavního výsledku"
+   },
+   {
+    "name": "File",
+    "type": "string",
+    "notes": "Vysledek: items = [{diagramID, guid, name, file, size, png_b64?}]"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "GetBaselines": {
+  "op": "GetBaselines",
+  "comp": "bla",
+  "fn": "FB_OpBaselineList",
+  "lifelines": [
+   "bla",
+   "mea",
+   "E:Baseline"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_ResolvePkg",
+    "op": null
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: get_baselines"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "PackageGuid",
+    "type": "string",
+    "notes": "pole odpovědi packageGuid (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Count",
+    "type": "number",
+    "notes": "počet položek"
+   },
+   {
+    "name": "Items",
+    "type": "array",
+    "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+   },
+   {
+    "name": "Raw",
+    "type": "string",
+    "notes": "Vraci parsovany seznam { guid, version, notes, date } + surove XML (raw)"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "BaselineDiff": {
+  "op": "BaselineDiff",
+  "comp": "bla",
+  "fn": "FB_OpBaselineDiff",
+  "lifelines": [
+   "bla",
+   "mea",
+   "E:Baseline"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_ResolvePkg",
+    "op": null
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: baseline_diff"
+   },
+   {
+    "name": "Baseline",
+    "type": "object",
+    "notes": "baseline_diff (K5, cteci cast) - porovnani package proti baseline."
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "PackageGuid",
+    "type": "string",
+    "notes": "pole odpovědi packageGuid (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Baseline",
+    "type": "object",
+    "notes": "baseline_diff (K5, cteci cast) - porovnani package proti baseline."
+   },
+   {
+    "name": "Summary",
+    "type": "object",
+    "notes": "pole odpovědi summary (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Raw",
+    "type": "string",
+    "notes": "pole odpovědi raw (tvar odpovědi v kódu)"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "CreateBaseline": {
+  "op": "CreateBaseline",
+  "comp": "bla",
+  "fn": "FB_OpBaselineCreate",
+  "lifelines": [
+   "bla",
+   "mea",
+   "scope",
+   "bpol",
+   "E:Baseline"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_ResolvePkg",
+    "op": null
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "bpol",
+    "fn": "FB_BaselineConfig",
+    "op": null
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "C"
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "R"
+   }
+  ],
+  "refs": [
+   "CheckWrite"
+  ],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: create_baseline"
+   },
+   {
+    "name": "Package",
+    "type": "string",
+    "notes": "create_baseline (K5) - explicitni mikro-baseline per package PRED zapisem"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole name (FB_FieldCheck SPEC)"
+   },
+   {
+    "name": "Session",
+    "type": "string",
+    "notes": "NESE JMENO: default \"AI-pre-<session>-<batch>\" (limit bezejmenne MCP"
+   },
+   {
+    "name": "Notes",
+    "type": "string",
+    "notes": "op.notes = poznamka baseline"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "PackageGuid",
+    "type": "string",
+    "notes": "pole odpovědi packageGuid (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "PackageID",
+    "type": "number",
+    "notes": "op.package = \"{GUID}\" | packageID | jmeno | $ref"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole odpovědi name (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "BaselineGuid",
+    "type": "string",
+    "notes": "pole odpovědi baselineGuid (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   }
+  ],
+  "fieldsFrom": "SPEC"
+ },
+ "CreateAutoBaseline": {
+  "op": "CreateAutoBaseline",
+  "comp": "bla",
+  "fn": "FB_AutoBaseline",
+  "lifelines": [
+   "bla",
+   "scope",
+   "bpol",
+   "E:Package",
+   "E:Baseline"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "scope",
+    "fn": "FB_CheckWrite",
+    "op": "CheckWrite"
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "R"
+   },
+   {
+    "to": "bpol",
+    "fn": "FB_BaselineName",
+    "op": null
+   },
+   {
+    "to": "E:Baseline",
+    "crud": "C"
+   }
+  ],
+  "refs": [
+   "CheckWrite"
+  ],
+  "skipped": {
+   "FB_XmlUnescape": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "PackageGuid",
+    "type": "string",
+    "notes": "parametr PackageGuid operace katalogu"
+   },
+   {
+    "name": "Token",
+    "type": "string",
+    "notes": "parametr Token operace katalogu"
+   },
+   {
+    "name": "Klass",
+    "type": "string",
+    "notes": "parametr Klass operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Guid",
+    "type": "string",
+    "notes": "GUID hlavního výsledku"
+   },
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "pole odpovědi name (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "ElapsedMs",
+    "type": "number",
+    "notes": "Vraci { status: \"created\"|\"reused\"|\"failed\", guid, name, elapsedMs, why }."
+   },
+   {
+    "name": "Why",
+    "type": "string",
+    "notes": "Vraci { status: \"created\"|\"reused\"|\"failed\", guid, name, elapsedMs, why }."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "WriteJournal": {
+  "op": "WriteJournal",
+  "comp": "bla",
+  "fn": "FB_Journal",
+  "lifelines": [
+   "bla",
+   "mea",
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "mea",
+    "fn": "FB_ResolveEl",
+    "op": null
+   },
+   {
+    "to": "mea",
+    "fn": "FB_ResolvePkg",
+    "op": null
+   },
+   {
+    "to": "xfa",
+    "fn": "FB_ResolveBaseDir",
+    "op": "ResolveBaseDir"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   }
+  ],
+  "refs": [
+   "ResolveBaseDir"
+  ],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_ComObj": 2,
+   "FB_JsonStringify": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Request",
+    "type": "object",
+    "notes": "parametr Request operace katalogu"
+   },
+   {
+    "name": "Baseline",
+    "type": "object",
+    "notes": "parametr Baseline operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Pre-image polí, která dávka přepíše."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "WriteAudit": {
+  "op": "WriteAudit",
+  "comp": "aud",
+  "fn": "FB_Audit",
+  "lifelines": [
+   "aud",
+   "mea",
+   "E:Package",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "E:Package",
+    "crud": "R"
+   },
+   {
+    "to": "E:Element",
+    "crud": "C"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "E:Package",
+    "crud": "U"
+   },
+   {
+    "to": "mea",
+    "fn": "SetTag",
+    "op": null
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_Config": 1,
+   "FB_RepoId": 1,
+   "Log": 3
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "RequestId",
+    "type": "string",
+    "notes": "parametr RequestId operace katalogu"
+   },
+   {
+    "name": "Summary",
+    "type": "string",
+    "notes": "parametr Summary operace katalogu"
+   },
+   {
+    "name": "RequestText",
+    "type": "string",
+    "notes": "parametr RequestText operace katalogu"
+   },
+   {
+    "name": "Human",
+    "type": "string",
+    "notes": "parametr Human operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Založí auditní Artifact dávky v #AI-LOG; vrací GUID nebo prázdný řetězec."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "WriteRiskAuditTags": {
+  "op": "WriteRiskAuditTags",
+  "comp": "aud",
+  "fn": "FB_RiskAuditTags",
+  "lifelines": [
+   "aud",
+   "mea",
+   "E:Element"
+  ],
+  "msgs": [
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "mea",
+    "fn": "SetTag",
+    "op": null
+   }
+  ],
+  "refs": [],
+  "skipped": {},
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "AuditGuid",
+    "type": "string",
+    "notes": "parametr AuditGuid operace katalogu"
+   },
+   {
+    "name": "Risk",
+    "type": "object",
+    "notes": "parametr Risk operace katalogu"
+   },
+   {
+    "name": "Baseline",
+    "type": "object",
+    "notes": "parametr Baseline operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "void",
+    "notes": "návratová hodnota (void): Riziková pole na audit jako tagged values (ai.risk.*)."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "LogChanges": {
+  "op": "LogChanges",
+  "comp": "aud",
+  "fn": "FB_LogChanges",
+  "lifelines": [
+   "aud",
+   "E:Element",
+   "E:Package"
+  ],
+  "msgs": [
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Package",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "Log": 1,
+   "FB_ElementPath": 2,
+   "FB_RepoId": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Response",
+    "type": "object",
+    "notes": "parametr Response operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "void",
+    "notes": "návratová hodnota (void): Lidsky čitelný výpis změn s tečkovou cestou do Output tabu."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "DeploySrc": {
+  "op": "DeploySrc",
+  "comp": "code",
+  "fn": "FB_OpDeploySrc",
+  "lifelines": [
+   "code",
+   "mea",
+   "E:Element",
+   "E:Operation"
+  ],
+  "msgs": [
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "C"
+   },
+   {
+    "to": "E:Operation",
+    "crud": "U"
+   },
+   {
+    "to": "E:Element",
+    "crud": "U"
+   },
+   {
+    "to": "mea",
+    "fn": "SetTag",
+    "op": null
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_Config": 1,
+   "FB_RepoId": 2,
+   "FB_ComObj": 3,
+   "FB_Sha256": 1
+  },
+  "dynamic": 0,
+  "candidates": [
+   "t_operationparams"
+  ],
+  "req": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu: deploy_src"
+   },
+   {
+    "name": "Only",
+    "type": "string",
+    "notes": "op.only = volitelne pole nazvu operaci (jinak vsechny soubory ve srcDir)"
+   }
+  ],
+  "res": [
+   {
+    "name": "Op",
+    "type": "string",
+    "notes": "jméno operace protokolu (opakuje požadavek)"
+   },
+   {
+    "name": "Status",
+    "type": "string",
+    "notes": "ok | error - výsledek operace"
+   },
+   {
+    "name": "Code",
+    "type": "string",
+    "notes": "kód chyby E_* (jen při chybě)"
+   },
+   {
+    "name": "Message",
+    "type": "string",
+    "notes": "hláška pro člověka i agenta"
+   },
+   {
+    "name": "ParamsSynced",
+    "type": "string",
+    "notes": "pole odpovědi paramsSynced (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Receptions",
+    "type": "string",
+    "notes": "pole odpovědi receptions (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Skipped",
+    "type": "array",
+    "notes": "pole odpovědi skipped (tvar odpovědi v kódu)"
+   },
+   {
+    "name": "Warnings",
+    "type": "array",
+    "notes": "varování, která operaci nezastavila"
+   }
+  ],
+  "fieldsFrom": "code"
+ },
+ "GetCodeInfo": {
+  "op": "GetCodeInfo",
+  "comp": "code",
+  "fn": "FB_CodeInfo",
+  "lifelines": [
+   "code",
+   "E:Element",
+   "E:TaggedValue"
+  ],
+  "msgs": [
+   {
+    "to": "E:Element",
+    "crud": "R"
+   },
+   {
+    "to": "E:TaggedValue",
+    "crud": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_XmlRows": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [],
+  "res": [
+   {
+    "name": "Found",
+    "type": "boolean",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   },
+   {
+    "name": "Fingerprint",
+    "type": "string",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   },
+   {
+    "name": "Short",
+    "type": "string",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   },
+   {
+    "name": "Files",
+    "type": "array",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   },
+   {
+    "name": "DeployedAt",
+    "type": "string",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   },
+   {
+    "name": "DeployedBy",
+    "type": "string",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   },
+   {
+    "name": "Text",
+    "type": "string",
+    "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "ReadRequestBytes": {
+  "op": "ReadRequestBytes",
+  "comp": "xfa",
+  "fn": "FB_FileBytes",
+  "lifelines": [
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_ComObj": 2
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Path",
+    "type": "string",
+    "notes": "parametr Path operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "array",
+    "notes": "návratová hodnota (array): Jedno binární čtení souboru (základ otisku dávky)."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "ReadWriteState": {
+  "op": "ReadWriteState",
+  "comp": "xfa",
+  "fn": "FB_StateFile",
+  "lifelines": [
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "R"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   }
+  ],
+  "refs": [
+   "ResolveBaseDir"
+  ],
+  "skipped": {
+   "FB_ComObj": 3
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "Name",
+    "type": "string",
+    "notes": "parametr Name operace katalogu"
+   },
+   {
+    "name": "Value",
+    "type": "string",
+    "notes": "parametr Value operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Perzistentní stav bridge v state-<name>.txt."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "UpdatePendingIndex": {
+  "op": "UpdatePendingIndex",
+  "comp": "xfa",
+  "fn": "FB_PendingIndex",
+  "lifelines": [
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "R"
+   },
+   {
+    "to": "xf",
+    "file": "W"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_ComObj": 3
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "PendingDir",
+    "type": "string",
+    "notes": "parametr PendingDir operace katalogu"
+   },
+   {
+    "name": "Action",
+    "type": "string",
+    "notes": "parametr Action operace katalogu"
+   },
+   {
+    "name": "Entry",
+    "type": "object",
+    "notes": "parametr Entry operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Index čekajících dávek .index.txt."
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "IsPumpAlive": {
+  "op": "IsPumpAlive",
+  "comp": "xfa",
+  "fn": "FB_PumpAlive",
+  "lifelines": [
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "R"
+   }
+  ],
+  "refs": [
+   "ResolveBaseDir"
+  ],
+  "skipped": {
+   "FB_ComObj": 2,
+   "FB_JsonParse": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [
+   {
+    "name": "BaseDir",
+    "type": "string",
+    "notes": "parametr BaseDir operace katalogu"
+   }
+  ],
+  "res": [
+   {
+    "name": "Result",
+    "type": "boolean",
+    "notes": "návratová hodnota (boolean): Běží pumpa nad složkou? (pump-status.json, aliveUntil)"
+   }
+  ],
+  "fieldsFrom": "params"
+ },
+ "ResolveBaseDir": {
+  "op": "ResolveBaseDir",
+  "comp": "xfa",
+  "fn": "FB_ResolveBaseDir",
+  "lifelines": [
+   "xfa",
+   "xf"
+  ],
+  "msgs": [
+   {
+    "to": "xf",
+    "file": "W"
+   },
+   {
+    "to": "xf",
+    "file": "R"
+   }
+  ],
+  "refs": [],
+  "skipped": {
+   "FB_RepoId": 1,
+   "FB_ComObj": 3,
+   "FB_Config": 1,
+   "Log": 1
+  },
+  "dynamic": 0,
+  "candidates": [],
+  "req": [],
+  "res": [
+   {
+    "name": "Result",
+    "type": "string",
+    "notes": "návratová hodnota (string): Kořen výměnné složky pro připojený repozitář."
+   }
+  ],
+  "fieldsFrom": "params"
+ }
+}

@@ -1,0 +1,894 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-61-usage-sr",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_connectors",
+   "connectors": [
+    {
+     "source": 12242,
+     "target": 12587,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ConfirmPending)."
+    },
+    {
+     "source": 12242,
+     "target": 12247,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ConfirmPending)."
+    },
+    {
+     "source": 12242,
+     "target": 12552,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ConfirmPending)."
+    },
+    {
+     "source": 12242,
+     "target": 12557,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ConfirmPending)."
+    },
+    {
+     "source": 12242,
+     "target": 12577,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ConfirmPending)."
+    },
+    {
+     "source": 12242,
+     "target": 11961,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ConfirmPending)."
+    },
+    {
+     "source": 12247,
+     "target": 12587,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR SweepPending)."
+    },
+    {
+     "source": 12247,
+     "target": 12552,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR SweepPending)."
+    },
+    {
+     "source": 12247,
+     "target": 12557,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR SweepPending)."
+    },
+    {
+     "source": 12252,
+     "target": 12292,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR StartSession)."
+    },
+    {
+     "source": 12252,
+     "target": 12572,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR StartSession)."
+    },
+    {
+     "source": 12252,
+     "target": 12577,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR StartSession)."
+    },
+    {
+     "source": 11965,
+     "target": 12292,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR Ping)."
+    },
+    {
+     "source": 11965,
+     "target": 12572,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR Ping)."
+    },
+    {
+     "source": 11965,
+     "target": 12287,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR Ping)."
+    },
+    {
+     "source": 12257,
+     "target": 12292,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR GetStatus)."
+    },
+    {
+     "source": 12257,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR GetStatus)."
+    },
+    {
+     "source": 12236,
+     "target": 12262,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR PrecheckBatch)."
+    },
+    {
+     "source": 12236,
+     "target": 12272,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR PrecheckBatch)."
+    },
+    {
+     "source": 12303,
+     "target": 12308,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR BuildConfirmSummary)."
+    },
+    {
+     "source": 12318,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR PlanBaseline)."
+    },
+    {
+     "source": 12318,
+     "target": 12328,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR PlanBaseline)."
+    },
+    {
+     "source": 12333,
+     "target": 12287,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CleanupBaselines)."
+    },
+    {
+     "source": 12333,
+     "target": 12552,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CleanupBaselines)."
+    },
+    {
+     "source": 12348,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ApplyClassifierStereotypes)."
+    },
+    {
+     "source": 12353,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR FindOrCreateReferencingSR)."
+    },
+    {
+     "source": 12364,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR GetSelectedContext)."
+    },
+    {
+     "source": 12364,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR GetSelectedContext)."
+    },
+    {
+     "source": 12394,
+     "target": 11969,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateElement)."
+    },
+    {
+     "source": 11969,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateElements)."
+    },
+    {
+     "source": 11969,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateElements)."
+    },
+    {
+     "source": 12399,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR MoveElements)."
+    },
+    {
+     "source": 12399,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR MoveElements)."
+    },
+    {
+     "source": 12404,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdatePackage)."
+    },
+    {
+     "source": 12409,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateConnectors)."
+    },
+    {
+     "source": 12414,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateAttributes)."
+    },
+    {
+     "source": 12419,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateOperations)."
+    },
+    {
+     "source": 12425,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateScenarios)."
+    },
+    {
+     "source": 12430,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateConstraints)."
+    },
+    {
+     "source": 12435,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateRequirements)."
+    },
+    {
+     "source": 11973,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR DeleteFromModel)."
+    },
+    {
+     "source": 11973,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR DeleteFromModel)."
+    },
+    {
+     "source": 12440,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR DeleteTaggedvalueFromModel)."
+    },
+    {
+     "source": 12440,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR DeleteTaggedvalueFromModel)."
+    },
+    {
+     "source": 12445,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ClonePackage)."
+    },
+    {
+     "source": 12450,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CloneElements)."
+    },
+    {
+     "source": 12450,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CloneElements)."
+    },
+    {
+     "source": 12455,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ExportElementLinkedDocuments)."
+    },
+    {
+     "source": 12460,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ImportElementLinkedDocuments)."
+    },
+    {
+     "source": 12460,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ImportElementLinkedDocuments)."
+    },
+    {
+     "source": 12470,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateDiagram)."
+    },
+    {
+     "source": 12470,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateDiagram)."
+    },
+    {
+     "source": 12475,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR PlaceElementsOnDiagram)."
+    },
+    {
+     "source": 12480,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR RemoveElementsFromDiagram)."
+    },
+    {
+     "source": 12486,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateOrUpdateMessages)."
+    },
+    {
+     "source": 12491,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR LayoutConnectors)."
+    },
+    {
+     "source": 12496,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ChangeConnectorVisibility)."
+    },
+    {
+     "source": 12511,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR UpdateDiagramProperties)."
+    },
+    {
+     "source": 12516,
+     "target": 12282,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR SetDiagramObjectStyle)."
+    },
+    {
+     "source": 12521,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR GetDiagramImage)."
+    },
+    {
+     "source": 12536,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateBaseline)."
+    },
+    {
+     "source": 12541,
+     "target": 12277,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR CreateAutoBaseline)."
+    },
+    {
+     "source": 12547,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR WriteJournal)."
+    },
+    {
+     "source": 12582,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR ReadWriteState)."
+    },
+    {
+     "source": 12592,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: Usage kopíruje ref řetěz (ref v sekvenci SR IsPumpAlive)."
+    },
+    {
+     "source": 11961,
+     "target": 12577,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12597,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12587,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12552,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12236,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12287,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12582,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12297,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12557,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12318,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12323,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12313,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12541,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12547,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12267,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12338,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12562,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 12343,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: FB_Main volá operaci přímo (zpráva v sekvenci SR ProcessRequest)."
+    },
+    {
+     "source": 11961,
+     "target": 11965,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace ping z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12358,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace query z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12364,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_selected_context z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12369,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace find_elements_by_name z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12374,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace find_packages_by_name z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12379,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_elements_information z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12384,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_packages_information z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12389,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_connectors_information z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12465,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_diagrams_information z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12526,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_baselines z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12531,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace baseline_diff z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12455,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace export_element_linked_documents z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12394,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_element z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12399,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace move_elements z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12404,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_package z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12409,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_connectors z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12414,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_attributes z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12419,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_operations z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12486,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_messages z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12440,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace delete_taggedvalue_from_model z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12480,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace remove_elements_from_diagram z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12536,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_baseline z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12445,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace clone_package z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12450,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace clone_elements z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12460,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace import_element_linked_documents z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12491,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace layout_connectors z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12496,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace change_connector_visibility z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12501,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace open_diagrams z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12506,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace reload_diagrams z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12511,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace update_diagram_properties z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12516,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace set_diagram_object_style z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12470,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_diagram z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12475,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace place_elements_on_diagram z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12521,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace get_diagram_image z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12425,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_scenarios z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12430,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_constraints z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12435,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace create_or_update_requirements z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12348,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace apply_classifier_stereotypes z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12353,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace find_or_create_referencing_sr z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    },
+    {
+     "source": 11961,
+     "target": 12567,
+     "type": "Usage",
+     "direction": "FromSourceToTarget",
+     "notes": "Impact: exekuce operace deploy_src z registru FB_Main (ref „exekuce operací dávky z registru“)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 11961,
+     "notes": "Servisní realizace operace ProcessRequest - průběh odvozený z kódu (as-implemented, src @ v0.22 (0c3e207)).\nVětve: chyba předběžné kontroly / E_BLACKLIST = odpověď error bez okna; ELEVATED = dávka do pending\\, odpověď confirm_required a pokračování přes ConfirmPending (okno pumpy); BLOCKED = error. Zápisová část (baseline, exekuce, QC, audit) běží jen u LOW nebo potvrzené dávky.\nExekuce z registru: FB_Main volá 42 protokolových operací přes this[reg.fn] (dynamicky - extraktor ji nevidí). Na diagramu ji zastupuje jedna zpráva „exekuce operací dávky z registru“ a refy na SR CreateOrUpdateElements a DeleteFromModel; vazby na SR všech operací registru jsou Usage (impact): ping → SR Ping, query → SR Query, get_selected_context → SR GetSelectedContext, find_elements_by_name → SR FindElementsByName, find_packages_by_name → SR FindPackagesByName, get_elements_information → SR GetElementsInformation, get_packages_information → SR GetPackagesInformation, get_connectors_information → SR GetConnectorsInformation, get_diagrams_information → SR GetDiagramsInformation, get_baselines → SR GetBaselines, baseline_diff → SR BaselineDiff, export_element_linked_documents → SR ExportElementLinkedDocuments, create_element → SR CreateElement, create_or_update_elements → SR CreateOrUpdateElements, move_elements → SR MoveElements, create_or_update_package → SR CreateOrUpdatePackage, create_or_update_connectors → SR CreateOrUpdateConnectors, create_or_update_attributes → SR CreateOrUpdateAttributes, create_or_update_operations → SR CreateOrUpdateOperations, create_or_update_messages → SR CreateOrUpdateMessages, delete_from_model → SR DeleteFromModel, delete_taggedvalue_from_model → SR DeleteTaggedvalueFromModel, remove_elements_from_diagram → SR RemoveElementsFromDiagram, create_baseline → SR CreateBaseline, clone_package → SR ClonePackage, clone_elements → SR CloneElements, import_element_linked_documents → SR ImportElementLinkedDocuments, layout_connectors → SR LayoutConnectors, change_connector_visibility → SR ChangeConnectorVisibility, open_diagrams → SR OpenDiagrams, reload_diagrams → SR ReloadDiagrams, update_diagram_properties → SR UpdateDiagramProperties, set_diagram_object_style → SR SetDiagramObjectStyle, create_or_update_diagram → SR CreateOrUpdateDiagram, place_elements_on_diagram → SR PlaceElementsOnDiagram, get_diagram_image → SR GetDiagramImage, create_or_update_scenarios → SR CreateOrUpdateScenarios, create_or_update_constraints → SR CreateOrUpdateConstraints, create_or_update_requirements → SR CreateOrUpdateRequirements, apply_classifier_stereotypes → SR ApplyClassifierStereotypes, find_or_create_referencing_sr → SR FindOrCreateReferencingSR, deploy_src → SR DeploySrc."
+    },
+    {
+     "elementID": 11965,
+     "notes": "Servisní realizace operace Ping - průběh odvozený z kódu (as-implemented, src @ v0.22 (0c3e207)).\nPing je čtecí operace bez risk gate a bez auditu zápisu; identitu repozitáře bere z FB_RepoId (Utility)."
+    },
+    {
+     "elementID": 11969,
+     "notes": "Servisní realizace operace CreateOrUpdateElements - průběh odvozený z kódu (as-implemented, src @ v0.22 (0c3e207)).\nAs-implemented: Resource Access sám volá Write Scope Engine (CheckWrite / CheckWriteElement) - opačný směr volání vůči IDesign; nález pro člověka, ne oprava."
+    },
+    {
+     "elementID": 11973,
+     "notes": "Servisní realizace operace DeleteFromModel - průběh odvozený z kódu (as-implemented, src @ v0.22 (0c3e207)).\nKaskády do chráněné části: cascadeDelete block = E_BLACKLIST už v předběžné kontrole; allow = cascades[] v odpovědi a varování v okně."
+    }
+   ]
+  }
+ ]
+}

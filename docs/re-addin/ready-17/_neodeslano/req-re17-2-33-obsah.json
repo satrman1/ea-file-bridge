@@ -1,0 +1,1144 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-33-obsah",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 12574,
+   "attributes": []
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12575,
+   "attributes": [
+    {
+     "name": "Found",
+     "type": "boolean",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    },
+    {
+     "name": "Fingerprint",
+     "type": "string",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    },
+    {
+     "name": "Short",
+     "type": "string",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    },
+    {
+     "name": "Files",
+     "type": "array",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    },
+    {
+     "name": "DeployedAt",
+     "type": "string",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    },
+    {
+     "name": "DeployedBy",
+     "type": "string",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    },
+    {
+     "name": "Text",
+     "type": "string",
+     "notes": "Vraci { found, fingerprint, short, files, deployedAt, deployedBy, text }:"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12572,
+     "notes": "Servisní realizace operace EAFB Code Access Interface.GetCodeInfo - průběh odvozený z kódu src/AICodeBridge.FB_CodeInfo.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nPřečte otisk a verzi nasazeného kódu z tagged values fb.code.*.\nAs-implemented: složku src\\ čte přímo souborovým systémem (není výměnná složka, v sekvenci nekresleno).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_CodeInfo.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12573,
+     "notes": "DTO služby GetCodeInfo. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_CodeInfo.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_CodeInfo.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12574,
+     "notes": "Request služby GetCodeInfo (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12575,
+     "notes": "Response služby GetCodeInfo (tvar odpovědi v kódu src/AICodeBridge.FB_CodeInfo.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1512,
+   "elementPlacements": [
+    {
+     "elementID": 12573,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12574,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 40
+    },
+    {
+     "elementID": 12575,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 180
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{D92A5D29-D93B-4651-8EA2-3E2EE11E8C9E}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{D92A5D29-D93B-4651-8EA2-3E2EE11E8C9E}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{D92A5D29-D93B-4651-8EA2-3E2EE11E8C9E}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11932,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{D92A5D29-D93B-4651-8EA2-3E2EE11E8C9E}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{D92A5D29-D93B-4651-8EA2-3E2EE11E8C9E}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1510,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[1]",
+     "x": 0,
+     "y": 256,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$4[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1510,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 1,
+     "operation": 1359,
+     "arguments": ""
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[3]",
+     "seqNo": 2,
+     "operation": 1379
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[4]",
+     "seqNo": 3,
+     "operation": 1383
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[1]",
+     "seqNo": 4,
+     "isReturn": true,
+     "name": "GetCodeInfoRes",
+     "notes": "Found, Fingerprint, Short, Files, DeployedAt, DeployedBy, Text"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1510
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12579,
+   "attributes": [
+    {
+     "name": "Path",
+     "type": "string",
+     "notes": "parametr Path operace katalogu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12580,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "array",
+     "notes": "návratová hodnota (array): Jedno binární čtení souboru (základ otisku dávky)."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12577,
+     "notes": "Servisní realizace operace EAFB Exchange Folder Access Interface.ReadRequestBytes - průběh odvozený z kódu src/AICodeBridge.FB_FileBytes.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nJedno binární čtení souboru (základ otisku dávky).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_FileBytes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12578,
+     "notes": "DTO služby ReadRequestBytes. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_FileBytes.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_FileBytes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12579,
+     "notes": "Request služby ReadRequestBytes (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12580,
+     "notes": "Response služby ReadRequestBytes (tvar odpovědi v kódu src/AICodeBridge.FB_FileBytes.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1516,
+   "elementPlacements": [
+    {
+     "elementID": 12578,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12579,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12580,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{5B5090B1-F8E7-4177-90CF-56B241420149}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{5B5090B1-F8E7-4177-90CF-56B241420149}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{5B5090B1-F8E7-4177-90CF-56B241420149}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11933,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{5B5090B1-F8E7-4177-90CF-56B241420149}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11935,
+     "stereotypes": "IDS-File Resource"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1514,
+   "elementPlacements": [
+    {
+     "element": "$12[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[1]",
+     "x": 0,
+     "y": 222,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1514,
+   "messages": [
+    {
+     "source": "$12[0]",
+     "target": "$12[2]",
+     "seqNo": 1,
+     "operation": 1360,
+     "arguments": "Path"
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[3]",
+     "seqNo": 2,
+     "name": "čtení souboru"
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[1]",
+     "seqNo": 3,
+     "isReturn": true,
+     "name": "ReadRequestBytesRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1514
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12584,
+   "attributes": [
+    {
+     "name": "Name",
+     "type": "string",
+     "notes": "parametr Name operace katalogu"
+    },
+    {
+     "name": "Value",
+     "type": "string",
+     "notes": "parametr Value operace katalogu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12585,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "string",
+     "notes": "návratová hodnota (string): Perzistentní stav bridge v state-<name>.txt."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12582,
+     "notes": "Servisní realizace operace EAFB Exchange Folder Access Interface.ReadWriteState - průběh odvozený z kódu src/AICodeBridge.FB_StateFile.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nPerzistentní stav bridge v state-<name>.txt.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_StateFile.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12583,
+     "notes": "DTO služby ReadWriteState. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_StateFile.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_StateFile.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12584,
+     "notes": "Request služby ReadWriteState (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12585,
+     "notes": "Response služby ReadWriteState (tvar odpovědi v kódu src/AICodeBridge.FB_StateFile.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1520,
+   "elementPlacements": [
+    {
+     "elementID": 12583,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12584,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 80
+    },
+    {
+     "elementID": 12585,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{6D9E3C82-AEE5-4754-941C-DC1B5F503BD0}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{6D9E3C82-AEE5-4754-941C-DC1B5F503BD0}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{6D9E3C82-AEE5-4754-941C-DC1B5F503BD0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11933,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{6D9E3C82-AEE5-4754-941C-DC1B5F503BD0}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11935,
+     "stereotypes": "IDS-File Resource"
+    },
+    {
+     "owningElement": "{6D9E3C82-AEE5-4754-941C-DC1B5F503BD0}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12597
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1518,
+   "elementPlacements": [
+    {
+     "element": "$20[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[1]",
+     "x": 0,
+     "y": 256,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[4]",
+     "x": 90,
+     "y": 296,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1518,
+   "messages": [
+    {
+     "source": "$20[0]",
+     "target": "$20[2]",
+     "seqNo": 1,
+     "operation": 1361,
+     "arguments": "Name, Value"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[3]",
+     "seqNo": 2,
+     "name": "čtení souboru"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[3]",
+     "seqNo": 3,
+     "name": "zápis souboru"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[1]",
+     "seqNo": 4,
+     "isReturn": true,
+     "name": "ReadWriteStateRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1518
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12589,
+   "attributes": [
+    {
+     "name": "PendingDir",
+     "type": "string",
+     "notes": "parametr PendingDir operace katalogu"
+    },
+    {
+     "name": "Action",
+     "type": "string",
+     "notes": "parametr Action operace katalogu"
+    },
+    {
+     "name": "Entry",
+     "type": "object",
+     "notes": "parametr Entry operace katalogu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12590,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "string",
+     "notes": "návratová hodnota (string): Index čekajících dávek .index.txt."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12587,
+     "notes": "Servisní realizace operace EAFB Exchange Folder Access Interface.UpdatePendingIndex - průběh odvozený z kódu src/AICodeBridge.FB_PendingIndex.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nIndex čekajících dávek .index.txt.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PendingIndex.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12588,
+     "notes": "DTO služby UpdatePendingIndex. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_PendingIndex.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PendingIndex.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12589,
+     "notes": "Request služby UpdatePendingIndex (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12590,
+     "notes": "Response služby UpdatePendingIndex (tvar odpovědi v kódu src/AICodeBridge.FB_PendingIndex.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1524,
+   "elementPlacements": [
+    {
+     "elementID": 12588,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12589,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12590,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{BF07F2EF-F703-47e4-8569-F627A05ADD4A}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{BF07F2EF-F703-47e4-8569-F627A05ADD4A}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{BF07F2EF-F703-47e4-8569-F627A05ADD4A}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11933,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{BF07F2EF-F703-47e4-8569-F627A05ADD4A}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11935,
+     "stereotypes": "IDS-File Resource"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1522,
+   "elementPlacements": [
+    {
+     "element": "$28[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[1]",
+     "x": 0,
+     "y": 256,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$28[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1522,
+   "messages": [
+    {
+     "source": "$28[0]",
+     "target": "$28[2]",
+     "seqNo": 1,
+     "operation": 1362,
+     "arguments": "PendingDir, Action, Entry"
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[3]",
+     "seqNo": 2,
+     "name": "čtení souboru"
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[3]",
+     "seqNo": 3,
+     "name": "zápis souboru"
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[1]",
+     "seqNo": 4,
+     "isReturn": true,
+     "name": "UpdatePendingIndexRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1522
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12594,
+   "attributes": [
+    {
+     "name": "BaseDir",
+     "type": "string",
+     "notes": "parametr BaseDir operace katalogu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12595,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "boolean",
+     "notes": "návratová hodnota (boolean): Běží pumpa nad složkou? (pump-status.json, aliveUntil)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12592,
+     "notes": "Servisní realizace operace EAFB Exchange Folder Access Interface.IsPumpAlive - průběh odvozený z kódu src/AICodeBridge.FB_PumpAlive.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nBěží pumpa nad složkou? (pump-status.json, aliveUntil)",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PumpAlive.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12593,
+     "notes": "DTO služby IsPumpAlive. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_PumpAlive.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_PumpAlive.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12594,
+     "notes": "Request služby IsPumpAlive (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12595,
+     "notes": "Response služby IsPumpAlive (tvar odpovědi v kódu src/AICodeBridge.FB_PumpAlive.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1528,
+   "elementPlacements": [
+    {
+     "elementID": 12593,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12594,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12595,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{0A305ECD-38FF-4cca-8A79-ADD4B7EDFD22}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{0A305ECD-38FF-4cca-8A79-ADD4B7EDFD22}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{0A305ECD-38FF-4cca-8A79-ADD4B7EDFD22}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11933,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{0A305ECD-38FF-4cca-8A79-ADD4B7EDFD22}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11935,
+     "stereotypes": "IDS-File Resource"
+    },
+    {
+     "owningElement": "{0A305ECD-38FF-4cca-8A79-ADD4B7EDFD22}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12597
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1526,
+   "elementPlacements": [
+    {
+     "element": "$36[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[1]",
+     "x": 0,
+     "y": 222,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[4]",
+     "x": 90,
+     "y": 262,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1526,
+   "messages": [
+    {
+     "source": "$36[0]",
+     "target": "$36[2]",
+     "seqNo": 1,
+     "operation": 1363,
+     "arguments": "BaseDir"
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[3]",
+     "seqNo": 2,
+     "name": "čtení souboru"
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[1]",
+     "seqNo": 3,
+     "isReturn": true,
+     "name": "IsPumpAliveRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1526
+  }
+ ]
+}

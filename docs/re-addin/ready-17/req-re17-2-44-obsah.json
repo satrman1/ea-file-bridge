@@ -1,0 +1,1552 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-44-obsah",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "create_or_update_attributes",
+   "element": 12345,
+   "attributes": [
+    {
+     "name": "Qc",
+     "type": "object",
+     "notes": "parametr Qc operace katalogu"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12346,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "string",
+     "notes": "návratová hodnota (string): Výsledek kontroly kvality jednou větou pro Output, dialog a audit."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12343,
+     "notes": "Servisní realizace operace EAFB Quality Check Engine Interface.DescribeQc - průběh odvozený z kódu src/AICodeBridge.FB_QcText.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nVýsledek kontroly kvality jednou větou pro Output, dialog a audit.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_QcText.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12344,
+     "notes": "DTO služby DescribeQc. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_QcText.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_QcText.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12345,
+     "notes": "Request služby DescribeQc (parametry operace katalogu)."
+    },
+    {
+     "elementID": 12346,
+     "notes": "Response služby DescribeQc (tvar odpovědi v kódu src/AICodeBridge.FB_QcText.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1332,
+   "elementPlacements": [
+    {
+     "elementID": 12344,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12345,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12346,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{7BF11FB3-48B1-4221-9FC6-379AFE9E3C4B}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{7BF11FB3-48B1-4221-9FC6-379AFE9E3C4B}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{7BF11FB3-48B1-4221-9FC6-379AFE9E3C4B}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11926,
+     "stereotypes": "IDS-Engine"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1330,
+   "elementPlacements": [
+    {
+     "element": "$4[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[1]",
+     "x": 0,
+     "y": 188,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$4[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1330,
+   "messages": [
+    {
+     "source": "$4[0]",
+     "target": "$4[2]",
+     "seqNo": 1,
+     "operation": 1312,
+     "arguments": "Qc"
+    },
+    {
+     "source": "$4[2]",
+     "target": "$4[1]",
+     "seqNo": 2,
+     "isReturn": true,
+     "name": "DescribeQcRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1330
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12350,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: apply_classifier_stereotypes"
+    },
+    {
+     "name": "Diagram",
+     "type": "string",
+     "notes": "op.diagram = cilovy diagram (\"{GUID}\" | diagramID)"
+    },
+    {
+     "name": "ElementIDs",
+     "type": "array",
+     "notes": "op.elementIDs = volitelny filtr - jen tyto elementy (pole id)"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12351,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12348,
+     "notes": "Servisní realizace operace EAFB ITAN Methodology Engine Interface.ApplyClassifierStereotypes - průběh odvozený z kódu src/AICodeBridge.FB_OpApplyClassifierStereotypes.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace apply_classifier_stereotypes - port ITAN-Apply Classifier Stereotypes on SD.vbs.\nAs-implemented: Engine čte repozitář přímo přes Repository.SQLQuery / Automation, ne přes Resource Access (nález A4).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpApplyClassifierStereotypes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12349,
+     "notes": "DTO služby ApplyClassifierStereotypes. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpApplyClassifierStereotypes.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpApplyClassifierStereotypes.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12350,
+     "notes": "Request služby ApplyClassifierStereotypes (pole op.<x> z kódu src/AICodeBridge.FB_OpApplyClassifierStereotypes.js (operace nemá záznam v FB_FieldCheck SPEC))."
+    },
+    {
+     "elementID": 12351,
+     "notes": "Response služby ApplyClassifierStereotypes (tvar odpovědi v kódu src/AICodeBridge.FB_OpApplyClassifierStereotypes.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1336,
+   "elementPlacements": [
+    {
+     "elementID": 12349,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12350,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12351,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 160
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11927,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{1789F90A-651A-4d0f-A050-A09726689DE2}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1334,
+   "elementPlacements": [
+    {
+     "element": "$12[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[1]",
+     "x": 0,
+     "y": 392,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$12[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$12[7]",
+     "x": 90,
+     "y": 432,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1334,
+   "messages": [
+    {
+     "source": "$12[0]",
+     "target": "$12[2]",
+     "seqNo": 1,
+     "operation": 1313,
+     "arguments": "Diagram, ElementIDs"
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[5]",
+     "seqNo": 2,
+     "operation": 1399
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[3]",
+     "seqNo": 3,
+     "operation": 1300
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[6]",
+     "seqNo": 4,
+     "operation": 1379
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[6]",
+     "seqNo": 5,
+     "operation": 1380
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[5]",
+     "seqNo": 6,
+     "operation": 1400
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[4]",
+     "seqNo": 7,
+     "name": "SetTag"
+    },
+    {
+     "source": "$12[2]",
+     "target": "$12[1]",
+     "seqNo": 8,
+     "isReturn": true,
+     "name": "ApplyClassifierStereotypesRes",
+     "notes": "Op, Status, Code, Message, Items, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1334
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12355,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: find_or_create_referencing_sr"
+    },
+    {
+     "name": "Operation",
+     "type": "string",
+     "notes": "op.operation = operace katalogu (\"{GUID}\" | operationID) - povinne"
+    },
+    {
+     "name": "PackageName",
+     "type": "string",
+     "notes": "op.packageName = jmeno noveho service package (povinne pri zakladani;"
+    },
+    {
+     "name": "Author",
+     "type": "string",
+     "notes": "(par. 7e/7g); (4) Author diagramu = op.author | \"Claude via eafb\""
+    },
+    {
+     "name": "TargetPackage",
+     "type": "string",
+     "notes": "op.targetPackage = volitelne prebiti cile (\"{GUID}\" | id | jmeno);"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12356,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Found",
+     "type": "boolean",
+     "notes": "Vysledek: found=true + items[] (nalezene SR) NEBO found=false + created"
+    },
+    {
+     "name": "Operation",
+     "type": "string",
+     "notes": "op.operation = operace katalogu (\"{GUID}\" | operationID) - povinne"
+    },
+    {
+     "name": "Count",
+     "type": "number",
+     "notes": "počet položek"
+    },
+    {
+     "name": "Items",
+     "type": "array",
+     "notes": "zapsané nebo nalezené položky (index, id, guid, name)"
+    },
+    {
+     "name": "Guid",
+     "type": "string",
+     "notes": "GUID hlavního výsledku"
+    },
+    {
+     "name": "Id",
+     "type": "number",
+     "notes": "ID hlavního výsledku"
+    },
+    {
+     "name": "Created",
+     "type": "object",
+     "notes": "Vysledek: found=true + items[] (nalezene SR) NEBO found=false + created"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12353,
+     "notes": "Servisní realizace operace EAFB ITAN Methodology Engine Interface.FindOrCreateReferencingSR - průběh odvozený z kódu src/AICodeBridge.FB_OpFindOrCreateSR.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace find_or_create_referencing_sr - port ITAN-Find or Create Referencing Service Realization.vbs.\nAs-implemented: Engine čte repozitář přímo přes Repository.SQLQuery / Automation, ne přes Resource Access (nález A4).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpFindOrCreateSR.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12354,
+     "notes": "DTO služby FindOrCreateReferencingSR. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpFindOrCreateSR.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpFindOrCreateSR.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12355,
+     "notes": "Request služby FindOrCreateReferencingSR (pole op.<x> z kódu src/AICodeBridge.FB_OpFindOrCreateSR.js (operace nemá záznam v FB_FieldCheck SPEC))."
+    },
+    {
+     "elementID": 12356,
+     "notes": "Response služby FindOrCreateReferencingSR (tvar odpovědi v kódu src/AICodeBridge.FB_OpFindOrCreateSR.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1340,
+   "elementPlacements": [
+    {
+     "elementID": 12354,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12355,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 140
+    },
+    {
+     "elementID": 12356,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 280
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11927,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11981,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11979,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11983,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11982,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{A2E648A2-5DAF-4ae2-8B7A-B5D31011A6DD}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12277
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1338,
+   "elementPlacements": [
+    {
+     "element": "$20[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[1]",
+     "x": 0,
+     "y": 800,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$20[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[6]",
+     "x": 770,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[7]",
+     "x": 940,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[8]",
+     "x": 1110,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[9]",
+     "x": 1280,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[10]",
+     "x": 1450,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$20[11]",
+     "x": 90,
+     "y": 840,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1338,
+   "messages": [
+    {
+     "source": "$20[0]",
+     "target": "$20[2]",
+     "seqNo": 1,
+     "operation": 1314,
+     "arguments": "Operation, PackageName, Author, TargetPackage"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[5]",
+     "seqNo": 2,
+     "operation": 1391
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[6]",
+     "seqNo": 3,
+     "operation": 1379
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[7]",
+     "seqNo": 4,
+     "operation": 1383
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[8]",
+     "seqNo": 5,
+     "operation": 1375
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[9]",
+     "seqNo": 6,
+     "operation": 1399
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[3]",
+     "seqNo": 7,
+     "name": "FB_ResolvePkg"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[4]",
+     "seqNo": 8,
+     "operation": 1299
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[4]",
+     "seqNo": 9,
+     "name": "FB_ScopeCheck"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[8]",
+     "seqNo": 10,
+     "operation": 1374
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[8]",
+     "seqNo": 11,
+     "operation": 1376
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[6]",
+     "seqNo": 12,
+     "operation": 1380
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[9]",
+     "seqNo": 13,
+     "operation": 1400
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[10]",
+     "seqNo": 14,
+     "operation": 1396
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[5]",
+     "seqNo": 15,
+     "operation": 1392
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[9]",
+     "seqNo": 16,
+     "operation": 1398
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[6]",
+     "seqNo": 17,
+     "operation": 1378
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[3]",
+     "seqNo": 18,
+     "name": "SetTag"
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[10]",
+     "seqNo": 19,
+     "operation": 1394
+    },
+    {
+     "source": "$20[2]",
+     "target": "$20[1]",
+     "seqNo": 20,
+     "isReturn": true,
+     "name": "FindOrCreateReferencingSRRes",
+     "notes": "Op, Status, Code, Message, Found, Operation, Count, Items, Guid, Id, Created, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1338
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12360,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: query"
+    },
+    {
+     "name": "Sql",
+     "type": "string",
+     "notes": "pole sql (FB_FieldCheck SPEC)"
+    },
+    {
+     "name": "MaxRows",
+     "type": "number",
+     "notes": "- STROP RADKU op.maxRows (vychozi 500, max 5000; novy parametr -> jen"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12361,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu (opakuje požadavek)"
+    },
+    {
+     "name": "Status",
+     "type": "string",
+     "notes": "ok | error - výsledek operace"
+    },
+    {
+     "name": "Code",
+     "type": "string",
+     "notes": "kód chyby E_* (jen při chybě)"
+    },
+    {
+     "name": "Message",
+     "type": "string",
+     "notes": "hláška pro člověka i agenta"
+    },
+    {
+     "name": "Sql",
+     "type": "string",
+     "notes": "pole odpovědi sql (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "Tables",
+     "type": "string",
+     "notes": "pole odpovědi tables (tvar odpovědi v kódu)"
+    },
+    {
+     "name": "SuppressDialogs",
+     "type": "string",
+     "notes": "nekryje; pole suppressDialogs v E_SQL vysledku rika proc (viz sqlErr),"
+    },
+    {
+     "name": "Raw",
+     "type": "string",
+     "notes": "nevyrobi -> falesne pozitivni E_SQL. Proto E_SQL od 9. 9. nese `raw`"
+    },
+    {
+     "name": "RowCount",
+     "type": "number",
+     "notes": "typeof): rows se oriznou, truncated: true, rowCount = SKUTECNY pocet radku,"
+    },
+    {
+     "name": "Rows",
+     "type": "array",
+     "notes": "typeof): rows se oriznou, truncated: true, rowCount = SKUTECNY pocet radku,"
+    },
+    {
+     "name": "MaxRows",
+     "type": "number",
+     "notes": "- STROP RADKU op.maxRows (vychozi 500, max 5000; novy parametr -> jen"
+    },
+    {
+     "name": "Warnings",
+     "type": "array",
+     "notes": "varování, která operaci nezastavila"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12358,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.Query - průběh odvozený z kódu src/AICodeBridge.FB_OpQuery.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace query (čtení). SQL jen SELECT/WITH, maxRows, E_SQL_UNBOUNDED nad velkými tabulkami.\nAs-implemented: SQL přichází z dávky, tabulky se v kódu nedají určit - jen čtení (SELECT/WITH).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpQuery.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12359,
+     "notes": "DTO služby Query. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpQuery.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpQuery.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12360,
+     "notes": "Request služby Query (pole z FB_FieldCheck SPEC, význam z hlavičky src/AICodeBridge.FB_OpQuery.js)."
+    },
+    {
+     "elementID": 12361,
+     "notes": "Response služby Query (tvar odpovědi v kódu src/AICodeBridge.FB_OpQuery.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1344,
+   "elementPlacements": [
+    {
+     "elementID": 12359,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12360,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 100
+    },
+    {
+     "elementID": 12361,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 280
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{097511C3-9EBD-42ce-A4DD-77B82C5B390D}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{097511C3-9EBD-42ce-A4DD-77B82C5B390D}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{097511C3-9EBD-42ce-A4DD-77B82C5B390D}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1342,
+   "elementPlacements": [
+    {
+     "element": "$28[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[1]",
+     "x": 0,
+     "y": 188,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$28[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1342,
+   "messages": [
+    {
+     "source": "$28[0]",
+     "target": "$28[2]",
+     "seqNo": 1,
+     "operation": 1315,
+     "arguments": "Sql, MaxRows"
+    },
+    {
+     "source": "$28[2]",
+     "target": "$28[1]",
+     "seqNo": 2,
+     "isReturn": true,
+     "name": "QueryRes",
+     "notes": "Op, Status, Code, Message, Sql, Tables, SuppressDialogs, Raw, RowCount, Rows, MaxRows, Warnings"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1342
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12366,
+   "attributes": [
+    {
+     "name": "Op",
+     "type": "string",
+     "notes": "jméno operace protokolu: get_selected_context"
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_attributes",
+   "element": 12367,
+   "attributes": [
+    {
+     "name": "Result",
+     "type": "OpResult",
+     "notes": "návratová hodnota (OpResult): Protokolová operace get_selected_context (čtení). Výběr v Project browseru a otevřený diagram jako kontext pro agenta."
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "elementID": 12364,
+     "notes": "Servisní realizace operace EAFB Model Element Access Interface.GetSelectedContext - průběh odvozený z kódu src/AICodeBridge.FB_OpSelectedContext.js (as-implemented, src @ v0.22 (0c3e207); docs/re-addin/extract_calls.py).\nProtokolová operace get_selected_context (čtení). Výběr v Project browseru a otevřený diagram jako kontext pro agenta.\nAs-implemented: Resource Access sám volá Write Scope Engine (nález A1).",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpSelectedContext.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12365,
+     "notes": "DTO služby GetSelectedContext. Kontrakt žije v kódu (contractAuthority physical): src/AICodeBridge.FB_OpSelectedContext.js; DTO je logický komentář, ne kopie.",
+     "taggedValues": [
+      {
+       "name": "code-repo",
+       "value": "https://github.com/satrman1/ea-file-bridge"
+      },
+      {
+       "name": "code-path",
+       "value": "src/AICodeBridge.FB_OpSelectedContext.js"
+      },
+      {
+       "name": "code-ref",
+       "value": "v0.22 (0c3e207)"
+      },
+      {
+       "name": "code-verified",
+       "value": "2026-10-17"
+      },
+      {
+       "name": "re-origin",
+       "value": "code"
+      }
+     ]
+    },
+    {
+     "elementID": 12366,
+     "notes": "Request služby GetSelectedContext (pole op.<x> z kódu src/AICodeBridge.FB_OpSelectedContext.js (operace nemá záznam v FB_FieldCheck SPEC))."
+    },
+    {
+     "elementID": 12367,
+     "notes": "Response služby GetSelectedContext (tvar odpovědi v kódu src/AICodeBridge.FB_OpSelectedContext.js)."
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1348,
+   "elementPlacements": [
+    {
+     "elementID": 12365,
+     "x": 260,
+     "y": 30,
+     "width": 220,
+     "height": 70
+    },
+    {
+     "elementID": 12366,
+     "x": 40,
+     "y": 180,
+     "width": 300,
+     "height": 60
+    },
+    {
+     "elementID": 12367,
+     "x": 380,
+     "y": 180,
+     "width": 320,
+     "height": 60
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_elements",
+   "elements": [
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "DiagramGate",
+     "name": ""
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11928,
+     "stereotypes": "IDS-Resource Access"
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11923,
+     "stereotypes": "IDS-Engine"
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11977,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "Object",
+     "name": "",
+     "classifierID": 11978,
+     "stereotypes": "entity"
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12277
+    },
+    {
+     "owningElement": "{6793F627-CB2D-46b9-8640-F6E9A03C5CEA}",
+     "type": "InteractionOccurrence",
+     "name": "",
+     "classifierID": 12282
+    }
+   ]
+  },
+  {
+   "op": "place_elements_on_diagram",
+   "diagram": 1346,
+   "elementPlacements": [
+    {
+     "element": "$36[0]",
+     "x": 0,
+     "y": 110,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[1]",
+     "x": 0,
+     "y": 324,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "element": "$36[2]",
+     "x": 90,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[3]",
+     "x": 260,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[4]",
+     "x": 430,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[5]",
+     "x": 600,
+     "y": 40,
+     "width": 130,
+     "height": 60
+    },
+    {
+     "element": "$36[6]",
+     "x": 90,
+     "y": 364,
+     "width": 260,
+     "height": 50
+    },
+    {
+     "element": "$36[7]",
+     "x": 370,
+     "y": 364,
+     "width": 260,
+     "height": 50
+    }
+   ]
+  },
+  {
+   "op": "create_or_update_messages",
+   "diagram": 1346,
+   "messages": [
+    {
+     "source": "$36[0]",
+     "target": "$36[2]",
+     "seqNo": 1,
+     "operation": 1316,
+     "arguments": ""
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[3]",
+     "seqNo": 2,
+     "operation": 1299
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[3]",
+     "seqNo": 3,
+     "operation": 1300
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[4]",
+     "seqNo": 4,
+     "operation": 1375
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[5]",
+     "seqNo": 5,
+     "operation": 1379
+    },
+    {
+     "source": "$36[2]",
+     "target": "$36[1]",
+     "seqNo": 6,
+     "isReturn": true,
+     "name": "GetSelectedContextRes",
+     "notes": "Result"
+    }
+   ]
+  },
+  {
+   "op": "apply_classifier_stereotypes",
+   "diagram": 1346
+  }
+ ]
+}

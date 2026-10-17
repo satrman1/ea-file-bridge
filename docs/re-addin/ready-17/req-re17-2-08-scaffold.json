@@ -1,0 +1,78 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-08-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1354,
+   "packageName": "WriteJournal",
+   "targetPackage": "{2667996B-D556-4c7b-9A6E-E8713479ECBB}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1355,
+   "packageName": "WriteAudit",
+   "targetPackage": "{5E3DA15F-A236-47a4-A1F3-41411D468409}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1356,
+   "packageName": "WriteRiskAuditTags",
+   "targetPackage": "{5E3DA15F-A236-47a4-A1F3-41411D468409}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1357,
+   "packageName": "LogChanges",
+   "targetPackage": "{5E3DA15F-A236-47a4-A1F3-41411D468409}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1358,
+   "packageName": "DeploySrc",
+   "targetPackage": "{AD62E0A5-0717-451f-BE22-84AB97A6E97F}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1359,
+   "packageName": "GetCodeInfo",
+   "targetPackage": "{AD62E0A5-0717-451f-BE22-84AB97A6E97F}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1360,
+   "packageName": "ReadRequestBytes",
+   "targetPackage": "{76146A27-A024-4e70-ADCB-FCEA6D08157D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1361,
+   "packageName": "ReadWriteState",
+   "targetPackage": "{76146A27-A024-4e70-ADCB-FCEA6D08157D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1362,
+   "packageName": "UpdatePendingIndex",
+   "targetPackage": "{76146A27-A024-4e70-ADCB-FCEA6D08157D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1363,
+   "packageName": "IsPumpAlive",
+   "targetPackage": "{76146A27-A024-4e70-ADCB-FCEA6D08157D}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1364,
+   "packageName": "ResolveBaseDir",
+   "targetPackage": "{76146A27-A024-4e70-ADCB-FCEA6D08157D}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1162,1163,1164,1165)",
+   "maxRows": 200
+  }
+ ]
+}

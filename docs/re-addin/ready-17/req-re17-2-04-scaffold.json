@@ -1,0 +1,84 @@
+{
+ "protocol": "eafb/0.2",
+ "id": "re17-2-04-scaffold",
+ "repo": "EAEXAMPLE",
+ "ops": [
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1304,
+   "packageName": "BuildConfirmSummary",
+   "targetPackage": "{8FD7F5D9-BDDD-4641-AF25-AF7B935BA32C}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1305,
+   "packageName": "DescribeReason",
+   "targetPackage": "{8FD7F5D9-BDDD-4641-AF25-AF7B935BA32C}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1306,
+   "packageName": "IssueNonce",
+   "targetPackage": "{8FD7F5D9-BDDD-4641-AF25-AF7B935BA32C}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1307,
+   "packageName": "PlanBaseline",
+   "targetPackage": "{6300D8E6-ACEF-4443-9B96-D23C46275EE2}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1308,
+   "packageName": "DecideBaseline",
+   "targetPackage": "{6300D8E6-ACEF-4443-9B96-D23C46275EE2}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1309,
+   "packageName": "EvaluateRecoveryPosture",
+   "targetPackage": "{6300D8E6-ACEF-4443-9B96-D23C46275EE2}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1310,
+   "packageName": "CleanupBaselines",
+   "targetPackage": "{6300D8E6-ACEF-4443-9B96-D23C46275EE2}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1311,
+   "packageName": "RunQc",
+   "targetPackage": "{FFC2FC09-F1BA-4756-AE6E-B264A8FF4EA0}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1312,
+   "packageName": "DescribeQc",
+   "targetPackage": "{FFC2FC09-F1BA-4756-AE6E-B264A8FF4EA0}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1313,
+   "packageName": "ApplyClassifierStereotypes",
+   "targetPackage": "{D7899E93-4E18-4254-BE3D-B308654122A7}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1314,
+   "packageName": "FindOrCreateReferencingSR",
+   "targetPackage": "{D7899E93-4E18-4254-BE3D-B308654122A7}"
+  },
+  {
+   "op": "find_or_create_referencing_sr",
+   "operation": 1315,
+   "packageName": "Query",
+   "targetPackage": "{D6520978-F6B0-4b6a-9CD7-5DBB6150098D}"
+  },
+  {
+   "op": "query",
+   "sql": "SELECT Package_ID, Name, Parent_ID FROM t_package WHERE Parent_ID IN (1131,1157,1158,1159,1160)",
+   "maxRows": 200
+  }
+ ]
+}
